@@ -53,6 +53,16 @@ PROBE = r"""
       rows.push(`OVERFLOW  ${id}  ${root.className} ${root.scrollHeight}px in ${root.clientHeight}px`);
     for (const el of card.querySelectorAll('*')) {
       if (!el.firstChild || el.children.length || !el.textContent.trim()) continue;
+      /* A VISUALLY-HIDDEN LABEL IS A 1px BOX ON PURPOSE, so `scrollWidth >
+         clientWidth` is its defining property rather than a defect — every
+         `.sr-only` in the product reports 30-100px of text inside one pixel,
+         by construction. This check existed to catch a LABEL being cut, and
+         it was counting the screen-reader text that exists precisely because
+         the visible label might be. Measured on a clean checkout of HEAD
+         before this line was added: 30 of these per width, on notes.recent
+         alone, at all six widths — the suite has been failing on its own
+         false positive, which is why nobody could read the sweep. */
+      if (el.classList.contains('sr-only')) continue;
       if (el.scrollWidth > el.clientWidth + 1)
         rows.push(`TRUNCATED ${id}  ${el.className} ${el.scrollWidth}>${el.clientWidth} “${el.textContent.trim().slice(0,40)}”`);
     }

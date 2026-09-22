@@ -1172,17 +1172,73 @@ def main():
             foliage: f ? cs(f).display : 'absent',
             searchBg: cs(document.querySelector('.search')).backgroundColor,
             searchR: cs(document.querySelector('.search')).borderTopLeftRadius,
+            searchBf: cs(document.querySelector('.search')).backdropFilter,
+            scanBf: cs(document.querySelector('.search-btn')).backdropFilter,
+            hint: (document.querySelector('.search__hint')
+                   ? cs(document.querySelector('.search__hint')).color : 'absent'),
+            qaBand: (document.querySelector('.qa-band')
+                     ? cs(document.querySelector('.qa-band')).display : 'absent'),
+            pillInk: cs(document.querySelector('.qa-pill')).color,
+            pillFill: cs(document.querySelector('.qa-pill')).backgroundColor,
+            footGap: (()=>{const s=[...document.querySelectorAll('#moduleGrid .slot')].pop();
+                      return s ? Math.round(document.documentElement.scrollHeight
+                             - (s.getBoundingClientRect().bottom + scrollY)) : -1})(),
             ink: cs(document.querySelector('.greeting__name')).color})})()"""))
         check("…on a black ground with the warm glow over it",
               v3["root"] == "rgb(0, 0, 0)" and v3["hasGlow"],
               f"{v3['root']} glow={v3['hasGlow']}")
         check("…and no planting, which would paint straight over it",
               v3["foliage"] == "none", str(v3["foliage"]))
-        # THE HEADER IS A HOLE IN THE BLACK, NOT AN OBJECT ON IT · 506:10233.
-        check("…the search field white at 10% on a 12px radius, ink white",
-              v3["searchBg"] == "rgba(255, 255, 255, 0.1)"
-              and v3["searchR"] == "12px" and v3["ink"] == "rgb(255, 255, 255)",
-              f"{v3['searchBg']} r={v3['searchR']} ink={v3['ink']}")
+        # THE HEADER IS GLASS, NOT A HOLE IN THE BLACK · ruled 17 Sep 2026.
+        #
+        # THIS CHECK USED TO ASSERT 10%, THE NODE'S OWN FILL, and it was
+        # right until the ruling changed. 506:10233 states
+        # `rgba(255,255,255,0.1)` flat, and over PURE BLACK that is 24 levels
+        # of 255 — it rendered as a dark rectangle with a hairline, and was
+        # reported as "glass effect not working". The fill is 14% behind the
+        # house glass filter now, which is the same material the Quick
+        # Actions pill at the foot of this page already uses.
+        #
+        # SO THE ASSERTION MOVED WITH IT rather than being deleted: what is
+        # checked is that the field and the scan button carry a REFRACTING
+        # material at all — a blur with a brightness lift — because that is
+        # the thing that was missing and the thing that can silently go away
+        # again. The radius and the ink are still the node's.
+        glass = ("blur" in v3["searchBf"] and "brightness" in v3["searchBf"]
+                 and v3["searchBf"] == v3["scanBf"])
+        check("…the search and scan are glass, 12px radius, ink white",
+              glass and v3["searchR"] == "12px" and v3["ink"] == "rgb(255, 255, 255)"
+              and v3["searchBg"] == "rgba(255, 255, 255, 0.14)",
+              f"{v3['searchBg']} r={v3['searchR']} {v3['searchBf']}")
+        # AND THE PLACEHOLDER IS WHITE · 506:10237 sets the whole string in
+        # `text-white`. The rotating hint that sits over the field is the
+        # thing that actually draws it, and it kept its own light-page grey.
+        check("…with the placeholder and its cycling word white",
+              v3["hint"] in ("rgb(255, 255, 255)", "absent"), str(v3["hint"]))
+        # AND THERE IS NO WHITE WASH AT THE FOOT. `.qa-band` is white at 20%
+        # falling to grey — correct under the pill on a pale page, a grey
+        # slab across the bottom 182px of a black one.
+        check("…and no pale wash under the Quick Actions bar",
+              v3["qaBand"] == "none", str(v3["qaBand"]))
+        # THE BAR IS DARK GLASS WITH WHITE MARKS · ruled 17 Sep 2026, "make it
+        # icon white". The pill is glass, so its own lightness follows whatever
+        # scrolls behind it — a light green disc over a Pharmacy card, a mid
+        # grey over the black foot — and white marks on the stock 40% white
+        # fill would only have swapped which of the two was unreadable. The
+        # fill is 506:10916's dark pane, the same material the scrolled search
+        # row uses at the other end of this page.
+        check("…the Quick Actions bar is dark glass with white marks",
+              v3["pillInk"] == "rgb(255, 255, 255)"
+              and v3["pillFill"] == "rgba(30, 30, 30, 0.4)",
+              f"{v3['pillInk']} on {v3['pillFill']}")
+        # AND THE PAGE ENDS WHERE THE CARDS DO. `#panel-modules` gives back the
+        # pill's own 112px and that is the whole of what the foot needs;
+        # `.main-frame` and `.page` were adding 72 more, which on black is
+        # visible as nothing at all. Asserted as a RANGE because the pill's
+        # clearance is derived from tokens: anything past ~130 is the empty
+        # space this was reported as.
+        check("…and the page hugs the last card, less the pill's clearance",
+              0 < v3["footGap"] <= 130, f"{v3['footGap']}px below the last card")
 
         # ── THE VERTICAL RHYTHM · 506:10213 states it to the pixel ────────
         # The Greeting block runs 0-200 with 16 of padding either end, the
@@ -1198,13 +1254,22 @@ def main():
         # to make room for a teal wash this page does not draw.
         rhythm = json.loads(c.eval("""(()=>{const b=e=>e.getBoundingClientRect();
           const R=e=>[Math.round(b(e).top),Math.round(b(e).bottom)];
+          /* THE BANNER MOVED INTO THE GRID ON V3 · 506:10260 makes it the
+             first band of the module block rather than chrome above it, so
+             the page's own `.hero` is hidden there and the card carries it.
+             Both resolve to the same BOX — 208 to 352 on the page's 24 — so
+             the three checks below are unchanged in what they assert; they
+             just have to look in the right place. `.hero` first would match
+             the hidden markup copy and measure zero. */
+          const HERO=()=>document.querySelector('.card[data-variant="hero.v3"] .hero')
+                       || document.querySelector('.hero');
           return JSON.stringify({
             hdr:R(document.querySelector('.home-header')),
             field:R(document.querySelector('.search')),
-            hero:R(document.querySelector('.hero')),
-            heroX:[Math.round(b(document.querySelector('.hero')).left),
-                   Math.round(b(document.querySelector('.hero')).right)],
-            card1:R(document.querySelector('#moduleGrid .card')),
+            hero:R(HERO()),
+            heroX:[Math.round(b(HERO()).left), Math.round(b(HERO()).right)],
+            card1:R([...document.querySelectorAll('#moduleGrid .card')]
+                    .find(e=>e.dataset.variant!=='hero.v3')),
             gap:Math.round(parseFloat(getComputedStyle(
               document.querySelector('#moduleGrid')).rowGap))})})()"""))
         # ONLY AT 744, WHICH IS THE ARTBOARD'S OWN WIDTH — and on this project
@@ -1319,27 +1384,47 @@ def main():
           return JSON.stringify([...document.querySelectorAll('#moduleGrid .card')]
             .map(x=>[x.dataset.variant,
                      Math.round(b(x).width)+'x'+Math.round(b(x).height)]))})()"""))
+        # 17 Sep 2026 · THE SET IS 506:10269's OWN WIDGETS NOW. The footprints
+        # below are unchanged — the frame's geometry did not move — but
+        # fifteen of the ids did: the seed used to fill the frame's ORDER with
+        # the nearest cards the catalogue already had, and a queue standing in
+        # for 506:10368 has the right footprint and the wrong card in it.
+        # This list is the one place that difference is asserted, so it is the
+        # one place that has to be rewritten when it changes; left alone it
+        # would have gone on passing for the shape while the content moved
+        # underneath it, which is the failure this file's own header warns
+        # about.
         want = [
-            ("insights.key", "340x144"), ("species.stats", "340x144"),
+            # 17 Sep, later · THE BANNER IS A CARD NOW. 506:10260 "Modules" is
+            # 696x2224 — the Hero Banner at y=0, the Modules Container at 160
+            # — so the banner is the first band of the module block, not
+            # chrome above it. In the markup it was the one thing on this page
+            # with no handle on it in edit mode.
+            ("hero.v3", "696x144"),
+            ("insights.v3", "340x144"), ("species.v3stats", "340x144"),
             # the promo banner, four columns and ONE row (506:12894) — its
             # absence is why every row below it sat 160px above the frame
             ("promo.tags", "696x144"),
-            ("notes.recent", "340x464"), ("pharmacy.requests", "340x304"),
-            ("approvals.pending", "340x144"),
+            ("notes.v3", "340x464"), ("pharmacy.v3requests", "340x304"),
+            ("approvals.v3transfer", "340x144"),
             # V3's own one-cell tiles, not the doors — 506:10428 stacks the
             # glyph and name together where `door` pushes them apart, and two
             # of these four cells carry a figure rather than a name at all.
             ("eggs.v3", "162x144"), ("species.v3new", "162x144"),
             ("users.v3", "162x144"), ("mortality.v3", "162x144"),
-            ("pharmacy.stock", "340x304"), ("pharmacy.default", "162x144"),
-            ("lab.default", "162x144"), ("approvals.week", "340x144"),
-            ("species.recent", "340x304"), ("approvals.breakdown", "340x144"),
-            ("mortality.trend", "340x144"), ("eggs.collection", "340x304"),
-            ("medical.actions", "340x144"), ("communication.unread", "340x144"),
+            ("pharmacy.v3stock", "340x304"), ("pharmacy.default", "162x144"),
+            ("lab.default", "162x144"), ("species.v3week", "340x144"),
+            ("species.v3list", "340x304"), ("approvals.v3helpdesk", "340x144"),
+            ("mortality.v3widgets", "340x144"), ("eggs.v3collected", "340x304"),
+            ("medical.v3actions", "340x144"), ("communication.v3chat", "340x144"),
+            # AND THE BAND THAT CLOSES IT · 517:13020, four columns and one
+            # row. It was absent, which is why the grid used to end on a
+            # half-empty row where the frame ends square.
+            ("quick.v3actions", "696x144"),
         ]
         got = [tuple(r) for r in cards]
         if WIDTH == 744:
-            check("V3 seeds its own twenty, in the frame's order",
+            check("V3 seeds its own twenty-two, in the frame's order",
                   got == want,
                   "as drawn" if got == want else
                   f"{len(got)} cards; first difference "
@@ -1347,7 +1432,7 @@ def main():
         else:
             # away from 744 the columns change, so the footprints do; what
             # still has to hold is WHICH cards and in what order
-            check("V3 seeds its own twenty, in the frame's order",
+            check("V3 seeds its own twenty-two, in the frame's order",
                   [g[0] for g in got] == [w[0] for w in want],
                   f"{len(got)} cards")
         # AND NOTES IS THREE ROWS, which is the one span this grid did not
@@ -1356,8 +1441,27 @@ def main():
         # four other pages, so `xtall` is its own step.
         if WIDTH == 744:
             check("…with Notes on the new three-row step, not a stretched tall",
-                  dict(got).get("notes.recent") == "340x464",
-                  str(dict(got).get("notes.recent")))
+                  dict(got).get("notes.v3") == "340x464",
+                  str(dict(got).get("notes.v3")))
+        # ── NO ROW FLAGS, AND NO HOLES IN THE MIDDLE OF THE GRID ──────────
+        # `newRow` pins a card to a fresh row so a DESIGNED gap survives
+        # first-fit. 506:10269 has no gaps — every row of it fills all four
+        # columns — so the seven flags this seed carried did nothing on a
+        # fresh page and did real damage once a card was dragged: a flag
+        # travels with its card, so moving Species Management below the promo
+        # left Key Insights alone on a row with two empty cells beside it.
+        # Reported as "when I arrange the widgets, empty space was there".
+        #
+        # Asserted two ways: no card carries the flag, and the packed grid has
+        # no gap ABOVE its last row. The last row may be short — twenty-two
+        # cards spanning 56 cells cannot always end on a multiple of four, and
+        # nothing is left to fill it. Measured across 40 random arrangements
+        # while this was written: interior holes zero every time.
+        grid = json.loads(c.eval("""(() => {\n  const g = document.getElementById("moduleGrid").getBoundingClientRect();\n  const set = new Set();\n  for (const e of document.querySelectorAll("#moduleGrid .card")) {\n    const b = e.getBoundingClientRect();\n    const x = Math.round((b.x-g.x)/178), y = Math.round((b.y-g.y)/160);\n    const w = Math.round((b.width+16)/178), h = Math.round((b.height+16)/160);\n    for (let dy=0; dy<h; dy++) for (let dx=0; dx<w; dx++) set.add((y+dy)+":"+(x+dx));\n  }\n  const maxY = Math.max(...[...set].map(s=>+s.split(":")[0]));\n  let holes = 0;\n  for (let y=0; y<maxY; y++) for (let x=0; x<4; x++) if (!set.has(y+":"+x)) holes++;\n  return JSON.stringify({holes, flagged: antz.state().cards.filter(c=>c.newRow).length});\n})()"""))
+        check("…with no row flags left on it", grid["flagged"] == 0,
+              str(grid["flagged"]) + " cards carry newRow")
+        check("…and no holes above the last row", grid["holes"] == 0,
+              str(grid["holes"]) + " interior cells empty")
         errs = c.errors()
         check("no console errors across three switches", not errs,
               "; ".join(str(e)[:110] for e in errs[:3]))

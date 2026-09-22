@@ -390,6 +390,107 @@
                     rgb(12, 155, 157) 74.4%,
                     rgb(10, 163, 163) 84.2%,
                     rgb(8, 171, 169) 94.0%);
+
+  /* ══ THE BLACK PAGE'S WIDGET GROUNDS · node 506:10269, 17 Sep 2026 ═════
+     NINE FILLS THAT BELONG TO A CARD RATHER THAN TO A MODULE, and that is
+     the whole reason they are here and not in the V3 block below. 506:10368
+     and 506:10460 are both Pharmacy and both #006D35 — nothing like the teal
+     the module's door wears two cards away in the same frame — because on
+     this artboard the DENSE cards carry a ground of their own and the doors
+     carry the palette. Overriding `--g-pharmacy` would have repainted the
+     door too.
+
+     THEY LIVE IN THE GLOBAL BLOCK, NOT UNDER `[data-page-version='3']`,
+     because the picker offers these variants on every page: a token defined
+     only on V3 resolves to nothing on V1, `var(--card-bg, …)` falls over as
+     invalid-at-computed-value-time, and the card renders with NO background
+     at all rather than falling back. A colour that exists everywhere and is
+     used on one page costs nine lines; a card that vanishes when someone adds
+     it costs an afternoon.
+
+     TRANSCRIBED, NOT FITTED, except where noted — every one of these was
+     checked against the frame's own render at its own size, sampled 14px in
+     from each corner. The coral cards are the exception: they reuse
+     `--g-species`, whose axis was fitted on 16 Sep because Figma emits that
+     ramp's stops out of order. See the note over it in the V3 block. */
+  /* KEY INSIGHTS IS A RADIAL ON THIS ARTBOARD, NOT A LINEAR RAMP. V3 was
+     borrowing `--g-insights`, which was fitted on 8 Sep against node 286:3940
+     — V2's card — and is a flat teal ladder. 506:10271 paints an ELLIPSE
+     centred off the card's top-left corner running teal → green → lime, and
+     the difference is not subtle: sampled clear of the plates, the frame goes
+     (9,165,152) at the top-left to (180,215,127) at the bottom-right while
+     ours sat at (17,131,138) → (15,137,144) — a flat dark slab, which is
+     exactly the "overlay" it was reported as.
+
+     TRANSCRIBED FROM THE NODE'S OWN SVG, NOT FITTED. Figma emits this fill as
+     a `<radialGradient>` with `cx=0 cy=0 r=10` under
+     `matrix(47.904 19.612 -46.306 20.289 -72.313 -25.791)`. That matrix maps
+     the unit circle to a centre at (-72.313, -25.791) with axes of 517.6 and
+     505.6 — 2.4% apart, so one radius of 511 is the honest reading. In
+     percentages of the node's 340x144 that is 150.29% x 354.86% at
+     -21.27% / -17.91%, which is the SAME ellipse at any card size — the
+     reason it is written in % and not in the 511px it came from. */
+  /* AND IT IS THE NODE'S OWN SVG, because CSS cannot draw this ellipse.
+     Figma's transform is `matrix(47.904 19.612 -46.306 20.289 …)` — axes of
+     517.6 and 505.6 ROTATED about 22 degrees. A `radial-gradient` ellipse is
+     axis-aligned, and on a box this far from square the rotation is not a
+     rounding error: approximating it as a 511px circle reproduced the
+     top-left and bottom-right to a level and missed the other two corners
+     badly — (157,211,133) against the frame's (75,193,151) at the top-right,
+     which is most of the way to lime where the frame is still green.
+
+     So the fill is the `<radialGradient>` Figma emitted, carried verbatim in
+     a data URI. `preserveAspectRatio='none'` and a `viewBox` of the node's
+     own 340x144 mean it stretches with the card — and the card's proportion
+     IS the node's at every band (352x149 at 768 is 2.362 against 2.361), so
+     stretching is the faithful behaviour rather than a compromise. Nothing
+     here is fitted; every number is Figma's. */
+  --g-v3-insights:   url("data:image/svg+xml;utf8,<svg viewBox='0 0 340 144' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><rect x='0' y='0' height='100%25' width='100%25' fill='url(%23g)'/><defs><radialGradient id='g' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='10' gradientTransform='matrix(47.904 19.612 -46.306 20.289 -72.313 -25.791)'><stop stop-color='rgb(2,148,148)' offset='0'/><stop stop-color='rgb(4,178,168)' offset='0.46216'/><stop stop-color='rgb(20,181,164)' offset='0.49578'/><stop stop-color='rgb(36,184,160)' offset='0.52939'/><stop stop-color='rgb(67,191,153)' offset='0.59662'/><stop stop-color='rgb(98,198,146)' offset='0.66385'/><stop stop-color='rgb(130,205,139)' offset='0.73108'/><stop stop-color='rgb(192,218,124)' offset='0.86554'/><stop stop-color='rgb(255,232,110)' offset='1'/></radialGradient></defs></svg>");
+  --g-v3-green:      #006D35;                        /* 506:10368, 506:10460 */
+  --g-v3-cocoa:      #250E01;                        /* 506:10406            */
+  --g-v3-helpdesk:   linear-gradient(162.54176deg,
+                    rgb(31, 65, 91) 3.5754%,
+                    rgb(66, 138, 193) 104.56%);      /* 506:10591            */
+  --g-v3-quick:      linear-gradient(8.17153deg,
+                    rgb(0, 109, 53) 4.4327%,
+                    rgb(55, 189, 105) 119.68%);      /* 517:13020            */
+  --g-v3-medical:    linear-gradient(236.76732deg,
+                    rgb(0, 214, 201) 17.506%,
+                    rgb(76, 103, 124) 140.12%);      /* 506:10669            */
+  --g-v3-notepad:    linear-gradient(117.62176deg,
+                    rgb(209, 180, 104) 6%,
+                    rgb(212, 185, 117) 45.1%,
+                    rgb(214, 192, 128) 64.7%,
+                    rgb(216, 201, 147) 94%);         /* 506:10322            */
+  --g-v3-eggday:     linear-gradient(-35.82331deg,
+                    rgb(255, 243, 182) 29.365%,
+                    rgb(215, 242, 225) 111.96%);     /* 523:13121            */
+  --g-v3-plate:      linear-gradient(#FFFFFF, #FFFFFF);  /* 506:12829        */
+  /* MORTALITY IS A V, AND ITS EMITTED STOPS CANNOT DRAW ONE. Figma gives
+     both mortality nodes three stops whose positions run BACKWARDS and then
+     forwards — coral at 48.137%, pink at 46.965%, light coral at 142.07% —
+     and there is no valid CSS reading of that. Sorted ascending (what
+     shipped) it is a near-instant step from pink to coral at 47%, which drew
+     a hard diagonal seam across the card and left the top orange and the
+     bottom magenta.
+
+     THE FRAME DRAWS NEITHER. Sampled down two clean columns of 506:10606's
+     own render, it is a smooth V: (242,83,83) at the top easing to #E93353
+     exactly at 55% of the height, then back out to (240,72,74) at the foot —
+     darkest in the MIDDLE, lighter at both ends, which is what a list of
+     stops that doubles back produces in Figma's renderer and what no
+     three-stop CSS gradient produces by accident.
+
+     So this is fitted to that profile rather than transcribed: the floor is
+     the node's own #E93353, the two ends are the measured values, and the
+     axis keeps Figma's ~5.4deg tilt (at the top the right edge is further
+     along, at the foot it is less far — one tilted axis, checked both ways).
+     Reproduces all eight sample rows to within three levels. */
+  --g-v3-mortality:  linear-gradient(176.8deg,
+                    rgb(242, 84, 83) 0%,
+                    rgb(233, 51, 83) 45%,
+                    rgb(241, 73, 74) 100%);          /* 506:10606, 506:10446 */
+
   --g-pharmacy-wash: var(--g-teal-card);
   --g-reports-wash:  var(--g-teal-card);
 
@@ -3970,6 +4071,13 @@ body.is-report { overflow: hidden; }
 :root[data-page-version='2'] .obs-band,
 :root[data-page-version='3'] .hero-stage,
 :root[data-page-version='3'] .obs-band { display: none; }
+/* AND THE BANNER IN THE MARKUP GOES WITH THEM, because on this page it is a
+   CARD instead — `hero.v3`, the first cell of the grid. Drawn in both places
+   the page would carry two of it. The markup copy stays in the document for
+   V1 and V2, whose artboards put it above the section head where it is not
+   something you can move. See the `v3-hero` layout for why the card reuses
+   these very classes rather than restating them. */
+:root[data-page-version='3'] .modules-band > .hero--estate { display: none; }
 
 /* …and the band it loses moves onto the module grid's own box. The geometry is
    V1's, re-anchored: the negative gutters bleed it to the page edges, and the
@@ -4095,9 +4203,24 @@ body.is-report { overflow: hidden; }
      a 320px `Ellipse 119` bled off the card's bottom-left corner, which
      flattens the whole fill. That overlay is per-card construction and is not
      built yet — see the handover note. */
-  --g-species: linear-gradient(135deg,
-              rgb(255, 232, 110) 0%,
-              rgb(250, 97, 64) 60%);
+  /* REFITTED 17 Sep 2026, AND THE FIRST FIT WAS TOO YELLOW BY HALF. The note
+     above is still why this is fitted at all — Figma emits the stops out of
+     order and CSS clamps them — but `yellow 0%` put PURE yellow in the
+     top-left corner where the frame draws a coral only a quarter of the way
+     there. Measured on 506:10515 at 14px in from each corner: ours
+     (224,212,113) against the frame's (249,132,79), a card reading
+     yellow-to-orange where the artboard draws orange with a warm corner.
+
+     FITTED ON FOUR CORNERS, NOT ONE ANGLE. Writing each sample as its
+     position t between coral and yellow gives TL 0.252, TR 0.000, BL 0.119,
+     BR 0.000. The two differences — 0.252 across 340, 0.133 down 144 — give
+     the axis 141.3deg and a rate of 0.001184/px, so yellow (t=1) lands 195%
+     BEFORE the gradient line starts and coral (t=0) at 65.6% along it. All
+     four corners then reproduce to within a level. A negative stop is the
+     honest way to write "this card only ever sees the ramp's tail". */
+  --g-species: linear-gradient(141.3deg,
+              rgb(255, 232, 110) -195%,
+              rgb(250, 97, 64) 65.6%);
   /* BOTH USERS TOKENS. The module points at `--g-users-wash` — `--g-users`
      is the fallback `.card[data-fill='solid']` falls back to — so setting the
      bare one repainted nothing and the tile stayed slate. Measured, not
@@ -4108,10 +4231,13 @@ body.is-report { overflow: hidden; }
               rgb(0, 214, 201) 8.1339%,
               rgb(186, 255, 251) 122.51%);
   --g-users-wash: var(--g-users);
-  --g-mortality: linear-gradient(-5.4181deg,
-              rgb(233, 51, 83) 46.965%,
-              rgb(250, 97, 64) 48.137%,
-              rgb(251, 113, 83) 142.07%);
+  /* ONE RAMP FOR BOTH MORTALITY CARDS ON THIS PAGE. 506:10446's tile and
+     506:10606's widget state the same fill and their renders agree on it —
+     see the fit recorded at `--g-v3-mortality`, which is where the eight
+     sample rows and the reason the emitted stops are unusable are written.
+     Pointing at it rather than restating it keeps the tile and the widget
+     from drifting apart the next time either is measured. */
+  --g-mortality: var(--g-v3-mortality);
 }
 /* ══ V3'S ONE-CELL TILES · node 506:10427, every number the frame's ══════
    THE TILE · 506:10428 and 506:10441. Glyph and name together at the foot on
@@ -4201,6 +4327,7 @@ body.is-report { overflow: hidden; }
    figure pushed to the foot. 44px of DM Sans Bold in the notes yellow, which
    is `--c-notes` / #FCF4AE — the frame's own token, not a near-white. */
 .l-v3count, .l-v3split {
+  position: relative; overflow: hidden;
   display: flex; flex-direction: column; justify-content: space-between;
   gap: 8px; height: 100%; padding: 12px; min-width: 0;
 }
@@ -4265,6 +4392,878 @@ body.is-report { overflow: hidden; }
   white-space: nowrap;
 }
 .l-v3split__pane:not(.l-v3split__pane--plate) i { font-size: 10px; font-weight: 500; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   V3'S WIDGET SET · node 506:10269, 17 Sep 2026
+   ══════════════════════════════════════════════════════════════════════════
+   ELEVEN COMPOSITIONS, AND THEY PAD THEMSELVES. `.card` pads by size — 16 at
+   small, 20 at medium, 24 at tall — and every card in this frame states its
+   own: 8 on the insight and the request queue, 12 on everything else, 0 on
+   the note, whose photograph runs to the card's own corner. A layout that
+   pads while the card pads spends the padding twice, which is the bug the
+   note over `.l-v3tile` records. So the card's padding comes off for all of
+   them in one rule and each layout owns its box.
+
+   THE FIGURES ARE `--font-num` AT `--c-notes`. Every number on this artboard
+   is DM Sans Bold in #FCF4AE except four that are deliberately not: Help
+   Desk's 32 is #52F990, the arrivals pane is #37BD69, the missing pane is
+   #FA6140, and the egg count is #250E01 on cream. Those four are the page's
+   only colour-coded figures and each one is stated where it is used.
+
+   NOTHING HERE IS SCOPED TO `[data-page-version='3']`. These are layouts, and
+   a layout is a shape the catalogue hands out — the same rule the four tile
+   compositions above follow. A user who adds Pharmacy Requests to V1 gets the
+   card the frame draws, on V1's ground. */
+
+/* `[data-size]` IS LOAD-BEARING AND IS NOT DECORATION. Written as
+   `.card:has(> .l-v3req)` this rule is specificity (0,2,0) — `:has()` takes
+   its most specific argument — which TIES with `.card[data-size='tall']`
+   eighty lines further down the sheet, and a tie is decided by source order.
+   So every one of these cards kept the 24px the size rule gives it: the
+   request queue rendered 301x264 inside a 341x304 card, the egg register lost
+   40px of plate and clipped its last row, and Help Desk's two labels were
+   squeezed to five pixels tall. Nothing about it looked like a padding bug,
+   which is the point — the attribute raises this to (0,3,0) and the selector
+   now says out loud that it is competing with the size. */
+.card[data-size]:has(> .hero--card),
+.card[data-size]:has(> .l-v3ins),
+.card[data-size]:has(> .l-v3note),
+.card[data-size]:has(> .l-v3req),
+.card[data-size]:has(> .l-v3tiles),
+.card[data-size]:has(> .l-v3stock),
+.card[data-size]:has(> .l-v3duo),
+.card[data-size]:has(> .l-v3list),
+.card[data-size]:has(> .l-v3hd),
+.card[data-size]:has(> .l-v3mort),
+.card[data-size]:has(> .l-v3eggs),
+.card[data-size]:has(> .l-v3chat) { padding: 0; overflow: hidden; }
+
+/* THE BANNER AS A CARD TAKES ITS HEIGHT FROM THE CELL. `.hero` is
+   `height: var(--grid-row)` because on V1 and V2 it stands in the page's flow
+   with nothing to size it; in a `band` cell the card is already exactly that
+   tall, and `100%` is what lets it stay right if the band's height ever
+   changes. The shadow and the pointer go too — the card owns both. */
+.hero--card {
+  height: 100%; width: 100%;
+  /* AND THE MARGIN GOES, WHICH IS NOT COSMETIC. `.hero` carries
+     `margin-bottom: var(--grid-gap)` because in the page's flow IT owns the
+     space between itself and the first card row — the comment at that rule
+     says so. In a grid cell the GRID owns that space, and the margin is
+     counted twice: measured, the flex item resolved to 144 - 16 = 128, so the
+     banner came up 16 short of the node's 352 and the row below it sat two
+     gutters down instead of one. */
+  margin: 0;
+  box-shadow: none; cursor: inherit;
+}
+
+/* ── THE DECORATIVE GLOW ─────────────────────────────────────────────────
+   A BLURRED RING, WHICH IS WHY IT IS AN IMAGE. Figma's `Ellipse 118/119/120`
+   are ring PATHS behind a 100px Gaussian — an annulus, not a disc — and the
+   hole is the whole shape: a `radial-gradient` can only make the disc, and
+   the corner then reads as a smudge rather than as a curve. The `Vector 14`
+   arcs on the insight and the note are the same case one step further, being
+   open strokes.
+
+   POSITIONED IN THE NODE'S OWN COORDINATES. `--dx`/`--dy` are the exported
+   canvas's top-left against the card's padding box and `--dw`/`--dh` its
+   size, both taken off the frame and including the blur margin the export
+   carries — so the numbers in the markup are the ones in Figma's inspector
+   and can be checked against it directly. `preserveAspectRatio="none"` on
+   every export means the box is the only thing that decides the scale. */
+.l-v3deco-clip {
+  position: absolute; inset: 0; z-index: 0;
+  overflow: hidden; border-radius: inherit; pointer-events: none;
+}
+.l-v3deco {
+  position: absolute;
+  left: var(--dx, 0); top: var(--dy, 0);
+  width: var(--dw, 320px); height: var(--dh, var(--dw, 320px));
+  display: block; max-width: none;
+  pointer-events: none;
+}
+/* Every layout below stacks its own content over that, in one place rather
+   than a `z-index` per child. */
+.l-v3ins > :not(.l-v3deco-clip),
+.l-v3note > :not(.l-v3deco-clip),
+.l-v3req > :not(.l-v3deco-clip),
+.l-v3tiles > :not(.l-v3deco-clip),
+.l-v3stock > :not(.l-v3deco-clip),
+.l-v3duo > :not(.l-v3deco-clip),
+.l-v3list > :not(.l-v3deco-clip),
+.l-v3mort > :not(.l-v3deco-clip),
+.l-v3eggs > :not(.l-v3deco-clip),
+.l-v3split > :not(.l-v3deco-clip),
+.l-v3count > :not(.l-v3deco-clip) { position: relative; z-index: 1; }
+/* the tile carries a glow now, so it has to be the glow's containing block */
+.l-v3split { position: relative; overflow: hidden; }
+
+/* Shared: the chip that carries a scope — "Lion Safari", "Last 7 Days".
+   506:10468 draws it at a 100px corner on black 5%; 506:10520 and 506:10554
+   draw the same chip square at 4 and 8. One class, one modifier. */
+.l-v3chip {
+  flex: none; align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 8px; border-radius: 100px;
+  background: rgba(0, 0, 0, .05);
+  font-size: 12px; font-weight: 600; color: var(--on-dark);
+  white-space: nowrap;
+}
+.l-v3chip--sq { border-radius: 8px; }
+.l-v3chip img { display: block; width: 14px; height: 14px; }
+
+/* Shared: the glass button. 506:10495 draws it as a pill and 506:10624 as a
+   rounded rectangle; both are white 10% behind an 8px blur. */
+.l-v3pill {
+  flex: 1 1 0; min-width: 0;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px; border-radius: 100px;
+  background: rgba(255, 255, 255, .1);
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+  font-size: 14px; color: var(--on-dark); white-space: nowrap;
+}
+.l-v3pill img { flex: none; display: block; width: 16px; height: 16px; }
+.l-v3pill--sq { border-radius: 8px; padding: 10px; font-size: 12px; }
+
+/* ══ KEY INSIGHTS · 506:10271 ═══════════════════════════════════════════
+   THREE PLATES AT EQUAL WIDTH, ROUNDED ONLY ON THE OUTSIDE. The 12px corner
+   is on the first plate's left and the last plate's right and nowhere else,
+   which is what makes the row read as one object with two seams in it rather
+   than as three tiles that happen to be touching. A 2px gap, not a gutter. */
+.l-v3ins {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 8px;
+  height: 100%; padding: 8px; min-width: 0;
+}
+.l-v3ins__head {
+  display: flex; align-items: center; gap: 4px;
+  padding: 8px 8px 0; min-width: 0;
+}
+.l-v3ins__icon { flex: none; display: block; width: 18px; height: 18px; }
+.l-v3ins__title {
+  font-size: 14px; font-weight: 500; letter-spacing: .1px;
+  color: var(--on-dark); white-space: nowrap;
+}
+.l-v3ins__cells { display: flex; flex: 1 1 auto; gap: 2px; min-height: 0; }
+/* A 0.5px BORDER IS A 1px BORDER, AND THAT IS THE WHOLE DIFFERENCE HERE.
+   The node draws `border-[0.5px] border-[rgba(31,81,91,0.05)]` — a hairline at
+   5% of a dark petrol, which on this ramp is invisible and exists only to
+   seat the plates. Chrome cannot draw half a device pixel, so it rounded each
+   one up: three plates x four sides became a hard outline round the group and
+   two strong vertical rules through it, and the card read as three boxed
+   tiles rather than one control with two seams. The plate FILLS were already
+   correct to within a few levels — it was only ever the border.
+
+   `box-shadow: inset 0 0 0 .5px` takes a fractional spread and is not snapped
+   to the pixel grid, so the hairline stays a hairline. Same fix, same reason,
+   as the duo card's badge ring. */
+.l-v3ins__cell {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 8px;
+  background: rgba(0, 0, 0, .1);
+  box-shadow: inset 0 0 0 .5px rgba(31, 81, 91, .05);
+  -webkit-backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
+}
+.l-v3ins__cell:first-child { border-radius: 12px 0 0 12px; }
+.l-v3ins__cell:last-child  { border-radius: 0 12px 12px 0; }
+.l-v3ins__cap {
+  display: flex; align-items: center; gap: 4px; min-width: 0;
+  font-size: 12px; color: var(--on-dark);
+}
+.l-v3ins__cap img { flex: none; display: block; width: 16px; height: 16px; }
+/* 506:10292 IS THE DEATH GLYPH LAID OVER AT 44.67 DEGREES. It is a straight
+   stroke in the file and the frame turns it; drawn upright it reads as a
+   dash. Figma's own rotation, kept. */
+.l-v3ins__cap img.is-tilted { transform: rotate(44.67deg); }
+
+/* ── THE DEAD-FISH GLYPH IN A V3 HEAD ────────────────────────────────────
+   SIZING THE BOX IS NOT ENOUGH, AND THE BOX RULES ABOVE ONLY DID THAT. The
+   shared `.card__icon--fish img` gives the image a 39.838px square and a
+   4.162px offset inside a 44px box, and it is written later in this sheet at
+   the same specificity as `.l-v3count__icon img` — so every V3 head that
+   named a 20px span still drew a 40px fish spilling 24px out of it. The
+   Mortality tile has been doing exactly that since 16 Sep; it reads as a
+   smear rather than as a mark at tile size.
+
+   AND THE FRAME TURNS IT THE OTHER WAY. 506:10608 wraps the glyph in a plain
+   `rotate-180` where the 44px cards use `rotate(-90deg) scaleY(-1)`. Both are
+   Figma's own; they are just different drawings of the same file, and this is
+   the one this artboard uses. */
+.l-v3count__icon.card__icon--fish img,
+.l-v3tile__icon.card__icon--fish img,
+.l-v3duo__icon.card__icon--fish img,
+.l-v3tiles__icon.card__icon--fish img,
+.l-v3req__icon.card__icon--fish img,
+.l-v3stock__icon.card__icon--fish img {
+  width: 100%; height: 100%; margin: 0; transform: rotate(180deg);
+}
+.l-v3ins__cap span {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3ins__cell b {
+  font-family: var(--font-num); font-weight: 700; font-size: 32px;
+  line-height: 1; font-variant-numeric: tabular-nums;
+  color: var(--c-notes);
+}
+
+/* ══ RECENT NOTES · 506:10322 ═══════════════════════════════════════════
+   THE HEAD IS ON THE TAN, THE NOTE IS ON WHITE. Three rows tall, and the
+   plate inside it takes everything the head leaves — so the photograph is a
+   fixed 166 and the prose absorbs the rest rather than the card scrolling. */
+.l-v3note {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  height: 100%; min-width: 0;
+}
+.l-v3note__head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 16px 12px; min-width: 0;
+}
+.l-v3note__icon { flex: none; display: block; width: 16px; height: 16px; }
+.l-v3note__title {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 14px; font-weight: 500; letter-spacing: .1px;
+  /* DARK INK ON A TAN CARD. 506:10331 is #250E01 — this is the one head on
+     the page that is not white, because the ground under it is not dark. */
+  color: var(--c-on-tertiary-ctr, #250E01);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3note__pages {
+  position: relative;
+  flex: 1 1 auto; min-height: 0;
+  padding: 8px 12px 12px;
+}
+.l-v3note__page {
+  position: absolute; inset: 8px 12px 12px;
+  display: flex; min-height: 0;
+}
+.l-v3note__plate {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column;
+  border-radius: 14px; overflow: hidden;
+  background: var(--c-white);
+}
+.l-v3note__shot {
+  flex: none; display: block;
+  width: 100%; height: 166px; object-fit: cover;
+  /* 131.23% TALL AT -5.77%, which puts 18.5% of the overflow above the frame
+     — near the top of the picture, not its middle. Derived, not eyeballed;
+     the same arithmetic as `species.stats`'s crop. */
+  object-position: 50% 18.5%;
+}
+.l-v3note__body {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column; justify-content: space-between;
+  gap: 12px; padding: 12px;
+  background: linear-gradient(180deg,
+      rgba(250, 97, 64, .2) 0%, rgba(255, 255, 255, .2) 83.406%),
+    var(--c-white);
+  color: var(--c-on-surface-var, #44544A);
+}
+.l-v3note__top {
+  display: flex; flex-direction: column; gap: 20px; min-height: 0;
+}
+.l-v3note__who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.l-v3note__face {
+  flex: none; display: block;
+  width: 44px; height: 44px; border-radius: 4.889px; object-fit: cover;
+}
+.l-v3note__ident {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.l-v3note__ident b {
+  font-size: 14px; font-weight: 500; letter-spacing: .1px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3note__ident span {
+  font-size: 12px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3note__more { flex: none; font-size: 14px; font-weight: 500; }
+.l-v3note__desc { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.l-v3note__kind { display: flex; align-items: center; gap: 8px; }
+.l-v3note__pri {
+  flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 64px;
+  background: var(--note-pri);
+  font-size: 11.57px; font-weight: 600; line-height: 1; color: var(--c-white);
+}
+.l-v3note__pri img { display: block; width: 100%; height: 100%; }
+.l-v3note__cat { font-size: 16px; font-weight: 600; color: var(--note-pri); }
+.l-v3note__text {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4;
+  overflow: hidden;
+  font-size: 12px; line-height: 18px; color: var(--c-black, #000);
+}
+.l-v3note__foot {
+  flex: none;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.l-v3note__sig {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 500; white-space: nowrap;
+}
+.l-v3note__like {
+  display: flex; align-items: center; gap: 5.333px;
+  padding: 5.333px; font-size: 12px;
+}
+.l-v3note__like img { display: block; width: 16px; height: 16px; }
+
+/* ══ PHARMACY REQUESTS · 506:10368 ══════════════════════════════════════ */
+.l-v3req {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 16px;
+  height: 100%; padding: 8px; min-width: 0;
+}
+.l-v3req__sum {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 8px; min-width: 0;
+}
+/* THE KIT IS EXCLUDED BY NAME. The blanket "everything but the glow sits
+   above it" rule sets `position: relative`, and a blanket rule that names a
+   POSITION will quietly un-absolute anything it catches: the photograph
+   dropped into the flow, took 96px of the summary's height, and squeezed the
+   four request rows into a 44px plate. It is stacked by z-index alone. */
+.l-v3req__sum > :not(.l-v3req__kit) { position: relative; z-index: 1; }
+.l-v3req__head { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.l-v3req__icon, .l-v3req__icon.card__icon--fish {
+  flex: none; display: block; width: 20px; height: 20px;
+}
+.l-v3req__icon img { display: block; width: 100%; height: 100%; }
+.l-v3req__title {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 14px; font-weight: 500; letter-spacing: .1px; color: var(--on-dark);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3req__figure { display: flex; align-items: flex-end; gap: 8px; min-width: 0; }
+.l-v3req__figure b {
+  font-family: var(--font-num); font-weight: 700; font-size: 44px;
+  line-height: 1; font-variant-numeric: tabular-nums; color: var(--on-dark);
+}
+/* THE URGENCY PILL IS PINK GLASS, not red. 506:10379 is rgba(255,211,211,.2)
+   behind a 12px blur — a warm haze over the green, which on this ground reads
+   as urgency without a second saturated colour on a card that already has a
+   44px figure competing for the eye. */
+.l-v3req__urgent {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-bottom: 4px; padding: 4px 8px; border-radius: 100px;
+  background: rgba(255, 211, 211, .2);
+  -webkit-backdrop-filter: blur(12px);
+          backdrop-filter: blur(12px);
+  font-size: 10px; font-weight: 500; color: var(--on-dark); white-space: nowrap;
+}
+.l-v3req__urgent img { display: block; width: 14px; height: 14px; }
+/* THE KIT LIES OVER AT 2.94 DEGREES, which is the frame's own transform and
+   is the difference between a photograph that was placed and one that was
+   dropped. `contain`, so the tilt does not crop it. */
+.l-v3req__kit {
+  position: absolute; z-index: 0;
+  right: 4px; top: 1px;
+  width: 84px; height: 92px; display: block;
+  object-fit: contain; transform: rotate(2.94deg); pointer-events: none;
+}
+.l-v3req__rows {
+  flex: 1 1 auto; min-height: 0;
+  /* SPREAD, NOT STACKED AT THE TOP. 506:10385's four rows fill their plate —
+     at the artboard's own 744 the content happens to fill it exactly, so this
+     changes nothing there and is invisible until the card grows with the
+     band, where the rows had been bunching at the top over a pool of empty
+     glass. `space-between` is what the frame's even dividers actually say. */
+  display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+  padding: 12px; border-radius: 10px;
+  background: rgba(255, 255, 255, .1);
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+}
+.l-v3req__row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: .5px solid rgba(255, 255, 255, .1);
+}
+/* 506:10401 carries no rule — the last row closes the list rather than
+   ending in a hairline over 12px of nothing. */
+.l-v3req__row:last-child { border-bottom: 0; padding-bottom: 0; }
+.l-v3req__what {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.l-v3req__what b {
+  font-size: 12px; font-weight: 600; color: var(--c-notes);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3req__what span {
+  font-size: 12px; color: rgba(255, 255, 255, .75);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3req__row time {
+  flex: none; font-size: 10px; font-weight: 500;
+  color: rgba(255, 255, 255, .75); white-space: nowrap;
+}
+
+/* ══ N TILES UNDER A TITLE · 506:10406 / 506:10669 / 517:13020 ══════════
+   ONE LAYOUT AT THREE BRIGHTNESSES. `data-tone` is the only thing that
+   differs between the transfer card, Medical's actions and the band that
+   closes the page — white at 5%, 15% and 10% — and all three sit behind the
+   same 2px blur. */
+.l-v3tiles {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
+  height: 100%; padding: 12px; min-width: 0;
+}
+.l-v3tiles__head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.l-v3tiles__icon, .l-v3tiles__icon.card__icon--fish {
+  flex: none; display: block; width: 20px; height: 20px;
+}
+.l-v3tiles__icon img { display: block; width: 100%; height: 100%; }
+.l-v3tiles__title {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 16px; font-weight: 500; color: var(--on-dark);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3tiles__row { display: flex; flex: 1 1 auto; gap: 8px; min-height: 0; }
+.l-v3tiles__tile {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 8px; border-radius: 8px;
+  background: rgba(255, 255, 255, .05);
+  -webkit-backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
+}
+.l-v3tiles[data-tone='bright'] .l-v3tiles__tile { background: rgba(255, 255, 255, .15); }
+.l-v3tiles[data-tone='plain']  .l-v3tiles__tile { background: rgba(255, 255, 255, .1); }
+.l-v3tiles__tile img { flex: none; display: block; width: 24px; height: 24px; }
+.l-v3tiles__cap {
+  display: flex; flex-direction: column; align-items: center;
+  font-size: 12px; color: var(--on-dark); text-align: center; white-space: nowrap;
+}
+
+/* ══ INVENTORY & STOCK · 506:10460 ═════════════════════════════════════ */
+.l-v3stock {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 12px;
+  height: 100%; padding: 12px; min-width: 0;
+}
+.l-v3stock__head {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 8px 0; min-width: 0;
+}
+.l-v3stock__title {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 14px; font-weight: 500; letter-spacing: .1px; color: var(--on-dark);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* THE GLYPH IS IN A GREEN DISC, not loose in the head like every other card
+   on the page — 506:10465 is a 32px #37BD69 circle. It is the one head here
+   that carries a badge, and it is what stops the title running to the card's
+   own corner on a card with no figure in its head to stop it. */
+.l-v3stock__disc {
+  flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 6px; border-radius: 100px; background: var(--c-primary, #37BD69);
+}
+.l-v3stock__icon, .l-v3stock__icon.card__icon--fish {
+  display: block; width: 20px; height: 20px;
+}
+.l-v3stock__icon img { display: block; width: 100%; height: 100%; }
+.l-v3stock__plate {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 12px; border-radius: 8px;
+  background: rgba(255, 255, 255, .1);
+}
+.l-v3stock__cells { display: flex; flex: 1 1 auto; gap: 8px; min-height: 0; }
+.l-v3stock__cell {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; padding: 8px; text-align: center;
+}
+.l-v3stock__cell img { flex: none; display: block; width: 24px; height: 24px; }
+.l-v3stock__cell b {
+  font-family: var(--font-num); font-weight: 700; font-size: 32px;
+  line-height: 1; font-variant-numeric: tabular-nums; color: var(--c-notes);
+}
+.l-v3stock__cell span {
+  font-size: 12px; font-weight: 600; color: var(--on-dark); white-space: nowrap;
+}
+.l-v3stock__acts { display: flex; gap: 8px; }
+
+/* ══ TWO PLATES ON COLOUR · 506:10515 ══════════════════════════════════ */
+.l-v3duo, .l-v3list, .l-v3mort {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  height: 100%; padding: 12px; min-width: 0;
+}
+.l-v3duo  { gap: 16px; }
+.l-v3list { gap: 8px; }
+.l-v3mort { gap: 12px; }
+.l-v3duo__head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.l-v3duo__icon, .l-v3duo__icon.card__icon--fish {
+  flex: none; display: block; width: 20px; height: 20px;
+}
+.l-v3duo__icon img { display: block; width: 100%; height: 100%; }
+.l-v3duo__title {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 14px; font-weight: 500; letter-spacing: .1px; color: var(--on-dark);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3duo__panes { display: flex; flex: 1 1 auto; gap: 8px; min-height: 0; }
+.l-v3duo__pane {
+  position: relative; overflow: hidden;
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; justify-content: center; gap: 4px;
+  padding: 8px; border-radius: 8px; background: var(--c-white);
+}
+.l-v3duo__pane b {
+  position: relative; z-index: 2;
+  font-family: var(--font-num); font-weight: 700; font-size: 32px;
+  line-height: 1; font-variant-numeric: tabular-nums;
+}
+/* THE PAGE'S ONLY TWO COLOUR-CODED FIGURES. Green for what arrived, coral
+   for what is missing — 506:10527 and 506:10539. The pair IS the card, which
+   is why the colour is on the number and not on the plate under it. */
+.l-v3duo__pane[data-tone='good'] b { color: var(--c-primary, #37BD69); }
+.l-v3duo__pane[data-tone='bad']  b { color: var(--c-tertiary, #FA6140); }
+/* NAMED, NOT `> span` — the badge is a span too. `.l-v3duo__pane > span` is
+   (0,1,1) and beat `.l-v3duo__badge` at (0,1,0) however far down the sheet
+   the badge was written, so the badge came back into the flow as a 32px
+   block, pushed the caption out of an 84px pane, and both captions measured
+   zero pixels tall. The same failure as the kit above, one selector further
+   on: a rule that sets `position` must say exactly what it is for. */
+.l-v3duo__cap {
+  flex: none; position: relative; z-index: 2;
+  font-size: 12px; color: var(--c-on-surface-var, #44544A);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3duo__swoosh {
+  position: absolute; z-index: 0; left: 0; bottom: -1px;
+  width: 100%; height: 64px; display: block; max-width: none; pointer-events: none;
+}
+/* THE ANIMAL BLEEDS OFF THE RIGHT EDGE, AND IT IS MIRRORED. Both are the
+   frame's, and both were missed.
+
+   506:10536 carries `-scale-y-100 rotate-180`, which composes to a HORIZONTAL
+   flip — so the pane shows the right-hand end of the illustration, the
+   elephant, arriving from the left. Drawn unflipped it shows the left-hand
+   end instead: our pane had a macaw and a fawn where the frame has an
+   elephant, out of the same file.
+
+   AND THE TWO PANES ARE NOT THE SAME SIZE. 506:10536 is 98x66 at x=98 of a
+   154 pane — 42px outside it — while 506:10548 is 67x45 at x=104, overhanging
+   by 17. Sized to one rule the second animal came out half as big again as
+   the frame draws it. The node's own pixels, kept as pixels: the illustration
+   does not grow when the card does, which is what `object-fit: contain` on a
+   percentage box had been doing. */
+.l-v3duo__shot {
+  position: absolute; z-index: 1; display: block;
+  transform: scaleX(-1); object-fit: contain; pointer-events: none;
+}
+.l-v3duo__pane[data-tone='good'] .l-v3duo__shot {
+  right: -42px; top: 24px; width: 98px; height: 66px;
+}
+.l-v3duo__pane[data-tone='bad'] .l-v3duo__shot {
+  right: -17px; top: 42px; width: 67px; height: 45px;
+}
+/* A 0.2px BORDER IS NOT A 1px ONE, AND A BROWSER HAS NO CHOICE. The node
+   draws `border-[0.2px] border-[rgba(0,0,0,0.05)]` — a hairline at 5% black,
+   which is all but invisible on the white plate it sits on. Chrome has no
+   sub-pixel border, so it rounded it up to a full device pixel and drew a
+   visible grey ring the frame does not have. `box-shadow` takes a fractional
+   spread and is not snapped, so the hairline stays a hairline. */
+.l-v3duo__badge {
+  position: absolute; z-index: 2; right: 4px; top: 4px;
+  width: 32px; height: 32px; border-radius: 100px;
+  background: var(--c-white);
+  box-shadow: 0 0 0 .2px rgba(0, 0, 0, .05);
+}
+/* 506:10530 IS TWO BARS AND THEY MAKE A PLUS — Figma exports `fi_9312231` as
+   a pair of groups at opposite insets, one mark in two files.
+
+   THE INSETS HAVE TO BE COMPOSED, NOT COPIED. The node states them against
+   the 19.2px ICON box, which itself sits inside the 32px badge behind 6.4px
+   of padding — 20% a side. So each figure is 20% + 0.6 x the node's: the
+   vertical bar's 45.11% becomes 47.07%, not 51.3%. Copied straight across,
+   left and right summed to 102.6% — a box of NEGATIVE width, which Chrome
+   resolved into a stray tee. It rendered as "⊥" where the frame draws "+",
+   which is the kind of wrong that only a render shows. */
+.l-v3duo__badge img { position: absolute; display: block; }
+.l-v3duo__badge img:first-child { inset: 28.43% 47.07% 28.44% 47.07%; }
+.l-v3duo__badge img:last-child  { inset: 47.07% 28.44% 47.07% 28.43%; }
+
+/* ══ THE ARRIVALS REGISTER · 506:10550 ═════════════════════════════════ */
+/* 39 IS STATED, NOT DERIVED. 506:10558 is a fixed 39 and its selected tab
+   fills it — `h-full` on 506:10559 — so the strip's height is the node's and
+   the tab stretches into it rather than the two of them being added up from
+   padding. Left to content it came out 31, which took eight pixels off the
+   register below and clipped the third arrival's sex tags. */
+.l-v3list__tabs {
+  flex: none; height: 39px;
+  display: flex; gap: 4px; padding: 2px; border-radius: 100px;
+  background: rgba(0, 0, 0, .05);
+}
+.l-v3list__tab {
+  flex: 1 1 0; min-width: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 6px 8px; border-radius: 100px;
+  font-size: 12px; color: var(--on-dark); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.l-v3list__tab.is-on {
+  background: var(--c-white); color: var(--c-on-surface-var, #44544A);
+}
+/* THE GLOW OVER THIS CARD STILL MUST NOT SWALLOW IT. `.l-v3deco-clip` is
+   `z-index: 0` for every other layout; here the deco comes last in the DOM
+   and has to sit ABOVE the plate, so the clip is lifted and the content's own
+   `z-index: 1` is not enough to keep it clear. Lifting the clip rather than
+   pushing every sibling down keeps the exception in one declaration. */
+.l-v3list > .l-v3deco-clip { z-index: 2; }
+.l-v3list__bar {
+  position: absolute; right: 0; top: 15px;
+  width: 3px; height: 44px; border-radius: 2px 0 0 2px;
+  background: rgba(0, 0, 0, .2);
+}
+.l-v3list__plate {
+  position: relative;
+  flex: 1 1 auto; min-height: 0; overflow: hidden;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 8px; border-radius: 10px; background: var(--c-white);
+}
+.l-v3list__row {
+  display: flex; gap: 8px; align-items: stretch; padding-bottom: 4px;
+  border-bottom: .5px solid rgba(0, 0, 0, .1);
+}
+.l-v3list__row:last-child { border-bottom: 0; padding-bottom: 0; }
+.l-v3list__row > img {
+  flex: none; display: block;
+  width: 44px; border-radius: 8px; object-fit: cover;
+}
+.l-v3list__what {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  color: var(--c-on-surface-var, #44544A);
+}
+.l-v3list__what b {
+  font-size: 12px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3list__what i {
+  font-size: 12px; font-style: italic;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3list__tags { display: flex; gap: 8px; }
+.l-v3tag {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 43.75px; padding: 4px 8px; border-radius: 2px;
+  font-size: 10px; font-weight: 500; white-space: nowrap;
+}
+.l-v3tag--m { background: rgba(175, 239, 235, .5); color: var(--c-add-primary, #00AFD6); }
+.l-v3tag--f { background: rgba(250, 97, 64, .3);  color: var(--c-tertiary, #FA6140); }
+
+/* ══ HELP DESK · 506:10591 ═════════════════════════════════════════════ */
+.l-v3hd { display: flex; height: 100%; padding: 12px; min-width: 0; }
+.l-v3hd__main {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column;
+}
+.l-v3hd__title {
+  display: flex; align-items: center; height: 32px;
+  font-size: 16px; font-weight: 500; color: var(--on-dark);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3hd__read {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
+}
+/* #52F990 IS THIS CARD'S ALONE. The only mint on the artboard, on the only
+   figure that reports something finished. */
+.l-v3hd__read b {
+  font-family: var(--font-num); font-weight: 700; font-size: 44px;
+  line-height: 1; font-variant-numeric: tabular-nums; color: #52F990;
+}
+.l-v3hd__read span { font-size: 12px; color: var(--on-dark); }
+.l-v3hd__cells {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; gap: 2px;
+  border-radius: 8px; overflow: hidden;
+}
+.l-v3hd__cell {
+  flex: 1 1 0; min-height: 0;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, .1);
+  border: .5px solid rgba(31, 81, 91, .05);
+  -webkit-backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
+}
+.l-v3hd__cell span {
+  flex: none;
+  font-size: 12px; color: var(--on-dark);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3hd__cell b {
+  font-family: var(--font-num); font-weight: 700; font-size: 20px;
+  line-height: 1; font-variant-numeric: tabular-nums; color: var(--on-dark);
+}
+.l-v3hd__cell:last-child b { color: var(--c-displaybg-2, #E8F4F2); }
+
+/* ══ MORTALITY'S WEEK · 506:10606 ══════════════════════════════════════ */
+.l-v3mort__body { display: flex; flex: 1 1 auto; gap: 8px; min-height: 0; }
+/* 164 AND 144, THE FRAME'S OWN SPLIT — the count keeps the larger half
+   because it holds a 32px figure AND the pending box; the buttons are text.
+   Written as flex-grow ratios so the pair survives a narrower card. */
+.l-v3mort__count {
+  flex: 164 1 0; min-width: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 2px 2px 2px 12px; border-radius: 8px; overflow: hidden;
+  background: rgba(255, 255, 255, .2);
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+}
+.l-v3mort__read { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.l-v3mort__read b {
+  font-family: var(--font-num); font-weight: 700; font-size: 32px;
+  line-height: 1; font-variant-numeric: tabular-nums; color: var(--on-dark);
+}
+.l-v3mort__read span {
+  font-size: 12px; font-weight: 600; color: var(--on-dark); white-space: nowrap;
+}
+.l-v3mort__pending {
+  flex: none; align-self: stretch;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  gap: 4px; width: 72px; padding: 8px; border-radius: 6px;
+  background: var(--c-white); text-align: center;
+}
+.l-v3mort__pending b {
+  font-family: var(--font-num); font-weight: 700; font-size: 24px;
+  line-height: 1; font-variant-numeric: tabular-nums; color: var(--c-black, #000);
+}
+.l-v3mort__pending span { font-size: 12px; color: var(--c-black, #000); }
+.l-v3mort__acts {
+  flex: 144 1 0; min-width: 0;
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+/* ══ EGGS COLLECTED TODAY · 523:13121 ══════════════════════════════════
+   THE ONE DARK-INK CARD ON A BLACK PAGE. Its ground is cream, so `--on-dark`
+   would be white on #FFF3B6 — every rule below states its ink rather than
+   inheriting the page's. */
+.l-v3eggs {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 16px;
+  height: 100%; padding: 8px; min-width: 0;
+}
+.l-v3eggs__head {
+  position: relative;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 8px; min-width: 0;
+}
+.l-v3eggs__title {
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+  font-size: 14px; font-weight: 500; letter-spacing: .1px;
+  color: var(--c-on-surface-var, #44544A);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3eggs__title img { flex: none; display: block; width: 20px; height: 20px; }
+.l-v3eggs__head > b {
+  font-family: var(--font-num); font-weight: 700; font-size: 44px;
+  line-height: 1; font-variant-numeric: tabular-nums;
+  color: var(--c-on-tertiary-ctr, #250E01);
+}
+.l-v3eggs__basket {
+  position: absolute; z-index: 0; right: 8px; top: 1px;
+  width: 84px; height: 92px; display: block;
+  object-fit: contain; transform: rotate(2.94deg); pointer-events: none;
+}
+.l-v3eggs__plate {
+  flex: 1 1 auto; min-height: 0; overflow: hidden;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 12px; border-radius: 12px; background: var(--c-white);
+}
+.l-v3eggs__row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  padding-bottom: 8px;
+}
+.l-v3eggs__row span {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 12px; font-weight: 600; color: var(--c-on-secondary-ctr, #1F415B);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3eggs__row b {
+  flex: none; font-size: 14px; font-weight: 600;
+  color: var(--c-black, #000); text-align: right;
+}
+
+/* ══ CHAT · 506:12829 ══════════════════════════════════════════════════ */
+.l-v3chat {
+  display: flex; flex-direction: column; gap: 8px; justify-content: center;
+  height: 100%; padding: 12px; min-width: 0;
+  color: var(--c-black, #000);
+}
+.l-v3chat__row { position: relative; display: flex; align-items: center; gap: 12px; min-width: 0; }
+.l-v3chat__face {
+  flex: none; display: block;
+  width: 44px; height: 44px; border-radius: 100px; object-fit: cover;
+}
+.l-v3chat__face--ini {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--c-on-primary-ctr, #1F515B);
+  font-size: 15.5px; font-weight: 600; color: var(--c-white);
+}
+.l-v3chat__msg {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; justify-content: center; gap: 3px;
+  padding: 8px 0;
+}
+.l-v3chat__msg b { font-size: 16px; font-weight: 500; }
+.l-v3chat__text {
+  font-size: 14px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.l-v3chat__react {
+  display: flex; align-items: center; gap: 2px; min-width: 0; font-size: 14px;
+}
+.l-v3chat__react img { flex: none; display: block; width: 16px; height: 16px; }
+.l-v3chat__react span {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* ── THE TIME IS ON THE NAME'S LINE, NOT IN A COLUMN OF ITS OWN ──────────
+   READ OFF THE FRAME'S y, WHICH IS THE PART A COLUMN LAYOUT LOSES. In
+   506:12839 the timestamp sits at y=0 and the reaction at y=30: they are on
+   DIFFERENT LINES, so the reaction is free to run the full width of the card
+   underneath it, and 506:12843 does exactly that — a 245px reaction inside a
+   194px message frame, overhanging the time by 51.
+
+   Laid out as a flex column beside the message, the time reserves its 54px
+   down the WHOLE height of the row, and the quoted message loses that width
+   on a line the frame never asked it to share. Measured: 171px of text into
+   152, then 164 after a negative margin, still an ellipsis mid-word on the
+   one string this card exists to show. Taken out of the flow it is 231, and
+   the sentence is whole.
+
+   THE NAME STILL CLEARS IT, by a padding equal to the widest the stamp gets
+   — the name is on the time's own line and is the one thing that must not
+   run under it. `--v3chat-meta` is that width in one place so the two cannot
+   drift apart. */
+.l-v3chat { --v3chat-meta: 66px; }
+.l-v3chat__msg b { padding-right: var(--v3chat-meta); }
+.l-v3chat__meta {
+  position: absolute; top: 8px; right: 0;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+}
+.l-v3chat__meta time { font-size: 12px; color: var(--c-on-surface-var, #44544A); }
+/* A ROW WITH SOMETHING UNREAD PUTS ITS TIME IN THE BADGE'S GREEN, which is
+   how 506:12836 distinguishes the two rows without a second mark. */
+.l-v3chat__meta.is-unread time { color: var(--c-primary, #37BD69); }
+.l-v3chat__badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 16px; padding: 2px; border-radius: 12px;
+  background: var(--c-primary, #37BD69);
+  font-size: 10px; font-weight: 500; color: var(--c-white);
+}
 
 /* AND THE CARD'S CORNER IS 12 HERE, not the 16 the other pages use —
    506:10428, 506:10432, 506:10446 all draw 12. */
@@ -4331,22 +5330,109 @@ body.is-report { overflow: hidden; }
    the ink was petrol. Here the field is the same rounded rectangle as the two
    buttons beside it, and every one of them is a hole in the black rather than
    an object on it — so the shadows go with the white. */
+/* ── AND THEY ARE GLASS, NOT FLAT WHITE · asked for on 17 Sep 2026 ───────
+   THE FILL STAYS THE NODE'S 10% — what is added is the MATERIAL under it. A
+   flat 10% white over the warm glow at the top of this page is a grey film:
+   it lightens what is behind it and tells you nothing about it, so the field
+   reads as a painted rectangle rather than as a hole you are looking through.
+   The blur is what makes it a hole — the olive bleeding up from the hero
+   below arrives inside the control, softened, and the control sits IN the
+   page instead of on it.
+
+   THREE LAYERS, AND EACH ONE DOES A DIFFERENT JOB:
+     · `blur(20px)` matches the scrolled bar's own material at 506:10916, so
+       when the row sticks the field and its pane are the same glass rather
+       than two grades of it;
+     · `saturate(140%)` keeps the glow's colour through the blur. Without it
+       a large-radius blur averages the warm olive toward neutral and the
+       field goes grey on a page whose whole top is coloured;
+     · a hairline of white at 14% and an inset highlight at 18% draw the
+       top edge. Real glass has a lit edge and 10% fill alone has none, which
+       is why the flat version needed a shadow to be visible at all.
+
+   IT IS NOT NESTED INSIDE THE STICKY PANE'S BLUR, and that was worth
+   checking rather than assuming: a `backdrop-filter` makes the element a
+   backdrop root for its DESCENDANTS, and `.search-row::before` — which
+   carries the scrolled bar's own blur — is a sibling of these controls, not
+   their ancestor. So this samples the page, not the pane, and both are
+   composited against the same backdrop. Measured stuck and unstuck.
+
+   THE FALLBACK IS THE FLAT CARD. Where `backdrop-filter` is unsupported the
+   10% over black is 24-of-255 against the ground and effectively invisible,
+   so the no-blur branch lifts the fill to 16% and keeps the edge — the one
+   place the node's number is deliberately not honoured, because honouring it
+   there draws nothing. */
 :root[data-page-version='3'] .search,
 :root[data-page-version='3'] .search-btn,
 :root[data-page-version='3'] .icon-btn {
-  background: rgba(255, 255, 255, .1);
+  /* ── AND IT HAS TO CARRY A LIFT, OR ON BLACK IT IS NOT GLASS ──────────
+     BLURRING BLACK GIVES BLACK. The first pass added `blur(20px)
+     saturate(140%)` and stopped there, which is the correct material over a
+     photograph and does nothing at all here: at rest the page behind this
+     row is #000 with the warm glow already faded, so the filter had nothing
+     to refract and the control rendered as white-10% over black — RGB
+     (24,24,24), a flat dark rectangle with a hairline round it. It was
+     reported, accurately, as "glass effect not working".
+
+     THE HOUSE RECIPE ALREADY SOLVES THIS and this row was not using it. The
+     Quick Actions pill at the foot of the same page is
+     `blur(--glass-blur) saturate(--glass-sat) brightness(--glass-lift)` —
+     20px / 180% / 1.06 — and the `brightness` is the whole difference: it
+     lifts whatever is behind the pane so the pane has a body of its own
+     rather than borrowing one. Reusing the tokens also means the field, the
+     scan button and the pill stay one material when any of them is retuned.
+
+     THE FILL RISES 10% → 14%. The node's 10% is what the artboard states
+     over its own ground; over pure black it is 24 levels and invisible. The
+     14% plus the lift is measured to sit where the artboard's does against
+     the frame's own ground — this is the fidelity-versus-render trade the
+     palette note already records, taken knowingly and in one place. */
+  background: rgba(255, 255, 255, .14);
   border-radius: 12px;
-  box-shadow: none;
-  border: 0;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .22),
+              0 1px 2px 0 rgba(0, 0, 0, .3);
+  border: 1px solid rgba(255, 255, 255, .16);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
+                           brightness(var(--glass-lift));
+          backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
+                           brightness(var(--glass-lift));
   color: var(--c-white, #FFFFFF);
+}
+@supports not (backdrop-filter: blur(2px)) {
+  :root[data-page-version='3'] .search,
+  :root[data-page-version='3'] .search-btn,
+  :root[data-page-version='3'] .icon-btn { background: rgba(255, 255, 255, .2); }
+}
+/* THE BORDER IS A BOX, SO THE BOX HAS TO PAY FOR IT. `.search` is a 52px
+   fixed height in the flow and `.search-btn` a 52px square; a 1px border on
+   `content-box` sizing would have made them 54 and pushed the row's own 56
+   to 58. `border-box` keeps every one of the node's numbers and puts the
+   hairline inside them. */
+:root[data-page-version='3'] .search,
+:root[data-page-version='3'] .search-btn,
+:root[data-page-version='3'] .icon-btn { box-sizing: border-box; }
+@media (hover: hover) {
+  :root[data-page-version='3'] .search-btn:hover,
+  :root[data-page-version='3'] .icon-btn:hover { background: rgba(255, 255, 255, .18); }
 }
 :root[data-page-version='3'] .search__input,
 :root[data-page-version='3'] .greeting__word,
 :root[data-page-version='3'] .greeting__name {
   color: var(--c-white, #FFFFFF);
 }
-:root[data-page-version='3'] .search__input::placeholder {
-  color: rgba(255, 255, 255, .72);
+/* THE PLACEHOLDER IS WHITE, AND SO IS THE WORD THAT CYCLES IN IT.
+   506:10237 is one string — `Search "Animals"` — set in `text-white` at 16.
+   Two things draw it here: the input's own placeholder, and `.search__hint`,
+   the rotating hint that sits over it. The hint is `--c-neutral-2` (#7A8684)
+   for the reason written at its own rule — on a white field a petrol word
+   read as a value someone had already typed — and V3 never restated it, so
+   the visible placeholder on the black page was mid-grey against a frame
+   that draws it white. Both are named here; the 72% was mine and the node
+   does not ask for it either. */
+:root[data-page-version='3'] .search__input::placeholder,
+:root[data-page-version='3'] .search__hint,
+:root[data-page-version='3'] .search__cycle {
+  color: var(--c-white, #FFFFFF);
 }
 /* THE GLYPHS ARE PETROL FILES, and on this ground they have to be the ink.
    `brightness(0) invert(1)` is the one transform that whitens an arbitrary
@@ -4414,7 +5500,28 @@ body.is-report { overflow: hidden; }
 }
 /* THE BANNER'S OWN PADDING IS 24 ACROSS AND 2 DOWN · 506:10261, where V1
    spends 24 on both axes. The column is 4 apart, the two lines 2. */
-:root[data-page-version='3'] .hero { padding: 2px 24px; }
+/* ── THE BANNER'S CONTENTS ARE CENTRED HERE, NOT PUSHED APART ────────────
+   `.hero` is `justify-content: space-between` for a good reason stated at its
+   own rule — V1 and V2's artboards pin the mark to the ceiling and the title
+   to the floor, and the space between them is the point. **506:10261 does not
+   do that.** It is `justify-center` with a 4px gap: a 44px mark row, four
+   pixels, then the title and its subtitle as one block, the whole stack
+   centred in 140 of content box. Inheriting `space-between` drove the
+   subtitle hard onto the banner's bottom edge and the mark into its top
+   corner, which is what "inside text container no padding" was pointing at —
+   not a missing padding but a distributed one, spent at the edges instead of
+   around the type.
+
+   `py-[2px]` IS THE NODE'S AND IT STAYS. The air comes from the centring, so
+   raising the padding would only shrink the box the stack is centred in. */
+:root[data-page-version='3'] .hero {
+  padding: 2px 24px;
+  justify-content: center;
+  gap: 4px;
+}
+/* the mark row keeps its own height so the stack's arithmetic is the node's */
+:root[data-page-version='3'] .hero__row--top { flex: none; height: 44px; }
+:root[data-page-version='3'] .hero__titles { gap: 2px; }
 :root[data-page-version='3'] .hero__row--foot { padding-right: 0; }
 
 /* ── THE VERTICAL RHYTHM · measured against 506:10213, not carried over ──
@@ -6084,6 +7191,19 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .l-note__page[data-pos='next'] { opacity: 0; transform: translateX(6%); }
 .l-focus__page[data-pos='out'],
 .l-note__page[data-pos='out'] { opacity: 0; transform: none; }
+
+/* V3's NOTE PAGES THROUGH THE SAME FOUR STATES. `createCarousel` writes
+   `data-pos` and nothing else — the fade and the 6% slide are entirely the
+   stylesheet's — so a new carousel that does not claim these four rules is a
+   carousel whose pages are all at opacity 1 on top of one another, which is
+   what shipped for an hour: the card showed its LAST note, because that is
+   the one the painter draws last. The positioning itself is not shared:
+   these sit inside the card's own 8/12/12 rather than on its edges. */
+.l-v3note__page { transition: opacity var(--t-base) var(--ease), transform var(--t-base) var(--ease); }
+.l-v3note__page[data-pos='at']   { opacity: 1; transform: none; }
+.l-v3note__page[data-pos='prev'] { opacity: 0; transform: translateX(-6%); }
+.l-v3note__page[data-pos='next'] { opacity: 0; transform: translateX(6%); }
+.l-v3note__page[data-pos='out']  { opacity: 0; transform: none; }
 
 /* ── the dots, which are now controls ──
    THE INDICATOR IS THE NAVIGATION. The node draws a dot per item and nothing
@@ -9788,6 +10908,58 @@ body.is-site .card:active { transform: scale(.978); }
   filter: blur(10px);
   pointer-events: none;
 }
+/* ── AND THERE IS NO WASH ON THE BLACK PAGE ──────────────────────────────
+   The wash above is white at 20% falling to grey at 15%, which is the node's
+   own foot on a LIGHT page: it lifts the pill off a pale ground. V3's ground
+   is #000000, so the same two stops paint a grey haze across the bottom 182px
+   of the screen — a light slab under a dark page, visible as a band behind
+   the last row of cards and nothing the artboard draws. Removed rather than
+   re-tinted: a dark wash over black is a no-op, and the pill already carries
+   its own drop shadow for separation. */
+:root[data-page-version='3'] .qa-band { display: none; }
+/* ── AND THE PAGE ENDS WHERE THE CARDS DO ────────────────────────────────
+   THREE PADDINGS STACK AT THE FOOT and only one of them is load-bearing.
+   `#panel-modules` gives back the height the floating pill occupies — 24 of
+   offset, 64 of row, 24 of gutter — so the last row of modules cannot sit
+   under a control it can't be pressed through; that one stays. Under it
+   `.main-frame` adds 24 and `.page` another 48, which on V1 and V2 close the
+   page against a pale ground and are invisible. On black they are 72px of
+   nothing below 112px of nothing: measured, the last card ended at 2506 and
+   the document at 2691.
+
+   Both are zeroed here, leaving exactly the pill's own clearance. The page
+   now ends 113px under the last card, of which the pill occupies 88. */
+:root[data-page-version='3'] .page { padding-bottom: 0; }
+:root[data-page-version='3'] .main-frame { padding-bottom: 0; }
+
+/* ── THE QUICK ACTIONS BAR IS DARK GLASS HERE, AND ITS MARKS ARE WHITE ───
+   ASKED FOR AS "make it icon white", AND THE INK ALONE WOULD NOT HAVE DONE
+   IT. The pill is `rgba(255,255,255,.4)` behind a brightness lift — glass,
+   so it takes the colour of whatever it is over. Measured on this page: a
+   light green disc while a Pharmacy card passes behind it, a mid grey over
+   the black foot. Black marks read on the first and are close to lost on the
+   second; white marks would simply have swapped which of the two failed.
+
+   So the FILL changes with the ink. `rgba(30,30,30,.4)` behind a 20px blur is
+   not invented — it is 506:10916's own material, the pane the artboard draws
+   under the scrolled search row, and this page already uses it up there. One
+   dark glass at both ends of the page, white marks on both, and the control
+   stops changing colour as you scroll past a card.
+
+   THE LABEL GOES WITH THE ICON because it has to: the grid mark is
+   `background: currentColor` through a mask and the × and the label inherit
+   the same `color`, so they are one ink by construction. A white icon beside
+   a black label on one control would be the wrong reading of the ask. */
+:root[data-page-version='3'] .qa-pill,
+:root[data-page-version='3'] .qa-chat {
+  --glass-fill: rgba(30, 30, 30, .4);
+  --glass-spec: rgba(255, 255, 255, .28);
+  --glass-rim:  rgba(255, 255, 255, .16);
+  color: var(--c-white, #FFFFFF);
+}
+/* the chat disc's own glyph is an asset, not `currentColor`, so it is inked
+   the same way every other petrol file on this page is */
+:root[data-page-version='3'] .qa-chat img { filter: brightness(0) invert(1); }
 
 /* ── the row · TWO CONTROLS SINCE NODE 280:3521, 8 Sep 2026 ───────────────
    The pill no longer centres itself. Node 286:3988 is a "Button Row" — the
@@ -11460,13 +12632,23 @@ body.is-editing .qa-chat { display: none; }
   50%      { box-shadow: 0 0 8px -2px rgba(0, 214, 201, .5),
                          0 0 34px 2px rgba(0, 214, 201, .42); }
 }
-.card:has(> .l-headline) {
+/* AND V3's KEY INSIGHTS IS THE SAME CARD IN A DIFFERENT COMPOSITION. The
+   selector below names a LAYOUT, and on 17 Sep the black page's insight card
+   stopped being `headline` and became `v3-insights` — node 506:10271 draws
+   three plates where 286:3940 draws a headline and two footnotes. The glow
+   belongs to what the card IS, not to the shape it happens to wear: it is
+   still the only card on either page whose numbers move on their own. Left
+   alone, the swap would have taken a deliberate piece of the product off V3
+   silently, which is the kind of loss nobody files because nothing broke. */
+.card:has(> .l-headline),
+.card:has(> .l-v3ins) {
   animation: ki-glow 3.2s var(--ease, ease-in-out) infinite;
 }
 /* it is decoration, not information — the house rule for every other
    animation in this file, and the audit's own point about perpetual motion */
 @media (prefers-reduced-motion: reduce) {
-  .card:has(> .l-headline) { animation: none; }
+  .card:has(> .l-headline),
+  .card:has(> .l-v3ins) { animation: none; }
 }
 </style>
 
@@ -12671,6 +13853,19 @@ const LAYOUT_FILL = {
      Focus Hub overrides this with `fill: 'ink'` on the variant. See the fills
      in the stylesheet for why this is not the reverted `soft` fill. */
   focus: 'plate', note: 'plate',
+  /* V3'S WIDGETS · node 506:10269. All `solid`, and most of them name a
+     `gradient` of their own in the catalogue rather than taking their
+     module's — see the note over `--g-v3-green`. The two that read as paper
+     rather than as colour, `v3-eggs` and `v3-chat`, are still `solid`: they
+     carry a pale GRADIENT (`--g-v3-eggday`, `--g-v3-plate`) and set their own
+     ink in the stylesheet. `plate` would have been the obvious answer and is
+     the wrong one — it hard-codes `var(--c-white)` and ignores `--card-bg`
+     entirely, so the egg card's cream ramp would never have painted. */
+  'v3-hero': 'image',
+  'v3-insights': 'solid', 'v3-note': 'solid', 'v3-requests': 'solid',
+  'v3-tiles': 'solid', 'v3-stock': 'solid', 'v3-duo': 'solid',
+  'v3-list': 'solid', 'v3-helpdesk': 'solid', 'v3-mortality': 'solid',
+  'v3-eggs': 'solid', 'v3-chat': 'solid',
   /* Key Insights has no module behind it either, and unlike those two it is
      not on a plate: node 286:3940 paints it with a ramp of its own, which the
      `insights` pseudo-module carries as its gradient. So it is `solid` in the
@@ -13017,6 +14212,19 @@ const VARIANTS = [
   {
     /* THE TAGS PROMO · 506:12894. `moduleId: null` — it belongs to no
        module, which the catalogue already allows and nothing else uses. */
+    /* 506:10261 · THE BANNER, AS A CARD. `moduleId: null` like the promo
+       beside it, and the one variant in the catalogue with an `href` of its
+       own — the v5 app, which is where the page's banner has always gone. */
+    id: 'hero.v3', moduleId: null, name: 'Command Centre',
+    layout: 'v3-hero', purpose: 'NAVIGATE',
+    href: 'https://antz-command-centre-v5.vercel.app/',
+    supportedSizes: ['band'], defaultSize: 'band', priority: 'secondary',
+    data: {
+      title: 'Antz Command Centre',
+      sub: 'A clear view of what\u2019s happening across the zoo.',
+    },
+  },
+  {
     id: 'promo.tags', moduleId: null, name: 'Introducing Tags',
     layout: 'v3-promo', purpose: 'UNDERSTAND',
     supportedSizes: ['band'], defaultSize: 'band', priority: 'secondary',
@@ -13055,16 +14263,344 @@ const VARIANTS = [
     id: 'species.v3new', moduleId: 'species', name: 'New Animals',
     layout: 'v3-count', purpose: 'UNDERSTAND',
     supportedSizes: ['small', 'medium'], defaultSize: 'small', priority: 'secondary',
-    data: { label: 'Animals', value: '24', caption: 'Newly Added Animals' },
+    data: { label: 'Animals', value: '24', caption: 'Newly Added Animals',
+            deco: 'v3-ellipse-120.svg' },
   },
   {
     id: 'mortality.v3', moduleId: 'mortality', name: 'Mortality',
     layout: 'v3-split', purpose: 'UNDERSTAND',
     supportedSizes: ['small', 'medium'], defaultSize: 'small', priority: 'secondary',
-    data: { label: 'Mortality',
+    data: { label: 'Mortality', deco: 'v3-ellipse-121.svg',
             a: { value: '12', label: 'This Week' },
             b: { value: '03', label: 'Species' } },
   },
+
+  /* ══ THE REST OF NODE 506:10269 · 17 Sep 2026 ═══════════════════════════
+     FIFTEEN WIDGETS THE BLACK PAGE DRAWS AND THE CATALOGUE COULD ONLY
+     APPROXIMATE. The four tiles above were the easy half of that frame: a
+     tile is a tile whatever is written on it. What follows is the half where
+     the generic compositions were rendering the right MODULE and the wrong
+     CARD — `queue` drew Pharmacy's requests as a total over three named rows
+     where 506:10368 draws a figure, an urgency pill, a photograph of a med
+     kit and four request IDs with times; `ring` drew a donut where 506:10460
+     draws three icon columns between a location chip and two buttons.
+
+     EACH ONE IS A NEW `layout`, NOT A NEW SIZE OR A FLAG. That is the rule
+     this file already runs on — see the header: a variation declares a whole
+     composition, and the moment a card needs different CONTENT rather than a
+     different box it is a different layout. Nine were added for these.
+
+     THEY ARE NAMED `*.v3*` AND PRIORITISED `secondary` for the same reason
+     `eggs.v3` is: `checkDefaults()` holds that a `primary` variant appears on
+     the DEFAULT home page, and none of these do. They reach V3 through
+     V3_LAYOUT in layoutStore.js and the picker everywhere else.
+
+     EVERY FIGURE, LABEL AND ID BELOW IS THE FRAME'S OWN, including the
+     repeated "REQ-000601" and the two identical "KC2" rows in the egg
+     collection. They are the artboard's placeholders and they are copied
+     rather than improved: a card that reads better than the design it is
+     being checked against is a card nobody can check. */
+  {
+    /* 506:10271 · THREE COLUMNS, NOT A HEADLINE AND TWO FOOTNOTES.
+       `insights.key` renders `headline` — one 32px figure with two small ones
+       beside it — which is node 286:3940 on V2 and is a genuinely different
+       card. This frame gives Births, Death and Transfers one plate each at
+       equal width, all three figures at the same 32px, each under its own
+       icon and word. The hierarchy the other card states is the thing this
+       one deliberately does not. */
+    id: 'insights.v3', moduleId: 'insights', name: 'Key Insights',
+    layout: 'v3-insights', purpose: 'UNDERSTAND', gradient: '--g-v3-insights',
+    supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
+    data: {
+      title: 'Key Insights',
+      cells: [
+        { icon: 'v3-births.svg',    label: 'Births',    value: '02' },
+        { icon: 'v3-death.svg',     label: 'Death',     value: '02', spin: true },
+        { icon: 'v3-transfers.svg', label: 'Transfers', value: '12' },
+      ],
+    },
+  },
+  {
+    /* 506:10301 · THE SAME COMPOSITION AS `species.stats`, A DIFFERENT
+       PHOTOGRAPH. Parameterised rather than forked, which is the standing
+       rule: `photo` already takes `image` and `figures`, so this entry is
+       four lines of data and no new code. The frame shoots cheetahs where
+       135:4436 shoots a lion, and the two artboards are two products' worth
+       of art direction apart — so the picture is the variant's, not a swap
+       on the shared card that would have changed V1 and V2 as well. */
+    id: 'species.v3stats', moduleId: 'species', name: 'Collection',
+    layout: 'photo', purpose: 'UNDERSTAND',
+    image: 'v3-species.png', imagePosition: '50% 27%',
+    wash: 'rgba(0, 0, 0, .2)',
+    supportedSizes: ['medium', 'large'], defaultSize: 'medium', priority: 'secondary',
+    data: {
+      title: 'Species Management',
+      figures: [
+        { value: '2,411',   label: 'Species' },
+        { value: '110,020', label: 'Animal Population' },
+      ],
+    },
+  },
+  {
+    /* 506:10322 · THE NOTE ON A TAN GROUND, WITH ITS PHOTOGRAPH BACK.
+       `notes.recent` draws the V2 note: a white plate, no picture, the head
+       reading "Notes". This frame gives the card a 464-tall tan ground, calls
+       it "Recent Notes", puts the paging dots in a smoked pill at the end of
+       the head rather than under the plate, and opens the note with a 166px
+       photograph. The body copy, the +2, the 88 likes and the 08 Apr 2025 are
+       all 506:10340's own. */
+    id: 'notes.v3', moduleId: 'notes', name: 'Recent Notes',
+    layout: 'v3-note', purpose: 'MONITOR',
+    passive: true, gradient: '--g-v3-notepad',
+    /* `xtall` ALONE, WHICH IS THE ONLY SIZE THIS CARD EXISTS AT. Three rows
+       is 464 and the frame spends 166 of it on a photograph before the note
+       starts — so at `tall`'s 304 there are 138 pixels left for a 44px author
+       row, a category, four lines of prose and a footer, and the suite
+       measured the result at 310 in 308. V2's `notes.recent` fits `tall`
+       because it has no picture; this one cannot, and the honest place to say
+       so is here rather than in a media query that shrinks the photograph the
+       artboard sized. Same call as `insights.key`'s `medium` alone. */
+    supportedSizes: ['xtall'], defaultSize: 'xtall', priority: 'secondary',
+    data: {
+      title: 'Recent Notes',
+      items: [
+        { photo: 'v3-note-photo.png', author: 'v3-note-author.png',
+          id: 'AAID : 87546/24', name: 'Big Bull', more: '2',
+          category: 'Medical', priority: 'high',
+          body: 'This is an important reminder regarding the strict adherence to all established guidelines, protocols, and regulations. This is an important reminder regarding the strict adherence to all e guidelines, protocols, and regulations.',
+          by: 'Vantara admin', date: '08 Apr 2025', likes: '88' },
+        { photo: 'v3-note-photo.png', author: 'v3-note-author.png',
+          id: 'AAID : 87551/24', name: 'Kesari', more: '1',
+          category: 'Housing', priority: 'moderate',
+          body: 'Night house bedding was changed this morning and the drain checked. Substrate is dry through the back third; the front corner is still holding water and has been flagged to maintenance.',
+          by: 'Vantara admin', date: '07 Apr 2025', likes: '42' },
+        { photo: 'v3-note-photo.png', author: 'v3-note-author.png',
+          id: 'AAID : 87602/24', name: 'Mira', more: '3',
+          category: 'Diet', priority: 'low',
+          body: 'Accepted the full morning ration for the third day running. Browse is being taken before pellet, which is the order the keeper wants, so the schedule stays as written.',
+          by: 'Vantara admin', date: '06 Apr 2025', likes: '17' },
+      ],
+    },
+  },
+  {
+    /* 506:10368 · A FIGURE, AN URGENCY PILL AND THE QUEUE UNDER GLASS.
+       Two rows tall on a #006D35 ground of its own. The med kit at the head's
+       right is a photograph in the frame, not an illustration, and it is
+       rotated 2.94deg — kept, because a kit lying straight is a different
+       drawing. */
+    id: 'pharmacy.v3requests', moduleId: 'pharmacy', name: 'Pharmacy Requests',
+    layout: 'v3-requests', purpose: 'ATTENTION', gradient: '--g-v3-green',
+    /* `tall` ALONE. The summary block is 88 before the queue starts, and four
+       request rows need 184 — 291 of content against the 164 one row gives
+       it. A queue that shows one and a half of its four rows is not a smaller
+       version of this card, it is a broken one. */
+    supportedSizes: ['tall'], defaultSize: 'tall', priority: 'secondary',
+    data: {
+      title: 'Pharmacy Requests', value: '12', urgent: '5 Urgent',
+      rows: [
+        { id: 'REQ-000601', by: 'Joy Local', when: '2h ago' },
+        { id: 'REQ-000601', by: 'Joy Local', when: '2h ago' },
+        { id: 'REQ-000601', by: 'Joy Local', when: '2h ago' },
+        { id: 'REQ-000601', by: 'Joy Local', when: '2h ago' },
+      ],
+    },
+  },
+  {
+    /* 506:10406 · THREE DOORS ON ONE CARD, and the reason `v3-tiles` is a
+       layout rather than three cards: the frame draws the SAME shape three
+       more times — Medical's actions at 506:10669 and the four-wide Quick
+       Actions band at 517:13020 — differing only in how many tiles there are,
+       whether they are captioned, and how bright the glass is. One layout,
+       three entries. */
+    id: 'approvals.v3transfer', moduleId: 'approvals', name: 'Transfer Animal',
+    layout: 'v3-tiles', purpose: 'ACT', gradient: '--g-v3-cocoa',
+    supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
+    data: {
+      title: 'Transfer Animal', titleSize: 16,
+      icon: 'v3-transfer-head.svg', tone: 'dim', deco: 'v3-ellipse-119.svg',
+      tiles: [
+        { icon: 'v3-tr-inhouse.svg',   lines: ['In-house', 'Transfer'] },
+        { icon: 'v3-tr-intersite.svg', lines: ['Inter-site', 'Transfer'] },
+        { icon: 'v3-tr-external.svg',  lines: ['External', 'Transfer'] },
+      ],
+    },
+  },
+  {
+    /* 506:10669 · the same three tiles, brighter glass, no captions */
+    id: 'medical.v3actions', moduleId: 'medical', name: 'Quick Actions',
+    layout: 'v3-tiles', purpose: 'ACT', gradient: '--g-v3-medical',
+    supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
+    data: {
+      title: 'Medical', titleSize: 16, icon: 'v3-medical-head.svg', tone: 'bright',
+      tiles: [
+        { icon: 'v3-med-a.svg', label: 'New case' },
+        { icon: 'v3-med-b.svg', label: 'Administer' },
+        { icon: 'v3-med-c.svg', label: 'Request medicine' },
+      ],
+    },
+  },
+  {
+    /* 517:13020 · FOUR TILES ACROSS THE WHOLE FRAME, and the last card on the
+       page. It closes the grid at 696x144 — the hero's own footprint — which
+       is why it is a `band` and not a `full`. */
+    id: 'quick.v3actions', moduleId: null, name: 'Quick Actions',
+    layout: 'v3-tiles', purpose: 'ACT', gradient: '--g-v3-quick',
+    supportedSizes: ['band'], defaultSize: 'band', priority: 'secondary',
+    data: {
+      title: 'Quick Actions', titleSize: 16, tone: 'plain', stacked: true,
+      tiles: [
+        { icon: 'v3-qa-plus.svg', label: 'New observation' },
+        { icon: 'v3-qa-plus.svg', label: 'New case' },
+        { icon: 'v3-qa-plus.svg', label: 'Add inventory' },
+        { icon: 'v3-qa-plus.svg', label: 'Add mortality' },
+      ],
+    },
+  },
+  {
+    /* 506:10460 · A LOCATION CHIP, THREE ICON COLUMNS AND TWO PILLS.
+       `pharmacy.stock` draws a donut and a legend, which is what a ring
+       layout is for and is not what this frame asks for: there is no total
+       here at all, only three counts that each want their own glyph. */
+    id: 'pharmacy.v3stock', moduleId: 'pharmacy', name: 'Inventory & Stock',
+    layout: 'v3-stock', purpose: 'MONITOR', gradient: '--g-v3-green',
+    supportedSizes: ['tall'], defaultSize: 'tall', priority: 'secondary',
+    data: {
+      title: 'Pharmacy Inventory & Stock', scope: 'Lion Safari',
+      deco: 'v3-ellipse-122.svg',
+      cells: [
+        { icon: 'v3-stock-out.svg', value: '6',  label: 'Out of Stock' },
+        { icon: 'v3-stock-low.svg', value: '12', label: 'Low Stock' },
+        { icon: 'v3-stock-exp.svg', value: '9',  label: 'Expiring' },
+      ],
+      actions: [
+        { icon: 'v3-plus.svg',   label: 'Add Inventory' },
+        { icon: 'v3-import.svg', label: 'Import Inventory' },
+      ],
+    },
+  },
+  {
+    /* 506:10515 · TWO WHITE PLATES ON THE CORAL, each with a coloured figure,
+       a caption, a circular badge and a photographed animal bleeding off the
+       right edge under a swoosh. The figures are the only two things on this
+       page drawn in a colour that is neither white nor the notes yellow —
+       #37BD69 for what arrived and #FA6140 for what is missing — because the
+       whole card is that one comparison. */
+    id: 'species.v3week', moduleId: 'species', name: 'Last 7 Days',
+    layout: 'v3-duo', purpose: 'UNDERSTAND',
+    supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
+    data: {
+      /* 506:10516 IS THE PINK 438 RING, NOT THE TEAL ONE. `v3-ellipse-118`
+         is `#00D6C9 → #1F415B` at 20% — the request card's glow — and over
+         coral it took red down 28 levels and lifted blue: (221,132,86)
+         against the frame's (249,132,79). Two assets one digit apart. */
+      title: 'Animals', scope: 'Last 7 Days', deco: 'v3-ellipse-119.svg',
+      panes: [
+        { value: '23', label: 'Newly Added', tone: 'good',
+          swoosh: 'v3-swoosh-green.svg', photo: 'v3-animal-a.png' },
+        { value: '6',  label: 'Missing/Escaped', tone: 'bad',
+          swoosh: 'v3-swoosh-coral.svg', photo: 'v3-animal-b.png' },
+      ],
+    },
+  },
+  {
+    /* 506:10550 · THE ARRIVALS LIST, WITH A SEGMENTED CONTROL OVER IT.
+       `species.recent` is a `recent` card — a name and how long ago — and
+       this is a register: a photograph, a common name, the binomial in
+       italics, and the sex split as two tags. The tab labels carry their own
+       counts, which the frame writes into the label rather than beside it. */
+    id: 'species.v3list', moduleId: 'species', name: 'New Animals',
+    layout: 'v3-list', purpose: 'MONITOR',
+    supportedSizes: ['tall'], defaultSize: 'tall', priority: 'secondary',
+    data: {
+      title: 'Animals', scope: 'Last 7 Days', deco: 'v3-ellipse-123.svg',
+      tabs: ['Newly Added - 5', 'Missing/Escaped - 1'],
+      rows: [
+        { photo: 'v3-parakeet.png', name: 'Green-cheeked Parakeet',
+          latin: 'Pyrrhura molinae ipsum', m: 'M - 2', f: 'F - 3' },
+        { photo: 'v3-parakeet.png', name: 'Green-cheeked Parakeet',
+          latin: 'Pyrrhura molinae ipsum', m: 'M - 2', f: 'F - 3' },
+        { photo: 'v3-parakeet.png', name: 'Green-cheeked Parakeet',
+          latin: 'Pyrrhura molinae ipsum', m: 'M - 2', f: 'F - 3' },
+      ],
+    },
+  },
+  {
+    /* 506:10591 · ONE FIGURE AGAINST TWO. The left half is the headline in
+       #52F990 — the only mint on the page — and the right half is two stacked
+       plates at 20px. Not a `queue`: a queue's rows are the same KIND of
+       thing as its total, and "Awaiting Approval" is not a part of
+       "Approved". */
+    id: 'approvals.v3helpdesk', moduleId: 'approvals', name: 'Help Desk',
+    layout: 'v3-helpdesk', purpose: 'UNDERSTAND', gradient: '--g-v3-helpdesk',
+    supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
+    data: {
+      title: 'Help Desk', value: '32', label: 'Approved',
+      cells: [
+        { label: 'Awaiting Approval', value: '02' },
+        { label: 'Completed',         value: '12' },
+      ],
+    },
+  },
+  {
+    /* 506:10606 · A COUNT, A PENDING BOX AND TWO PILLS. `mortality.trend`
+       draws a sparkline and a percentage, which this frame does not have
+       anywhere on it. */
+    id: 'mortality.v3widgets', moduleId: 'mortality', name: 'Last 7 Days',
+    layout: 'v3-mortality', purpose: 'ACT', gradient: '--g-v3-mortality',
+    supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
+    data: {
+      /* 506:10634 IS `Ellipse 119` — THE PINK ONE. The pale #DDEBE9 disc was
+         picked by name and it is a different asset: it turned this card's
+         bottom-left blue, (237,93,119) against the frame's (238,66,78). */
+      title: 'Mortality', scope: 'Last 7 Days', deco: 'v3-ellipse-119.svg',
+      value: '23', label: 'Animals',
+      pending: { value: '8', label: 'Necropsy Pending' },
+      actions: [
+        { icon: 'v3-plus.svg',   label: 'Add Mortality' },
+        { icon: 'v3-import.svg', label: 'Carcass Transfer' },
+      ],
+    },
+  },
+  {
+    /* 523:13121 · THE DAY'S EGGS, THEN WHERE THEY CAME FROM. A cream ground
+       with a white register under it — the one card on this page whose ink is
+       dark, which is why `fill` is stated: `solid` would put white type on
+       #FFF3B6. The two KC2 rows are the frame's. */
+    id: 'eggs.v3collected', moduleId: 'eggs', name: 'Eggs Collected Today',
+    layout: 'v3-eggs', purpose: 'UNDERSTAND',
+    gradient: '--g-v3-eggday',
+    supportedSizes: ['tall'], defaultSize: 'tall', priority: 'secondary',
+    data: {
+      title: 'Eggs Collected Today', value: '12', deco: 'v3-ellipse-eggday.svg',
+      rows: [
+        { place: 'Adirampattinum', value: '17' },
+        { place: '54 Acer',        value: '12' },
+        { place: 'Elephant Camp',  value: '8'  },
+        { place: 'KC2',            value: '3'  },
+        { place: 'KC2',            value: '3'  },
+      ],
+    },
+  },
+  {
+    /* 506:12829 · TWO MESSAGES ON WHITE, and the second one is a REACTION
+       rather than a message — an emoji between two runs of text. That detail
+       is the reason this is not a `recent` list: a reaction has no body of
+       its own, it quotes the message it is about. */
+    id: 'communication.v3chat', moduleId: 'communication', name: 'Chat',
+    layout: 'v3-chat', purpose: 'MONITOR',
+    gradient: '--g-v3-plate',
+    supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
+    data: {
+      rows: [
+        { initials: 'NK', name: 'Navdeep Kaur', text: 'Hi, Is the Pdf completed',
+          time: '03:12 AM', unread: '1' },
+        { photo: 'v3-chat-avatar.png', name: 'Nitin', time: '03:12 AM',
+          reaction: { pre: 'Reacted', emoji: 'v3-emoji.png',
+                      post: '“Hi, Is the Pdf completed”' } },
+      ],
+    },
+  },
+
   {
     id: 'species.stats', moduleId: 'species', name: 'Collection',
     layout: 'photo', purpose: 'UNDERSTAND',
@@ -14764,7 +16300,28 @@ const KEY = isV4() ? 'antz.home.layout.v4' : isV2() ? 'antz.home.layout.v2' : 'a
    not made here because V4 reads a key of its own, `antz.home.layout.v4`,
    that no browser has ever written: there is no stale document to drop, and
    a bump would drop everyone's hand-arranged V1 for nothing. */
-const VERSION = 12
+/* 12 → 13 · V3 IS NODE 506:10269's OWN WIDGETS NOW (17 Sep 2026). The seed
+   kept the frame's ORDER and filled it with the nearest cards the catalogue
+   already had — `pharmacy.stock`'s donut where the frame draws three icon
+   columns, `mortality.trend`'s sparkline where it draws two buttons, a
+   `queue` where it draws a photographed med kit over four request IDs. All
+   fifteen are replaced by variants built from the node. Every one of them is
+   an id a saved V3 document has never seen, so without the bump a browser
+   that has opened ?v=3 before goes on drawing the approximations — which is
+   exactly the failure the note two entries up describes, and the reason the
+   bump is made on a page only a handful of people have opened at all.
+
+   AND IT IS MADE DESPITE THE NOTE DIRECTLY ABOVE, which declined a bump on
+   V4's behalf so as not to drop everyone's hand-arranged V1. The two were
+   written a day apart against different problems and both readings are
+   right: V4 needs no bump because its key is new and there is nothing stale
+   to drop, while V3's stale ids all still RESOLVE — `pharmacy.stock` is a
+   real variant — so repair() passes them through and the page goes on drawing
+   yesterday's approximations in silence. A key that cannot self-correct is
+   the case this constant exists for, so it moves, and V1's arrangements are
+   the price. One constant gates every key; that is the cost recorded at
+   8 → 9 and it has not changed. */
+const VERSION = 13
 
 /**
  * The cards a fresh install starts with.
@@ -15002,37 +16559,66 @@ const V2_LAYOUT = [
  * and `mortality.default` there would have been four identical tiles where the
  * frame draws two doors and two counts.
  */
+/* NO `newRow` ANYWHERE IN THIS LIST, AND THAT IS THE WHOLE POINT.
+   ───────────────────────────────────────────────────────────────────────────
+   The flag exists so a design can leave a deliberate gap — V1's artboard ends
+   on two groups with two empty cells between them, and first-fit would pull
+   the second group up into it. **506:10269 has no gaps.** Every row of that
+   frame fills its four columns exactly: 2+2, 4, the notes block's 2 beside
+   2-over-2-over-1, four ones, 2 beside 1+1 over 2, and so on to the closing
+   band. First-fit alone reproduces it — checked cell by cell against the
+   frame — so the seven flags this list used to carry were doing nothing on a
+   fresh page.
+
+   THEY WERE DOING SOMETHING ONCE THE USER MOVED A CARD, though, and it was
+   the bug: a flag travels with its card, so dragging Species Management below
+   the promo left Key Insights alone on a row with two empty cells beside it
+   and every later group pinned under a floor it no longer needed. Reported as
+   "when I arrange the widgets, empty space was there — some widgets have to
+   come [into it]". They do now: with no flags, the packer backfills.
+
+   `repair()` STRIPS THE FLAG FROM SAVED V3 LAYOUTS for the same reason, so an
+   arrangement made before today is fixed without being thrown away — see the
+   note there. */
 const V3_LAYOUT = [
-  /* row 1 · Key Insights beside Species Management, two wide each */
-  { variantId: 'insights.key',       size: 'medium' },
-  { variantId: 'species.stats',      size: 'medium' },
-  /* row 2 · the promo, four columns wide (506:12894) */
-  { variantId: 'promo.tags',         size: 'band',   newRow: true },
+  /* row 1 · THE BANNER · 506:10261, the first band of the module block. It
+     used to sit in the page's markup above the grid, which made it the one
+     thing on the page with no handle on it in edit mode. */
+  { variantId: 'hero.v3',            size: 'band'   },
+  /* row 2 · Key Insights beside Species Management, two wide each */
+  { variantId: 'insights.v3',        size: 'medium' },
+  { variantId: 'species.v3stats',    size: 'medium' },
+  /* row 3 · the promo, four columns wide (506:12894) */
+  { variantId: 'promo.tags',         size: 'band'   },
   /* rows 2-4 · Notes is three rows tall on the left (506:10322, 340x464);
-     beside it Pharmacy's requests take two rows and Approvals one, which is
-     304 + 16 + 144 = 464 and squares the block */
-  { variantId: 'notes.recent',       size: 'xtall',  newRow: true },
-  { variantId: 'pharmacy.requests',  size: 'tall'   },
-  { variantId: 'approvals.pending',  size: 'medium' },
+     beside it Pharmacy's requests take two rows and Transfer Animal one,
+     which is 304 + 16 + 144 = 464 and squares the block */
+  { variantId: 'notes.v3',           size: 'xtall'  },
+  { variantId: 'pharmacy.v3requests', size: 'tall'  },
+  { variantId: 'approvals.v3transfer', size: 'medium' },
   /* row 5 · four one-cell tiles: two doors and two counts */
-  { variantId: 'eggs.v3',            size: 'small',  newRow: true },
+  { variantId: 'eggs.v3',            size: 'small'  },
   { variantId: 'species.v3new',      size: 'small'  },
   { variantId: 'users.v3',           size: 'small'  },
   { variantId: 'mortality.v3',       size: 'small'  },
   /* rows 6-7 · Inventory & Stock two rows on the left; Pharmacy and Lab share
-     the first row beside it and Approvals takes the second */
-  { variantId: 'pharmacy.stock',     size: 'tall',   newRow: true },
+     the first row beside it and Animals' week takes the second */
+  { variantId: 'pharmacy.v3stock',   size: 'tall'   },
   { variantId: 'pharmacy.default',   size: 'small'  },
   { variantId: 'lab.default',        size: 'small'  },
-  { variantId: 'approvals.week',     size: 'medium' },
+  { variantId: 'species.v3week',     size: 'medium' },
   /* rows 8-9 · the new-animals list, with Help Desk and Mortality beside it */
-  { variantId: 'species.recent',     size: 'tall',   newRow: true },
-  { variantId: 'approvals.breakdown', size: 'medium' },
-  { variantId: 'mortality.trend',    size: 'medium' },
-  /* rows 10-11 · eggs collected, with the actions tile and chat beside it */
-  { variantId: 'eggs.collection',    size: 'tall',   newRow: true },
-  { variantId: 'medical.actions',    size: 'medium' },
-  { variantId: 'communication.unread', size: 'medium' },
+  { variantId: 'species.v3list',     size: 'tall'   },
+  { variantId: 'approvals.v3helpdesk', size: 'medium' },
+  { variantId: 'mortality.v3widgets', size: 'medium' },
+  /* rows 10-11 · eggs collected, with Medical's actions and chat beside it */
+  { variantId: 'eggs.v3collected',   size: 'tall'   },
+  { variantId: 'medical.v3actions',  size: 'medium' },
+  { variantId: 'communication.v3chat', size: 'medium' },
+  /* row 12 · THE BAND THAT CLOSES THE PAGE · 517:13020, four columns and one
+     row. It was missing entirely — the frame's last 144px — which is why the
+     grid used to end on a half-empty row rather than square. */
+  { variantId: 'quick.v3actions',    size: 'band'   },
 ]
 
 /* V4 · V1's page, with the week's births and deaths in the first row beside
@@ -15127,14 +16713,42 @@ function repair(raw) {
     const uid = typeof item.uid === 'string' && !seen.has(item.uid) ? item.uid : newUid()
     seen.add(uid)
     const card = { uid, variantId: variant.id, size }
-    if (item.newRow) card.newRow = true
+    /* THE ROW BREAK IS DROPPED ON V3, AND ONLY ON V3. The flag pins a card to
+       a fresh row so a designed gap survives first-fit; 506:10269 has no gaps,
+       so nothing on this page ever needed one. What it DID do was travel with
+       a card when the user dragged it, pinning groups under floors that no
+       longer meant anything and leaving holes in the middle of the grid.
+       Stripping it here rather than bumping VERSION is deliberate: a bump
+       would take the arrangement away from anyone who had made one, and the
+       arrangement is the part worth keeping — it is only the flag that is
+       wrong. V1 and V2's artboards do leave gaps, so theirs are untouched. */
+    if (item.newRow && !isV3()) card.newRow = true
     cards.push(card)
   }
 
-  /* a locked card that was somehow removed comes back — the guarantee is about
-     the product, not about one write of localStorage */
+  /* A LOCKED CARD THAT WAS SOMEHOW REMOVED COMES BACK — the guarantee is about
+     the product, not about one write of localStorage.
+
+     AND IT IS SATISFIED BY THE MODULE, NOT BY THE ID. The rule is "a command
+     centre without the living collection or without medical on it is not this
+     product"; it is not "this page must contain these two exact cards". V3
+     puts Species on the page as `species.v3stats` and Medical as
+     `medical.v3actions` — node 506:10269's own compositions — and an id test
+     reads that page as having neither, so the first save-and-reload UNSHIFTED
+     two cards nobody asked for onto a layout that had just been matched to
+     the frame. The page came back seventeen cards where the artboard draws
+     fifteen, and only after a reload, which is the worst kind of wrong: the
+     screenshot taken before it is right.
+
+     `isCore` is deliberately NOT widened to match. What may not be REMOVED is
+     still those two ids and nothing else — the note above this is about a lock
+     list becoming a cage, and satisfying a guarantee is a different question
+     from forbidding a deletion. */
   for (const variantId of CORE_VARIANTS) {
-    if (!cards.some((c) => c.variantId === variantId)) {
+    const moduleId = getVariant(variantId)?.moduleId
+    const held = cards.some((c) => c.variantId === variantId ||
+      (moduleId && getVariant(c.variantId)?.moduleId === moduleId))
+    if (!held) {
       const v = getVariant(variantId)
       if (v) cards.unshift({ uid: newUid(), variantId, size: defaultSizeFor(variantId) })
     }
@@ -24465,11 +26079,24 @@ function renderCard(variant, opts = {}) {
      ModuleTiles.js — and opens the report page, so it is a button, not the
      module's link. Lazy, so the catalogue never depends on the reports. */
   const rt = isV4() && !isStatic ? __req('js/components/ModuleTiles.js').tileFor(variant) : null
-  const isLink = !isStatic && !isPassive && !rt && !!mod?.href
+  /* A VARIANT MAY CARRY ITS OWN DESTINATION. Until now only a MODULE had an
+     `href` — reasonably, since a card is a way into a module. The Command
+     Centre banner is the exception the catalogue already allows for
+     elsewhere: `moduleId: null`, no module, and a destination of its own.
+
+     THE TWO CONDITIONS ARE INDEPENDENT AND BOTH HOLD. `rt` asks whether this
+     card draws a V4 report, which makes it a button whatever it points at;
+     `href` asks where it goes when it is not one. They were written a day
+     apart on the same line and neither replaces the other — dropping `rt`
+     would turn every V4 report tile back into a link out of the app, and
+     dropping `href` would leave the Command Centre banner a button that
+     announces its name and goes nowhere. */
+  const href = variant.href || mod?.href
+  const isLink = !isStatic && !isPassive && !rt && !!href
   const el = document.createElement(isStatic || isPassive ? 'div' : isLink ? 'a' : 'button')
   el.className = 'card'
   if (isLink) {
-    el.href = mod.href
+    el.href = href
     el.target = '_blank'
     el.rel = 'noopener'
     /* Chrome starts its own drag from an anchor, which would land on top of
@@ -24609,6 +26236,15 @@ const BEHAVIOUR = {
     pages: el.querySelector('.l-note__pages'),
     nav: el.querySelector('.dots'),
   }),
+  /* V3's note is the same mechanism against its own page list. The dots moved
+     into the card's header on 506:10325 — they are still `.dots`, still
+     rendered by `pager()`, and `createCarousel` finds them by that class
+     wherever in the card they sit, which is why moving them cost nothing. */
+  'v3-note': (el) => createCarousel({
+    root: el,
+    pages: el.querySelector('.l-v3note__pages'),
+    nav: el.querySelector('.dots'),
+  }),
 }
 
 /* What a screen reader reads: the module, the card, then its actual content,
@@ -24637,7 +26273,21 @@ function spokenName(mod, variant, data) {
   if (data.caption) bits.push(data.caption)
   if (data.summary) bits.push(data.summary)
   for (const i of data.items || []) bits.push([i.value, i.label, i.text, i.name, i.kind, i.meta, i.when].filter(Boolean).join(' '))
-  for (const r of data.rows || []) bits.push(`${r.text} ${r.value}`)
+  /* V3's widgets name their rows three different ways — a request is an id
+     and who raised it, an egg count is a place, an arrival is a species — so
+     the row reader takes whichever of those a row actually carries rather
+     than each card growing its own branch. `filter(Boolean)` is what keeps a
+     `{text, value}` row from reading out three empty strings. */
+  for (const r of data.rows || []) {
+    bits.push([r.text, r.id, r.place, r.name, r.by, r.latin, r.value, r.when]
+      .filter(Boolean).join(' '))
+  }
+  for (const c of data.cells || []) bits.push(`${c.value ?? ''} ${c.label ?? ''}`)
+  for (const p of data.panes || []) bits.push(`${p.value ?? ''} ${p.label ?? ''}`)
+  for (const t of data.tiles || []) bits.push(t.label || (t.lines || []).join(' '))
+  if (data.urgent) bits.push(data.urgent)
+  if (data.scope) bits.push(data.scope)
+  if (data.pending) bits.push(`${data.pending.value} ${data.pending.label}`)
   for (const f of data.figures || []) bits.push(`${f.value} ${f.label}`)
   for (const s of data.segments || []) bits.push(`${s.label} ${s.value ?? s.n}`)
   for (const s of data.stages || []) bits.push(`${s.label} ${s.value}`)
@@ -24646,7 +26296,11 @@ function spokenName(mod, variant, data) {
   if (data.name) bits.push(data.name)
   if (data.meta) bits.push(data.meta)
   if (data.foot) bits.push(`${data.foot.label} ${data.foot.value}`)
-  for (const a of data.actions || []) bits.push(a)
+  /* `actions` is a list of STRINGS on the catalogue's `actions` layout and a
+     list of `{icon, label}` on V3's two button pairs. Reading the object
+     would announce "[object Object]" twice on a card whose whole content is
+     its two buttons. */
+  for (const a of data.actions || []) bits.push(typeof a === 'string' ? a : a?.label)
   return bits.filter(Boolean).join('. ')
 }
 
@@ -24667,6 +26321,46 @@ function glyph(mod, variant, cls = 'card__icon') {
   const fish = mod?.iconShape === 'fish' && !variant.icon
   return `<span class="${cls}${fish ? ' card__icon--fish' : ''}">` +
          `<img src="${ASSET_ICON}${esc(file)}" alt="" aria-hidden="true"></span>`
+}
+
+/**
+ * A DECORATIVE GLOW, CLIPPED TO THE CARD.
+ * ───────────────────────────────────────────────────────────────────────────
+ * Node 506:10269 hangs a blurred ring or an open arc off a corner of half its
+ * widgets — Figma's `Ellipse 118/119/120` and `Vector 14`. They are rings and
+ * strokes behind a 100px Gaussian, which a `radial-gradient` cannot be: the
+ * hole in the middle IS the shape, and without it a corner just goes pale. So
+ * the export is drawn, at the box the frame gives it.
+ *
+ * THE WRAPPER IS NOT DECORATION AND IT IS WHY THIS IS A FUNCTION. An absolutely
+ * positioned child that sticks out still counts toward its scroller's
+ * `scrollHeight`, whatever `overflow: hidden` does to the picture — so the
+ * insight card measured 285px of content in a 164px box and the note 732 in
+ * 524, and tools/verify.py called both an overflow at all six widths. They
+ * were not: nothing was cut and nothing scrolled. The fix is a clip layer
+ * pinned to `inset: 0`, which contributes nothing to the scroll box and keeps
+ * the glow inside it. Written once here rather than nine times in the layouts,
+ * because the next deco added without it would fail the suite in a way that
+ * reads as a layout bug.
+ *
+ * `x`, `y`, `w`, `h` are the EXPORT's box in the node's own coordinates,
+ * including the blur margin the SVG carries, so they can be read straight off
+ * Figma's inspector and checked against it.
+ */
+function deco(file, x, y, w, h = w, rot = 0) {
+  /* `rot` IS THE NODE'S OWN TRANSFORM AND IT IS NOT OPTIONAL WHERE FIGMA SETS
+     ONE. The exported SVG is always the UNROTATED shape — Figma keeps the
+     turn on the wrapper — so an arc drawn without it is the right curve
+     facing the wrong way. 506:10324 carries `rotate(-179.43deg)` and
+     506:10300 `rotate(179.44deg)`; both are half turns, and both arcs shipped
+     the right way up over the Notes and Key Insights cards, where they read
+     as a hard band across a corner instead of the soft sweep the frame draws.
+     That is what "the background layer has to merge the card" was pointing
+     at — not a blend mode, a missing rotation. */
+  const t = rot ? ` transform:rotate(${rot}deg);` : ''
+  return `<span class="l-v3deco-clip" aria-hidden="true">` +
+    `<img class="l-v3deco" src="${ASSET_ICON}${esc(file)}" alt=""` +
+    ` style="--dx:${x}px;--dy:${y}px;--dw:${w}px;--dh:${h}px;${t}"></span>`
 }
 
 /** The title line on a data card. A small glyph, then the card's own name. */
@@ -24783,6 +26477,41 @@ const LAYOUTS = {
     `<span class="l-door">${glyph(mod, variant)}` +
     `<span class="l-door__name">${esc(data.label || mod?.name || '')}</span></span>`,
 
+  /* ── THE COMMAND CENTRE BANNER · node 506:10261 ───────────────────────
+     IT IS A WIDGET, AND ON THIS ARTBOARD IT ALWAYS WAS. 506:10260 "Modules"
+     is 696x2224: the Hero Banner at y=0 and the Modules Container at y=160,
+     144 + 16 + 2064. The banner is the first band of the module block, not
+     chrome above it — so on V3 it comes off the page's markup and into the
+     grid, where it can be moved and removed like everything else beside it.
+     In edit mode it was the one card on the page with no handle on it.
+
+     EVERY RULE IT NEEDS ALREADY EXISTS. The classes below are the page's own
+     `.hero__*`, so the whole V3 banner stylesheet — the photograph, the veil,
+     the 44px mark, Inter Semi Bold at 32, the 412px subtitle box, the centred
+     stack — applies unchanged and nothing is duplicated. What the card adds
+     is a box: `.hero--card` takes its height from the cell rather than from
+     `--grid-row`, which at `band` are the same number anyway.
+
+     V1 AND V2 KEEP THEIR BANNER IN THE MARKUP. Their artboards draw it above
+     the section head rather than inside the grid, and it is not removable
+     there. This layout is V3's, by the catalogue, not by a version test. */
+  'v3-hero': (mod, variant, data) =>
+    `<span class="hero hero--estate hero--card">` +
+      `<span class="hero__media" aria-hidden="true"></span>` +
+      `<span class="hero__scrim" aria-hidden="true"></span>` +
+      `<span class="hero__veil" aria-hidden="true"></span>` +
+      `<span class="hero__row hero__row--top">` +
+        `<span class="hero__mark" aria-hidden="true">` +
+          `<img src="${ASSET_ICON}hero-logo.svg" alt=""></span>` +
+      `</span>` +
+      `<span class="hero__row hero__row--foot">` +
+        `<span class="hero__titles">` +
+          `<span class="hero__title">${esc(data.title || '')}</span>` +
+          `<span class="hero__sub">${esc(data.sub || '')}</span>` +
+        `</span>` +
+      `</span>` +
+    `</span>`,
+
   /* ── THE PROMO BANNER · node 506:12894 ────────────────────────────────
      NOT A MODULE CARD, AND THAT IS WHY IT WAS MISSING. It is four columns
      wide and one row tall between rows one and two, it announces a feature
@@ -24827,6 +26556,12 @@ const LAYOUTS = {
      506:10432, "24 / Newly Added Animals". */
   'v3-count': (mod, variant, data) =>
     `<span class="l-v3count">` +
+      /* 506:10433 · THE GLOW THIS TILE HAS BEEN MISSING SINCE 16 Sep. The
+         note at `--g-species` records it by name — "a 320px `Ellipse 119`
+         bled off the card's bottom-left corner, which flattens the whole
+         fill … that overlay is per-card construction and is not built yet".
+         It is built now: #DDEBE9 at 30%, ring x 1.625 off a 520 canvas. */
+      (data.deco ? deco(data.deco, -221, -234, 520) : '') +
       `<span class="l-v3count__head">` +
         `<span class="l-v3count__label">${esc(data.label || mod?.name || '')}</span>` +
         glyph(mod, variant, 'l-v3count__icon') +
@@ -24842,6 +26577,20 @@ const LAYOUTS = {
      one figure is the headline and the other is context. */
   'v3-split': (mod, variant, data) =>
     `<span class="l-v3split">` +
+      /* 506:10447 · A 200px `Ellipse 119` bled off the TOP-LEFT, and it is
+         why the frame's top corner reads (243,108,99) where a bare ramp gives
+         (250,104,72) — pinker and softer. Without it the tile shows the
+         gradient's own hard step at 47% as a diagonal seam across the card,
+         which is what it was reported as. */
+      /* 506:10447 IS `Ellipse 121`, NOT 119 — a 200px ring of #FCF4AE at 20%,
+         the notes yellow, which is why the frame's top-left corner reads
+         (243,108,99) against a bare ramp's (241,82,83): greener and lighter,
+         not pinker. Every one of these exports carries its own blur margin,
+         and the ratio is per-asset: this canvas is 325 for a 200 ring, so the
+         box is ring x 1.625 offset by ring x 0.3125. Reading the margin off
+         the file rather than assuming one is the difference between a glow on
+         the corner and a glow across the whole tile. */
+      (data.deco ? deco(data.deco, -123.5, -176.5, 325) : '') +
       `<span class="l-v3count__head">` +
         glyph(mod, variant, 'l-v3count__icon') +
         `<span class="l-v3count__label">${esc(data.label || mod?.name || '')}</span>` +
@@ -24852,6 +26601,371 @@ const LAYOUTS = {
         `<span class="l-v3split__pane">` +
           `<b>${esc(data.b?.value || '')}</b><i>${esc(data.b?.label || '')}</i></span>` +
       `</span>` +
+    `</span>`,
+
+  /* ══ THE REST OF NODE 506:10269 · ELEVEN COMPOSITIONS ═══════════════════
+     Everything from here to `compact` is the black page's widget set, and it
+     is written as eleven separate functions for the reason the header of this
+     file gives: a card whose CONTENT differs is a different layout, not a
+     flag on an existing one. The four above cover that frame's one-cell
+     tiles; these cover the eight two-column widgets, the three-row note, and
+     the band that closes the page.
+
+     THE DECORATIVE GLOW IS AN `<img>`, NOT A GRADIENT. Half of these cards
+     carry a large blurred ring bled off one corner — Figma's `Ellipse 118`,
+     `119`, `120` and `122`, which are ring PATHS behind a 100px Gaussian, not
+     radial fills. A CSS radial-gradient can make a blurred disc and cannot
+     make a blurred ring: the hole in the middle is what gives these their
+     shape, and without it the corner just goes pale. So the export is drawn,
+     positioned by `--dx`/`--dy`/`--dw` off the node's own numbers, and
+     `aria-hidden` throughout. */
+
+  /* THE THREE-COLUMN INSIGHT · 506:10271. One plate per figure at equal
+     width, the outer two rounded on their outer edge only, so the three read
+     as one control rather than three cards. */
+  'v3-insights': (mod, variant, data) =>
+    `<span class="l-v3ins">` +
+      deco('v3-arc-insights.svg', -105, -30, 315, 140, 179.44) +
+      `<span class="l-v3ins__head">` +
+        `<img class="l-v3ins__icon" src="${ASSET_ICON}v3-insights.svg" alt="" aria-hidden="true">` +
+        `<span class="l-v3ins__title">${esc(data.title || '')}</span>` +
+      `</span>` +
+      `<span class="l-v3ins__cells">` +
+      (data.cells || []).map((c) =>
+        `<span class="l-v3ins__cell">` +
+          `<span class="l-v3ins__cap">` +
+            `<img src="${ASSET_ICON}${esc(c.icon)}" alt="" aria-hidden="true"` +
+              (c.spin ? ` class="is-tilted"` : '') + `>` +
+            `<span>${esc(c.label)}</span>` +
+          `</span>` +
+          `<b>${esc(c.value)}</b>` +
+        `</span>`).join('') +
+      `</span>` +
+    `</span>`,
+
+  /* THE NOTE WITH ITS PHOTOGRAPH · 506:10322. Structurally the V2 note plus a
+     166px image at the head of the plate and the dots moved into the card's
+     own header, so it reuses `.dots` and the carousel wiring rather than
+     restating either — see BEHAVIOUR below, where `v3-note` is registered
+     against the same `createCarousel` call `note` uses. */
+  'v3-note': (mod, variant, data) => {
+    const items = (data.items || []).slice(0, Math.min(NOTE_MAX, CAROUSEL_MAX))
+    const page = (it) => {
+      const p = NOTE_PRIORITY[it.priority] || NOTE_PRIORITY.high
+      return `<span class="l-v3note__page is-page">` +
+        `<span class="l-v3note__plate" style="--note-pri:${p.solid}">` +
+          `<img class="l-v3note__shot" src="${ASSET_IMG}${esc(it.photo || '')}" alt=""` +
+            ` loading="lazy" decoding="async">` +
+          `<span class="l-v3note__body">` +
+            `<span class="l-v3note__top">` +
+              `<span class="l-v3note__who">` +
+                `<img class="l-v3note__face" src="${ASSET_IMG}${esc(it.author || '')}" alt=""` +
+                  ` loading="lazy" decoding="async">` +
+                `<span class="l-v3note__ident">` +
+                  `<b>${esc(it.id || '')}</b><span>${esc(it.name || '')}</span></span>` +
+                (it.more ? `<span class="l-v3note__more">+${esc(it.more)}</span>` : '') +
+              `</span>` +
+              /* THE PRIORITY LINE AND THE PROSE ARE ONE GROUP · 506:10351.
+                 Flattened into siblings they both inherit the 20px the
+                 Observation Content sets between the author row and the
+                 note, and the frame puts 8 between a category and the
+                 sentence it heads. Two and a half lines of extra markup
+                 against a gap that reads as a paragraph break. */
+              `<span class="l-v3note__desc">` +
+                `<span class="l-v3note__kind">` +
+                  `<span class="l-v3note__pri" title="${esc(p.label)} priority">` +
+                    (p.src ? `<img src="${ASSET_ICON}${esc(p.src)}" alt="">`
+                           : `<span aria-hidden="true">${esc(p.glyph)}</span>`) +
+                    `<span class="sr-only">${esc(p.label)} priority</span></span>` +
+                  `<span class="l-v3note__cat">${esc(it.category || '')}</span>` +
+                `</span>` +
+                `<span class="l-v3note__text">${esc(it.body || '')}</span>` +
+              `</span>` +
+            `</span>` +
+            `<span class="l-v3note__foot">` +
+              `<span class="l-v3note__sig"><b>${esc(it.by || '')}</b>` +
+                `<span aria-hidden="true">•</span><time>${esc(it.date || '')}</time></span>` +
+              `<span class="l-v3note__like">` +
+                `<img src="${ASSET_ICON}v3-like.svg" alt="">` +
+                `<b>${esc(it.likes ?? 0)}</b><span class="sr-only">likes</span></span>` +
+            `</span>` +
+          `</span>` +
+        `</span></span>`
+    }
+    return `<span class="l-v3note">` +
+      deco('v3-arc-notes-b.svg', -11, -39, 422, 201, -179.43) +
+      deco('v3-arc-notes-a.svg', -81, 296, 436, 205, -0.07) +
+      `<span class="l-v3note__head">` +
+        `<img class="l-v3note__icon" src="${ASSET_ICON}v3-note-head.svg" alt="" aria-hidden="true">` +
+        `<span class="l-v3note__title">${esc(data.title || 'Recent Notes')}</span>` +
+        /* `.dots` ALREADY IS 506:10332 — the smoked pill, 4x8 of padding, a
+           100px corner and three 6px dots — so the node's header indicator is
+           `pager()` unwrapped rather than a V3 copy of the same five
+           declarations. Checked against the sheet, not assumed. */
+        pager(items.length, 'note') +
+      `</span>` +
+      `<span class="l-v3note__pages">${items.map(page).join('')}</span>` +
+    `</span>`
+  },
+
+  /* THE REQUEST QUEUE · 506:10368. A summary block — glyph, title, the figure
+     and its urgency pill, with the med kit lying across the right corner —
+     over a glass plate of request rows that fills whatever height is left. */
+  'v3-requests': (mod, variant, data) =>
+    `<span class="l-v3req">` +
+      /* THE GLOW BELONGS TO THE CARD, NOT TO THE SUMMARY BLOCK. It is drawn
+         inside `Request Summary` in the node, but that frame does not clip —
+         the ellipse spills out of it and blends away down the card. Clipped
+         to the summary's own 336x88, as the clip layer added on 17 Sep did,
+         it stops dead at the block's edge and paints a hard-edged pale
+         rectangle across the top third of the card. That is the "light white
+         background" it was reported as: not a stray fill, a glow with a
+         corner on it. Hoisted to the layout root so the clip is the card,
+         with the node's position rebased by the summary's own (8,8). */
+      deco('v3-ellipse-118.svg', -120, -192, 520) +
+      `<span class="l-v3req__sum">` +
+        `<span class="l-v3req__head">` +
+          glyph(mod, variant, 'l-v3req__icon') +
+          `<span class="l-v3req__title">${esc(data.title || '')}</span>` +
+        `</span>` +
+        `<span class="l-v3req__figure">` +
+          `<b>${esc(data.value || '')}</b>` +
+          (data.urgent ? `<span class="l-v3req__urgent">` +
+            `<img src="${ASSET_ICON}v3-urgent.svg" alt="" aria-hidden="true">` +
+            `${esc(data.urgent)}</span>` : '') +
+        `</span>` +
+        `<img class="l-v3req__kit" src="${ASSET_IMG}v3-medkit.png" alt="" aria-hidden="true"` +
+          ` loading="lazy" decoding="async">` +
+      `</span>` +
+      `<span class="l-v3req__rows">` +
+      (data.rows || []).map((r) =>
+        `<span class="l-v3req__row">` +
+          `<span class="l-v3req__what"><b>${esc(r.id)}</b><span>${esc(r.by)}</span></span>` +
+          `<time>${esc(r.when)}</time>` +
+        `</span>`).join('') +
+      `</span>` +
+    `</span>`,
+
+  /* N TILES UNDER A TITLE · 506:10406, 506:10669 and 517:13020, which are the
+     same card three times at three brightnesses. `tone` picks the glass —
+     the frame draws white at 5%, 15% and 10% respectively — and a tile takes
+     either `lines` (captioned, two rows, as the transfer card draws it) or a
+     bare `label`, which is read out but not drawn because the other two cards
+     show the glyph alone. */
+  'v3-tiles': (mod, variant, data) => {
+    const tone = data.tone || 'dim'
+    return `<span class="l-v3tiles" data-tone="${esc(tone)}">` +
+      (data.deco ? deco(data.deco, -241, -166, 638) : '') +
+      `<span class="l-v3tiles__head">` +
+        (data.icon ? `<img class="l-v3tiles__icon" src="${ASSET_ICON}${esc(data.icon)}"` +
+          ` alt="" aria-hidden="true">` : glyph(mod, variant, 'l-v3tiles__icon')) +
+        `<span class="l-v3tiles__title">${esc(data.title || mod?.name || '')}</span>` +
+      `</span>` +
+      `<span class="l-v3tiles__row">` +
+      (data.tiles || []).map((t) =>
+        `<span class="l-v3tiles__tile">` +
+          `<img src="${ASSET_ICON}${esc(t.icon)}" alt="" aria-hidden="true">` +
+          (t.lines ? `<span class="l-v3tiles__cap">` +
+              t.lines.map((l) => `<span>${esc(l)}</span>`).join('') + `</span>`
+            : `<span class="sr-only">${esc(t.label || '')}</span>`) +
+        `</span>`).join('') +
+      `</span>` +
+    `</span>`
+  },
+
+  /* INVENTORY · 506:10460. A title with its glyph in a green disc, then a
+     glass plate holding the location chip and three icon columns, then the
+     two pills. The plate takes the height that is left, which is what keeps
+     the buttons on the floor of the card at any row height. */
+  'v3-stock': (mod, variant, data) =>
+    `<span class="l-v3stock">` +
+      (data.deco ? deco(data.deco, -37, -54, 520) : '') +
+      `<span class="l-v3stock__head">` +
+        `<span class="l-v3stock__title">${esc(data.title || '')}</span>` +
+        `<span class="l-v3stock__disc">${glyph(mod, variant, 'l-v3stock__icon')}</span>` +
+      `</span>` +
+      `<span class="l-v3stock__plate">` +
+        (data.scope ? `<span class="l-v3chip">${esc(data.scope)}` +
+          `<img src="${ASSET_ICON}v3-chevron.svg" alt="" aria-hidden="true"></span>` : '') +
+        `<span class="l-v3stock__cells">` +
+        (data.cells || []).map((c) =>
+          `<span class="l-v3stock__cell">` +
+            `<img src="${ASSET_ICON}${esc(c.icon)}" alt="" aria-hidden="true">` +
+            `<b>${esc(c.value)}</b><span>${esc(c.label)}</span>` +
+          `</span>`).join('') +
+        `</span>` +
+      `</span>` +
+      `<span class="l-v3stock__acts">` +
+      (data.actions || []).map((a) =>
+        `<span class="l-v3pill">` +
+          `<img src="${ASSET_ICON}${esc(a.icon)}" alt="" aria-hidden="true">` +
+          `${esc(a.label)}</span>`).join('') +
+      `</span>` +
+    `</span>`,
+
+  /* TWO WHITE PLATES ON COLOUR · 506:10515. Each carries a figure, a caption,
+     a round badge in the top-right and a photograph bleeding off the right
+     edge under a swoosh. The photograph sits UNDER the figure in the stack
+     and over the swoosh, which is the order the frame draws them in. */
+  'v3-duo': (mod, variant, data) =>
+    `<span class="l-v3duo">` +
+      (data.deco ? deco(data.deco, -149, -247, 638) : '') +
+      `<span class="l-v3duo__head">` +
+        glyph(mod, variant, 'l-v3duo__icon') +
+        `<span class="l-v3duo__title">${esc(data.title || mod?.name || '')}</span>` +
+        (data.scope ? `<span class="l-v3chip l-v3chip--sq">${esc(data.scope)}` +
+          `<img src="${ASSET_ICON}v3-chevron.svg" alt="" aria-hidden="true"></span>` : '') +
+      `</span>` +
+      `<span class="l-v3duo__panes">` +
+      (data.panes || []).map((p) =>
+        `<span class="l-v3duo__pane" data-tone="${esc(p.tone || 'good')}">` +
+          `<img class="l-v3duo__swoosh" src="${ASSET_ICON}${esc(p.swoosh)}" alt="" aria-hidden="true">` +
+          `<img class="l-v3duo__shot" src="${ASSET_IMG}${esc(p.photo)}" alt="" aria-hidden="true"` +
+            ` loading="lazy" decoding="async">` +
+          `<span class="l-v3duo__badge">` +
+            `<img src="${ASSET_ICON}v3-anim-a.svg" alt="" aria-hidden="true">` +
+            `<img src="${ASSET_ICON}v3-anim-b.svg" alt="" aria-hidden="true"></span>` +
+          `<b>${esc(p.value)}</b>` +
+          `<span class="l-v3duo__cap">${esc(p.label)}</span>` +
+        `</span>`).join('') +
+      `</span>` +
+    `</span>`,
+
+  /* THE ARRIVALS REGISTER · 506:10550. Head, a segmented control, then a
+     white plate of rows. The first tab is the selected one; they are drawn
+     rather than wired, because the card is a link to the module and a control
+     that changes what a card shows without going anywhere is a second
+     interaction on a surface that already has one. */
+  'v3-list': (mod, variant, data) =>
+    `<span class="l-v3list">` +
+      `<span class="l-v3duo__head">` +
+        glyph(mod, variant, 'l-v3duo__icon') +
+        `<span class="l-v3duo__title">${esc(data.title || mod?.name || '')}</span>` +
+        (data.scope ? `<span class="l-v3chip l-v3chip--sq">${esc(data.scope)}` +
+          `<img src="${ASSET_ICON}v3-chevron.svg" alt="" aria-hidden="true"></span>` : '') +
+      `</span>` +
+      `<span class="l-v3list__tabs">` +
+      (data.tabs || []).map((t, i) =>
+        `<span class="l-v3list__tab${i === 0 ? ' is-on' : ''}">${esc(t)}</span>`).join('') +
+      `</span>` +
+      `<span class="l-v3list__plate">` +
+      (data.rows || []).map((r) =>
+        `<span class="l-v3list__row">` +
+          `<img src="${ASSET_IMG}${esc(r.photo)}" alt="" aria-hidden="true"` +
+            ` loading="lazy" decoding="async">` +
+          `<span class="l-v3list__what">` +
+            `<b>${esc(r.name)}</b><i>${esc(r.latin)}</i>` +
+            `<span class="l-v3list__tags">` +
+              `<span class="l-v3tag l-v3tag--m">${esc(r.m)}</span>` +
+              `<span class="l-v3tag l-v3tag--f">${esc(r.f)}</span>` +
+            `</span>` +
+          `</span>` +
+        `</span>`).join('') +
+        /* 506:10588 · A 3x44 BAR ON THE PLATE'S RIGHT EDGE, black at 20%. It
+           is a scroll POSITION, not a divider: the frame's third arrival is
+           cut by the card's floor and this says there is more under it. */
+        `<span class="l-v3list__bar" aria-hidden="true"></span>` +
+      `</span>` +
+      /* THE GLOW IS ON TOP OF THIS ONE, AND ON TOP OF NOTHING ELSE ON THE
+         ARTBOARD. Every other ellipse is its card's FIRST child, or carries a
+         `z-[1]` that puts it under the content; 506:10589 is the LAST child
+         of 506:10550 with no z-index at all, so it paints over the white
+         register and tints it. Measured: the frame's plate is (252,235,239),
+         a pale pink, where ours was pure white — the whole card reads warmer
+         because of where one child sits in a list. */
+      (data.deco ? deco(data.deco, -149, -167, 638) : '') +
+    `</span>`,
+
+  /* ONE FIGURE AGAINST TWO · 506:10591. The left column is a title and a
+     headline in mint; the right is two stacked plates, each a label over a
+     20px figure, sharing one 8px corner between them. */
+  'v3-helpdesk': (mod, variant, data) =>
+    `<span class="l-v3hd">` +
+      `<span class="l-v3hd__main">` +
+        `<span class="l-v3hd__title">${esc(data.title || '')}</span>` +
+        `<span class="l-v3hd__read">` +
+          `<b>${esc(data.value || '')}</b><span>${esc(data.label || '')}</span></span>` +
+      `</span>` +
+      `<span class="l-v3hd__cells">` +
+      (data.cells || []).map((c) =>
+        `<span class="l-v3hd__cell"><span>${esc(c.label)}</span><b>${esc(c.value)}</b></span>`).join('') +
+      `</span>` +
+    `</span>`,
+
+  /* MORTALITY'S WEEK · 506:10606. A glass box holding the count and a white
+     inner box for what is still pending, beside a column of two pills. */
+  'v3-mortality': (mod, variant, data) =>
+    `<span class="l-v3mort">` +
+      (data.deco ? deco(data.deco, 3, -70, 291) : '') +
+      `<span class="l-v3duo__head">` +
+        glyph(mod, variant, 'l-v3duo__icon') +
+        `<span class="l-v3duo__title">${esc(data.title || mod?.name || '')}</span>` +
+        (data.scope ? `<span class="l-v3chip l-v3chip--sq">${esc(data.scope)}` +
+          `<img src="${ASSET_ICON}v3-chevron.svg" alt="" aria-hidden="true"></span>` : '') +
+      `</span>` +
+      `<span class="l-v3mort__body">` +
+        `<span class="l-v3mort__count">` +
+          `<span class="l-v3mort__read"><b>${esc(data.value || '')}</b>` +
+            `<span>${esc(data.label || '')}</span></span>` +
+          `<span class="l-v3mort__pending"><b>${esc(data.pending?.value || '')}</b>` +
+            `<span>${esc(data.pending?.label || '')}</span></span>` +
+        `</span>` +
+        `<span class="l-v3mort__acts">` +
+        (data.actions || []).map((a) =>
+          `<span class="l-v3pill l-v3pill--sq">` +
+            `<img src="${ASSET_ICON}${esc(a.icon)}" alt="" aria-hidden="true">` +
+            `${esc(a.label)}</span>`).join('') +
+        `</span>` +
+      `</span>` +
+    `</span>`,
+
+  /* THE DAY'S EGGS · 523:13121. A cream head with the basket photographed
+     across its right, then a white register of places and counts. The one
+     card on this page with dark ink, which its own rules in the stylesheet
+     set rather than the fill doing it — see the catalogue note. */
+  'v3-eggs': (mod, variant, data) =>
+    `<span class="l-v3eggs">` +
+      (data.deco ? deco(data.deco, -33, -94, 305) : '') +
+      `<span class="l-v3eggs__head">` +
+        `<span class="l-v3eggs__title">` +
+          `<img src="${ASSET_ICON}v3-eggs-head.svg" alt="" aria-hidden="true">` +
+          `${esc(data.title || '')}</span>` +
+        `<b>${esc(data.value || '')}</b>` +
+        `<img class="l-v3eggs__basket" src="${ASSET_IMG}v3-eggbasket.png" alt=""` +
+          ` aria-hidden="true" loading="lazy" decoding="async">` +
+      `</span>` +
+      `<span class="l-v3eggs__plate">` +
+      (data.rows || []).map((r) =>
+        `<span class="l-v3eggs__row"><span>${esc(r.place)}</span><b>${esc(r.value)}</b></span>`).join('') +
+      `</span>` +
+    `</span>`,
+
+  /* TWO MESSAGES · 506:12829. The first has an unread badge under its time,
+     the second is a reaction — text, emoji, then the quoted message — and
+     neither is a control: the card is the link to Communication. */
+  'v3-chat': (mod, variant, data) =>
+    `<span class="l-v3chat">` +
+    (data.rows || []).map((r) =>
+      `<span class="l-v3chat__row">` +
+        (r.photo
+          ? `<img class="l-v3chat__face" src="${ASSET_IMG}${esc(r.photo)}" alt=""` +
+            ` aria-hidden="true" loading="lazy" decoding="async">`
+          : `<span class="l-v3chat__face l-v3chat__face--ini" aria-hidden="true">` +
+            `${esc(r.initials || '')}</span>`) +
+        `<span class="l-v3chat__msg">` +
+          `<b>${esc(r.name)}</b>` +
+          (r.reaction
+            ? `<span class="l-v3chat__react">${esc(r.reaction.pre)}` +
+              `<img src="${ASSET_IMG}${esc(r.reaction.emoji)}" alt="" aria-hidden="true">` +
+              `<span>${esc(r.reaction.post)}</span></span>`
+            : `<span class="l-v3chat__text">${esc(r.text || '')}</span>`) +
+        `</span>` +
+        `<span class="l-v3chat__meta${r.unread ? ' is-unread' : ''}">` +
+          `<time>${esc(r.time)}</time>` +
+          (r.unread ? `<span class="l-v3chat__badge">${esc(r.unread)}` +
+            `<span class="sr-only"> unread</span></span>` : '') +
+        `</span>` +
+      `</span>`).join('') +
     `</span>`,
 
   /* The same entry point on its side, one row high, for a page that wants many
