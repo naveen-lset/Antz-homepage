@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANTZ Home Redesign — Review</title>
+  <link rel="icon" href="data:,">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+  <style>
+    /* THE REVIEW FRAME · shows home.html at the brief's device sizes, scaled
+       to fit. On an iPad itself, open home.html directly instead. */
+    :root { --ink: #13231C; --mute: #66776E; --line: rgba(19,35,28,.1); --green: #1E7A44; font-family: Inter, system-ui, sans-serif; color: var(--ink); }
+    * { box-sizing: border-box; }
+    body { margin: 0; height: 100vh; display: flex; flex-direction: column; background: #E7ECE9; }
+    .bar { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 20px; background: #fff; box-shadow: 0 1px 0 var(--line); }
+    .bar h1 { margin: 0 8px 0 0; font-size: 15px; font-weight: 700; }
+    .bar h1 small { display: block; font-size: 11px; font-weight: 500; color: var(--mute); }
+    .grp { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+    .grp > span { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); margin-right: 4px; }
+    button { font: inherit; font-size: 12.5px; font-weight: 550; min-height: 34px; padding: 0 11px; border: 0; border-radius: 12px; background: #EEF3F0; color: var(--ink); cursor: pointer; }
+    button[aria-pressed='true'] { background: var(--ink); color: #fff; }
+    button small { opacity: .6; margin-left: 4px; font-weight: 500; }
+    a { font-size: 13px; font-weight: 600; color: var(--green); text-decoration: none; margin-left: auto; }
+    .stage { flex: 1; min-height: 0; display: grid; place-items: center; overflow: hidden; padding: 20px; }
+    .dev { position: relative; border-radius: 22px; background: #0E1512; padding: 12px; box-shadow: 0 30px 80px -30px rgba(0,0,0,.45); transform-origin: 50% 50%; }
+    .dev.web { border-radius: 12px; padding: 0; background: #fff; }
+    iframe { display: block; border: 0; border-radius: 12px; background: #F5F7F6; }
+    .cap { position: absolute; left: 0; right: 0; top: 100%; margin-top: 10px; text-align: center; font-size: 12px; color: var(--mute); }
+    .note { font-size: 12px; color: var(--mute); max-width: 520px; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <h1>ANTZ Home — Redesign Mock<small>Isolated prototype · mock data · not the live product</small></h1>
+    <div class="grp" id="variant"><span>Mockup</span>
+      <button data-v="a" aria-pressed="true">A · Stream</button>
+      <button data-v="b" aria-pressed="false">B · Split</button>
+    </div>
+    <div class="grp" id="devices"><span>Device</span></div>
+    <a id="open" href="home.html" target="_blank" rel="noopener">Open full screen ↗</a>
+  </div>
+  <div class="stage" id="stage"><div class="dev" id="dev"><iframe id="frame" title="ANTZ Home mock"></iframe><div class="cap" id="cap"></div></div></div>
+  <script>
+    const DEVICES = [
+      ['iPad Mini', 768, 1024], ['iPad Mini ⟲', 1024, 768], ['iPad Air', 820, 1180], ['iPad Air ⟲', 1180, 820],
+      ['iPad Pro 11"', 834, 1194], ['iPad Pro 13"', 1032, 1376], ['Desktop', 1440, 900], ['Large desktop', 1920, 1080], ['Phone', 390, 844],
+    ]
+    let dev = DEVICES[1], v = new URLSearchParams(location.search).get('v') === 'b' ? 'b' : 'a'
+    const $ = (s) => document.querySelector(s)
+    $('#devices').insertAdjacentHTML('beforeend', DEVICES.map((d, i) => `<button data-d="${i}">${d[0]}<small>${d[1]}×${d[2]}</small></button>`).join(''))
+    function draw() {
+      const f = $('#frame'), box = $('#dev'), stage = $('#stage')
+      const web = dev[1] >= 1400
+      box.classList.toggle('web', web)
+      f.width = dev[1]; f.height = dev[2]
+      const src = `home.html?v=${v}`
+      if (!f.src.endsWith(src)) f.src = src
+      $('#open').href = src
+      const pad = web ? 0 : 24
+      const s = Math.min(1, (stage.clientWidth - 40) / (dev[1] + pad), (stage.clientHeight - 60) / (dev[2] + pad))
+      box.style.transform = `scale(${s})`
+      $('#cap').textContent = `${dev[0]} · ${dev[1]} × ${dev[2]} · shown at ${Math.round(s * 100)}%`
+      document.querySelectorAll('[data-d]').forEach((b) => b.setAttribute('aria-pressed', DEVICES[b.dataset.d] === dev))
+      document.querySelectorAll('[data-v]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === v))
+    }
+    document.addEventListener('click', (e) => {
+      const d = e.target.closest('[data-d]'); if (d) { dev = DEVICES[d.dataset.d]; draw() }
+      const b = e.target.closest('[data-v]'); if (b) { v = b.dataset.v; draw() }
+    })
+    addEventListener('resize', draw); draw()
+  </script>
+</body>
+</html>
