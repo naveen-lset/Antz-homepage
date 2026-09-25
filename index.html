@@ -6304,14 +6304,33 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .l-sch__top .c-head { margin: 0; min-width: 0; }
 /* the module glyph is white, so on a white plate it is a blank gap */
 .l-sch .c-head__icon, .l-xt .c-head__icon { display: none; }
-.card[data-variant='species.schedule'], .card[data-variant='species.appendix'] { box-shadow: inset 0 0 0 1px rgba(31, 65, 91, .1); }
+.card[data-variant='species.schedule'], .card[data-variant='species.appendix'], .card[data-variant='housing.types'] {
+  background: linear-gradient(180deg, var(--c-white) 0%, var(--viz-100) 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 171, 171, .16);
+}
+.l-sch .c-head__text, .l-xt .c-head__text, .l-tm .c-head__text { color: var(--viz-900); }
+.l-tm .c-head__icon { display: none; }
+.l-xt__row--head > span:not(:first-child) { color: var(--viz-700); }
+.l-xt__n.is-heat { justify-self: end; min-width: 2.4em; padding: 2px 5px; border-radius: 6px; background: rgba(60, 198, 190, calc(.1 + var(--h) * .38)); color: var(--viz-900); font-weight: 600; }
+.l-tm { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; }
+.l-tm__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
+.l-tm__top .c-head { margin: 0; min-width: 0; }
+.l-tm__all { flex: none; font-size: var(--fs-micro); color: var(--ink-mute); }
+.l-tm__all b { font-family: var(--font-num); font-size: 16px; color: var(--viz-900); }
+.l-tm__map { display: flex; flex: 1 1 auto; flex-direction: column; gap: 4px; min-height: 0; }
+/* the smallest row still has to hold a figure and a two-line name */
+.l-tm__row { display: flex; gap: 4px; min-height: 68px; }
+.l-tm__b { display: flex; flex-direction: column; justify-content: flex-end; gap: 1px; min-width: 76px; padding: 6px 10px; border-radius: 10px; overflow: hidden;
+  background: rgba(60, 198, 190, calc(.12 + var(--h) * .42)); color: var(--viz-900); }
+.l-tm__b b { font-family: var(--font-num); font-size: 18px; line-height: 1.1; }
+.l-tm__b small { font-size: var(--fs-micro); line-height: 1.2; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .l-seg { display: inline-flex; flex: none; padding: 3px; border-radius: var(--r-pill); background: var(--viz-100); }
 .l-seg__opt { border: 0; padding: 4px 12px; border-radius: var(--r-pill); background: none; color: var(--ink-2); font: inherit; font-size: var(--fs-label); font-weight: 600; cursor: pointer; }
 .l-seg__opt[aria-pressed='true'] { background: var(--c-white); color: var(--viz-900); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
 .l-seg__opt:focus-visible { outline: 2px solid var(--viz-700); outline-offset: 1px; }
 .l-sch__body { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
 .l-sch__viz { display: flex; align-items: center; gap: 20px; }
-.l-sch__donut { position: relative; flex: none; width: 92px; height: 92px; }
+.l-sch__donut { position: relative; flex: none; width: 100px; height: 100px; }
 .l-sch__donut svg { width: 100%; height: 100%; transform: rotate(0deg); }
 .l-sch__mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
 .l-sch__mid b { font-family: var(--font-num); font-size: 20px; font-weight: 700; color: var(--ink); }
@@ -6323,7 +6342,7 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .l-sch__key b { color: var(--ink); font-variant-numeric: tabular-nums; }
 .l-sch__key small { color: var(--ink-mute); text-align: right; font-variant-numeric: tabular-nums; }
 .l-xt__grid { display: flex; flex-direction: column; min-width: 0; font-size: var(--fs-label); }
-.l-xt__row { display: grid; grid-template-columns: 7.2em repeat(calc(var(--cols) + 1), minmax(0, 1fr)); align-items: center; gap: 4px; padding: 4px 0; color: var(--ink); }
+.l-xt__row { display: grid; grid-template-columns: 6.8em repeat(calc(var(--cols) + 1), minmax(min-content, 1fr)); align-items: center; gap: 6px; padding: 4px 0; color: var(--ink); }
 .l-xt__row > span:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
 .l-xt__row--head { font-size: var(--fs-micro); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-mute); border-top: 1px solid rgba(31, 65, 91, .1); padding-top: 8px; }
 .l-xt > .l-xt__grid .l-xt__row--head { border-top: 0; padding-top: 0; }
@@ -14156,6 +14175,26 @@ const VARIANTS = [
       ],
     },
   },
+  /* ENCLOSURES BY TYPE · V5 (owner, 25 Sep 2026). The project's sixteen
+     housing kinds folded into seven families; counts are placeholders. */
+  {
+    id: 'housing.types', moduleId: 'housing', name: 'Enclosures by type',
+    layout: 'treemap', purpose: 'UNDERSTAND', fill: 'plate',
+    supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
+    data: {
+      title: 'Enclosures by type', unit: 'enclosures',
+      summary: 'Cages 62, Aviaries 41, Paddocks and open ranges 38, Buildings 31, Moated and island 22, Vivaria and aquaria 12, Hospital units 8',
+      parts: [
+        { label: 'Cages', n: 62 },
+        { label: 'Aviaries', n: 41 },
+        { label: 'Paddocks & open ranges', n: 38 },
+        { label: 'Buildings', n: 31 },
+        { label: 'Moated & island', n: 22 },
+        { label: 'Vivaria & aquaria', n: 12 },
+        { label: 'Hospital units', n: 8 },
+      ],
+    },
+  },
   {
     id: 'species.appendix', moduleId: 'species', name: 'Appendix, by class',
     layout: 'appendix', purpose: 'UNDERSTAND', fill: 'plate',
@@ -15187,8 +15226,8 @@ const V3_LAYOUT = [
 const V5_LAYOUT = DEFAULT_LAYOUT.flatMap((e) => (e.variantId === 'species.stats'
   ? [e, { variantId: 'species.byclass', size: 'medium' }] : [e]))
   /* a fresh row, so the pair sits side by side instead of backfilling gaps */
-  .concat([{ variantId: 'species.schedule', size: 'large', newRow: true }, { variantId: 'species.appendix', size: 'large' }])
-const REQUIRED_V5 = V5_LAYOUT.filter((e) => ['species.byclass', 'species.schedule', 'species.appendix'].includes(e.variantId))
+  .concat([{ variantId: 'species.schedule', size: 'large', newRow: true }, { variantId: 'species.appendix', size: 'large' }, { variantId: 'housing.types', size: 'large' }])
+const REQUIRED_V5 = V5_LAYOUT.filter((e) => ['species.byclass', 'species.schedule', 'species.appendix', 'housing.types'].includes(e.variantId))
 
 const V4_LAYOUT = [
   ...DEFAULT_LAYOUT.filter((e) => e.variantId !== 'mortality.default' && e.variantId !== 'security.default')
@@ -24755,10 +24794,15 @@ const fmtN = (n) => n.toLocaleString('en-IN')
 function crossTable(corner, cols, rows) {
   const sum = (a) => a.reduce((t, x) => t + x, 0)
   const cell = (n) => `<span class="l-xt__n${n === 0 ? ' is-zero' : ''}">${fmtN(n)}</span>`
+  /* the body cells carry a pale teal wash in proportion to the largest one,
+     so the table reads as a light heatmap; ALL and Total stay plain */
+  const top = Math.max(1, ...rows.flatMap((r) => r.by))
+  const heat = (n) => n === 0 ? cell(0)
+    : `<span class="l-xt__n is-heat" style="--h:${(Math.sqrt(n / top)).toFixed(2)}">${fmtN(n)}</span>`
   const foot = cols.map((_, i) => sum(rows.map((r) => r.by[i])))
   return `<span class="l-xt__grid" style="--cols:${cols.length}" role="table">` +
     `<span class="l-xt__row l-xt__row--head" role="row"><span>${esc(corner)}</span>${cols.map((c) => `<span>${esc(c)}</span>`).join('')}<span>All</span></span>` +
-    rows.map((r) => `<span class="l-xt__row" role="row"><span class="l-xt__label">${esc(r.label)}</span>${r.by.map(cell).join('')}${cell(sum(r.by))}</span>`).join('') +
+    rows.map((r) => `<span class="l-xt__row" role="row"><span class="l-xt__label">${esc(r.label)}</span>${r.by.map(heat).join('')}${cell(sum(r.by))}</span>`).join('') +
     `<span class="l-xt__row l-xt__row--foot" role="row"><span class="l-xt__label">Total</span>${foot.map(cell).join('')}${cell(sum(foot))}</span>` +
   `</span>`
 }
@@ -24766,12 +24810,12 @@ function crossTable(corner, cols, rows) {
 function scheduleBody(view, entities) {
   const totals = view.rows.map((r) => r.by.reduce((t, x) => t + x, 0))
   const all = totals.reduce((t, x) => t + x, 0) || 1
-  const tones = ['var(--viz-900)', 'var(--viz-300)']
+  const tones = ['var(--viz-500)', 'var(--viz-300)']
   let at = 0
   /* r = 15.9155 makes the circumference 100, so a dash length is a percent */
   const arcs = totals.map((n, i) => {
     const pct = (n / all) * 100
-    const a = `<circle r="15.9155" cx="21" cy="21" fill="none" stroke="${tones[i]}" stroke-width="5" stroke-dasharray="${pct} ${100 - pct}" stroke-dashoffset="${25 - at}"/>`
+    const a = `<circle r="15.9155" cx="21" cy="21" fill="none" stroke="${tones[i]}" stroke-width="3.6" stroke-dasharray="${pct} ${100 - pct}" stroke-dashoffset="${25 - at}"/>`
     at += pct
     return a
   }).join('')
@@ -25449,6 +25493,22 @@ const LAYOUTS = {
       `</span>` +
       `<span class="l-sch__body">${scheduleBody(data.views[0], data.entities)}</span>` +
     `</span>`,
+
+  /* ENCLOSURES BY TYPE · a three-row treemap — two, two, then the rest —  each row as tall as its share and each block as wide
+     as its share of the row. Larger blocks take a deeper (still pale) wash. */
+  treemap: (mod, variant, data) => {
+    const parts = [...data.parts].sort((a, b) => b.n - a.n)
+    const all = parts.reduce((t, p) => t + p.n, 0) || 1
+    const top = parts[0].n
+    const rows = [parts.slice(0, 2), parts.slice(2, 4), parts.slice(4)].filter((r) => r.length)
+    const block = (p) => `<span class="l-tm__b" style="flex:${p.n} 1 0;--h:${(p.n / top).toFixed(2)}">` +
+      `<b>${fmtN(p.n)}</b><small>${esc(p.label)}</small></span>`
+    return `<span class="l-tm">` +
+      `<span class="l-tm__top">${head(mod, variant, data)}<span class="l-tm__all"><b>${fmtN(all)}</b> ${esc(data.unit)}</span></span>` +
+      `<span class="l-tm__map">` + rows.map((r) =>
+        `<span class="l-tm__row" style="flex:${r.reduce((t, p) => t + p.n, 0)} 1 0">${r.map(block).join('')}</span>`).join('') +
+      `</span></span>`
+  },
 
   /* APPENDIX, BY CLASS · the CITES appendices against the classes, footed */
   appendix: (mod, variant, data) =>

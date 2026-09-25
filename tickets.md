@@ -19,5 +19,5 @@
 - [x] v5-v4-top-v1-modules — Version 5: V4 page down to Recent Observations, then V1 All Modules (own layout key)
 - [x] v5-collection-by-class — V5 home: one card, animals per class as bars, species count per class, totals on the title line
 - [x] v5-schedule-appendix — V5 home: Which schedule (donut + by entity, Species/Animals switch; animal figures are placeholders) and Appendix, by class; teal only
-- [ ] v5-enclosure-types — V5 home: card with enclosure-type-wise count — WAITING: wireframe approval
+- [x] v5-enclosure-types — V5 home: Enclosures by type treemap, seven families from the housing kinds (placeholder counts)
 - [ ] v5-site-tabs — V5 home: All / Site A / Site B / Site 3 tabs on top of modules — WAITING: wireframe approval
