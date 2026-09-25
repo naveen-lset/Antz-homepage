@@ -3744,6 +3744,36 @@ body.is-report { overflow: hidden; }
 .fav__chip:focus-visible { outline: 2px solid var(--c-action-ink); outline-offset: 2px; }
 .fav__edit { flex: none; height: 28px; padding: 0 12px; border: 0; border-radius: var(--r-pill); background: transparent; font: inherit; font-size: var(--fs-label); font-weight: 500; color: var(--c-action-ink); cursor: pointer; }
 .fav__none { font-size: var(--fs-label); color: var(--ink-mute); }
+/* V5 · MY FAVOURITES as cards: the title and Edit share a line, the row of
+   cards runs beneath it and scrolls sideways */
+:root[data-page-version='5'] .fav-band:not([hidden]) { flex-wrap: wrap; justify-content: space-between; }
+:root[data-page-version='5'] .fav__rail { order: 3; flex-basis: 100%; gap: 12px; padding: 4px 2px 8px; margin-bottom: 12px; }
+.fav-card {
+  flex: none; display: flex; flex-direction: column; gap: 10px; width: 216px; padding: 14px 16px;
+  border: 0; border-radius: 18px; text-align: left; font: inherit; color: var(--ink); cursor: pointer;
+  background: linear-gradient(160deg, var(--c-white) 55%, var(--viz-100) 100%);
+  box-shadow: var(--shadow-card), inset 0 0 0 1px rgba(0, 171, 171, .14);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.fav-card:hover { transform: translateY(-2px); }
+.fav-card:focus-visible { outline: 2px solid var(--c-action-ink); outline-offset: 2px; }
+.fav-card__head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.fav-card__dot { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--viz-300); color: var(--viz-900); font-weight: 700; font-size: 16px; }
+.fav-card__id { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.fav-card__id b { font-size: var(--fs-label); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fav-card__id small { font-size: var(--fs-micro); color: var(--ink-mute); }
+.fav-card__n { font-size: var(--fs-label); color: var(--ink-2); }
+.fav-card__n b { font-family: var(--font-num); font-size: 22px; color: var(--viz-900); margin-right: 2px; }
+.fav-card__tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.fav-card__tags i { font-style: normal; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: var(--r-pill); background: var(--viz-100); color: var(--viz-900); }
+.fav-card__tags i.is-none { background: rgba(31, 65, 91, .06); color: var(--ink-mute); }
+.fav-card__moved { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: var(--fs-micro); font-weight: 600;
+  padding-top: 8px; border-top: 1px solid rgba(31, 65, 91, .08); }
+.fav-card__up { color: var(--viz-900); }
+.fav-card__down { color: var(--c-tertiary); }
+.fav-card__quiet { color: var(--ink-mute); font-weight: 500; }
+.fav-card__moved small { color: var(--ink-mute); font-weight: 500; }
 @media (max-width: 743px) {
   :root[data-page-version='4'] .fav-band:not([hidden]),
   :root[data-page-version='5'] .fav-band:not([hidden]) { flex-wrap: wrap; }
@@ -33420,8 +33450,8 @@ __def('js/components/Favourites.js', function (__x, __req) {
  * blocked, so every touch is guarded and the seed is what a blocked
  * browser sees every time.
  */
-const { hasV4Top } = __req('js/lib/pageVersion.js')
-const { SPECIES, CLASSES } = __req('js/data/lifecycle.js')
+const { hasV4Top, isV5 } = __req('js/lib/pageVersion.js')
+const { SPECIES, CLASSES, summarise } = __req('js/data/lifecycle.js')
 const { PROTECTED } = __req('js/data/collection.js')
 const { esc } = __req('js/components/LifePanel.js')
 
@@ -33449,8 +33479,43 @@ const chip = (sp, { pressed = null } = {}) =>
     `<span class="fav__dot" aria-hidden="true">${esc(sp.name.charAt(0))}</span>${esc(sp.name)}` +
   `</button>`
 
+/* V5 · MY FAVOURITES (owner, 25 Sep 2026: "my species needs to be changed to
+   my favourites … a nice, interesting card"). Each favourite is a small card:
+   the animals held, its Schedule and CITES status, and its births and deaths
+   in the last ten days. Animals, Schedule and CITES come from PROTECTED; the
+   two species it does not list carry PLACEHOLDER counts below. */
+const EXTRA_ANIMALS = { 'Rose-ringed parakeet': 24, 'Giant forest scorpion': 30 }
+const DAYS = 10
+function facts(name, klass) {
+  const p = PROTECTED.find((r) => r.species === name)
+  const s = Object.values(SPECIES).find((r) => r.common === name)
+  const moved = (kind) => (summarise(kind, DAYS).rows.find((r) => r.common === name) || { count: 0 }).count
+  return {
+    animals: p ? p.animals : EXTRA_ANIMALS[name] ?? null,
+    schedule: p ? p.schedule : s ? s.schedule : null,
+    cites: p ? p.cites : s ? s.cites : null,
+    klass: (CLASSES.find((c) => c.key === klass) || { one: 'Other' }).one,
+    births: moved('natality'), deaths: moved('mortality'),
+  }
+}
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`
+const favCard = (sp) => {
+  const f = facts(sp.name, sp.klass)
+  const tags = [f.schedule && `Sch ${f.schedule}`, f.cites && `CITES ${f.cites}`].filter(Boolean)
+  const moved = [f.births && `<span class="fav-card__up">\u25B2 ${plural(f.births, 'birth', 'births')}</span>`,
+                 f.deaths && `<span class="fav-card__down">\u25BC ${plural(f.deaths, 'death', 'deaths')}</span>`].filter(Boolean)
+  return `<button type="button" class="fav-card" role="listitem" data-name="${esc(sp.name)}">` +
+    `<span class="fav-card__head"><span class="fav-card__dot" aria-hidden="true">${esc(sp.name.charAt(0))}</span>` +
+      `<span class="fav-card__id"><b>${esc(sp.name)}</b><small>${esc(f.klass)}</small></span></span>` +
+    `<span class="fav-card__n">${f.animals == null ? '\u2014' : `<b>${f.animals.toLocaleString('en-IN')}</b> ${f.animals === 1 ? 'animal' : 'animals'}`}</span>` +
+    `<span class="fav-card__tags">${tags.length ? tags.map((t) => `<i>${esc(t)}</i>`).join('') : '<i class="is-none">Not protected</i>'}</span>` +
+    `<span class="fav-card__moved">${moved.length ? moved.join('') : '<span class="fav-card__quiet">No births or deaths</span>'}<small> \u00b7 ${DAYS} days</small></span>` +
+  `</button>`
+}
+
 function mount({ root, onOpen } = {}) {
   if (!root || !hasV4Top()) return null
+  if (isV5()) root.querySelector('.fav__title').textContent = 'My favourites'
   const rail = root.querySelector('.fav__rail')
   const edit = root.querySelector('.fav__edit')
   const all = catalogue()
@@ -33464,7 +33529,7 @@ function mount({ root, onOpen } = {}) {
       rail.innerHTML = all.map((sp) => chip(sp, { pressed: list.includes(sp.name) })).join('')
     } else {
       rail.setAttribute('role', 'list'); rail.removeAttribute('aria-label')
-      rail.innerHTML = list.length ? list.map((n) => chip(known(n))).join('')
+      rail.innerHTML = list.length ? list.map((n) => (isV5() ? favCard : chip)(known(n))).join('')
         : `<span class="fav__none">No species yet — Edit to choose some</span>`
     }
     edit.textContent = editing ? 'Done' : 'Edit'
@@ -33473,7 +33538,7 @@ function mount({ root, onOpen } = {}) {
   }
 
   rail.addEventListener('click', (e) => {
-    const btn = e.target.closest('.fav__chip')
+    const btn = e.target.closest('.fav__chip, .fav-card')
     if (!btn) return
     const name = btn.dataset.name
     if (editing) {
