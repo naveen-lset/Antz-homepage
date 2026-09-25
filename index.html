@@ -485,6 +485,10 @@
                   rgb(31, 81, 91) 74.4%,
                   rgb(31, 81, 91) 84.2%,
                   rgb(31, 81, 91) 94.0%);
+  /* NOT FROM FIGMA. V5's Pending card is a sticky note (owner, 25 Sep 2026):
+     classic pale yellow, lighter at the top where the adhesive strip holds it
+     flat and a touch deeper towards the free end. */
+  --g-note:            linear-gradient(172deg, rgb(255, 247, 196) 0%, rgb(255, 240, 166) 70%, rgb(252, 232, 146) 100%);
 
 
   /* The scrim under a label on a photographic card: a band across the bottom
@@ -6336,18 +6340,29 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .l-et__row--head { font-size: 9.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; opacity: .85; }
 .l-et__row--head > span:not(:first-child) { font-weight: 700; }
 .l-et__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* PENDING (V5) · two columns of counts on the coral, filled down then across */
-.l-pd { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 6px; min-height: 0; color: var(--c-white); text-shadow: 0 1px 2px rgba(120, 30, 20, .3); }
-.l-pd__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
+/* PENDING (V5) · a sticky note on the grid: pale yellow paper tilted a
+   degree, a strip of tape across the top, ruled lines, dark ink, and the
+   bottom-right corner curling up. No bars and no coral (owner, 25 Sep 2026). */
+.card:has(.l-pd) { rotate: -1deg; border-radius: 4px 4px 4px 4px; box-shadow: 0 1px 1px rgba(90, 70, 0, .08), 0 10px 18px -8px rgba(90, 70, 0, .35); }
+.card:has(.l-pd)::after { content: ''; position: absolute; right: 0; bottom: 0; z-index: 3; width: 26px; height: 26px; pointer-events: none;
+  background: linear-gradient(315deg, transparent 0 50%, rgb(242, 222, 128) 50% 100%); border-top-left-radius: 6px; filter: drop-shadow(-1px -1px 2px rgba(90, 70, 0, .22)); }
+.l-pd { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 8px; min-height: 0; color: rgb(62, 52, 20); }
+.l-pd .c-head { color: rgb(62, 52, 20); }
+/* the module glyph is a white SVG drawn for the gradients; on paper it inks */
+.l-pd .c-head__icon img { filter: brightness(0) saturate(100%) opacity(.8); }
+.l-pd__tape { position: absolute; top: calc(var(--pad-card) * -1); left: 50%; width: 92px; height: 18px; translate: -50% -4px; rotate: 2deg;
+  background: rgba(150, 214, 208, .7); box-shadow: 0 1px 2px rgba(40, 70, 60, .18); }
+.l-pd__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); padding-bottom: 6px; border-bottom: 2px solid rgba(214, 120, 90, .45); }
 .l-pd__top .c-head { margin: 0; min-width: 0; }
-.l-pd__all { flex: none; font-size: var(--fs-micro); opacity: .9; white-space: nowrap; }
-.l-pd__all b { font-family: var(--font-num); font-size: 16px; }
-.l-pd__grid { display: grid; flex: 1 1 auto; grid-template-rows: repeat(4, 1fr); grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); column-gap: 14px; min-height: 0; }
-.l-pd__row { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 12px; line-height: 1.15; border-top: 1px solid rgba(255, 255, 255, .22); }
-.l-pd__row:first-child, .l-pd__row:nth-child(5) { border-top: 0; }
+.l-pd__all { flex: none; font-size: var(--fs-micro); opacity: .75; white-space: nowrap; }
+.l-pd__all b { font-family: var(--font-num); font-size: 16px; opacity: 1; }
+.l-pd__grid { display: grid; flex: 1 1 auto; grid-auto-rows: 1fr; min-height: 0; }
+.l-pd__row { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: 10px; font-size: var(--fs-label); line-height: 1.15; border-bottom: 1px solid rgba(80, 130, 170, .28); }
+.l-pd__box { display: block; width: 12px; height: 12px; border: 1.5px solid rgba(62, 52, 20, .55); border-radius: 3px; }
 .l-pd__label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.l-pd__row b { flex: none; font-family: var(--font-num); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.l-pd__row--none { opacity: .55; }
+.l-pd__row b { font-family: var(--font-num); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.l-pd__row--none { opacity: .5; }
+.l-pd__row--none .l-pd__label, .l-pd__row--none b { text-decoration: line-through; }
 /* COLLECTION (V5) · one thick white column per class, height = animals,
    the count on top and the class and its species underneath */
 .l-cc { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; }
@@ -6365,6 +6380,16 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .l-cc__key { display: flex; flex-direction: column; min-width: 0; }
 .l-cc__key span { font-size: var(--fs-label); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .l-cc__key small { font-size: var(--fs-micro); opacity: .82; white-space: nowrap; }
+/* 2x1 (V5, owner 25 Sep 2026: Pending took the 2x2): the columns shorten,
+   the figure sits smaller and the key's two lines tighten under each column */
+.card[data-size='medium']:has(.l-cc) { padding: 14px 18px; }
+.card[data-size='medium'] .l-cc { gap: 4px; }
+.card[data-size='medium'] .l-cc__plot, .card[data-size='medium'] .l-cc__keys { gap: 10px; }
+.card[data-size='medium'] .l-cc__col b { font-size: 14px; }
+.card[data-size='medium'] .l-cc__bar { height: calc(var(--h) * (100% - 20px)); border-radius: 6px 6px 0 0; }
+.card[data-size='medium'] .l-cc__keys { margin-top: -2px; }
+.card[data-size='medium'] .l-cc__key span { font-size: 12px; line-height: 1.1; }
+.card[data-size='medium'] .l-cc__key small { line-height: 1.1; }
 .l-sch__foot { margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, .22); font-size: var(--fs-label); opacity: .92; }
 .l-sch__foot b { font-variant-numeric: tabular-nums; }
 .l-wf { --wf-0: rgba(255, 255, 255, .95); --wf-1: rgba(255, 255, 255, .62); --wf-2: rgba(255, 255, 255, .38); --wf-3: rgba(255, 255, 255, .16); }
@@ -14202,7 +14227,7 @@ const VARIANTS = [
   {
     id: 'species.byclass', moduleId: 'species', name: 'Collection by Class',
     layout: 'classcols', purpose: 'UNDERSTAND',
-    supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
+    supportedSizes: ['medium', 'large'], defaultSize: 'medium', priority: 'secondary',
     scopedData() {
       const sc = siteScale()
       const rows = BY_CLASS.map((r) => ({ ...r, species: sc(r.species), animals: sc(r.animals) }))
@@ -14274,8 +14299,8 @@ const VARIANTS = [
      The whole card opens Medical; the counts are placeholders. */
   {
     id: 'medical.pending', scopedData() { return scaleData(this.data) }, moduleId: 'medical', name: 'Pending',
-    layout: 'pendlist', purpose: 'ACT', gradient: '--g-mortality',
-    supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
+    layout: 'pendlist', purpose: 'ACT', gradient: '--g-note',
+    supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
     data: {
       title: 'Pending', unit: 'open',
       summary: 'Vaccinations 48, necropsy reports 6, medicine administrations 39, surgeries 4, sexing 31, microchipping 57, transfers 9',
@@ -15319,19 +15344,19 @@ const V3_LAYOUT = [
    tiles sat in this grid for a day (18 Sep 2026) and were moved by the owner
    to the head of the Circle of Life band, where the lists they summarise
    are; `RETIRED_V4` is how a layout saved that day loses them. */
-/* V5's GRID IS V1's, plus Collection by Class beside Species Management */
+/* V5's GRID IS V1's, plus Pending and Collection by Class beside Species Management */
 /* the three data cards follow straight after, on a fresh row, so the data
    sits together near the top and the plain module doors come after it
    (owner, 25 Sep 2026: "this has to come somewhere on top") */
-/* Collection is 2x2 beside Medical and Species, which leaves a strip three
-   columns wide under those two: Pending and Housing (2 + 1) fill it exactly,
+/* Pending is 2x2 beside Medical and Species, which leaves a strip three
+   columns wide under those two: Collection and Housing (2 + 1) fill it exactly,
    before the data row starts. Hospital, pulled up from further down, waits
    until after the two lists, where it sits beside Enclosures. */
 const V5_PULLED = ['hospital.photo', 'housing.default']
 const pulled = (id) => DEFAULT_LAYOUT.find((d) => d.variantId === id)
 const V5_LAYOUT = DEFAULT_LAYOUT.filter((e) => !V5_PULLED.includes(e.variantId)).flatMap((e) => (e.variantId === 'species.stats'
-  ? [e, { variantId: 'species.byclass', size: 'large' },
-     { variantId: 'medical.pending', size: 'medium' },
+  ? [e, { variantId: 'medical.pending', size: 'large' },
+     { variantId: 'species.byclass', size: 'medium' },
      pulled('housing.default'),
      { variantId: 'species.schedule', size: 'large' },
      { variantId: 'species.appendix', size: 'large' },
@@ -15342,7 +15367,7 @@ const V5_LAYOUT = DEFAULT_LAYOUT.filter((e) => !V5_PULLED.includes(e.variantId))
      pulled('hospital.photo'),
      { variantId: 'housing.types', size: 'medium' }] : [e]))
 /* a saved V5 grid from an older seed is an older ORDER; it falls back */
-const V5_SEED = 9
+const V5_SEED = 10
 const REQUIRED_V5 = V5_LAYOUT.filter((e) => ['species.byclass', 'medical.pending', 'species.schedule', 'species.appendix', 'housing.types', 'mortality.list', 'natality.list'].includes(e.variantId))
 
 const V4_LAYOUT = [
@@ -25629,14 +25654,18 @@ const LAYOUTS = {
       `</span></span>`
   },
 
-  /* PENDING · seven counts in two columns, in the order given; a row with
-     nothing waiting fades rather than keeping the coral's urgency */
+  /* PENDING · a sticky note: seven jobs down ruled lines, in the order
+     given so a row is always in the same place (owner, 25 Sep 2026), an
+     empty tick box before each and the count at the end. A job with nothing
+     waiting is struck through, as if ticked off. */
   pendlist: (mod, variant, data) => {
     const all = data.parts.reduce((t, p) => t + p.n, 0)
     return `<span class="l-pd">` +
+      `<i class="l-pd__tape" aria-hidden="true"></i>` +
       `<span class="l-pd__top">${head(mod, variant, data)}<span class="l-pd__all"><b>${fmtN(all)}</b> ${esc(data.unit)}</span></span>` +
       `<span class="l-pd__grid">` + data.parts.map((p) =>
-        `<span class="l-pd__row${p.n ? '' : ' l-pd__row--none'}"><span class="l-pd__label">${esc(p.label)}</span><b>${fmtN(p.n)}</b></span>`).join('') +
+        `<span class="l-pd__row${p.n ? '' : ' l-pd__row--none'}"><i class="l-pd__box" aria-hidden="true"></i>` +
+        `<span class="l-pd__label">${esc(p.label)}</span><b>${fmtN(p.n)}</b></span>`).join('') +
       `</span></span>`
   },
 
