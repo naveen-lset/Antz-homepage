@@ -6332,7 +6332,7 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 
 /* SITE TABS (V5) · a light pill track above the banner, the selected site a
    white pill; it scrolls sideways rather than wrapping on a phone */
-.site-tabs { display: flex; gap: 4px; margin: 0 0 16px; padding: 4px; width: fit-content; max-width: 100%;
+.site-tabs { display: flex; gap: 4px; margin: 24px 0 0; padding: 4px; width: fit-content; max-width: 100%;
   border-radius: var(--r-pill); background: rgba(0, 171, 171, .1); overflow-x: auto; scrollbar-width: none; }
 .site-tabs::-webkit-scrollbar { display: none; }
 .site-tabs[hidden] { display: none; }
@@ -11778,6 +11778,11 @@ body.is-editing .qa-chat { display: none; }
       <div class="hero-stage__deck"></div>
     </div>
 
+    <!-- ══ site tabs (V5) ════════════════════════════════════════════════
+         Which site the page counts, above Recent Observations (owner, 25 Sep
+         2026). Filled by app.js; hidden on every other version. -->
+    <div class="site-tabs" id="siteTabs" role="tablist" aria-label="Site" hidden></div>
+
     <!-- ══ recent observations ═════════════════════════════════════════
          The band is node 196:7243, the "Current Design" of 4 Sep 2026: it sits
          between the announcements and the modules and holds the newest
@@ -11829,9 +11834,6 @@ body.is-editing .qa-chat { display: none; }
         <h2 class="section-head__title" id="modulesTitle">All Modules</h2>
         <div class="section-head__actions"></div>
       </div>
-      <!-- site tabs (V5): which site the data cards count. Filled by app.js;
-           hidden on every other version. -->
-      <div class="site-tabs" id="siteTabs" role="tablist" aria-label="Site" hidden></div>
     <a class="hero hero--estate" href="https://antz-command-centre-v5.vercel.app/"
        target="_blank" rel="noopener">
       <span class="hero__media" aria-hidden="true"></span>
