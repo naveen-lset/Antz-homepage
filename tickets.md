@@ -20,4 +20,4 @@
 - [x] v5-collection-by-class — V5 home: one card, animals per class as bars, species count per class, totals on the title line
 - [x] v5-schedule-appendix — V5 home: Which schedule (donut + by entity, Species/Animals switch; animal figures are placeholders) and Appendix, by class; teal only
 - [x] v5-enclosure-types — V5 home: Enclosures by type treemap, seven families from the housing kinds (placeholder counts)
-- [ ] v5-site-tabs — V5 home: All / Site A / Site B / Site 3 tabs on top of modules — WAITING: wireframe approval
+- [x] v5-site-tabs — V5 home: All sites + four site tabs above the banner; re-scope the four data cards (mock site share)

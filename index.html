@@ -6306,6 +6306,18 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
    2026: the white plates did not blend). White text; cells, blocks and the
    switch are white washes of the fill, deeper where the figure is larger. */
 .l-sch, .l-xt, .l-tm { color: var(--c-white); }
+
+/* SITE TABS (V5) · a light pill track above the banner, the selected site a
+   white pill; it scrolls sideways rather than wrapping on a phone */
+.site-tabs { display: flex; gap: 4px; margin: 0 0 16px; padding: 4px; width: fit-content; max-width: 100%;
+  border-radius: var(--r-pill); background: rgba(0, 171, 171, .1); overflow-x: auto; scrollbar-width: none; }
+.site-tabs::-webkit-scrollbar { display: none; }
+.site-tabs[hidden] { display: none; }
+.site-tabs__tab { flex: none; border: 0; padding: 8px 16px; border-radius: var(--r-pill); background: none; color: var(--ink-2);
+  font: inherit; font-size: var(--fs-label); font-weight: 600; white-space: nowrap; cursor: pointer; }
+.site-tabs__tab:hover { color: var(--ink); }
+.site-tabs__tab[aria-selected='true'] { background: var(--c-white); color: var(--viz-900); box-shadow: 0 1px 3px rgba(31, 65, 91, .12); }
+.site-tabs__tab:focus-visible { outline: 2px solid var(--viz-700); outline-offset: 1px; }
 .l-xt__row--head > span:not(:first-child) { color: rgba(255, 255, 255, .92); }
 .l-xt__n.is-heat { justify-self: end; min-width: 2.4em; padding: 2px 5px; border-radius: 6px; background: rgba(255, 255, 255, calc(.1 + var(--h) * .26)); font-weight: 600; }
 .l-tm { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; }
@@ -11813,6 +11825,9 @@ body.is-editing .qa-chat { display: none; }
         <h2 class="section-head__title" id="modulesTitle">All Modules</h2>
         <div class="section-head__actions"></div>
       </div>
+      <!-- site tabs (V5): which site the data cards count. Filled by app.js;
+           hidden on every other version. -->
+      <div class="site-tabs" id="siteTabs" role="tablist" aria-label="Site" hidden></div>
     <a class="hero hero--estate" href="https://antz-command-centre-v5.vercel.app/"
        target="_blank" rel="noopener">
       <span class="hero__media" aria-hidden="true"></span>
@@ -12605,6 +12620,19 @@ function moveItem(cards, from, to) {
 __def('js/data/cardVariants.js', function (__x, __req) {
 const { isV4 } = __req('js/lib/pageVersion.js')
 const { BY_CLASS } = __req('js/data/collection.js')
+/* THE SITE TABS (V5) re-scope the data cards. `scale` is reportScope's mock
+   share of an all-sites figure; lazy, so the catalogue loads without it. */
+const siteScale = () => __req('js/state/reportScope.js').scale
+function scaleData(d) {
+  const sc = siteScale()
+  const rows = (rs) => rs.map((r) => ({ ...r, by: r.by.map(sc) }))
+  return {
+    ...d,
+    ...(d.rows ? { rows: rows(d.rows) } : {}),
+    ...(d.views ? { views: d.views.map((w) => ({ ...w, rows: rows(w.rows) })) } : {}),
+    ...(d.parts ? { parts: d.parts.map((p) => ({ ...p, n: sc(p.n) })) } : {}),
+  }
+}
 /**
  * CARD VARIATIONS
  * ───────────────────────────────────────────────────────────────────────────
@@ -14125,33 +14153,35 @@ const VARIANTS = [
      Read from BY_CLASS, the table V4's reports use; its totals are not the
      Species Management tile's, and the owner has accepted that while both
      are placeholder figures. */
-  (() => {
-    const rows = [...BY_CLASS].sort((a, b) => b.animals - a.animals)
-    const top = rows[0].animals
-    const n = (x) => x.toLocaleString('en-IN')
-    const species = rows.reduce((t, r) => t + r.species, 0)
-    const animals = rows.reduce((t, r) => t + r.animals, 0)
-    return {
-      id: 'species.byclass', moduleId: 'species', name: 'Collection by Class',
-      layout: 'meters', purpose: 'UNDERSTAND',
-      supportedSizes: ['medium', 'large'], defaultSize: 'medium', priority: 'secondary',
-      data: {
+  {
+    id: 'species.byclass', moduleId: 'species', name: 'Collection by Class',
+    layout: 'meters', purpose: 'UNDERSTAND',
+    supportedSizes: ['medium', 'large'], defaultSize: 'medium', priority: 'secondary',
+    scopedData() {
+      const sc = siteScale()
+      const rows = BY_CLASS.map((r) => ({ ...r, species: sc(r.species), animals: sc(r.animals) }))
+        .sort((a, b) => b.animals - a.animals)
+      const top = rows[0].animals || 1
+      const n = (x) => x.toLocaleString('en-IN')
+      const species = rows.reduce((t, r) => t + r.species, 0)
+      const animals = rows.reduce((t, r) => t + r.animals, 0)
+      return {
         title: 'Collection', total: n(animals), unit: `animals \u00b7 ${n(species)} species`,
         rows: rows.map((r) => ({
           text: `${r.label} \u00b7 ${n(r.species)} species`,
           value: n(r.animals),
           pct: Math.round((r.animals / top) * 100),
         })),
-      },
-    }
-  })(),
+      }
+    },
+  },
   /* WHICH SCHEDULE and APPENDIX, BY CLASS · V5's home (owner, 25 Sep 2026,
      from two reference screenshots). Teal only, per the one-palette rule, not
      the screenshots' coral and yellow. The Species figures are the
      screenshot's; the ANIMALS FIGURES ARE PLACEHOLDERS the owner asked to be
      made up so the switch can be reviewed — replace both with real reads. */
   {
-    id: 'species.schedule', moduleId: 'species', name: 'Which schedule',
+    id: 'species.schedule', scopedData() { return scaleData(this.data) }, moduleId: 'species', name: 'Which schedule',
     layout: 'schedule', purpose: 'UNDERSTAND', passive: true,
     supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
     data: {
@@ -14174,7 +14204,7 @@ const VARIANTS = [
   /* ENCLOSURES BY TYPE · V5 (owner, 25 Sep 2026). The project's sixteen
      housing kinds folded into seven families; counts are placeholders. */
   {
-    id: 'housing.types', moduleId: 'housing', name: 'Enclosures by type',
+    id: 'housing.types', scopedData() { return scaleData(this.data) }, moduleId: 'housing', name: 'Enclosures by type',
     layout: 'treemap', purpose: 'UNDERSTAND',
     supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
     data: {
@@ -14192,7 +14222,7 @@ const VARIANTS = [
     },
   },
   {
-    id: 'species.appendix', moduleId: 'species', name: 'Appendix, by class',
+    id: 'species.appendix', scopedData() { return scaleData(this.data) }, moduleId: 'species', name: 'Appendix, by class',
     layout: 'appendix', purpose: 'UNDERSTAND',
     supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
     data: {
@@ -24635,7 +24665,8 @@ const ASSET_IMG = 'assets/img/'
 function renderCard(variant, opts = {}) {
   const { size = variant.defaultSize, w = 1, h = 1, uid = '', static: isStatic = false } = opts
   const mod = getModule(variant.moduleId)
-  const data = variant.data || {}
+  /* a card whose figures follow the site tabs computes them per paint */
+  const data = (variant.scopedData ? variant.scopedData() : variant.data) || {}
 
   /**
    * A card with a destination is a link, one without is a button, a preview is
@@ -24842,7 +24873,7 @@ const BEHAVIOUR = {
       b.addEventListener('click', (e) => {
         e.stopPropagation()
         for (const o of el.querySelectorAll('.l-seg__opt')) o.setAttribute('aria-pressed', String(o === b))
-        body.innerHTML = scheduleBody(data.views[Number(b.dataset.i)], data.entities)
+        body.innerHTML = scheduleBody(data.views[Number(b.dataset.i)], data.entities)  // `data` is this paint's scoped copy
       })
     }
   },
@@ -34938,6 +34969,35 @@ if (PAGE_VERSION === '1' || hasV4Top()) {
     /* the grid keeps a card's element between paints, so a scope change
        clears the slots first and every tile is drawn again for the new site */
     __req('js/state/reportScope.js').subscribe(() => { grid.destroy(); paint({ animate: false }) })
+  }
+  /* V5's site tabs: the same scope as V4's site select (one key), drawn as
+     tabs above the modules; a change repaints the grid for the new site */
+  if (isV5()) {
+    const scope = __req('js/state/reportScope.js')
+    const bar = document.getElementById('siteTabs')
+    const draw = () => {
+      bar.innerHTML = scope.options().map((o) =>
+        `<button type="button" role="tab" class="site-tabs__tab" data-site="${o.id}" aria-selected="${o.id === scope.get()}"` +
+        ` tabindex="${o.id === scope.get() ? 0 : -1}">${o.label}</button>`).join('')
+    }
+    draw()
+    bar.hidden = false
+    bar.addEventListener('click', (e) => {
+      const t = e.target.closest('.site-tabs__tab')
+      if (t) scope.set(t.dataset.site)
+    })
+    /* arrow keys move along the tabs, as a tablist should */
+    bar.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+      const tabs = [...bar.querySelectorAll('.site-tabs__tab')]
+      const i = tabs.indexOf(document.activeElement)
+      if (i < 0) return
+      e.preventDefault()
+      const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]
+      scope.set(next.dataset.site)
+      bar.querySelector(`[data-site="${next.dataset.site}"]`).focus()
+    })
+    scope.subscribe(() => { draw(); grid.destroy(); paint({ animate: false }) })
   }
 }
 
