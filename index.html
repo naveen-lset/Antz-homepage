@@ -1584,11 +1584,13 @@ button { font: inherit; color: inherit; }
   position: absolute;
   inset: 0;
   z-index: -1;
-  /* the page's own top wash — rgba(175,239,235,.5) over white — held back to
-     78% so the blur has something to do */
-  background: rgba(215, 247, 245, .78);
-  backdrop-filter: blur(14px) saturate(150%);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  /* NO FILL — BLUR ONLY (ruling 25 Sep: "make it blur, don't give me
+     background colour"). The mint rgba(215,247,245,.78) wash is gone; the
+     page shows through, frosted. The fallback below keeps a solid ground
+     only where backdrop-filter is unsupported, since clear there = unreadable. */
+  background: transparent;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
   border-bottom: 1px solid rgba(195, 206, 199, .38);
   box-shadow: 0 8px 20px -14px rgba(22, 55, 61, .38);
   opacity: 0;
@@ -3959,53 +3961,136 @@ body.is-report { overflow: hidden; }
   .fav__name { font-size: 14px; }
 }
 
-/* ── the picker sheet ── GlobalSearch's sheet, a little wider and taller:
-   search, the site and filter chips, a live count, then every species as a
-   row with its photo and an add / added mark */
-.fsp-sheet { height: min(88dvh, 820px); }
-.fsp-sheet .gsx-sheet__body { flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 0; }
-.fsp__search {
-  flex: none; display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px;
+/* ── the picker sheet · V5 (owner, 25 Sep 2026: "combine these two", from
+   mockups/my-species-picker.html) ── GlobalSearch's sheet, a little wider
+   and taller. One row holds the search and, beside it and apart from it, the
+   site; one row of chips holds the class and New. Under them every species
+   is a photo, grouped by class; a picked photo wears a ring in the primary
+   green (owner: "selected species outline make it our primary colour") and
+   the number of its place on the home rail. The foot keeps the picks' faces
+   in view, so no filter is needed to see what is chosen. */
+.fsp-sheet { height: min(88dvh, 860px); }
+.fsp-sheet .gsx-sheet__body { position: relative; flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 0; overflow: hidden; }
+.fsp-sheet .gsx-sheet__note b { color: var(--c-primary-ink); font-weight: 600; font-family: var(--font-num); }
+.fsp__bar { flex: none; display: flex; gap: 8px; }
+.fsp__search, .fsp__site {
+  position: relative; display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px;
   border-radius: 14px; background: var(--c-white); box-shadow: inset 0 0 0 1px var(--line);
 }
-.fsp__search:focus-within { box-shadow: inset 0 0 0 2px var(--c-action-ink); }
-.fsp__search .icon { width: 18px; height: 18px; color: var(--ink-mute); flex: none; }
-.fsp__search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: inherit; font-size: var(--fs-body); color: var(--ink); }
-.fsp__filters { flex: none; display: flex; flex-direction: column; gap: 8px; }
-.fsp__chips { display: flex; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -4px; padding: 4px; }
+.fsp__search { flex: 1 1 auto; min-width: 0; padding-right: 6px; }
+.fsp__search:focus-within, .fsp__site:focus-within { box-shadow: inset 0 0 0 2px var(--c-action-ink); }
+.fsp__search > .icon { width: 18px; height: 18px; color: var(--ink-mute); flex: none; }
+.fsp__search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; font: inherit; font-size: max(16px, var(--fs-body)); color: var(--ink); }
+.fsp__search input::-webkit-search-cancel-button { display: none; }
+.fsp__clear {
+  flex: none; display: grid; place-items: center; width: 32px; height: 32px; border: 0; padding: 0; border-radius: 50%;
+  background: var(--petrol-050, #E6F0EF); color: var(--ink-2); cursor: pointer;
+}
+.fsp__clear .icon { width: 14px; height: 14px; }
+.fsp__clear[hidden] { display: none; }
+/* the site: a button's face over the platform's own picker, so the choice is
+   the iPad's wheel or popover and the face only says what is chosen */
+.fsp__site { flex: none; max-width: 46%; gap: 8px; font-size: var(--fs-label); font-weight: 600; color: var(--ink); cursor: pointer; }
+.fsp__site > .icon { flex: none; width: 16px; height: 16px; color: var(--c-primary-ink); }
+.fsp__site > .icon:last-of-type { color: var(--ink-mute); }
+.fsp__site-v { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fsp__site select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; font-size: 16px; cursor: pointer; appearance: none; }
+.fsp__chips { position: relative; flex: none; display: flex; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -4px; padding: 4px; }
 .fsp__chips::-webkit-scrollbar { display: none; }
 .fsp__chip {
-  position: relative; flex: none; display: inline-flex; align-items: center; gap: 6px;
+  position: relative; z-index: 1; flex: none; display: inline-flex; align-items: center; gap: 6px;
   height: 36px; padding: 0 14px; border: 0; border-radius: var(--r-pill);
   background: var(--c-white); box-shadow: inset 0 0 0 1px var(--line);
   font: inherit; font-size: var(--fs-label); font-weight: 500; color: var(--ink); cursor: pointer; white-space: nowrap;
 }
 .fsp__chip::after { content: ''; position: absolute; inset: -4px 0; }
 .fsp__chip[aria-pressed='true'] { background: var(--c-primary-ink); box-shadow: none; color: var(--c-white); }
+/* the class chips share one fill that slides to the chosen one; they are
+   see-through so the fill is seen travelling under them */
+.fsp__chip[data-group='klass'] { background: transparent; }
+.fsp__chip[data-group='klass'][aria-pressed='true'] { background: transparent; }
+.fsp__chips.has-ink .fsp__chip[data-group='klass'][aria-pressed='true'] { box-shadow: none; }
+.fsp__chips:not(.has-ink) .fsp__chip[data-group='klass'][aria-pressed='true'] { background: var(--c-primary-ink); }
+.fsp__ink { position: absolute; z-index: 0; top: 4px; left: 0; height: 36px; border-radius: var(--r-pill); background: var(--c-primary-ink); pointer-events: none; }
+.fsp__chip[data-group='new'][aria-pressed='true'] { background: var(--c-primary); }
 .fsp__chip:focus-visible { outline: 2px solid var(--c-action-ink); outline-offset: 2px; }
 .fsp__n { font-family: var(--font-num); font-size: 12px; font-weight: 600; opacity: .7; }
 .fsp__rule { flex: none; width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
-.fsp__summary { flex: none; margin: 0; font-size: var(--fs-label); color: var(--ink-mute); }
-.fsp__list { flex: 1 1 auto; margin: 0 -8px; padding: 0 0 16px; list-style: none; overflow-y: auto; }
-.fsp__item {
-  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 8px;
-  border: 0; border-radius: 14px; background: none; font: inherit; text-align: left; color: var(--ink); cursor: pointer;
+
+/* the grid: a stage that does not scroll (the leaving photos are drawn on
+   it) around a grid that does */
+.fsp__stage { position: relative; flex: 1 1 auto; min-height: 0; margin: 0 -8px; }
+.fsp__grid { position: absolute; inset: 0; overflow-y: auto; padding: 0 8px 20px; overscroll-behavior: contain; }
+.fsp__sec + .fsp__sec { margin-top: 8px; }
+.fsp__sec-h { display: flex; align-items: baseline; gap: 8px; margin: 0; padding: 10px 0 10px; font-size: var(--fs-body); font-weight: 600; color: var(--ink); }
+.fsp__sec-h span { font-family: var(--font-num); font-size: 13px; font-weight: 600; color: var(--ink-mute); }
+.fsp__sec-h small { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--c-primary-ink); }
+.fsp__sec-h small:empty { display: none; }
+.fsp__tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; }
+.fsp__tile {
+  position: relative; display: block; width: 100%; aspect-ratio: 1 / 1.06; padding: 0; border: 0; border-radius: 16px;
+  overflow: hidden; background: var(--petrol-050, #E6F0EF); cursor: pointer; text-align: left; color: var(--c-white); font: inherit;
+  box-shadow: 0 0 0 0 var(--c-white), 0 0 0 0 var(--c-primary);
 }
-.fsp__item:hover { background: color-mix(in srgb, var(--c-white) 70%, transparent); }
-.fsp__item:focus-visible { outline: 2px solid var(--c-action-ink); outline-offset: -2px; }
-.fsp__img { flex: none; width: 48px; height: 48px; border-radius: 12px; object-fit: cover; background: var(--petrol-050, #E6F0EF); }
-.fsp__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.fsp__txt b { font-size: var(--fs-body); font-weight: 600; line-height: 1.25; }
-.fsp__txt small { font-size: var(--fs-label); color: var(--ink-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fsp__new { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--c-primary-ink) 12%, #fff); color: var(--c-primary-ink); font-size: 11px; font-weight: 700; vertical-align: 2px; }
-.fsp__tick {
-  flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
-  box-shadow: inset 0 0 0 1.5px var(--line); color: var(--ink-mute);
+.fsp__tile::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, .7)); pointer-events: none; }
+.fsp__tile[aria-pressed='true'] { box-shadow: 0 0 0 3px var(--c-white), 0 0 0 6px var(--c-primary); }
+.fsp__tile:focus-visible { outline: 2px solid var(--c-action-ink); outline-offset: 8px; }
+.fsp__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.fsp__cap { position: absolute; z-index: 1; left: 12px; right: 12px; bottom: 10px; display: flex; flex-direction: column; gap: 1px; }
+.fsp__cap b { font-size: 15px; font-weight: 600; line-height: 1.2; text-shadow: 0 1px 2px rgba(0, 0, 0, .3); }
+.fsp__cap small { font-family: var(--font-num); font-size: 12.5px; opacity: .88; }
+.fsp__new { position: absolute; z-index: 1; top: 10px; left: 10px; padding: 3px 9px; border-radius: var(--r-pill); background: var(--c-white); color: var(--c-primary-ink); font-size: 11px; font-weight: 700; }
+/* the mark: a + on smoked glass, or the pick's place on the rail on the
+   primary green. Both faces are always there; the state picks one */
+.fsp__mark {
+  position: absolute; z-index: 1; top: 8px; right: 8px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(16, 32, 30, .34); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .9);
 }
-.fsp__tick .icon { width: 16px; height: 16px; }
-.fsp__item[aria-pressed='true'] .fsp__tick { background: var(--c-primary-ink); box-shadow: none; color: var(--c-white); }
-.fsp__none { padding: 32px 8px; text-align: center; color: var(--ink-mute); font-size: var(--fs-label); }
-.fsp-sheet .gsx-sheet__foot .gsx-btn { flex: 1 1 auto; }
+.fsp__mark > * { grid-area: 1 / 1; }
+.fsp__mark .icon { width: 16px; height: 16px; }
+.fsp__ord { font-family: var(--font-num); font-size: 14px; font-weight: 700; transform: scale(0); opacity: 0; }
+.fsp__tile[aria-pressed='true'] .fsp__mark { background: var(--c-primary); box-shadow: 0 0 0 2px var(--c-white); }
+.fsp__tile[aria-pressed='true'] .fsp__mark .icon { transform: scale(0) rotate(90deg); opacity: 0; }
+.fsp__tile[aria-pressed='true'] .fsp__ord { transform: none; opacity: 1; }
+.fsp__ghost { position: absolute; z-index: 2; margin: 0; pointer-events: none; }
+.fsp__none { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 48px 8px; text-align: center; color: var(--ink-mute); font-size: var(--fs-label); }
+.fsp__none button { height: 36px; padding: 0 16px; border: 0; border-radius: var(--r-pill); background: var(--petrol-050, #E6F0EF); font: inherit; font-size: var(--fs-label); font-weight: 600; color: var(--ink); cursor: pointer; }
+
+/* the foot: the picks' faces in rail order, the count, Done */
+.fsp-sheet .gsx-sheet__foot { align-items: center; }
+.fsp__picked { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 12px; }
+.fsp__faces { flex: none; display: flex; align-items: center; }
+.fsp__face { flex: none; width: 34px; height: 34px; margin-right: -8px; padding: 0; border: 0; border-radius: 50%; overflow: hidden; background: var(--petrol-050, #E6F0EF); box-shadow: 0 0 0 2px var(--c-white); cursor: pointer; }
+.fsp__face img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.fsp__more { flex: none; display: grid; place-items: center; min-width: 34px; height: 34px; padding: 0 6px; border-radius: 17px; background: var(--petrol-050, #E6F0EF); box-shadow: 0 0 0 2px var(--c-white); font-family: var(--font-num); font-size: 12px; font-weight: 700; color: var(--ink-2); }
+.fsp__faces > :last-child { margin-right: 0; }
+.fsp__sum { min-width: 0; font-size: var(--fs-label); color: var(--ink-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fsp__sum b { color: var(--ink); font-weight: 600; }
+.fsp-sheet .gsx-sheet__foot .gsx-btn { flex: none; min-width: 132px; padding: 0 24px; }
+/* a phone: three photos across rather than two, so a screen shows a class
+   rather than a few animals; the caption and mark step down with them */
+@media (max-width: 480px) {
+  .fsp__faces .fsp__face:nth-child(n+4) { display: none; }
+  .fsp__tiles { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+  .fsp__tile { border-radius: 14px; }
+  .fsp__cap { left: 9px; right: 9px; bottom: 8px; }
+  .fsp__cap b { font-size: 13px; }
+  .fsp__cap small { font-size: 11.5px; }
+  .fsp__mark { top: 6px; right: 6px; width: 28px; height: 28px; }
+  .fsp__new { top: 7px; left: 7px; padding: 2px 7px; font-size: 10.5px; }
+  .fsp__site { max-width: 42%; padding: 0 12px; }
+}
+/* the undo: a dark pill over the foot, for a removal only — an addition
+   already says so with its ring and its number */
+.fsp__toast {
+  position: absolute; z-index: 3; left: 50%; bottom: calc(var(--fsp-foot, 88px) + 12px); display: flex; align-items: center; gap: 14px;
+  max-width: calc(100% - 32px); padding: 8px 8px 8px 16px; border-radius: 14px; background: #1C2B2A; color: var(--c-white);
+  font-size: var(--fs-label); white-space: nowrap; box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+  transform: translate(-50%, 0); opacity: 1;
+}
+.fsp__toast[hidden] { display: none; }
+.fsp__toast span { overflow: hidden; text-overflow: ellipsis; }
+.fsp__toast button { flex: none; height: 32px; padding: 0 14px; border: 0; border-radius: 9px; background: rgba(255, 255, 255, .14); color: #9BE3B4; font: inherit; font-weight: 600; cursor: pointer; }
 
 /* ══ V2 · V4's PAGE, REDESIGNED (24 Sep 2026) ═══════════════════════════════
    Everything below is scoped to :root[data-home="v2"] or to classes only V2
@@ -4031,8 +4116,8 @@ body.is-report { overflow: hidden; }
 .adeck__all img { display: block; width: 18px; height: 18px; }
 .adeck__all:focus-visible { outline: 2px solid var(--c-add-primary, #00AFD6); outline-offset: 4px; border-radius: 4px; }
 
-/* the stack: the front card sets the height, the two behind it are the same
-   box scaled about their top-right corner and pushed 16 and 32px out, so
+/* the stack: every card is the same 210 box; the two behind the front one
+   are scaled about their top-right corner and pushed 16 and 32px out, so
    each shows a 16px strip — white edge, a sliver of its photograph */
 .adeck__stack { position: relative; display: grid; touch-action: pan-y; }
 /* THE DWELL ("it has to auto scroll", 24 Sep 2026). No timer: an invisible
@@ -4047,12 +4132,27 @@ body.is-report { overflow: hidden; }
 .adeck:has(.is-dragging) .adeck__dwell, .adeck:has(:focus-visible) .adeck__dwell, body.is-hidden .adeck__dwell, body.is-editing .adeck__dwell { animation-play-state: paused; }
 @media (hover: hover) { .adeck:hover .adeck__dwell { animation-play-state: paused; } }
 @media (prefers-reduced-motion: reduce) { .adeck__dwell { animation: none; } }
+/* THE CARD IS A FIXED BOX ("Announcement card has fixed size. Do not reduce
+   the Size", 25 Sep 2026). The node's front card is 648×210: 12 of padding
+   round a 186 column — a 36 chip, 12, a two-line title (39), 8, three lines
+   of body (60), 8, the byline (23). The card first hugged its text, so a
+   fact with a one-line title and two lines of body brought the band down by
+   20px when it reached the front, and the page under it jumped with it. Now
+   every card is 210: the title is cut at the node's two lines and the body
+   at its three, the chip keeps the top and the byline keeps the foot, and
+   the text sits between them. How many of its two lines the title needs is
+   the column's business — one at 1024, two on the 744 artboard, where the
+   node's own sample wraps — and the box is the same either way.
+   The transform transition is the TURN's clock, set on the stack by
+   AnnouncementDeck.js for each turn (an auto-turn eases in from rest; a
+   flick keeps the finger's speed), so the cards rising behind a leaver move
+   on the leaver's own timing. */
 .adeck__card {
   grid-area: 1 / 1; position: relative; z-index: 3; box-sizing: border-box;
-  display: flex; align-items: center; width: calc(100% - 32px); padding: 12px;
+  display: flex; align-items: stretch; width: calc(100% - 32px); height: 210px; padding: 12px;
   border-radius: 12px; background: #fff; box-shadow: 8px 0 16px rgba(0, 0, 0, .05); overflow: hidden;
   transform-origin: 100% 0; cursor: grab;
-  transition: transform 560ms var(--spring-smooth, cubic-bezier(.32,.72,0,1)), opacity 320ms ease;
+  transition: transform var(--adeck-ms, 640ms) var(--adeck-ease, cubic-bezier(.4, 0, .2, 1)), opacity 320ms ease;
   user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
 }
 .adeck__card:not([data-i='0']) { position: absolute; inset: 0 auto 0 0; }
@@ -4060,23 +4160,160 @@ body.is-report { overflow: hidden; }
 .adeck__card[data-i='2'] { z-index: 1; box-shadow: none; transform: translate(31.74px, 15.32px) scale(.8883, .8573); }
 .adeck__card[data-i='3'] { z-index: 0; opacity: 0; pointer-events: none; transform: translate(31.74px, 15.32px) scale(.8883, .8573); }
 .adeck__card.is-dragging { transition: none; cursor: grabbing; }
+/* a card in flight — leaving the front, or arriving at it — belongs to its
+   animation alone: above the deck, no transition of its own, so the deck
+   reordering under it cannot move it (after the data-i rules on purpose:
+   the same specificity, and this one has to win) */
+.adeck__card.is-flying { z-index: 4; transition: none; pointer-events: none; }
 .adeck__card > * { pointer-events: none; }
-.adeck__body { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 12px; padding-right: 12px; }
+.adeck__body { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 12px; padding-right: 12px; }
 .adeck__chip { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 2px 12px 2px 2px; border-radius: 100px; background: rgba(55, 189, 105, .1); font-size: 12px; font-weight: 600; line-height: normal; letter-spacing: 0; color: var(--c-on-surface-var, #44544A); white-space: nowrap; }
 .adeck__chip img { display: block; width: 32px; height: 32px; }
 .adeck__card[data-k='important'] .adeck__chip { background: rgba(233, 51, 83, .1); }
-.adeck__text { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; }
-.adeck__hl { margin: 0; font-size: 16px; font-weight: 500; line-height: 19.5px; /* the node's two lines are 39 */ letter-spacing: 0; color: transparent; background: linear-gradient(-38.56deg, #00AFD6 .6%, #37BD69 103.4%); -webkit-background-clip: text; background-clip: text; }
+.adeck__text { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; }
+.adeck__hl { margin: 0; font-size: 16px; font-weight: 500; line-height: 19.5px; /* the node's two lines are 39 */ letter-spacing: 0; color: transparent; background: linear-gradient(-38.56deg, #00AFD6 .6%, #37BD69 103.4%); -webkit-background-clip: text; background-clip: text; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .adeck__card[data-k='important'] .adeck__hl { background-image: linear-gradient(133.1deg, #E93353 1.5%, #FA6140 96.9%); }
 .adeck__desc { margin: 0; font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: 0; color: var(--c-on-surface-var, #44544A); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.adeck__meta { display: flex; align-items: center; gap: 4px; padding: 4px 0; font-size: 12px; font-weight: 600; line-height: normal; letter-spacing: 0; color: var(--c-neutral-2, #7A8684); white-space: pre; }
+.adeck__meta { margin-top: auto; display: flex; align-items: center; gap: 4px; max-width: 100%; padding: 4px 0; font-size: 12px; font-weight: 600; line-height: normal; letter-spacing: 0; color: var(--c-neutral-2, #7A8684); white-space: pre; }
+/* the byline is one line in a fixed box: where the column is too narrow for
+   "who • when" (a phone), the name stays whole and the date is cut with an
+   ellipsis, rather than running on under the photograph */
+.adeck__meta > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.adeck__meta > span:first-child { flex: none; }
 /* the photograph fills the card's height and sets none of it: the text
    column is the only thing that can make the card taller */
 .adeck__img { position: relative; flex: none; align-self: stretch; width: 180px; border-radius: 6px; overflow: hidden; }
 .adeck__img img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
-.adeck__dots { display: flex; align-items: center; justify-content: center; gap: 6px; height: 8px; margin-top: 16px; }
+/* on a phone the card is too narrow to give the photograph its 180 and the
+   title the node's two lines — a 94px column set the title in six lines and
+   the card at 288. The photograph gives way; the box does not. */
+@media (max-width: 599px) { .adeck__img { width: 120px; } }
+/* THE FOOT ROW · node 753:21034 (25 Sep 2026): the head is gone, so the
+   stack opens 16 under the band's top, and 16 under the stack a 17px row
+   carries the dots — centred in the room left of View all, not in the band
+   — and View all at the right: Inter Regular 14 in addPrimary, a 4 gap, the
+   node's 16px arrow (assets/icon/arrow-forward-16.svg). */
+.adeck__foot { display: flex; align-items: center; justify-content: space-between; height: 17px; margin-top: 16px; }
+.adeck__dots { flex: 1 0 0; min-width: 1px; display: flex; align-items: center; justify-content: center; gap: 6px; height: 8px; }
+.adeck__foot .adeck__all { flex: none; justify-content: flex-end; gap: 4px; height: 17px; font-size: 14px; font-weight: 400; line-height: normal; letter-spacing: 0; }
+.adeck__foot .adeck__all img { width: 16px; height: 16px; }
 .adeck__dots i { width: 8px; height: 8px; border-radius: 4px; background: rgba(31, 65, 91, .18); transition: width 420ms var(--spring-smooth, ease), background-color 240ms ease; }
 .adeck__dots i.on { width: 20px; background: rgba(0, 0, 0, .2); }
+
+/* ── a note, opened (owner, 25 Sep 2026: "if i click … it has open Centre
+   popup, when i scroll it has to change Full screen" — then "I want for
+   Notes not for Announcements") ──
+   js/components/DetailPopup.js. A tap on a V2 Observation Note opens it as
+   a CENTRED popup over a veil: the card's own photograph (or its priority
+   colour), its plate, then the priority, the whole title, the tags, the
+   whole note, the date and who wrote it, nothing clamped. The first scroll
+   inside it (a wheel, a swipe up, the Down arrow) grows the popup to FULL
+   SCREEN; scrolling back past the top in full screen settles it to the
+   centre. It closes on ×, Escape and a tap on the veil. The box animates its
+   own width, height and radius on one clock, so the popup visibly becomes
+   the page rather than being swapped for it. */
+.dpop-veil { position: fixed; inset: 0; z-index: 420; background: rgba(16, 45, 52, .32); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; transition: opacity 260ms ease; }
+.dpop-veil.is-on { opacity: 1; }
+.dpop {
+  --dpop-t: 460ms var(--spring-smooth, cubic-bezier(.32, .72, 0, 1));
+  position: fixed; left: 50%; top: 50%; z-index: 421; box-sizing: border-box;
+  width: min(560px, calc(100vw - 32px)); height: min(640px, calc(100dvh - 96px));
+  border-radius: 20px; background: #fff; overflow: hidden;
+  box-shadow: 0 30px 80px -20px rgba(16, 45, 52, .45);
+  transform: translate(-50%, -50%) scale(.94); opacity: 0;
+  transition: width var(--dpop-t), height var(--dpop-t), border-radius var(--dpop-t), transform 320ms var(--spring-smooth, ease), opacity 220ms ease;
+}
+.dpop.is-on { transform: translate(-50%, -50%); opacity: 1; }
+.dpop.is-full { width: 100vw; height: 100dvh; border-radius: 0; }
+.dpop__scroll { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.dpop__media { position: relative; height: 260px; overflow: hidden; background: var(--dpop-slab, rgba(31, 65, 91, .06)); transition: height var(--dpop-t); }
+.dpop.is-full .dpop__media { height: min(46dvh, 440px); }
+.dpop__media > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.dpop__x { position: absolute; top: 12px; right: 12px; z-index: 2; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .86); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 2px 8px rgba(0, 0, 0, .14); color: #1D2B2A; cursor: pointer; }
+.dpop__x::after { content: ''; position: absolute; inset: -4px; }
+.dpop__x svg { width: 18px; height: 18px; }
+.dpop__x:focus-visible { outline: 2px solid var(--c-add-primary, #00AFD6); outline-offset: 2px; }
+.dpop__hint { position: absolute; left: 50%; bottom: 12px; z-index: 2; transform: translateX(-50%); padding: 6px 12px; border-radius: 100px; background: rgba(0, 0, 0, .55); color: #fff; font-size: 12px; font-weight: 500; white-space: nowrap; pointer-events: none; transition: opacity 200ms ease; }
+.dpop.is-full .dpop__hint { opacity: 0; }
+body.dpop-open { overflow: hidden; }
+/* the note's parts */
+.dpop__plate { position: absolute; left: 16px; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 8px; border-radius: 12px; background: rgba(255, 255, 255, .3); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; }
+.dpop__plate img { flex: none; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+.dpop__plate b { display: block; font-size: 17px; font-weight: 500; }
+.dpop__plate small { display: block; font-size: 14px; opacity: .92; }
+.dpop__plate em { margin-left: auto; font-style: normal; font-size: 17px; font-weight: 500; }
+.dpop__body { display: flex; flex-direction: column; gap: 12px; max-width: 680px; margin: 0 auto; padding: 20px 24px 64px; }  /* 64 at the foot clears the hint */
+.dpop__pri { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 100px; background: var(--dpop-badge, rgba(31, 65, 91, .08)); color: var(--dpop-glyph, #1F415B); font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.dpop__title { margin: 0; font-size: 24px; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; color: #1F415B; }
+.dpop__tags { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--c-neutral-2, #7A8684); }
+.dpop__tags li::before { content: '•'; margin-right: 8px; }
+.dpop__note { margin: 4px 0 0; padding-top: 14px; border-top: 1px solid rgba(31, 65, 91, .08); font-size: 16px; line-height: 26px; color: var(--c-on-surface-var, #44544A); }
+.dpop__date { font-size: 13px; font-weight: 500; color: var(--c-neutral-2, #7A8684); }
+.dpop__foot { display: flex; align-items: center; gap: 18px; margin-top: 8px; padding-top: 14px; border-top: 1px solid rgba(31, 65, 91, .08); font-size: 14px; color: #1F415B; }
+.dpop__who { display: inline-flex; align-items: center; gap: 8px; margin-right: auto; font-weight: 500; }
+.dpop__av { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(31, 65, 91, .08); font-size: 11px; font-weight: 700; }
+.dpop__n { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.dpop__n img { width: 20px; height: 20px; }
+:root[data-home='v2'] #recentObs .obs { cursor: pointer; }
+:root[data-home='v2'] #recentObs .obs:focus-visible { outline: 2px solid var(--c-add-primary, #00AFD6); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .dpop, .dpop-veil, .dpop__media { transition: none; } }
+
+/* ── "your modules are below" · the Modules chip (owner, 25 Sep 2026; node
+   752:20867) ──
+   A glass chip at the head of the Quick Actions row while the Modules head
+   is still below the screen: the word "Modules" and a double chevron that
+   keeps easing down and back, in the pill's own material. A tap scrolls to
+   Modules; once the
+   head is on screen the chip folds away, and it returns if you scroll back
+   above it.
+   IT IS IN THE ROW, so chip, pill and chat disc are centred as ONE group
+   ("Bottom actions not center aligned"). It first hung off the row's left
+   edge, out of flow, so the pill never moved, but the three then sat off
+   centre. Folding it by width (max-width, padding and the gap to 0) lets
+   the row re-centre with the pill gliding, never jumping.
+   IT OPTS BACK IN TO POINTERS: `.qa` is `pointer-events: none` so the page
+   stays usable under the bar, and a control that does not opt in lets a
+   tap fall through — which is how tapping the chip opened the note under
+   it. Where the screen cannot fit all three, it drops the word and keeps
+   the chevron (`is-compact`). It stands down while Quick Actions is doing anything: the
+   panel open, the keyboard up, edit mode, a note popup or a hold menu. */
+.mhint {
+  position: relative; flex: none; pointer-events: auto;
+  /* the pill's own box ("Quick Action & chat are same height, but Modules
+     is Different Size"): its 52, its 16 of padding, its 8 gap, its label */
+  display: inline-flex; align-items: center; gap: var(--s2); height: var(--qa-h); max-width: 160px; padding: 0 16px;
+  border: 0; border-radius: var(--r-pill, 100px); overflow: hidden;
+  /* NODE 752:20867 (25 Sep 2026: "Change Module Button Same as Quick
+     Actions"): the pill's own glass — its fill, blur and five-layer shadow
+     — with the word first and a 20px double chevron after it. It replaced
+     a tinted, liquid-glass version of the same control. */
+  background: var(--glass-fill); color: var(--c-black, #000);
+  font: inherit; font-size: var(--fs-body); font-weight: 600; white-space: nowrap; cursor: pointer;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-lift));
+          backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-lift));
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25), inset 0 1px 0 0 var(--glass-spec), inset 0 -1px 0 0 var(--glass-bounce),
+              inset 0 0 0 1px var(--glass-rim), inset 0 -6px 12px -6px var(--glass-depth);
+  transition: max-width 420ms var(--spring-smooth, cubic-bezier(.32, .72, 0, 1)), padding 420ms var(--spring-smooth, ease),
+              margin 420ms var(--spring-smooth, ease), opacity 220ms ease, box-shadow 220ms ease, transform 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.mhint.is-compact .mhint__n { display: none; }
+.mhint.is-compact { padding: 0 16px; }
+.mhint.is-off { max-width: 0; padding: 0; margin-right: calc(-1 * var(--s3)); opacity: 0; box-shadow: none; pointer-events: none; }
+.mhint:active { transform: scale(.95); }
+.mhint:focus-visible { outline: 3px solid var(--ui-link); outline-offset: 3px; }
+/* the chevron is the node's own export (assets/icon/v2-modules-chevron.svg,
+   752:20869), at its 20×20, and it keeps easing down 3px and back while
+   the chip is showing: the "further down" the word points at */
+.mhint__chev { display: block; flex: none; animation: mhint-chev 1.6s cubic-bezier(.45, 0, .55, 1) infinite; }
+@keyframes mhint-chev {
+  0%, 100% { transform: translateY(-2px); opacity: .6; }
+  50%      { transform: translateY(2px);  opacity: 1; }
+}
+.mhint__n { letter-spacing: 0; }
+.qa.is-open .mhint, .qa.is-kb .mhint, body.is-editing .mhint, body.dpop-open .mhint, body.v2ctx-open .mhint { max-width: 0; padding: 0; margin-right: calc(-1 * var(--s3)); opacity: 0; box-shadow: none; pointer-events: none; }
+body.is-editing .mhint { display: none; }
+@media (prefers-reduced-motion: reduce) { .mhint { transition: none; } .mhint__chev { animation: none; } }
 
 /* ── the notes filter: a segmented control whose selection slides ── */
 .v2seg { position: relative; display: inline-flex; gap: 2px; max-width: 100%; margin: 0 0 6px; padding: 3px; border-radius: 12px; background: rgba(31, 65, 91, .06); overflow-x: auto; scrollbar-width: none; }
@@ -4142,6 +4379,9 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
    above and below is left clear so the tint never doubles over the header or
    the species block */
 :root[data-home='v2'] .search-row { gap: 8px; background: linear-gradient(rgba(175, 239, 235, .5), rgba(175, 239, 235, .5)) 0 10px / 100% calc(100% - 20px) no-repeat; }
+/* …at rest only. Stuck, the bar is blur with no fill (ruling 25 Sep), and this
+   strip was the mint still showing through it */
+:root[data-home='v2'] .search-row.is-stuck { background: none; }
 /* the docked profile is 0 wide at rest and still earned a flex gap: the node's
    field is 636, scan 52, one gap of 8 */
 :root[data-home='v2'] .search-row:not(.is-stuck) .search-row__profile { margin-left: -8px; }
@@ -4157,16 +4397,18 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 :root[data-home='v2'] .fav__edit { display: inline-flex; align-items: center; gap: 4px; height: 20px; font-size: 16px; line-height: normal; color: var(--c-add-primary, #00AFD6); }
 :root[data-home='v2'] .fav__edit::before { content: ''; order: 2; width: 20px; height: 20px; background: url("assets/icon/v2-add-circle.svg") center / 20px 20px no-repeat; }
 :root[data-home='v2'] .fav__rail { --fav-w: 148px; --fav-h: 158px; gap: 8px; margin: 0 calc(var(--pad-page) * -1) 0 0; padding: 0; }
-/* no padding: the frame's photograph and plate run edge to edge on the 148 */
-:root[data-home='v2'] .fav__card { display: flex; flex-direction: column; justify-content: flex-end; width: 148px; height: 158px; padding: 0; border: 0; border-radius: 12px; background: #fff; box-shadow: none; overflow: hidden; }
-:root[data-home='v2'] .fav__card::after { display: none; }
-:root[data-home='v2'] .fav__img { position: static; flex: none; width: 100%; max-width: none; height: 106px; margin: 0; border-radius: 0; object-fit: cover; }
-:root[data-home='v2'] .fav__txt { position: static; flex: none; display: flex; flex-direction: column; gap: 4px; width: 100%; height: 52px; margin: 0; padding: 8px 12px; border-radius: 0; background: #000; backdrop-filter: none; -webkit-backdrop-filter: none; color: #fff; }
-:root[data-home='v2'] .fav__name { font-size: 14px; font-weight: 600; line-height: normal; text-shadow: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }  /* the plate is 52: one line, cut */
+/* V4'S CARD AT V2'S SIZE (owner, 25 Sep 2026: "version 2 make like this
+   card, But Fix the card height same as v2"). The photograph fills the card
+   and the name and count sit on the base card's dark fade — V4's card, the
+   base rules above — where the frame drew a 106px photograph over a black
+   52px plate. Only the box stays V2's: 148 × 158, radius 12. The name keeps
+   to one line, since 158 has no room for a second. */
+:root[data-home='v2'] .fav__card { width: 148px; height: 158px; border-radius: 12px; box-shadow: none; }  /* the rail has no padding, so a shadow would only be clipped */
+:root[data-home='v2'] .fav__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* the frame's rail is species only — Edit opens the same picker the add card
    does, so the card draws only when there is nothing else on the rail */
 :root[data-home='v2'] .fav__item:not(:only-child) > .fav__card--add { display: none; }
-:root[data-home='v2'] .fav__meta { font-family: var(--font); font-size: 12px; font-weight: 400; line-height: normal; color: #fff; opacity: 1; }
+
 
 /* ── Observation Notes · 718:17314 inside 725:18873 ──
    A 712 band (the column plus 8 a side) padded 24 top and bottom, on a
@@ -4180,6 +4422,68 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 :root[data-home='v2'] .obs-head__all { gap: 4px; height: 18px; font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; color: var(--c-on-surface-var, #44544A); }
 :root[data-home='v2'] .obs-head__all img { width: 18px; height: 18px; }
 :root[data-home='v2'] .obs-rail { gap: 12px; margin: 0; padding: 0 24px; scroll-padding-left: 24px; }
+
+/* ── Key Insights · node 757:9930 (25 Sep 2026: "Add this section under
+   notes. Make sure Each Container has to Scroll inside") ──
+   A 712 band like the notes band's — the column plus 8 a side — on the
+   display colour #E8F4F2, padded 24 top and bottom and 16 at the sides; a
+   19px head (Key Insights · View all →) 16 over a rail of 297×430 cards 12
+   apart that runs to the band's edge. Each card: a hairline in its own
+   colour over a radial wash from above its top (the node's own SVG
+   gradients, at their 50%), an 18px mark and a "Title - n" head, then a list
+   that SCROLLS INSIDE THE CARD, the native bar replaced by the node's 3×52
+   grey thumb on the card's right edge (761:8149), which tracks the list and
+   only shows when there is somewhere to go. Built by KeyInsights in
+   HomeV2.js. */
+.kins { margin: 16px -8px 0; padding: 24px 16px; border-radius: 12px; overflow: hidden; background: #E8F4F2; }
+.kins__head { display: flex; align-items: center; justify-content: space-between; height: 19px; margin: 0 0 16px; }
+.kins__title { margin: 0; font-size: 16px; font-weight: 500; line-height: normal; letter-spacing: 0; color: var(--c-on-surface-var, #44544A); }
+.kins__all { position: relative; display: inline-flex; align-items: center; gap: 4px; height: 18px; padding: 0; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; color: var(--c-on-surface-var, #44544A); cursor: pointer; }
+.kins__all::after { content: ''; position: absolute; inset: -13px -8px; }
+.kins__all img { display: block; width: 18px; height: 18px; }
+.kins__all:focus-visible { outline: 2px solid var(--c-add-primary, #00AFD6); outline-offset: 4px; border-radius: 4px; }
+.kins__rail { display: flex; gap: 12px; margin: 0 -16px; padding: 0 16px; overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: 16px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.kins__rail::-webkit-scrollbar { display: none; }
+.kins__card {
+  position: relative; flex: none; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;
+  width: 297px; height: 430px; padding: 16px; border-radius: 12px; overflow: hidden; scroll-snap-align: start;
+  /* THE OUTLINE ONLY ON TOP (owner, 25 Sep 2026: "Outline has show only on
+     top, not fully down"): the node draws a full .5 hairline; here it is a
+     gradient border — the card's colour along the top edge and round the
+     upper corners, gone by half way down — painted in the border box under
+     the wash and the white, which stay in the padding box */
+  border: .5px solid transparent;
+  background: var(--k-wash) padding-box, linear-gradient(#fff, #fff) padding-box,
+              linear-gradient(180deg, var(--k-line) 0%, var(--k-line) 12%, transparent 50%) border-box;
+}
+.kins__card[data-k='natality'] { --k-ink: #00AFD6; --k-line: #6ADCE2;
+  --k-wash: radial-gradient(355.5px 162px at 159px -60.5px, rgba(106, 220, 226, .5) 6%, rgba(143, 229, 233, .5) 28%, rgba(181, 238, 241, .5) 50%, rgba(255, 255, 255, .5) 94%); }
+.kins__card[data-k='mortality'] { --k-ink: #FA6140; --k-line: rgba(250, 97, 64, .6);
+  --k-wash: radial-gradient(339.1px 154.6px at 159px -60.5px, rgba(250, 97, 64, .15) 6%, rgba(251, 137, 112, .2375) 28%, rgba(253, 176, 160, .325) 50%, rgba(254, 216, 207, .4125) 72%, rgba(255, 255, 255, .5) 94%); }
+.kins__card[data-k='transfer'] { --k-ink: #E4B819; --k-line: #D8C993;
+  --k-wash: radial-gradient(339.1px 154.6px at 159px -60.5px, rgba(216, 201, 147, .5) 6%, rgba(236, 228, 201, .5) 50%, rgba(255, 255, 255, .5) 94%); }
+.kins__card[data-k='food'] { --k-ink: #006D35; --k-line: #67A886;
+  --k-wash: radial-gradient(307.1px 140px at 148px -46.5px, rgba(103, 168, 134, .5) 6%, rgba(141, 190, 164, .5) 28%, rgba(179, 212, 195, .5) 50%, rgba(217, 233, 225, .5) 72%, rgba(255, 255, 255, .5) 94%); }
+.kins__cap { flex: none; display: flex; align-items: flex-start; gap: 4px; padding-bottom: 8px; }
+.kins__mark { flex: none; display: grid; place-items: center; width: 18px; height: 18px; }
+.kins__mark img { display: block; }
+.kins__card[data-k='natality'] .kins__mark { padding: 0 3.026px 0 1.513px; box-sizing: content-box; width: 13.461px; }
+.kins__card[data-k='mortality'] .kins__mark { width: 18.691px; height: 18.613px; }
+.kins__card[data-k='mortality'] .kins__mark img { transform: rotate(44.67deg); }
+.kins__card[data-k='transfer'] .kins__mark { height: 19.2px; }
+.kins__name { font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; color: var(--k-ink); white-space: nowrap; }
+/* the list is the scroller: flex 1 inside the fixed card, its bar hidden */
+.kins__list { flex: 1 1 auto; min-height: 0; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.kins__list::-webkit-scrollbar { display: none; }
+.kins__list:focus-visible { outline: 2px solid var(--k-ink); outline-offset: 2px; border-radius: 6px; }
+.kins__row { flex: none; display: flex; align-items: center; gap: 8px; padding-bottom: 8px; box-shadow: inset 0 -.5px 0 rgba(0, 0, 0, .05); }  /* inside the box, as Figma draws a stroke: 43, not 43.5 */
+.kins__av { flex: none; width: 34px; height: 34px; border-radius: 8px; object-fit: cover; background: rgba(31, 65, 91, .06); }
+.kins__txt { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.kins__txt b { font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; color: var(--c-on-surface-var, #44544A); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kins__txt small { font-size: 10px; font-weight: 400; line-height: 16px; color: var(--c-neutral-2, #7A8684); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kins__n { flex: none; font-family: 'DM Sans', var(--font); font-size: 16px; font-weight: 600; line-height: normal; font-variation-settings: 'opsz' 14; font-variant-numeric: tabular-nums; color: var(--c-on-surface-var, #44544A); text-align: center; white-space: nowrap; }
+.kins__thumb { position: absolute; right: 0; top: 0; width: 3px; height: 52px; border-radius: 2px 0 0 2px; background: #D9D9D9; pointer-events: none; opacity: 0; transition: opacity 200ms ease; }
+.kins__card.is-scrollable .kins__thumb { opacity: 1; }
 :root[data-home='v2'] .obs { --obs-w: 290px; height: 430px; border-radius: 12px; box-shadow: none; border: .5px solid rgba(0, 0, 0, .05); }
 @media (hover: hover) { :root[data-home='v2'] .obs:hover { transform: none; box-shadow: none; } }
 :root[data-home='v2'] .obs__media { aspect-ratio: auto; height: 209px; }
@@ -4215,7 +4519,16 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 :root[data-home='v2'] .obs__count { min-width: 18px; }
 
 /* ── Modules · 718:17642: a 19px head, the 144px banner, rows of 144 ── */
-:root[data-home='v2'] .modules-band { margin-top: 16px; padding-bottom: 16px; }
+:root[data-home='v2'] .modules-band { margin-top: 16px; padding-top: 24px; padding-bottom: 0; }
+/* THE PAGE ENDS AT THE PILL'S CLEARANCE (page feedback, 25 Sep 2026: "Need
+   top padding 24px" on the band, "Remove Empty Space in on Down"). Four
+   paddings stacked 184px under the last card — the band's 16, the panel's
+   pill clearance, .main-frame's 24 and .page's 48. Only the clearance is
+   load-bearing: the pill and chat disc float over the page, and without it
+   the last row could never scroll out from under them. It stays, cut to the
+   row's own footprint plus 16; the rest go, as V3 already did. */
+:root[data-home='v2'] #panel-modules { padding-bottom: calc(var(--qa-b) + var(--qa-row-h) + 16px); }
+:root[data-home='v2'] .main-frame, :root[data-home='v2'] .page { padding-bottom: 0; }
 :root[data-home='v2'] body:not(.is-editing) .section-head--home { height: 19px; margin: 0 0 16px; opacity: 1; overflow: visible; pointer-events: auto; }
 :root[data-home='v2'] .section-head--home .link-btn:not(.link-btn--done) { gap: 12px; color: #006D35; }
 :root[data-home='v2'] .section-head--home .link-btn:not(.link-btn--done)::before { width: 18px; height: 18px; background: url("assets/icon/v2-pencil.svg") center / 18px 18px no-repeat; }
@@ -4341,7 +4654,7 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
     --spring-smooth: linear(0, 0.018, 0.063, 0.127, 0.2, 0.278, 0.357, 0.434, 0.506, 0.573, 0.634, 0.689, 0.738, 0.781, 0.818, 0.85, 0.877, 0.901, 0.92, 0.936, 0.95, 0.961, 0.97, 0.977, 0.983, 0.988, 0.992, 0.994, 0.996, 0.998, 0.999, 1, 1.001, 1.001, 1.001, 1.001, 1);
   }
 }
-:root[data-page-version='4'] :is(#moduleGrid .card, .fav__card, .fsp__chip, .life-chip, .fsp__item, .today__row, .qa-chip) {
+:root[data-page-version='4'] :is(#moduleGrid .card, .fav__card, .fsp__chip, .life-chip, .fsp__tile, .fsp__face, .today__row, .qa-chip) {
   -webkit-tap-highlight-color: transparent;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -4361,12 +4674,29 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
   :root[data-page-version='4'] :is(.fsp__chip, .life-chip):active {
     transform: scale(.94); transition-duration: 110ms, 200ms, 200ms, 200ms; transition-timing-function: var(--ease-out), var(--ease), var(--ease), var(--ease);
   }
-  :root[data-page-version='4'] :is(.fsp__item, .today__row) { transition: transform 460ms var(--spring-bounce), background-color 160ms var(--ease); }
-  :root[data-page-version='4'] :is(.fsp__item, .today__row):active { transform: scale(.985); transition-duration: 110ms; }
-  /* the tick springs in when a species is chosen */
-  .fsp__tick { transition: background-color 180ms var(--ease), color 180ms var(--ease), box-shadow 180ms var(--ease); }
-  .fsp__tick.is-pop { animation: fsp-pop 520ms var(--spring-bounce); }
-  @keyframes fsp-pop { 0% { transform: scale(.55); } 100% { transform: scale(1); } }
+  :root[data-page-version='4'] .today__row { transition: transform 460ms var(--spring-bounce), background-color 160ms var(--ease); }
+  :root[data-page-version='4'] .today__row:active { transform: scale(.985); transition-duration: 110ms; }
+  /* a photo in the picker: the card's dip and spring; the ring grows out of
+     the photo's edge on the bounce, and the mark turns — the + spins away as
+     the number springs in, the glass warming to the primary green under it.
+     The filters' glide, the entrance and the faces are Favourites.js's, on
+     the same two springs, read from these properties */
+  .fsp__tile { transition: transform 520ms var(--spring-bounce), box-shadow 380ms var(--spring-bounce); }
+  .fsp__tile:active { transform: scale(.955); transition: transform 120ms var(--ease-out), box-shadow 380ms var(--spring-bounce); }
+  .fsp__tile .fsp__photo { transition: transform 700ms var(--spring-smooth); }
+  .fsp__tile[aria-pressed='true'] .fsp__photo { transform: scale(1.04); }
+  .fsp__mark { transition: background-color 220ms var(--ease), box-shadow 220ms var(--ease); }
+  .fsp__mark .icon, .fsp__ord { transition: transform 480ms var(--spring-bounce), opacity 160ms var(--ease); }
+  .fsp__ord.is-bump { animation: fsp-bump 420ms var(--spring-bounce); }
+  @keyframes fsp-bump { 0% { transform: scale(.6); } 100% { transform: scale(1); } }
+  /* the class fill slides between chips on the smooth spring */
+  .fsp__chips.has-ink.is-live .fsp__ink { transition: transform 480ms var(--spring-smooth), width 480ms var(--spring-smooth); }
+  .fsp__clear { transition: transform 360ms var(--spring-bounce), opacity 160ms var(--ease); }
+  .fsp__clear:active { transform: scale(.88); transition-duration: 110ms; }
+  .fsp__face { transition: transform 460ms var(--spring-bounce); }
+  .fsp__face:active { transform: scale(.9); transition-duration: 110ms; }
+  .fsp__none button { transition: transform 460ms var(--spring-bounce); }
+  .fsp__none button:active { transform: scale(.94); transition-duration: 110ms; }
   /* the sheet rises on the smooth spring, a touch longer than the search
      sheets' curve, and follows the finger exactly while it is dragged */
   .gsx-sheet.fsp-sheet { transition: transform 520ms var(--spring-smooth); }
@@ -4376,9 +4706,6 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
   @keyframes fav-in { 0% { opacity: 0; transform: scale(.7); } 60% { opacity: 1; } 100% { transform: scale(1); } }
   .fav__item.is-leaving { animation: fav-out 260ms var(--ease) forwards; overflow: hidden; }
   @keyframes fav-out { 0% { width: var(--w); opacity: 1; transform: scale(1); } 100% { width: 0; margin-right: -12px; opacity: 0; transform: scale(.7); } }
-}
-@media (min-width: 744px) {
-  .fsp__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 8px; align-content: start; }
 }
 
 /* the two week tiles at the head of Circle of Life: the module grid's own
@@ -8955,14 +9282,6 @@ body.is-dragging { -webkit-user-select: none; user-select: none; cursor: grabbin
    has to read as "you are here" without becoming the loudest thing on a panel
    whose actual subject is the previews to its right. */
 .mod-item.is-selected { background: var(--surface-sel); }
-/* The row in hand lifts off the list while it is being dragged. */
-.mod-item.is-dragging {
-  position: relative;
-  z-index: 2;
-  background: var(--c-white);
-  box-shadow: 0 8px 24px -8px rgba(10, 38, 44, .32);
-}
-.mod-rail.is-reordering { user-select: none; -webkit-user-select: none; }
 
 .mod-row {
   flex: 1 1 auto;
@@ -8977,29 +9296,6 @@ body.is-dragging { -webkit-user-select: none; user-select: none; cursor: grabbin
   cursor: pointer;
   text-align: left;
 }
-
-/* The side controls: 32px wide, the full 44px of the row tall, so a finger
-   has the whole row height to land on and the pair still costs the name only
-   64px. Ink-2 rather than ink-3 — controls hold to AA, the exception granted
-   to module fills does not reach them. */
-.mod-item__ctl {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 44px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--ink-2);
-  cursor: pointer;
-  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
-}
-.mod-item__ctl .icon { width: 17px; height: 17px; }
-.mod-item__ctl:hover { color: var(--ink); background: rgba(31, 81, 91, .08); }
-.mod-pin.is-pinned { color: var(--c-on-primary-ctr, #1F515B); }
-.mod-grip { cursor: grab; touch-action: none; }
-.mod-grip:active, .mod-item.is-dragging .mod-grip { cursor: grabbing; }
 
 .mod-row__icon {
   flex: none;
@@ -9525,6 +9821,174 @@ body.is-dragging { -webkit-user-select: none; user-select: none; cursor: grabbin
   .sheet__foot { grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
   .sheet__actions { width: 100%; }
   .sheet__actions .btn-primary { flex: 1; justify-content: center; }
+}
+
+/* ══ THE LIST, MADE PLAIN · 25 Sep 2026 ═════════════════════════════════════
+   One layout (List) after four were tried, dressed as an Apple sheet:
+   Cancel · title · Add in a 56px bar; a sidebar of icon-and-name rows with the
+   selected row filled; the module's name as the pane's only heading; each card
+   on a quiet plate with its name beneath. No tray, no counts, no blurbs.
+   Type holds to the guideline scale — 17 bar, 15 rows, 22 heading, 13 caption,
+   nothing under 12 — and every preview is drawn big enough that the card's
+   own figures stay readable (see gridBounds()). */
+
+.sheet { background: var(--c-white); }
+
+/* ── the bar ── */
+.sheet .sheet__head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.sheet .sheet__title {
+  grid-column: 2;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -.2px;
+  color: var(--ink);
+}
+.sheet__cancel,
+.sheet__add {
+  height: 36px;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 17px;
+  color: var(--ui-link);
+  cursor: pointer;
+}
+.sheet__cancel { justify-self: start; }
+.sheet__add { justify-self: end; font-weight: 600; }
+.sheet__add:disabled { color: var(--ink-4); cursor: default; }
+@media (max-width: 743px) { .sheet .sheet__head { padding-top: 18px; } }
+
+/* ── the sidebar ── */
+.sheet .sheet__side { padding: 16px 12px; gap: 12px; background: #F7F9F9; }
+.sheet .sheet__side::after { display: none; }
+.sheet-search .icon { left: 10px; width: 16px; height: 16px; color: var(--ink-3); }
+.sheet .sheet-search input {
+  height: 36px;
+  padding: 0 12px 0 32px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(118, 118, 128, .12);
+  font-size: 16px;
+}
+.sheet .sheet-search input:focus { box-shadow: none; background: rgba(118, 118, 128, .16); }
+.sheet .mod-rail { margin: 0; padding: 0; }
+.mod-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.mod-row:hover { background: rgba(118, 118, 128, .08); }
+.mod-row.is-selected { background: var(--c-on-primary-ctr, #1F515B); }
+.mod-row.is-selected .mod-row__name { color: #fff; font-weight: 600; }
+.sheet .mod-row__icon { width: 29px; height: 29px; border-radius: 7px; }
+.sheet .mod-row__icon img { width: 17px; height: 17px; }
+.sheet .mod-row__name { font-size: 15px; font-weight: 400; letter-spacing: -.1px; color: var(--ink); }
+.mod-row > .icon { flex: none; width: 16px; height: 16px; color: var(--ink-4); }
+/* the chevron says "opens"; beside the gallery the row does not open anything */
+@media (min-width: 744px) { .mod-row > .icon { display: none; } }
+
+/* ── the pane ── */
+.sheet .sheet__body { padding: 24px 28px 40px; }
+.detail-title {
+  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.35px;
+  color: var(--ink);
+}
+@media (max-width: 743px) { .sheet .sheet__body { padding: 8px 20px 40px; } }
+
+.widget-row {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+  gap: 28px 20px;
+  grid-auto-flow: row dense;
+  align-items: stretch;
+  padding: 0;
+}
+.widget {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+.widget:hover, .widget[aria-pressed='true'] { background: none; }
+.widget__plate {
+  position: relative;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  border-radius: 20px;
+  background: #F2F4F5;
+  transition: box-shadow var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.widget:hover .widget__plate { background: #ECEFF0; }
+.widget .variant__stage,
+.widget[aria-pressed='true'] .variant__stage,
+.widget.is-sizing .variant__stage {
+  transform: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 6px 18px rgba(0, 0, 0, .08);
+}
+.widget[aria-pressed='true'] .widget__plate { box-shadow: inset 0 0 0 2.5px var(--ui-link); }
+.widget.is-sizing .widget__plate {
+  box-shadow: inset 0 0 0 2.5px var(--ui-link), 0 0 0 4px color-mix(in srgb, var(--ui-link) 18%, transparent);
+}
+.widget .widget__check { top: 10px; right: 10px; width: 26px; height: 26px; border: 2px solid var(--c-white); box-shadow: 0 1px 3px rgba(0, 0, 0, .18); }
+.widget__meta { display: flex; flex-direction: column; align-items: center; gap: 2px; max-width: none; padding: 0; text-align: center; }
+.widget .widget__name { font-size: 13px; font-weight: 500; line-height: 16px; color: var(--ink); }
+.widget__placed { font-size: 12px; line-height: 16px; color: var(--ink-3); }
+
+/* already on Home: there, but not addable */
+.widget.is-placed { cursor: default; }
+.widget.is-placed:hover .widget__plate { background: #F2F4F5; }
+.widget.is-placed .variant__stage { opacity: .4; filter: saturate(.4); box-shadow: none; }
+.widget.is-placed .widget__name { color: var(--ink-3); }
+
+.sheet-empty { padding: 64px 24px; }
+
+/* ── the foot: the size control, only where the page sizes cards ── */
+.sheet .sheet__foot {
+  display: flex;
+  justify-content: center;
+  padding: 12px 20px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+.sheet .sheet__foot .size-picker__label { display: none; }
+.sheet.has-foot .sheet__foot { transform: translateY(0); pointer-events: auto; }
+.sheet:not(.has-foot) .sheet__foot { pointer-events: none; }
+.sheet.has-foot .sheet__body { padding-bottom: 110px; }
+
+@media (min-width: 744px) {
+  .sheet { grid-template-columns: 240px minmax(0, 1fr); }
+  .sheet .sheet__foot { left: 240px; }
+}
+@media (min-width: 1024px) {
+  .sheet { grid-template-columns: 264px minmax(0, 1fr); }
+  .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
 </head>
@@ -10673,6 +11137,206 @@ body.is-site .card:active { transform: scale(.978); }
    the whole visible proof that it is one engine. The only addition is the
    bottom breathing room the home page gets from the page's own padding. */
 #panel-site { padding-bottom: var(--s6); }
+
+/* ══ WIDGET GRAMMAR · 25 Sep 2026 ═══════════════════════════════════════════
+   "How Apple widgets are — text and number hierarchy." Reviewed in the Add
+   Module gallery, card by card, and the faults were one fault in many places:
+   a composition that centred or bottom-aligned its WHOLE column dragged the
+   title down with it, and a short list in a tall card was centred into a hole
+   (the 3 Sep rule above, "a short list in a tall card sits in the middle of
+   it", is reversed here). Apple's widgets follow one grammar and so do these:
+     1 · the head is always on the top edge;
+     2 · a list starts under the head and keeps an even rhythm;
+     3 · a summary's figures sit on the bottom edge, top-aligned to each other,
+         so a label that wraps never knocks its number out of line;
+     4 · labels are sentence case at reading contrast — no 10px capitals;
+     5 · a carousel's preview shows one page, not every page at once.
+   Last in the cascade on purpose: it restates the compositions, it does not
+   rebuild them. ══════════════════════════════════════════════════════════ */
+
+/* 1 · the head never floats */
+.l-progress, .l-fig, .l-duo, .l-spark, .l-pulse,
+.l-trend, .l-strip, .l-vs, .l-rail { justify-content: flex-start; }
+
+/* 3 · …and the reading sits on the foot */
+.l-progress > .c-head + *, .l-fig > .c-head + *, .l-duo > .c-head + *,
+.l-spark > .c-head + *, .l-pulse > .c-head + *, .l-trend > .c-head + *,
+.l-strip > .c-head + *, .l-vs > .c-head + *, .l-rail > .c-head + * { margin-top: auto; }
+.l-stat__body { justify-content: flex-end; }
+.l-metrics__row { flex: 0 0 auto; margin-top: auto; align-items: flex-start; }
+.metric__label {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: .9;
+}
+
+/* 2 · lists start under the head */
+.card[data-h='2'] .l-queue__rows,
+.card[data-h='2'] .l-meters__rows { flex: 0 1 auto; justify-content: flex-start; gap: var(--s4); }
+.l-status__rows { justify-content: flex-start; }
+.card[data-h='1'] .l-status__rows { align-content: start; }
+.card[data-h='2'] .l-status__rows[data-n] { gap: var(--s4); }
+.card[data-h='2'] .l-timeline__items { gap: var(--s5); }
+.l-shelf__rows, .l-tree__levels { justify-content: flex-start; }
+.l-queue__text, .l-timeline__meta, .l-recent__kind { opacity: .92; }
+
+/* the pipeline, across: stages on the foot, the chevron on the figures' line
+   with room either side of it */
+.l-flow__stages { flex: 0 0 auto; margin-top: auto; align-items: flex-start; }
+.l-flow__stages[data-n='4'] { gap: var(--s6); }
+.l-flow__stages[data-n='4'] .l-flow__stage:not(:last-child)::after { right: calc(var(--s6) / -2 - 3px); }
+.l-flow__stage:not(:last-child)::after { top: calc(var(--fs-metric-sm) / 2); }
+.card[data-h='1'] .l-flow__stage:not(:last-child)::after { top: calc(var(--fs-body) / 2); }
+.l-flow__label { font-size: var(--fs-label); opacity: .9; }
+.l-flow__stages[data-n='5'] .l-flow__label { font-size: var(--fs-micro); }
+
+/* …and down: a list — figure, then its stage beside it, from the top */
+.card[data-h='2'] .l-flow__stages { margin-top: 0; justify-content: flex-start; gap: var(--s5); }
+.card[data-h='2'] .l-flow__stage { align-items: baseline; gap: var(--s3); }
+.card[data-h='2'] .l-flow__value { min-width: 2.2em; }
+.card[data-h='2'] .l-flow__label { font-size: var(--fs-body); opacity: .92; }
+.card[data-h='2'] .l-flow__stage:not(:last-child)::after { top: auto; }
+
+/* 4 · the pair's labels read as words */
+.l-duo__tag { font-size: var(--fs-label); letter-spacing: 0; opacity: .9; }
+.l-rail__caption { font-size: var(--fs-label); }
+
+/* 5 · a carousel that is not wired — a gallery preview — shows its first page */
+.is-page:not([data-pos]) ~ .is-page:not([data-pos]) { visibility: hidden; }
+
+/* ══ CLIMATE BACKGROUND · 25 Sep 2026 · live on V2 (`?climate` = dev switcher) ═
+   See ClimateBackground.js. The scene sits at z-index -1 behind V2's top band;
+   these rules make the band transparent so it shows, and nothing else moves. */
+:root.has-climate { background: #fff; }
+:root.has-climate body { background: transparent; }
+:root.has-climate[data-home='v2'] .home-header,
+:root.has-climate[data-home='v2'] .search-row:not(.is-stuck),
+:root.has-climate[data-home='v2'] .fav-band:not([hidden]) { background: transparent; }
+
+.climate {
+  position: absolute;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: 0 0 20px 20px;
+  pointer-events: none;
+  contain: strict;
+}
+.climate__scene {
+  position: absolute;
+  inset: 0;
+  transition: opacity 2.2s cubic-bezier(.4, 0, .2, 1);
+}
+.climate__scene > * { position: absolute; }
+.climate__sky { inset: 0; background: var(--sky); }
+
+/* THE FLAT ART (second pass): one SVG, solid fills, crisp edges — no blur,
+   no bloom. Anchored to the band's foot and cropped at the sides on a
+   narrower screen, so the land always meets the band's rounded corners. */
+.climate__art { inset: 0; width: 100%; height: 100%; }
+/* the sky strip: right of the greeting, left of the bell */
+.climate__skyart { top: 1%; left: 290px; width: calc(100% - 440px); height: 30%; overflow: visible; }  /* an SVG does not stretch between left and right; the width is explicit */
+/* the meadow, in daylight — every climate is a relighting of this */
+.climate__land .l-far { fill: #8FB1E6; }
+.climate__land .l-far-lit { fill: #B8CEF2; }
+.climate__land .l-back { fill: #C4D850; }
+.climate__land .l-back-lit { fill: #DCE76E; }
+.climate__land .l-front { fill: #A2C63C; }
+.climate__land .l-shade { fill: #8DB634; }
+.climate__land .l-fore { fill: #86AE30; }
+.climate__land .b-dark { fill: #3F8127; }
+.climate__land .b-mid { fill: #5FA232; }
+.climate__land .b-light { fill: #8CC542; }
+.climate__land .b-flower { fill: #F4A6D0; }
+.climate__land .l-rim { fill: #E9B46C; }
+.climate__land .l-water { fill: #4DB3E2; }
+.climate__land .l-glint { fill: none; stroke: #A9E2F7; stroke-width: 3; stroke-linecap: round; }
+.climate__land .l-wood { fill: #E3892F; }
+.climate__land .l-wood-dark { fill: #B45F1E; }
+.climate__land .l-plank { fill: none; stroke: #C46E24; stroke-width: 2; stroke-linecap: round; }
+.climate__land .g-tuft { fill: none; stroke: #6E9A28; stroke-width: 2.2; stroke-linecap: round; }
+.climate__rays { fill: #FFF7CF; opacity: .14; }
+.climate__clouds .c-shade { fill: rgba(96, 124, 170, .16); }
+
+/* THE RELIGHTING — one tint for the hour, one for the weather, multiplied
+   over the land only (the mask), with the colour drained for grey days */
+.climate__tint { fill: transparent; mix-blend-mode: multiply; }
+.climate__scene[data-time='morning']   .climate__tint[data-by='time'] { fill: #FFEBD2; opacity: .55; }
+.climate__scene[data-time='evening']   .climate__tint[data-by='time'] { fill: #D98C8E; opacity: .7; }
+.climate__scene[data-time='night']     .climate__tint[data-by='time'] { fill: #1B2A55; opacity: .88; }
+.climate__scene[data-weather='cloudy'] .climate__tint[data-by='weather'] { fill: #B7C3CC; opacity: .45; }
+.climate__scene[data-weather='rain']   .climate__tint[data-by='weather'] { fill: #8FA3B2; opacity: .55; }
+.climate__scene[data-weather='storm']  .climate__tint[data-by='weather'] { fill: #56637A; opacity: .72; }
+.climate__scene[data-weather='mist']   .climate__tint[data-by='weather'] { fill: #EEF2F2; opacity: .55; mix-blend-mode: normal; }
+.climate__scene:is([data-weather='cloudy'], [data-weather='rain'], [data-weather='storm'], [data-weather='mist']) .climate__land { filter: saturate(.7); }
+.climate__scene[data-time='night'] .climate__land { filter: saturate(.5); }
+.climate__sun { fill: var(--sun); }
+.climate__moon { fill: var(--sun); }
+.climate__stars { fill: #fff; opacity: .7; }
+.climate__birds { fill: none; stroke: var(--tree); stroke-width: 2; stroke-linecap: round; opacity: .55; }
+.climate__clouds { fill: var(--cloud); animation: climate-sway 36s ease-in-out infinite alternate; }
+.climate__clouds[data-weather='clear'] { opacity: .85; }
+.climate__clouds[data-weather='mist'] { opacity: .7; }
+.climate__fog { fill: #fff; opacity: .34; animation: climate-sway 28s ease-in-out infinite alternate-reverse; }
+.climate__scene[data-time='night'] .climate__fog,
+.climate__scene[data-time='evening'] .climate__fog { fill: #C9CED6; opacity: .28; }
+.climate__bolt { fill: #F4F1D0; opacity: 0; }
+@keyframes climate-sway { from { transform: translateX(0); } to { transform: translateX(24px); } }
+
+.climate__rain { inset: 0; width: 100%; height: 100%; }
+.climate__flash { inset: 0; background: rgb(220, 230, 255); opacity: 0; }
+
+/* protection · a light veil where the greeting and the search sit, so the
+   ink never reads against the brightest or busiest part of the sky */
+.climate__veil { inset: 0; background: linear-gradient(180deg, rgba(255, 255, 255, .12) 0%, rgba(255, 255, 255, 0) 40%); }
+:root[data-climate-tone='dark'] .climate__veil { background: linear-gradient(180deg, rgba(8, 14, 24, .22) 0%, rgba(8, 14, 24, 0) 50%, rgba(8, 14, 24, .18) 100%); }
+
+/* ink on a dark sky — colour only, never a word or a size */
+:root[data-climate-tone='dark'][data-home='v2'] :is(.greeting__word, .greeting__name, #favTitle) { color: #fff; transition: color 1.2s ease; }
+/* the Edit link keeps its place and its word; on a dark sky it reads in white */
+:root[data-climate-tone='dark'][data-home='v2'] .fav__edit { color: #fff; }
+:root[data-climate-tone='dark'][data-home='v2'] .fav__edit::before { filter: brightness(0) invert(1); }
+:root[data-climate-tone='dark'][data-home='v2'] .greeting__word { color: rgba(255, 255, 255, .82); }
+
+@media (prefers-reduced-motion: reduce) {
+  .climate__scene { transition: none; }
+  .climate__clouds, .climate__fog { animation: none; }
+}
+
+/* the mock switcher — development only */
+.climate-dev {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(20, 28, 34, .82);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  font: 500 12px/1 Inter, system-ui, sans-serif;
+  color: #fff;
+}
+.climate-dev__tag { opacity: .6; letter-spacing: .04em; text-transform: uppercase; font-size: 10px; }
+.climate-dev__row { display: flex; flex-wrap: wrap; gap: 4px; }
+.climate-dev button {
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .1);
+  font: inherit;
+  color: #fff;
+  cursor: pointer;
+}
+.climate-dev button[aria-pressed='true'] { background: #fff; color: #14202A; }
+.climate-dev__row--time button { height: 24px; background: rgba(255, 255, 255, .06); }
+
 </style>
 
 <style>
@@ -11444,6 +12108,10 @@ body.is-site .card:active { transform: scale(.978); }
    re-tinted: a dark wash over black is a no-op, and the pill already carries
    its own drop shadow for separation. */
 :root[data-page-version='3'] .qa-band { display: none; }
+/* …AND NONE ON V2 EITHER ("Can u remove overley of this area", 25 Sep 2026):
+   on V2's white page the wash read as a grey haze over the cards behind the
+   pill and the chat disc. Both controls carry their own drop shadow. */
+:root[data-home='v2'] .qa-band { display: none; }
 /* ── AND THE PAGE ENDS WHERE THE CARDS DO ────────────────────────────────
    THREE PADDINGS STACK AT THE FOOT and only one of them is load-bearing.
    `#panel-modules` gives back the height the floating pill occupies — 24 of
@@ -16615,7 +17283,7 @@ const VARIANTS = [
     /* two figures that only mean something together, so never one card each */
     data: {
       title: 'In Care',
-      rows: [{ value: '268', label: 'ISOLATION' }, { value: '742', label: 'QUARANTINE' }],
+      rows: [{ value: '268', label: 'Isolation' }, { value: '742', label: 'Quarantine' }],
     },
   },
   {
@@ -16873,7 +17541,7 @@ const VARIANTS = [
     supportedSizes: ['small', 'medium'], defaultSize: 'small', priority: 'secondary',
     data: {
       title: 'Attendance',
-      rows: [{ value: '2,617', label: 'PRESENT' }, { value: '148', label: 'ABSENT', tone: 'alert' }],
+      rows: [{ value: '2,617', label: 'Present' }, { value: '148', label: 'Absent', tone: 'alert' }],
     },
   },
   {
@@ -16936,7 +17604,7 @@ const VARIANTS = [
     supportedSizes: ['small', 'medium'], defaultSize: 'small', priority: 'optional',
     data: {
       title: 'This Week',
-      rows: [{ value: '31', label: 'CLEARED' }, { value: '4', label: 'RETURNED' }],
+      rows: [{ value: '31', label: 'Cleared' }, { value: '4', label: 'Returned' }],
     },
   },
 
@@ -30275,7 +30943,7 @@ const DEFAULT_LABELS = {
 }
 
 function createEditMode({ head, grid, root, getCards, onCommit, onExit, onEnter, onAdd, labels,
-                          actionsHost }) {
+                          actionsHost, editingHost }) {
   const L = { ...DEFAULT_LABELS, ...(labels || {}) }
   const title = head.querySelector('.section-head__title')
   /* ── WHERE THE MODE'S BUTTONS LIVE · 10 Sep 2026 ───────────────────────
@@ -30373,8 +31041,12 @@ function createEditMode({ head, grid, root, getCards, onCommit, onExit, onEnter,
     onEnter?.()
     document.body.classList.add('is-editing')
     title.textContent = L.editTitle
-    editBtn.replaceWith(doneBtn)
-    actions.insertBefore(addBtn, doneBtn)
+    /* `editingHost` — V2's (25 Sep 2026, "It has to come bottom centre"):
+       Edit rests in the page's head, but the mode's own controls go to the
+       bottom bar's capsule slot, where every other home page has them. Edit
+       is hidden rather than swapped, since it is not in that slot. */
+    if (editingHost) { editBtn.hidden = true; editingHost.append(addBtn, doneBtn) }
+    else { editBtn.replaceWith(doneBtn); actions.insertBefore(addBtn, doneBtn) }
     head.classList.add('section-head--editing')
     grid.setEditing(true)
     onCommit?.(getCards(), { rerender: true })
@@ -30390,7 +31062,8 @@ function createEditMode({ head, grid, root, getCards, onCommit, onExit, onEnter,
     title.textContent = L.title
     addBtn.remove()
     head.classList.remove('section-head--editing')
-    doneBtn.replaceWith(editBtn)
+    if (editingHost) { doneBtn.remove(); editBtn.hidden = false }
+    else doneBtn.replaceWith(editBtn)
     grid.setEditing(false)
     onExit?.()
     editBtn.focus()
@@ -30692,6 +31365,437 @@ function createSizeSelector({ onChange }) {
   __x.createSizeSelector = createSizeSelector;
 });
 
+__def('js/components/ClimateBackground.js', function (__x, __req) {
+/**
+ * CLIMATE BACKGROUND — the environment behind V2's Home, not a weather app.
+ * ───────────────────────────────────────────────────────────────────────────
+ * Brief of 25 Sep 2026 ("ANTZ Home — Dynamic Climate Background"): the page's
+ * content, layout, sizes and behaviour stay exactly as they are; only the
+ * environment behind the top band answers the weather and the hour. Live on
+ * V2 from the device clock, weather `clear` until a feed is connected (see
+ * mountClimate); `?climate` adds a development switcher for the eight states.
+ *
+ * WHERE IT LIVES. V2's environment is its mint band: the header, the search
+ * strip and the My Species block with its 20px foot corners. The scene is one
+ * absolutely-placed layer measured to exactly that box, at z-index -1 so every
+ * piece of UI paints over it; the band's own three tints go transparent while
+ * it is on (the `.has-climate` rules). Nothing is re-laid out.
+ *
+ * FIVE LAYERS, back to front: sky → distant hills → trees → atmosphere (sun,
+ * clouds, fog, rain, stars, lightning) → a protection veil. A change of state
+ * builds a whole new scene over the old one and cross-fades it in 2.2s, so
+ * sky, light and weather move together rather than in a row.
+ *
+ * WEATHER × TIME, not eight themes. A state is `{ weather, time }` and the sky
+ * is looked up by both — rain in the morning is a cool pale sky, rain at night
+ * a wet navy one. The eight named presets are just eight such pairs.
+ *
+ * READABILITY. A dark sky flips the band's own ink (greeting, "My Species")
+ * to white via `data-climate-tone` — the only UI property it touches, and it
+ * is a colour, never a word or a size. Reduced motion: no rain, no lightning,
+ * no drifting cloud, and an instant change of state.
+ */
+
+const PRESETS = {
+  'clear-morning': { label: 'Clear Morning', weather: 'clear',  time: 'morning' },
+  sunny:           { label: 'Sunny',         weather: 'clear',  time: 'afternoon', hot: true },
+  cloudy:          { label: 'Cloudy',        weather: 'cloudy', time: 'afternoon' },
+  rain:            { label: 'Rain',          weather: 'rain',   time: 'morning' },
+  mist:            { label: 'Mist',          weather: 'mist',   time: 'morning' },
+  sunset:          { label: 'Sunset',        weather: 'clear',  time: 'evening' },
+  night:           { label: 'Night',         weather: 'clear',  time: 'night' },
+  storm:           { label: 'Storm',         weather: 'storm',  time: 'afternoon' },
+}
+const TIMES = ['morning', 'afternoon', 'evening', 'night']
+
+/* FLAT PALETTES (25 Sep 2026, second pass: "more flat illustration style").
+   Every surface is one solid colour: sky top and foot, the sun or moon, the
+   clouds, four hills far → front, and the trees and animals. Weather × time,
+   twenty pairs; `dark` flips the band's ink to white. */
+const P = (sky, sun, cloud, h, tree, dark = false) => ({ sky, sun, cloud, h, tree, dark })
+const SKY = {
+  'morning:clear':    P(['#CFE6F2', '#F7E6CB'], '#FFD98A', '#FFFFFF', ['#C3DCC6', '#A1C8A9', '#7FB28D', '#639974'], '#3F6E50'),
+  'afternoon:clear':  P(['#7EC4EC', '#CDEBF6'], '#FFE9A8', '#FFFFFF', ['#AED8B4', '#86C293', '#63A876', '#4A8D5E'], '#2F6343'),
+  'evening:clear':    P(['#5C5A96', '#F4A77E'], '#FFC98A', '#F2B09A', ['#A07C93', '#7B637F', '#5A4A62', '#3F3549'], '#2A2233', true),
+  'night:clear':      P(['#0F1D38', '#29426C'], '#F3F0DA', '#2F4368', ['#28415F', '#203551', '#182A41', '#111F31'], '#0B1624', true),
+
+  'morning:cloudy':   P(['#C3CFD8', '#E6EBEE'], '#FFE7B0', '#F7F9FA', ['#BACABF', '#9CB4A4', '#7E9D88', '#668671'], '#48634F'),
+  'afternoon:cloudy': P(['#B2C1CD', '#DDE4E9'], '#FFF0C8', '#F4F7F9', ['#B3C6BA', '#94AF9E', '#779983', '#5F826C'], '#44604C'),
+  'evening:cloudy':   P(['#6A6780', '#C4A9A1'], '#F2C29A', '#9E95A8', ['#877989', '#685F72', '#4C4657', '#373341'], '#27232F', true),
+  'night:cloudy':     P(['#18222F', '#2E3B4C'], '#E6E6DA', '#34445A', ['#27374B', '#1F2D3E', '#182432', '#111A25'], '#0C131B', true),
+
+  'morning:rain':     P(['#A6B7C3', '#CCD7DD'], '#FFFFFF', '#8E9FAC', ['#A1B5AA', '#86A193', '#6C8A7A', '#577464'], '#3C5548'),
+  'afternoon:rain':   P(['#9AADBA', '#C3D0D7'], '#FFFFFF', '#8496A4', ['#9AAFA3', '#7F9B8C', '#668574', '#516E5F'], '#385144'),
+  'evening:rain':     P(['#454C60', '#7F859A'], '#FFFFFF', '#5F667A', ['#5D6374', '#4B5060', '#3A3F4C', '#2B2F39'], '#1E2129', true),
+  'night:rain':       P(['#111A27', '#243243'], '#FFFFFF', '#27354B', ['#202E3E', '#1A2734', '#141F2A', '#0F1720'], '#0A1017', true),
+
+  'morning:mist':     P(['#DCE2E4', '#F2F4F3'], '#FFF6DE', '#FFFFFF', ['#D6DED9', '#C4D1C9', '#B0C2B6', '#9BB2A3'], '#7E9887'),
+  'afternoon:mist':   P(['#D2DADD', '#EDF0F0'], '#FFF6DE', '#FFFFFF', ['#CFD9D3', '#BCCBC2', '#A8BCAF', '#93AB9C'], '#779181'),
+  'evening:mist':     P(['#8A8599', '#CEC0BB'], '#F4D2B8', '#D8CDD0', ['#A59BA5', '#8F8592', '#79707E', '#645C6A'], '#4E4755', true),
+  'night:mist':       P(['#2B3440', '#49535D'], '#E6E6DA', '#59636D', ['#454F5A', '#3B4450', '#323A44', '#293139'], '#1F262D', true),
+
+  'morning:storm':    P(['#56637A', '#8896A7'], '#FFFFFF', '#3F495A', ['#637569', '#506257', '#3F5046', '#303F37'], '#223029', true),
+  'afternoon:storm':  P(['#48556B', '#7B899C'], '#FFFFFF', '#384254', ['#5C6E63', '#4A5C51', '#3A4A41', '#2C3B33'], '#1F2C25', true),
+  'evening:storm':    P(['#2E3247', '#5F6179'], '#FFFFFF', '#272B3B', ['#41445B', '#34374B', '#282B3B', '#1D202C'], '#14161F', true),
+  'night:storm':      P(['#0B1019', '#1F2937'], '#FFFFFF', '#171F2C', ['#1B2531', '#151E28', '#10171F', '#0B1117'], '#060A0F', true),
+}
+
+/* a flat cloud: three circles on a rounded base */
+function cloud(x, y, s) {
+  return `<g transform="translate(${x} ${y}) scale(${s})">` +
+    `<circle cx="0" cy="0" r="18"/><circle cx="24" cy="-12" r="24"/><circle cx="52" cy="-2" r="18"/>` +
+    `<rect x="-18" y="-4" width="88" height="22" rx="11"/>` +
+    /* the cartoon's two-tone underside */
+    `<rect class="c-shade" x="-14" y="8" width="80" height="10" rx="5"/></g>`
+}
+
+/* CLEAR OF THE UI: the sky pieces are drawn in their own strip (600×130),
+   which the stylesheet places between the greeting and the bell at every
+   width, so a cloud never sits behind a word or a control. */
+const CLOUDS = {
+  clear:  [[120, 70, .7], [330, 50, .55]],
+  cloudy: [[40, 74, 1.1], [210, 56, 1.3], [400, 78, 1.05]],
+  rain:   [[30, 74, 1.15], [200, 56, 1.35], [395, 80, 1.1]],
+  storm:  [[20, 74, 1.25], [195, 56, 1.45], [395, 80, 1.2]],
+  mist:   [[220, 64, 1]],
+}
+
+const STARS = [[60, 40], [140, 90], [210, 30], [300, 70], [380, 24], [470, 96], [620, 34], [700, 84], [780, 22], [860, 60], [930, 30], [250, 130], [540, 140], [900, 130]]
+
+/* the sky strip: sun, moon, birds, clouds and the bolt */
+function skyScene({ weather, time, hot }) {
+  const day = time !== 'night'
+  let s = ''
+  if (weather === 'clear' && (time === 'morning' || time === 'afternoon')) {
+    const r = time === 'morning' ? 24 : hot ? 30 : 27
+    const [cx, cy] = time === 'morning' ? [500, 74] : [500, 58]
+    s += `<g class="climate__sun"><circle cx="${cx}" cy="${cy}" r="${r * 2.2}" opacity=".16"/>` +
+         `<circle cx="${cx}" cy="${cy}" r="${r * 1.5}" opacity=".26"/><circle cx="${cx}" cy="${cy}" r="${r}"/></g>`
+    s += `<g class="climate__birds">` +
+      [[250, 86, 1], [278, 74, .8], [300, 92, .7]].map(([x, y, k]) =>
+        `<path d="M${x} ${y} q${6 * k} ${-6 * k} ${12 * k} 0 q${6 * k} ${-6 * k} ${12 * k} 0"/>`).join('') + `</g>`
+  }
+  if (!day && (weather === 'clear' || weather === 'cloudy')) {
+    s += `<mask id="cl-moon"><rect width="600" height="130" fill="#fff"/><circle cx="312" cy="46" r="20" fill="#000"/></mask>` +
+         `<circle class="climate__moon" cx="300" cy="54" r="22" mask="url(#cl-moon)"/>`
+  }
+  const cl = CLOUDS[weather] || []
+  if (cl.length && !(weather === 'clear' && time !== 'morning')) {
+    s += `<g class="climate__clouds" data-weather="${weather}">` + cl.map(([x, y, k]) => cloud(x, y, k)).join('') + `</g>`
+  }
+  if (weather === 'storm') s += `<path class="climate__bolt" d="M318 70 L302 108 L314 108 L298 150 L336 94 L322 94 L334 70 Z"/>`
+  return s
+}
+
+/* the land: THE MEADOW (third pass, 25 Sep 2026 — "all climates like this"
+   reference: a cartoon meadow, blue distant ridge, round bushes, a pond with a
+   wooden bridge, grass tufts, sun rays). Drawn ONCE in daylight colours; each
+   climate relights it with a tint masked to the land (see LIGHT), so eight
+   states are one place in eight kinds of weather, not eight pictures. */
+const LAND_TOP = 'M0 290 Q150 250 330 272 T700 262 T1000 254 V420 H0 Z'
+
+/* a round bush: dark base, mid body, light blobs top-left, a few flowers */
+function bush(cx, cy, r) {
+  const c = (x, y, rr, cls) => `<circle class="${cls}" cx="${cx + x * r}" cy="${cy + y * r}" r="${rr * r}"/>`
+  return c(-.9, .1, .75, 'b-dark') + c(.9, .15, .7, 'b-dark') + c(0, -.2, 1, 'b-dark') +
+    c(-.8, 0, .62, 'b-mid') + c(.8, .05, .58, 'b-mid') + c(0, -.28, .86, 'b-mid') +
+    c(-.3, -.62, .34, 'b-light') + c(-.95, -.2, .24, 'b-light') + c(.55, -.4, .22, 'b-light') +
+    c(-.45, .12, .06, 'b-flower') + c(.35, -.05, .05, 'b-flower') + c(.9, .3, .05, 'b-flower') + c(-.1, -.5, .045, 'b-flower')
+}
+
+/* grass tufts: three blades */
+function tuft(x, y, k = 1) {
+  return `<path class="g-tuft" d="M${x} ${y} l${-4 * k} ${-12 * k} M${x + 3 * k} ${y} l0 ${-15 * k} M${x + 6 * k} ${y} l${4 * k} ${-11 * k}"/>`
+}
+
+function landScene({ weather, time }) {
+  let s = ''
+  if (time === 'night' && (weather === 'clear' || weather === 'cloudy')) {
+    s += `<g class="climate__stars">` + STARS.map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i % 3 ? 1.3 : 2}"/>`).join('') + `</g>`
+  }
+  if (weather === 'clear' && time === 'evening') {
+    s += `<g class="climate__sun"><circle cx="780" cy="262" r="100" opacity=".16"/>` +
+         `<circle cx="780" cy="262" r="68" opacity=".26"/><circle cx="780" cy="262" r="44"/></g>`
+  }
+  /* the land's own outline — the bushes sit below it, so nothing in the sky is tinted */
+  s += `<mask id="cl-land"><path d="${LAND_TOP}" fill="#fff"/></mask>`
+  s += `<g class="climate__land">` +
+    /* the distant ridge, blue, with a lit crest */
+    `<path class="l-far" d="M0 292 Q150 252 330 274 T700 264 T1000 256 V330 H0 Z"/>` +
+    `<path class="l-far-lit" d="M560 268 Q700 258 820 262 T1000 256 L1000 266 Q880 268 760 272 T560 274 Z"/>` +
+    /* the back meadow, and the light running across its brow */
+    `<path class="l-back" d="M0 304 Q260 266 520 290 T1000 276 V420 H0 Z"/>` +
+    `<path class="l-back-lit" d="M430 288 Q600 280 760 282 T1000 276 L1000 290 Q860 294 720 296 T430 300 Z"/>` +
+    /* bushes on the far bank, right of the cards */
+    bush(930, 302, 30) + bush(985, 296, 24) + bush(690, 300, 20) +
+    /* the front meadow */
+    `<path class="l-front" d="M0 334 Q300 304 620 326 T1000 314 V420 H0 Z"/>` +
+    `<path class="l-shade" d="M640 340 Q760 332 880 336 L1000 334 L1000 350 Q860 352 740 354 T640 352 Z"/>` +
+    /* the pond, its sandy rim, and two glints */
+    `<path class="l-rim" d="M668 380 Q700 356 820 354 T980 364 Q990 380 940 390 T700 396 Q660 392 668 380 Z"/>` +
+    `<path class="l-water" d="M676 378 Q708 360 820 358 T972 366 Q978 378 936 386 T704 390 Q670 388 676 378 Z"/>` +
+    `<path class="l-glint" d="M720 372 L790 368 M880 366 L930 368 M760 382 L840 380"/>` +
+    /* the wooden bridge over it: deck, lit edge, planks, the far side */
+    `<path class="l-wood" d="M770 402 C790 366 842 350 884 352 L900 362 C860 362 812 376 794 408 Z"/>` +
+    `<path class="l-wood-dark" d="M884 352 L900 362 L900 370 L886 360 Z"/>` +
+    `<path class="l-plank" d="M780 386 C800 370 836 360 880 360 M788 396 C806 380 842 368 890 366"/>` +
+    /* posts by the water, as in the reference's broken fence */
+    `<path class="l-wood" d="M946 364 l8 -34 l9 2 l-6 34 Z M962 366 l3 -26 l8 1 l-2 26 Z"/>` +
+    /* the foreground bank */
+    `<path class="l-fore" d="M0 404 Q350 392 640 400 T1000 396 V420 H0 Z"/>` +
+    tuft(700, 346) + tuft(868, 344, .8) + tuft(960, 400, 1.1) + tuft(650, 404, .9) + tuft(996, 350, .8) +
+    `</g>`
+  /* sun rays over the meadow on a clear day */
+  if (weather === 'clear' && (time === 'morning' || time === 'afternoon')) {
+    s += `<g class="climate__rays" mask="url(#cl-land)"><path d="M1000 0 L760 420 L830 420 Z"/><path d="M1000 0 L880 420 L920 420 Z"/><path d="M1000 0 L640 420 L680 420 Z"/></g>`
+  }
+  /* the relighting: the hour, then the weather, both masked to the land */
+  s += `<g mask="url(#cl-land)"><rect class="climate__tint" data-by="time" width="1000" height="420"/>` +
+       `<rect class="climate__tint" data-by="weather" width="1000" height="420"/></g>`
+  if (weather === 'mist') {
+    s += `<g class="climate__fog"><rect x="560" y="236" width="520" height="24" rx="12"/>` +
+         `<rect x="620" y="300" width="460" height="28" rx="14"/><rect x="-60" y="344" width="1120" height="32" rx="16"/>` +
+         `<rect x="-60" y="390" width="1120" height="40" rx="20"/></g>`
+  }
+  return s
+}
+
+function createClimateBackground({ band, root = document.documentElement }) {
+  const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const host = document.createElement('div')
+  host.className = 'climate'
+  host.setAttribute('aria-hidden', 'true')
+  document.body.prepend(host)
+  root.classList.add('has-climate')
+
+  /* measured to the band: from the top of the header to the foot of My Species */
+  function place() {
+    const head = band.top()
+    const foot = band.foot()
+    if (!head || !foot) return
+    const a = head.getBoundingClientRect()
+    const b = foot.getBoundingClientRect()
+    host.style.top = `${a.top + scrollY}px`
+    host.style.left = `${b.left + scrollX}px`
+    host.style.width = `${b.width}px`
+    host.style.height = `${b.bottom - a.top}px`
+  }
+  const ro = new ResizeObserver(place)
+  for (const el of [band.top(), band.foot()]) if (el) ro.observe(el)
+  addEventListener('resize', place)
+  place()
+
+  let current = null
+  let stopFx = () => {}
+
+  function scene(state) {
+    const { weather, time } = state
+    const p = SKY[`${time}:${weather}`] || SKY['morning:clear']
+    const el = document.createElement('div')
+    el.className = 'climate__scene'
+    el.dataset.weather = weather
+    el.dataset.time = time
+    el.style.cssText =
+      `--sky:linear-gradient(180deg, ${p.sky[0]} 0%, ${p.sky[1]} 100%);--sun:${p.sun};--cloud:${p.cloud};` +
+      `--h1:${p.h[0]};--h2:${p.h[1]};--h3:${p.h[2]};--h4:${p.h[3]};--tree:${p.tree}`
+    el.innerHTML =
+      `<i class="climate__sky"></i>` +
+      /* the land keeps its right edge on a narrow screen — the side the
+         species cards leave open */
+      `<svg class="climate__art" viewBox="0 0 1000 420" preserveAspectRatio="xMaxYMax slice">${landScene(state)}</svg>` +
+      `<svg class="climate__skyart" viewBox="0 0 600 130" preserveAspectRatio="xMidYMid meet">${skyScene(state)}</svg>` +
+      (weather === 'rain' || weather === 'storm' ? `<canvas class="climate__rain"></canvas>` : '') +
+      (weather === 'storm' ? `<i class="climate__flash"></i>` : '') +
+      `<i class="climate__veil"></i>`
+    return { el, dark: p.dark }
+  }
+
+  /* RAIN · one canvas, sixty thin strokes, a third of the band's height of
+     travel a second. Cheap, and it stops the moment the scene leaves. */
+  function rain(canvas, heavy) {
+    if (reduced()) return () => {}
+    const ctx = canvas.getContext('2d')
+    const dpr = Math.min(2, devicePixelRatio || 1)
+    let w = 0, h = 0, raf = 0, last = performance.now()
+    const drops = Array.from({ length: heavy ? 90 : 60 }, () => ({ x: Math.random(), y: Math.random(), s: .6 + Math.random() * .6 }))
+    const size = () => {
+      w = canvas.clientWidth; h = canvas.clientHeight
+      canvas.width = w * dpr; canvas.height = h * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+    size()
+    const tick = (t) => {
+      const dt = Math.min(50, t - last) / 1000; last = t
+      if (canvas.clientWidth !== w) size()
+      ctx.clearRect(0, 0, w, h)
+      ctx.strokeStyle = heavy ? 'rgba(225,235,245,.30)' : 'rgba(230,240,248,.26)'
+      ctx.lineWidth = 1.6
+      ctx.lineCap = 'round'
+      ctx.beginPath()
+      for (const d of drops) {
+        d.y += dt * 1.1 * d.s
+        d.x -= dt * .05 * d.s
+        if (d.y > 1) { d.y = -.05; d.x = Math.random() * 1.05 }
+        if (d.x < -.02) d.x = 1
+        const x = d.x * w, y = d.y * h, len = 10 * d.s
+        ctx.moveTo(x, y); ctx.lineTo(x - 1.5, y + len)
+      }
+      ctx.stroke()
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }
+
+  /* LIGHTNING · a cool wash to 16% for 90ms, once every nine to sixteen
+     seconds. Never a white-out, never a strobe. */
+  function lightning(flash) {
+    if (reduced()) return () => {}
+    let timer = 0
+    const next = () => {
+      timer = setTimeout(() => {
+        flash.animate(
+          [{ opacity: 0 }, { opacity: .16, offset: .15 }, { opacity: .04, offset: .4 }, { opacity: .1, offset: .55 }, { opacity: 0 }],
+          { duration: 700, easing: 'ease-out' })
+        /* the flat bolt shows with it, and only with it */
+        flash.parentNode.querySelector('.climate__bolt')?.animate(
+          [{ opacity: 0 }, { opacity: .9, offset: .12 }, { opacity: 0, offset: .4 }, { opacity: .7, offset: .52 }, { opacity: 0 }],
+          { duration: 700, easing: 'ease-out' })
+        next()
+      }, 9000 + Math.random() * 7000)
+    }
+    next()
+    return () => clearTimeout(timer)
+  }
+
+  function set(state) {
+    const s = { ...state }
+    const { el, dark } = scene(s)
+    const old = current
+    current = el
+    /* in at 0, flushed, then to 1 — set after the append alone, the browser
+       folds both writes into one style pass and there is nothing to fade */
+    if (old && !reduced()) el.style.opacity = '0'
+    host.append(el)
+    void el.offsetWidth
+    stopFx()
+    const stops = []
+    const cv = el.querySelector('.climate__rain')
+    if (cv) stops.push(rain(cv, s.weather === 'storm'))
+    const fl = el.querySelector('.climate__flash')
+    if (fl) stops.push(lightning(fl))
+    stopFx = () => stops.forEach((f) => f())
+
+    root.dataset.climateTone = dark ? 'dark' : 'light'
+    root.dataset.climate = `${s.time}:${s.weather}`
+
+    if (!old || reduced()) { el.style.opacity = '1'; old?.remove(); return }
+    el.style.opacity = '1'
+    setTimeout(() => old.remove(), 2400)
+  }
+
+  return { set, place }
+}
+
+/** The hour's time of day, for `time: 'auto'`. */
+function timeNow(d = new Date()) {
+  const h = d.getHours()
+  return h >= 5 && h < 11 ? 'morning' : h >= 11 && h < 17 ? 'afternoon' : h >= 17 && h < 20 ? 'evening' : 'night'
+}
+
+/**
+ * THE MOCK SWITCHER — development only, and only under `?climate`. Eight
+ * presets and a time-of-day override, so weather × time can be tried in any
+ * pairing. Not part of the product: it is the stand-in for a weather feed.
+ */
+function createClimateSwitcher({ onChange, initial }) {
+  let preset = initial.preset
+  let time = initial.time
+  const el = document.createElement('div')
+  el.className = 'climate-dev'
+  el.innerHTML =
+    `<span class="climate-dev__tag">Climate · dev</span>` +
+    `<span class="climate-dev__row">` +
+      Object.entries(PRESETS).map(([k, p]) => `<button type="button" data-preset="${k}">${p.label}</button>`).join('') +
+    `</span>` +
+    `<span class="climate-dev__row climate-dev__row--time">` +
+      ['auto', ...TIMES].map((t) => `<button type="button" data-time="${t}">${t === 'auto' ? 'Preset time' : t[0].toUpperCase() + t.slice(1)}</button>`).join('') +
+    `</span>`
+  document.body.append(el)
+
+  function sync() {
+    for (const b of el.querySelectorAll('[data-preset]')) b.setAttribute('aria-pressed', String(b.dataset.preset === preset))
+    for (const b of el.querySelectorAll('[data-time]')) b.setAttribute('aria-pressed', String(b.dataset.time === time))
+  }
+  function fire() {
+    const p = PRESETS[preset]
+    sync()
+    onChange({ weather: p.weather, time: time === 'auto' ? p.time : time, hot: p.hot && (time === 'auto' || time === 'afternoon') })
+    try { history.replaceState(null, '', `${location.pathname}?${new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(location.search)), climate: preset, ...(time === 'auto' ? {} : { time }) })}`) } catch { /* file:// in some browsers */ }
+  }
+  el.addEventListener('click', (e) => {
+    const b = e.target.closest('button')
+    if (!b) return
+    if (b.dataset.preset) preset = b.dataset.preset
+    if (b.dataset.time) time = b.dataset.time
+    if (time === 'auto' && b.dataset.time) { /* back to the preset's own hour */ }
+    fire()
+  })
+  fire()
+}
+
+/**
+ * Wire it to V2's Home. LIVE since 25 Sep 2026 ("implement the climate
+ * change"): the page opens on the device clock's time of day, and the weather
+ * is `clear` until a real feed is connected — `setWeather()` is that feed's
+ * whole interface. The hour is re-read every five minutes, so morning turns to
+ * afternoon, evening and night on its own, with the same 2.2s cross-fade.
+ *
+ * `?climate[=preset][&time=…]` still opens the development switcher over it,
+ * for trying the eight states; without the parameter no switcher is drawn.
+ */
+function mountClimate() {
+  const q = new URLSearchParams(location.search)
+  const bg = createClimateBackground({
+    band: {
+      top: () => document.querySelector('.home-header'),
+      foot: () => { const f = document.getElementById('favSpecies'); return f && !f.hidden ? f : document.querySelector('.search-row') },
+    },
+  })
+  /* the band can change height after first paint (the species rail loads) */
+  setTimeout(bg.place, 300)
+  setTimeout(bg.place, 1200)
+
+  if (q.has('climate')) {
+    const preset = PRESETS[q.get('climate')] ? q.get('climate') : 'clear-morning'
+    const time = TIMES.includes(q.get('time')) ? q.get('time') : 'auto'
+    createClimateSwitcher({ initial: { preset, time }, onChange: (s) => bg.set(s) })
+    return bg
+  }
+
+  let weather = 'clear'
+  let shown = ''
+  const apply = () => {
+    const time = timeNow()
+    const key = `${time}:${weather}`
+    if (key === shown) return
+    shown = key
+    bg.set({ weather, time, hot: false })
+  }
+  apply()
+  setInterval(apply, 5 * 60 * 1000)
+  /* a tablet left asleep comes back on the right hour, not the one it slept on */
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) apply() })
+  return { ...bg, setWeather(w) { weather = w; apply() } }
+}
+
+  __x.PRESETS = PRESETS;
+  __x.createClimateBackground = createClimateBackground;
+  __x.timeNow = timeNow;
+  __x.mountClimate = mountClimate;
+});
+
 __def('js/components/ModulePickerBottomSheet.js', function (__x, __req) {
 /**
  * THE WIDGET GALLERY
@@ -30744,7 +31848,7 @@ __def('js/components/ModulePickerBottomSheet.js', function (__x, __req) {
 const { MODULES, CATEGORIES, getModule } = __req('js/data/modules.js');
 const { CARD_VARIANTS, variantsForModule, PURPOSES, SIZE_LABELS } = __req('js/data/cardVariants.js');
 const { icon } = __req('js/icons.js');
-const { renderPreview } = __req('js/components/ModulePreview.js');
+const { renderPreview, previewMetrics } = __req('js/components/ModulePreview.js');
 const { createSizeSelector } = __req('js/components/ModuleSizeSelector.js');
 
 /**
@@ -30784,36 +31888,37 @@ const MODULE_SOURCE = {
              '\u201Coverdue\u201D, \u201Cpopulation\u201D, \u201Clow stock\u201D.',
 }
 
-function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
+/**
+ * THE LIST, MADE PLAIN (25 Sep 2026, second pass).
+ * ───────────────────────────────────────────────────────────────────────────
+ * Of the four layouts tried this morning, List was kept, with these rulings:
+ *   · each card and each module row simpler, with room for its data;
+ *   · no "N Selected" tray — the tick on the card is the selection;
+ *   · a card already on the Home page shows DISABLED, not addable twice;
+ *   · no size control on V2 — a card arrives at its default size;
+ *   · Apple's sheet: Cancel · title · Add in the bar, nothing else in words.
+ *
+ * `isPlaced(variantId)` answers "is this already on the page?"; `canSize()`
+ * says whether this page offers sizes at all. Both are asked at render time,
+ * so a card removed from the page is addable again on the next open.
+ */
+function createModulePicker({ onAdd, source = MODULE_SOURCE, isPlaced = () => false, canSize = () => true }) {
   const src = source
   /* ── state ──────────────────────────────────────────────────────────── */
   let open = false
   let query = ''
   let activeId = src.groups[0].id   // the group the detail pane is showing
 
-  /**
-   * THE SELECTION IS A BASKET, NOT A CURSOR.
-   *
-   * This used to be a single `{ variantId, size }`, so adding three cards meant
-   * open → pick → Add → reopen → pick → Add → reopen → pick → Add: the gallery
-   * threw away everything you had learned about it twice, and the module you
-   * were comparing against was two navigations behind you.
-   *
-   * A Map, because the order a curator picks things in is the order they should
-   * arrive on the page, and insertion order is the one thing a Map guarantees.
-   * Keyed by variant id, holding the size chosen for that variant — so the sizes
-   * genuinely are per-card and not one setting shared across the basket.
-   */
-  const selected = new Map()        // variantId → size, in the order picked
+  /* THE SELECTION IS A BASKET: variantId → size, in the order picked, so the
+     cards arrive on the page in that order. It survives moving between modules
+     and searching — picking two Medical cards and one Pharmacy card gives three. */
+  const selected = new Map()
 
-  /* Which selected card the footer's size control is currently editing. The
-     control needs exactly one subject and the basket has many, so the most
-     recently touched one owns it — and the tray below lets you hand it to
-     another without disturbing the selection. */
+  /* The card the size control is editing: the one most recently picked. */
   let sizing = null
 
   let restoreFocusTo = null
-  /* Only meaningful under the phone breakpoint, where the two panes are
+  /* Only meaningful under the split breakpoint, where the two panes are
      stacked: false = looking at the rail, true = looking at the widgets. */
   let detailOpen = false
 
@@ -30826,28 +31931,26 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
   sheet.className = 'sheet'
   sheet.setAttribute('role', 'dialog')
   sheet.setAttribute('aria-modal', 'true')
-  /* PER INSTANCE, NOT PER COMPONENT.
-     There are two galleries in the document now — one for modules, one for site
-     widgets — and both used to write `id="picker-title"`. Duplicate ids are not
-     a style question here: `aria-labelledby` resolves to the FIRST match in the
-     document, so the site widget sheet announced itself as "Add Module" to
-     anybody using a screen reader, and every scoped `getElementById` in a test
-     or a console session silently read the other sheet. */
+  /* Per instance: two galleries share the document (modules, site widgets), and
+     `aria-labelledby` resolves to the FIRST matching id. */
   const titleId = `picker-title-${src.id}`
   sheet.setAttribute('aria-labelledby', titleId)
   sheet.hidden = true
 
+  /* THE BAR IS APPLE'S: Cancel on the leading edge, the title centred, the
+     commit on the trailing edge — disabled until there is something to add. */
   sheet.innerHTML = `
     <span class="sheet__handle" aria-hidden="true"></span>
     <div class="sheet__head">
+      <button type="button" class="sheet__cancel">Cancel</button>
       <h2 class="sheet__title" id="${titleId}">${esc(src.title)}</h2>
-      <button type="button" class="sheet__close" aria-label="Close">${icon('close')}</button>
+      <button type="button" class="sheet__add" disabled>Add</button>
     </div>
 
     <div class="sheet__side">
       <div class="sheet-search">
         ${icon('search')}
-        <input type="search" placeholder="${esc(src.searchLabel)}" aria-label="${esc(src.searchLabel)}"
+        <input type="search" placeholder="Search" aria-label="${esc(src.searchLabel)}"
                autocomplete="off" autocorrect="off" spellcheck="false">
         <button type="button" class="sheet-search__clear" aria-label="Clear search">${icon('close')}</button>
       </div>
@@ -30857,7 +31960,8 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     <div class="sheet__body" tabindex="-1"></div>
     <div class="sheet__foot"></div>`
 
-  const closeBtn = sheet.querySelector('.sheet__close')
+  const cancelBtn = sheet.querySelector('.sheet__cancel')
+  const addBtn = sheet.querySelector('.sheet__add')
   const searchWrap = sheet.querySelector('.sheet-search')
   const searchInput = sheet.querySelector('.sheet-search input')
   const searchClear = sheet.querySelector('.sheet-search__clear')
@@ -30865,74 +31969,26 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
   const body = sheet.querySelector('.sheet__body')
   const foot = sheet.querySelector('.sheet__foot')
 
-  /* Changing the size re-renders the chosen widget's preview. A size control
-     that changes nothing you can see is a control you have to take on faith,
-     and the whole point of this gallery is that you do not have to. */
+  /* The foot holds ONLY the size control now, and only on pages that size
+     cards. Changing the size re-renders that card's preview. */
   const sizeSelector = createSizeSelector({
     onChange(size) {
       if (!sizing || !selected.has(sizing)) return
       selected.set(sizing, size)
       repaintPreview(sizing)
-      renderTray()
     },
   })
-
-  /**
-   * THE TRAY — what is in the basket, and which one the size control is on.
-   *
-   * Without it, multi-select has a hole in it: clicking a selected tile
-   * deselects (it has to — the way out of a selection should be the gesture
-   * that made it), so there would be no way to go back and re-size a card you
-   * picked three tiles ago short of removing and re-adding it. Each chip is
-   * that way back. It also keeps the basket visible while you scroll a long
-   * gallery, which is the actual reason iOS shows one.
-   */
-  const tray = document.createElement('div')
-  tray.className = 'sel-tray'
-
-  const trayCount = document.createElement('span')
-  trayCount.className = 'sel-tray__count'
-
-  const trayChips = document.createElement('div')
-  trayChips.className = 'sel-tray__chips'
-  tray.append(trayCount, trayChips)
-
-  const actions = document.createElement('div')
-  actions.className = 'sheet__actions'
-  const cancelBtn = document.createElement('button')
-  cancelBtn.type = 'button'
-  cancelBtn.className = 'btn-ghost'
-  cancelBtn.textContent = 'Cancel'
-  const addBtn = document.createElement('button')
-  addBtn.type = 'button'
-  addBtn.className = 'btn-primary'
-  addBtn.textContent = 'Add to Home'
-  actions.append(cancelBtn, addBtn)
-
-  const footMain = document.createElement('div')
-  footMain.className = 'sheet__foot-main'
-  footMain.append(tray, sizeSelector.root)
-  foot.append(footMain, actions)
+  foot.append(sizeSelector.root)
 
   document.body.append(scrim, sheet)
 
   /* ── search ─────────────────────────────────────────────────────────── */
 
   /**
-   * Everything about a variant that a person might type. Built once per
-   * variant and cached, because it is re-scanned on every keystroke.
-   */
-  /**
-   * REBUILT WHEN THE SOURCE CHANGES, NOT ONCE AT CONSTRUCTION.
-   *
-   * One gallery now serves four catalogues — modules, and the Site, Section and
-   * Enclosure workspaces — and it learns which one it is browsing from
-   * `src.revision`, a value the caller changes when the level does. Built once
-   * per catalogue and cached, because it is re-scanned on every keystroke.
-   *
-   * The alternative was four picker instances. That would have been four sheets
-   * in the document, four sets of duplicate ids to keep unique, and four copies
-   * of a basket that took three attempts to get right.
+   * Everything about a variant that a person might type — module name and
+   * keywords, the card's name, heading and every figure and label it shows.
+   * Rebuilt when `src.revision` changes (one gallery serves the module
+   * catalogue and the Site, Section and Enclosure workspaces).
    */
   const haystack = new Map()
   let builtFor = null
@@ -30941,37 +31997,25 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     if (builtFor === src.revision) return
     builtFor = src.revision
     haystack.clear()
-  for (const v of src.variants) {
-    const mod = src.getGroup(v.moduleId)
-    const d = v.data || {}
-    const bits = [
-      mod?.name, mod?.blurb, ...(mod?.keywords || []),
-      v.name, v.description, PURPOSES[v.purpose]?.label,
-      /* The card's own heading. Left out of the first version of this index,
-         which meant "low stock" — the heading on Pharmacy's alert card, and one
-         of the three examples the empty state suggests typing — found nothing
-         at all. */
-      d.title,
-    ]
-    /* Everything the card actually shows, so the figures are searchable too. */
-    for (const blk of d.blocks || []) {
-      bits.push(blk.label, blk.caption, blk.text, blk.value)
-      for (const it of blk.items || []) bits.push(it.label, it.text, it.lead, it.value)
+    for (const v of src.variants) {
+      const mod = src.getGroup(v.moduleId)
+      const d = v.data || {}
+      const bits = [
+        mod?.name, mod?.blurb, ...(mod?.keywords || []),
+        v.name, v.description, PURPOSES[v.purpose]?.label, d.title,
+      ]
+      for (const blk of d.blocks || []) {
+        bits.push(blk.label, blk.caption, blk.text, blk.value)
+        for (const it of blk.items || []) bits.push(it.label, it.text, it.lead, it.value)
+      }
+      /* nobody types U+00AD */
+      haystack.set(v.id, bits.filter(Boolean).join(' ').toLowerCase().replace(/­/g, ''))
     }
-    /* Strip soft hyphens: the index is matched against what people type, and
-       nobody types U+00AD. Without this, searching "communication" finds
-       nothing. */
-    haystack.set(v.id, bits.filter(Boolean).join(' ').toLowerCase().replace(/\u00AD/g, ''))
-  }
   }
 
   buildHaystack()
 
-  /**
-   * Every word in the query must appear somewhere. Substring rather than fuzzy:
-   * on a seventeen-module product fuzzy matching mostly produces surprises, and
-   * "lab" quietly matching "Follow Up" would be worse than finding nothing.
-   */
+  /* Every word must appear somewhere; substring, not fuzzy. */
   function matches(variantId) {
     if (!query) return true
     const hay = haystack.get(variantId) || ''
@@ -30986,14 +32030,12 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
   searchInput.addEventListener('input', () => {
     query = searchInput.value.trim().toLowerCase()
     searchWrap.classList.toggle('has-value', !!searchInput.value)
-    /* If the module being shown has nothing left that matches, move to the
-       first one that does. A search that leaves you staring at an empty pane
-       while the answer sits three rows up the rail is a search that failed. */
+    /* If the module on show has nothing left that matches, move to the first
+       one that does, rather than leave an empty pane. */
     if (query && !hits(activeId).length) {
       const first = src.groups.find((m) => hits(m.id).length)
       if (first) activeId = first.id
     }
-    /* The basket deliberately survives the search — see clearSelection(). */
     renderRail()
     renderDetail()
   })
@@ -31007,91 +32049,13 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     searchInput.focus()
   })
 
-  /* ── the rail · every module, always, in the curator's order ──────────── */
+  /* ── the rail · every module, in the catalogue's order ───────────────── */
 
-  /**
-   * THE RAIL IS ONE FLAT LIST AND THE CURATOR OWNS ITS ORDER.
-   *
-   * There were category headings here — MEDICAL, ANIMAL MANAGEMENT, OPERATIONS,
-   * ADMINISTRATION — and the ask on 3 Sep 2026 was to take them out: no
-   * sections, not even a "pinned" one above an "others". Instead each row has a
-   * grip to drag it up or down and a pin that lifts it to the top. Both write
-   * to one array of ids, saved per catalogue, so the rail comes back the way it
-   * was left. Anything the catalogue gains that the saved order does not know
-   * is appended; anything it lost is dropped.
-   */
-  const railKey = () => `antz.picker.rail.${src.id}${src.revision != null ? ':' + src.revision : ''}`
-  let order = []               // group ids, top to bottom
-  let pinned = new Set()
-  let orderFor = undefined
-
-  function loadOrder() {
-    if (orderFor === src.revision && order.length) return
-    orderFor = src.revision
-    let saved = null
-    try { saved = JSON.parse(localStorage.getItem(railKey()) || 'null') } catch { saved = null }
-    const ids = src.groups.map((g) => g.id)
-    const known = new Set(ids)
-    order = Array.isArray(saved?.order) ? saved.order.filter((id) => known.has(id)) : []
-    for (const id of ids) if (!order.includes(id)) order.push(id)
-    pinned = new Set((Array.isArray(saved?.pinned) ? saved.pinned : []).filter((id) => known.has(id)))
-  }
-
-  function saveOrder() {
-    try { localStorage.setItem(railKey(), JSON.stringify({ order, pinned: [...pinned] })) } catch { /* nothing to do */ }
-  }
-
-  function orderedGroups() {
-    loadOrder()
-    const byId = new Map(src.groups.map((g) => [g.id, g]))
-    return order.map((id) => byId.get(id)).filter(Boolean)
-  }
-
-  const visibleIds = () => orderedGroups().filter((m) => hits(m.id).length).map((m) => m.id)
-
-  /* Pinning lifts the module to the end of whatever run of pinned rows sits at
-     the top; unpinning drops it to just below that run. Neither is a section —
-     dragging can still put any row anywhere — it is only where the pin puts it. */
-  function togglePin(id) {
-    loadOrder()
-    if (pinned.has(id)) pinned.delete(id); else pinned.add(id)
-    order = order.filter((x) => x !== id)
-    let at = 0
-    while (at < order.length && pinned.has(order[at])) at++
-    order.splice(at, 0, id)
-    saveOrder()
-    renderRail()
-    rail.querySelector(`.mod-item[data-item="${id}"] .mod-pin`)?.focus()
-  }
-
-  /* The visible rows may be a search's subset of the list. Their new sequence
-     is written back into the slots that subset already occupied, so the rows a
-     search is hiding keep their places. */
-  function commitVisible(seq) {
-    const set = new Set(seq)
-    const slots = []
-    order.forEach((id, i) => { if (set.has(id)) slots.push(i) })
-    const next = order.slice()
-    slots.forEach((slot, k) => { next[slot] = seq[k] })
-    order = next
-    saveOrder()
-    renderRail()
-  }
-
-  function moveBy(id, step) {
-    const seq = visibleIds()
-    const i = seq.indexOf(id)
-    const j = i + step
-    if (i < 0 || j < 0 || j >= seq.length) return
-    seq.splice(i, 1)
-    seq.splice(j, 0, id)
-    commitVisible(seq)
-  }
-
+  /* No pin, no grip (25 Sep 2026): a row is an icon and a name. */
   function renderRail() {
     const keep = rail.scrollTop
     rail.replaceChildren()
-    const mods = orderedGroups().filter((m) => hits(m.id).length)
+    const mods = src.groups.filter((m) => hits(m.id).length)
     if (!mods.length) { rail.append(emptyState()); return }
     for (const mod of mods) rail.append(railItem(mod))
     rail.scrollTop = keep
@@ -31099,124 +32063,37 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
 
   function railItem(mod) {
     const on = mod.id === activeId
-    const isPinned = pinned.has(mod.id)
-
-    const item = document.createElement('div')
-    item.className = 'mod-item' + (on ? ' is-selected' : '')
-    item.dataset.item = mod.id
-
     const row = document.createElement('button')
     row.type = 'button'
-    row.className = 'mod-row'
+    row.className = 'mod-row' + (on ? ' is-selected' : '')
     row.setAttribute('role', 'tab')
     row.setAttribute('aria-selected', String(on))
     row.tabIndex = on ? 0 : -1
     row.dataset.module = mod.id
     row.innerHTML =
       groupTile(mod, 'mod-row__icon') +
-      `<span class="mod-row__name">${esc(mod.name)}</span>`
+      `<span class="mod-row__name">${esc(mod.name)}</span>` +
+      icon('chev-right')
     row.addEventListener('click', () => selectModule(mod.id))
-
-    const pin = document.createElement('button')
-    pin.type = 'button'
-    pin.className = 'mod-item__ctl mod-pin' + (isPinned ? ' is-pinned' : '')
-    pin.setAttribute('aria-pressed', String(isPinned))
-    pin.setAttribute('aria-label', `${isPinned ? 'Unpin' : 'Pin'} ${mod.name}`)
-    pin.title = isPinned ? 'Unpin' : 'Pin to top'
-    pin.innerHTML = icon(isPinned ? 'pin-push-on' : 'pin-push')
-    pin.addEventListener('click', () => togglePin(mod.id))
-
-    const grip = document.createElement('button')
-    grip.type = 'button'
-    grip.className = 'mod-item__ctl mod-grip'
-    grip.setAttribute('aria-label', `Move ${mod.name} — drag, or use the arrow keys`)
-    grip.title = 'Drag to reorder'
-    grip.innerHTML = icon('grip')
-    grip.addEventListener('pointerdown', (e) => startDrag(e, item))
-    grip.addEventListener('keydown', (e) => {
-      const step = { ArrowDown: 1, ArrowUp: -1 }[e.key]
-      if (!step) return
-      e.preventDefault()
-      e.stopPropagation()
-      moveBy(mod.id, step)
-      rail.querySelector(`.mod-item[data-item="${mod.id}"] .mod-grip`)?.focus()
-    })
-
-    item.append(row, pin, grip)
-    return item
-  }
-
-  /**
-   * DRAG TO REORDER.
-   * The row in hand is moved in the DOM as the pointer crosses the midpoints of
-   * its neighbours — no ghost, no placeholder, the list simply is the preview —
-   * and the new sequence is committed on release. `touch-action: none` on the
-   * grip is what stops the rail scrolling instead of the row moving.
-   *
-   * The move and release listeners are on the WINDOW, not the grip, and there
-   * is deliberately no pointer capture. Moving a node with after()/before() is
-   * a remove and a re-insert, and a disconnected element loses its capture —
-   * so a captured grip received exactly one crossing and then nothing, and the
-   * row stayed one step from where it started with `is-dragging` still on it.
-   */
-  function startDrag(e, item) {
-    if (e.pointerType === 'mouse' && e.button !== 0) return
-    e.preventDefault()
-    const pointerId = e.pointerId
-    const items = () => [...rail.querySelectorAll('.mod-item')]
-    let moved = false
-    item.classList.add('is-dragging')
-    rail.classList.add('is-reordering')
-
-    const onMove = (ev) => {
-      if (ev.pointerId !== pointerId) return
-      const y = ev.clientY
-      for (const other of items()) {
-        if (other === item) continue
-        const r = other.getBoundingClientRect()
-        const mid = r.top + r.height / 2
-        const follows = !!(item.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING)
-        if (follows && y > mid) { other.after(item); moved = true }
-        else if (!follows && y < mid) { other.before(item); moved = true }
-      }
-      const rr = rail.getBoundingClientRect()
-      if (y < rr.top + 28) rail.scrollTop -= 8
-      else if (y > rr.bottom - 28) rail.scrollTop += 8
-    }
-    const onUp = (ev) => {
-      if (ev.pointerId !== pointerId) return
-      window.removeEventListener('pointermove', onMove)
-      window.removeEventListener('pointerup', onUp)
-      window.removeEventListener('pointercancel', onUp)
-      item.classList.remove('is-dragging')
-      rail.classList.remove('is-reordering')
-      if (moved) commitVisible(items().map((el) => el.dataset.item))
-    }
-    window.addEventListener('pointermove', onMove)
-    window.addEventListener('pointerup', onUp)
-    window.addEventListener('pointercancel', onUp)
+    return row
   }
 
   function selectModule(id) {
     activeId = id
-    /* and it survives moving between modules, which is the whole point */
     detailOpen = true
     sheet.classList.add('is-detail')
     for (const row of rail.querySelectorAll('.mod-row')) {
       const on = row.dataset.module === id
       row.setAttribute('aria-selected', String(on))
+      row.classList.toggle('is-selected', on)
       row.tabIndex = on ? 0 : -1
-      row.closest('.mod-item')?.classList.toggle('is-selected', on)
     }
     renderDetail()
     body.scrollTop = 0
   }
 
-  /* Arrow keys walk the rail, which is what a keyboard user will try on
-     something marked up as a vertical tablist. */
+  /* Arrow keys walk the rail, as on any vertical tablist. */
   rail.addEventListener('keydown', (e) => {
-    /* the pin and grip have their own keys; arrows there are not a selection */
-    if (e.target.closest?.('.mod-item__ctl')) return
     const step = { ArrowDown: 1, ArrowUp: -1 }[e.key]
     if (!step) return
     e.preventDefault()
@@ -31228,16 +32105,15 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     next.focus()
   })
 
-  /* ── the detail · one module's widgets, grouped by purpose ───────────── */
+  /* ── the detail · one module's cards ─────────────────────────────────── */
 
   function renderDetail() {
     body.replaceChildren()
     const mod = src.getGroup(activeId)
     if (!mod) { body.append(emptyState()); return }
 
-    /* On a phone the two panes are stacked, so the detail needs its own way
-       back to the rail. On desktop the rail is right there and this is hidden
-       by the stylesheet rather than by a second code path. */
+    /* Stacked panes (phone) need a way back to the rail; hidden by the
+       stylesheet where the rail is beside it. */
     const back = document.createElement('button')
     back.type = 'button'
     back.className = 'detail-back'
@@ -31248,50 +32124,63 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
       rail.querySelector(`[data-module="${activeId}"]`)?.focus()
     })
 
-    const head = document.createElement('div')
-    head.className = 'detail-head'
-    head.innerHTML =
-      groupTile(mod, 'detail-head__icon') +
-      `<span class="detail-head__text">` +
-        `<span class="detail-head__name">${esc(mod.name)}</span>` +
-        `<span class="detail-head__blurb">${esc(mod.blurb)}</span>` +
-      `</span>`
+    /* The module's name and nothing else: the blurb and the rule under it were
+       words about the cards sitting above the cards. */
+    const head = document.createElement('h3')
+    head.className = 'detail-title'
+    head.textContent = mod.name
 
     body.append(back, head)
 
-    /* ONE SHELF, NOT FIVE SECTIONS.
-       An earlier pass grouped these under NAVIGATE / UNDERSTAND / ATTENTION /
-       ACT / MONITOR headings with a line of copy on each. It was a taxonomy the
-       user had to read before they could look at anything, and the widgets are
-       the point. The purposes still ORDER the shelf — door first, then the
-       figures, then what is waiting, then what you can do, then what just
-       happened — they just no longer announce themselves. */
-    const variants = src.variantsFor(mod.id).filter((v) => matches(v.id))
+    const variants = hits(mod.id)
     if (!variants.length) { body.append(emptyState()); return }
 
+    const g = gridBounds()
     const row = document.createElement('div')
     row.className = 'widget-row'
-    for (const v of variants) row.append(widgetTile(v))
+    row.style.setProperty('--cols', g.cols)
+    for (const v of variants) row.append(widgetTile(v, g))
     body.append(row)
   }
 
+  function paneWidth() {
+    const cs = getComputedStyle(body)
+    return body.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
+  }
+
   /**
-   * Are the rail and the gallery side by side, or stacked one over the other?
-   *
-   * THE STYLESHEET DECIDES AND THIS ASKS. It is the same arrangement as
-   * `currentColumns()` in sizes.js, and for the same reason: there was a
-   * hard-coded `innerWidth >= 1024` here and a `@media (min-width: 1024px)`
-   * there, and when the CSS breakpoint moved to 768 this would have gone on
-   * believing every iPad in portrait was stacked. One definition, in the place
-   * that owns it.
+   * EVERY CARD AT ITS REAL SIZE. A preview shrunk to fit a cell took the
+   * card's 13px labels down to 9px — under the type guidelines, and not the
+   * card the curator will get. So nothing is scaled unless it cannot fit the
+   * pane at all: a one-cell card takes one of two columns, and anything wider
+   * spans the row (Apple's gallery does the same), `dense` pairing the small
+   * ones up. `half` and `full` are the plate's inner widths for the two.
+   */
+  function gridBounds() {
+    const w = paneWidth()
+    const gap = 20, pad = 40                                  // the plate's 20px padding
+    if (!(w > 0)) return { cols: 1, half: previewBounds().maxWidth, full: previewBounds().maxWidth }
+    const cols = w >= 480 ? 2 : 1
+    return { cols, half: Math.floor((w - gap) / 2 - pad), full: Math.floor(w - pad) }
+  }
+
+  /* The span and the bounds one card gets in a gallery drawn at `g`. */
+  function tileFit(v, size, g) {
+    const m = previewMetrics(size)
+    const span = g.cols === 2 && m.width > g.half ? 2 : 1
+    const maxWidth = span === 2 || g.cols === 1 ? g.full : g.half
+    return { span, bounds: { maxWidth, maxHeight: 400 } }
+  }
+
+  /**
+   * Are the rail and the gallery side by side, or stacked? The stylesheet
+   * decides (`--picker-split`) and this asks.
    */
   function isSplit() {
     return getComputedStyle(document.documentElement)
       .getPropertyValue('--picker-split').trim() === '1'
   }
 
-  /* Wider viewports afford larger previews; these keep a Full Width card
-     readable beside a Small one rather than shrinking it to a smear. */
   function previewBounds() {
     const w = window.innerWidth
     return w >= 1200 ? { maxWidth: 300, maxHeight: 218 }
@@ -31299,44 +32188,54 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
       : { maxWidth: 236, maxHeight: 172 }
   }
 
-  function widgetTile(v) {
+  /**
+   * A CELL: the card on a quiet plate, its name underneath — Apple's widget
+   * gallery order. Selected draws a ring and a tick; a card already on the
+   * page is disabled and says so in two words.
+   */
+  function widgetTile(v, g = gridBounds()) {
+    const placed = isPlaced(v.id)
     const btn = document.createElement('button')
     btn.type = 'button'
-    btn.className = 'widget'
+    btn.className = 'widget' + (placed ? ' is-placed' : '')
     btn.dataset.variant = v.id
-    const isOn = selected.has(v.id)
-    btn.setAttribute('aria-pressed', String(isOn))
-    if (isOn && v.id === sizing) btn.classList.add('is-sizing')
+    if (placed) {
+      btn.disabled = true
+      btn.setAttribute('aria-label', `${v.name}, already on Home`)
+    } else {
+      btn.setAttribute('aria-pressed', String(selected.has(v.id)))
+      btn.addEventListener('click', () => toggleVariant(v))
+    }
 
-    /* The size the basket is holding for this card, so scrolling away and back
-       shows the choice rather than resetting it. */
-    const size = isOn ? selected.get(v.id) : v.defaultSize
-    const stage = renderPreview(v, size, previewBounds())
+    const plate = document.createElement('span')
+    plate.className = 'widget__plate'
+    const size = selected.get(v.id) || v.defaultSize
+    const fit = tileFit(v, size, g)
+    if (fit.span === 2) btn.style.gridColumn = 'span 2'
+    const stage = renderPreview(v, size, fit.bounds)
     stage.classList.add('widget__stage-wrap')
+    plate.append(stage)
 
-    /* The tick lives on the stage, not the button, so it pins to the corner of
-       the CARD rather than to the corner of the tile's padding box — which is
-       where the eye expects it and where a Full Width preview's very different
-       proportions would otherwise leave it stranded. */
     const check = document.createElement('span')
     check.className = 'widget__check'
     check.setAttribute('aria-hidden', 'true')
     check.innerHTML = icon('check')
-    stage.append(check)
+    plate.append(check)
 
-    /* THE NAME GOES ABOVE THE PICTURE, which is the design's order and the
-       right one. Underneath, a label sits closer to the NEXT preview than to
-       the one it belongs to — the previews are different heights, so the gap
-       below a short card is small and the gap below a tall one is large, and
-       the eye pairs by proximity. Above, every label is the same distance from
-       its own card and reads as its heading. */
+    const name = document.createElement('span')
+    name.className = 'widget__name'
+    name.textContent = v.name
     const meta = document.createElement('span')
     meta.className = 'widget__meta'
-    meta.innerHTML = `<span class="widget__name">${esc(v.name)}</span>`
-    btn.append(meta)
+    meta.append(name)
+    if (placed) {
+      const on = document.createElement('span')
+      on.className = 'widget__placed'
+      on.textContent = 'On Home'
+      meta.append(on)
+    }
 
-    btn.append(stage)
-    btn.addEventListener('click', () => toggleVariant(v))
+    btn.append(plate, meta)
     return btn
   }
 
@@ -31345,8 +32244,7 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     el.className = 'sheet-empty'
     el.innerHTML =
       `<span class="sheet-empty__icon">${icon('search')}</span>` +
-      `<span class="sheet-empty__title">Nothing matches &ldquo;${esc(searchInput.value)}&rdquo;</span>` +
-      `<span class="sheet-empty__note">${esc(src.emptyHint)}</span>`
+      `<span class="sheet-empty__title">No results for &ldquo;${esc(searchInput.value)}&rdquo;</span>`
     return el
   }
 
@@ -31356,12 +32254,8 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     return src.variants.find((v) => v.id === id) || null
   }
 
-  /**
-   * A group's coloured tile. Modules wear an SVG exported from Figma; domains
-   * wear a symbol from the sprite — see glyph() in ModuleCard.js, which makes
-   * the same distinction for the same reason. One helper so the rail row and
-   * the detail header cannot disagree about it.
-   */
+  /* A group's coloured tile: an exported SVG for modules, a sprite symbol for
+     domains — one helper so the rail row cannot disagree with anything else. */
   function groupTile(g, cls) {
     const inner = g.sprite
       ? icon(g.sprite, 'glyph')
@@ -31370,12 +32264,10 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
            `style="background:var(${esc(g.gradient)})">${inner}</span>`
   }
 
-  /** Toggle a widget in and out of the basket. */
   function toggleVariant(v) {
+    if (isPlaced(v.id)) return
     if (selected.has(v.id)) {
       selected.delete(v.id)
-      /* The size control cannot go on editing a card that is no longer in the
-         basket — hand it to whatever is still there, newest first. */
       if (sizing === v.id) sizing = lastKey()
     } else {
       selected.set(v.id, v.defaultSize)
@@ -31384,137 +32276,49 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     syncSelectionUI()
   }
 
-  /** The most recently added key, or null — Maps have no `last()`. */
   function lastKey() {
     let out = null
     for (const k of selected.keys()) out = k
     return out
   }
 
-  /** Point the footer's size control at one card in the basket. */
-  function focusSizing(variantId) {
-    if (!selected.has(variantId)) return
-    sizing = variantId
-    syncSelectionUI()
-  }
-
-  /**
-   * One function for every path that can change the basket, so the tile states,
-   * the tray, the size control and the Add button can never disagree about what
-   * is selected. Cheap enough to call on every toggle — the gallery is at most
-   * six tiles.
-   */
+  /** Every path that changes the basket ends here, so nothing can disagree. */
   function syncSelectionUI() {
     const n = selected.size
-    sheet.classList.toggle('has-selection', n > 0)
-
-    for (const btn of body.querySelectorAll('.widget')) {
+    for (const btn of body.querySelectorAll('.widget:not(.is-placed)')) {
       const on = selected.has(btn.dataset.variant)
       btn.setAttribute('aria-pressed', String(on))
-      btn.classList.toggle('is-sizing', on && btn.dataset.variant === sizing)
+      btn.classList.toggle('is-sizing', on && n > 1 && btn.dataset.variant === sizing && hasFoot())
     }
-
-    renderTray()
 
     const v = sizing ? variantById(sizing) : null
-    if (v) {
+    const showFoot = hasFoot()
+    sheet.classList.toggle('has-foot', showFoot)
+    if (showFoot) {
       sizeSelector.render(v.supportedSizes, selected.get(sizing))
       sizeSelector.setLabel(`Size for ${v.name}`)
-      sizeSelector.root.hidden = v.supportedSizes.length < 2
-    } else {
-      sizeSelector.root.hidden = true
     }
 
-    addBtn.textContent = n > 1 ? src.addMany(n) : src.addOne
     addBtn.disabled = n === 0
   }
 
-  function renderTray() {
-    const n = selected.size
-    trayCount.textContent = n === 1 ? '1 Selected' : `${n} Selected`
-    trayChips.replaceChildren()
-
-    for (const [id, size] of selected) {
-      const v = variantById(id)
-      if (!v) continue
-
-      const chip = document.createElement('span')
-      chip.className = 'sel-chip'
-      if (id === sizing) chip.classList.add('is-active')
-
-      /* The chip body picks the card up for sizing; the × takes it out. Two
-         targets in one chip, so neither gesture can be mistaken for the other. */
-      const pick = document.createElement('button')
-      pick.type = 'button'
-      pick.className = 'sel-chip__pick'
-      pick.innerHTML =
-        `<span class="sel-chip__name">${esc(v.name)}</span>` +
-        `<span class="sel-chip__size">${esc(SIZE_LABELS[size] || size)}</span>`
-      pick.setAttribute('aria-label', `${v.name}, ${SIZE_LABELS[size] || size}. Choose a size for this card`)
-      pick.addEventListener('click', () => focusSizing(id))
-
-      const drop = document.createElement('button')
-      drop.type = 'button'
-      drop.className = 'sel-chip__drop'
-      drop.innerHTML = icon('close')
-      drop.setAttribute('aria-label', `Remove ${v.name} from the selection`)
-      drop.addEventListener('click', () => {
-        selected.delete(id)
-        if (sizing === id) sizing = lastKey()
-        syncSelectionUI()
-      })
-
-      chip.append(pick, drop)
-      trayChips.append(chip)
-    }
-
-    /* Keep the card being sized where it can be seen. The tray scrolls
-       sideways, so picking a fourth widget puts its chip past the right edge —
-       and the size control below would then be labelled with a card the user
-       cannot see. */
-    const active = trayChips.querySelector('.sel-chip.is-active')
-    if (active) {
-      const box = trayChips.getBoundingClientRect()
-      const it = active.getBoundingClientRect()
-      if (it.right > box.right - 4 || it.left < box.left + 4) {
-        /* FLUSH LEFT, NOT CENTRED. Centring leaves the previous chip cut down
-           the middle at the left edge, and a chip cut after its name reads as a
-           chip that has no name — the tray showed a pill saying just "Medium".
-           Aligned to the leading edge, a chip is either wholly there or wholly
-           gone, and only the trailing edge is ever partial, which is the one
-           the fade is for. */
-        trayChips.scrollLeft += it.left - box.left
-      }
-    }
-    syncTrayFade()
+  /* The size control shows only where the page sizes cards, and only for a
+     picked card that has more than one size to offer. */
+  function hasFoot() {
+    const v = sizing ? variantById(sizing) : null
+    return !!(v && canSize() && v.supportedSizes.length > 1)
   }
 
-  /** Fade an edge only when there is something past it to scroll to. */
-  function syncTrayFade() {
-    const max = trayChips.scrollWidth - trayChips.clientWidth
-    const x = trayChips.scrollLeft
-    trayChips.style.setProperty('--fade-l', x > 2 ? '22px' : '0px')
-    trayChips.style.setProperty('--fade-r', x < max - 2 ? '22px' : '0px')
-  }
-  trayChips.addEventListener('scroll', syncTrayFade, { passive: true })
-
-  /** Redraw one widget's preview at the size the footer now says. */
+  /** Redraw one card's preview at the size the control now says. */
   function repaintPreview(variantId) {
     const btn = body.querySelector(`.widget[data-variant="${cssEsc(variantId)}"]`)
     const variant = variantById(variantId)
     if (!btn || !variant) return
-    const stage = renderPreview(variant, selected.get(variantId), previewBounds())
-    stage.classList.add('widget__stage-wrap')
-    btn.querySelector('.variant__stage')?.replaceWith(stage)
+    /* a new size can change the span, so the tile is rebuilt, not repainted */
+    btn.replaceWith(widgetTile(variant))
+    syncSelectionUI()
   }
 
-  /**
-   * Empty the basket.
-   *
-   * NOT called when the query changes or the module does. The whole point of a
-   * basket is that it survives browsing — picking two Medical cards, searching
-   * "overdue" and picking a Pharmacy one should give you three, not one.
-   */
   function clearSelection() {
     selected.clear()
     sizing = null
@@ -31527,22 +32331,17 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     onAdd?.(batch)
     close()
   })
-  /* Beside "Add to Home" in a footer, "Cancel" means abandon the whole thing —
-     that is what the control reads as. Deselecting without leaving is still
-     available by tapping the chosen widget again, which is the gesture that
-     selected it. */
   cancelBtn.addEventListener('click', close)
-  closeBtn.addEventListener('click', close)
   scrim.addEventListener('click', close)
 
   /* ── drag to dismiss ────────────────────────────────────────────────── */
 
   let dragY = null
   sheet.addEventListener('pointerdown', (e) => {
-    /* Only from the header. A sheet that dismisses when a finger moves anywhere
-       on it cannot also be scrolled. */
+    /* Only from the bar, so the gallery can still scroll — and not from its
+       buttons, which a finger has to be able to tap. */
     if (e.pointerType === 'mouse') return
-    if (!e.target.closest('.sheet__head, .sheet__handle')) return
+    if (!e.target.closest('.sheet__head, .sheet__handle') || e.target.closest('button')) return
     dragY = e.clientY
     sheet.style.transition = 'none'
   })
@@ -31557,7 +32356,6 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     dragY = null
     sheet.style.transition = ''
     sheet.style.transform = ''
-    /* a third of the sheet, or a flick — the usual pair of thresholds */
     if (dy > sheet.offsetHeight * 0.3) close()
   }
   sheet.addEventListener('pointerup', endDrag)
@@ -31575,9 +32373,6 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     if (!open) return
     if (e.key === 'Escape') { e.preventDefault(); close(); return }
     if (e.key !== 'Tab') return
-
-    /* A modal that lets Tab wander onto the page behind it is a modal in name
-       only — a keyboard user ends up editing a form they cannot see. */
     const items = focusables()
     if (!items.length) return
     const first = items[0]
@@ -31596,33 +32391,27 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     query = ''
     searchInput.value = ''
     searchWrap.classList.remove('has-value')
-    /* The sheet's own chrome is level-agnostic — "Add Widget" is right at all
-       three depths — but the index and the rail are not, so both are refreshed
-       on the way in rather than on construction. */
     buildHaystack()
     activeId = src.groups[0].id
-    /* Where the panes are side by side, open with the first module already
-       showing so the gallery is never empty. Where they are stacked — a phone —
-       open on the rail, because there the rail IS the gallery and landing
-       inside one group would hide all the others. */
+    /* Side by side: open on the first module. Stacked: open on the rail. */
     detailOpen = isSplit()
     sheet.classList.toggle('is-detail', detailOpen)
+    /* Unhidden BEFORE the render: the gallery takes its column count from the
+       pane's real width, and a hidden sheet has none. The transform still
+       parks it off screen until the frame below. */
+    scrim.hidden = false
+    sheet.hidden = false
     clearSelection()
     renderRail()
     renderDetail()
 
-    scrim.hidden = false
-    sheet.hidden = false
     document.body.style.overflow = 'hidden'
     document.addEventListener('keydown', onKeydown)
 
-    /* two frames: one to make the elements visible, one for the transition to
-       have a starting value to animate from */
     requestAnimationFrame(() => requestAnimationFrame(() => {
       scrim.classList.add('is-open')
       sheet.classList.add('is-open')
-      /* Focus the body, not the search field. Raising a keyboard over a gallery
-         the user came to look at is the wrong first move on a tablet. */
+      /* the body, not the search field: no keyboard over a gallery */
       body.focus({ preventScroll: true })
     }))
   }
@@ -31648,16 +32437,12 @@ function createModulePicker({ onAdd, source = MODULE_SOURCE }) {
     restoreFocusTo = null
   }
 
-  /* Previews are sized in JS against the viewport, so they have to be rebuilt
-     when it changes. Crossing the 1024px line also changes whether the two
-     panes are side by side or stacked, so the detail flag is re-derived. */
+  /* Previews are sized against the pane, so rebuild them when it changes. */
   window.addEventListener('resize', () => {
     if (!open) return
-    /* Rotating an iPad into landscape crosses into the split arrangement, where
-       both panes are live whatever this flag says. Setting it keeps the state
-       honest for the rotation back. */
     if (isSplit()) { detailOpen = true; sheet.classList.add('is-detail') }
     renderDetail()
+    syncSelectionUI()
   })
 
   return { open: show, close, get isOpen() { return open } }
@@ -36470,21 +37255,29 @@ const card = (sp) =>
       `<small class="fav__meta">${sp.animals != null ? plural(sp.animals, 'animal', 'animals') : esc(CLASS_ONE[sp.klass] || 'Other')}</small></span>` +
   `</button></div>`
 
-/* a row in the picker */
-const row = (sp, on, byNew) =>
-  `<li><button type="button" class="fsp__item" data-name="${esc(sp.name)}" aria-pressed="${on}">` +
-    `<img class="fsp__img" src="${photo(sp.name)}" alt="" loading="lazy" decoding="async">` +
-    `<span class="fsp__txt"><b>${esc(sp.name)}${sp.isNew ? ' <span class="fsp__new">New</span>' : ''}</b>` +
-      `<small>${[CLASS_ONE[sp.klass] || 'Other', sp.animals != null ? plural(sp.animals, 'animal', 'animals') : null,
-        byNew && sp.added != null ? (sp.added === 0 ? 'added today' : `added ${plural(sp.added, 'day', 'days')} ago`)
-          : siteShort(sp.sites[0]) + (sp.sites.length > 1 ? ` +${sp.sites.length - 1}` : '')].filter(Boolean).map(esc).join(' · ')}</small></span>` +
-    `<span class="fsp__tick" aria-hidden="true">${icon(on ? 'check' : 'plus')}</span>` +
-  `</button></li>`
+/* a photo in the picker: the rail card's anatomy, square, with a mark at
+   its corner — a + or, once picked, its place on the rail. `data-flip` is
+   the key the filters' glide follows it by */
+const tile = (sp, at) =>
+  `<button type="button" class="fsp__tile" data-name="${esc(sp.name)}" data-flip="${esc(sp.name)}" aria-pressed="${at >= 0}">` +
+    `<img class="fsp__photo" src="${photo(sp.name)}" alt="" loading="lazy" decoding="async">` +
+    (sp.isNew ? `<span class="fsp__new">New</span>` : '') +
+    `<span class="fsp__mark" aria-hidden="true">${icon('plus')}<b class="fsp__ord">${at >= 0 ? at + 1 : ''}</b></span>` +
+    `<span class="fsp__cap"><b>${esc(sp.name)}</b>` +
+      `<small>${sp.animals != null ? plural(sp.animals, 'animal', 'animals') : esc(CLASS_ONE[sp.klass] || 'Other')}</small></span>` +
+  `</button>`
 
 const CLASS_FILTERS = [
   { key: 'mammal', label: 'Mammals' }, { key: 'aves', label: 'Birds' },
   { key: 'reptile', label: 'Reptiles' }, { key: 'other', label: 'Others' },
 ]
+
+/* the page's two springs as the stylesheet samples them, for the motion
+   drawn from here; where linear() cannot run, the cubic the sheet falls to */
+const curve = (name, fallback) => {
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  return v && CSS.supports('transition-timing-function', v) ? v : fallback
+}
 
 function mount({ root, onOpen } = {}) {
   if (!root || !isV4()) return null
@@ -36504,9 +37297,10 @@ function mount({ root, onOpen } = {}) {
      and the rail closes over it — the list changes at once either way, only
      the drawing waits (and reduced motion skips the wait: no animation runs) */
   const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches
-  const toggle = (name) => {
+  const toggle = (name, at = null) => {
     const adding = !list.includes(name)
-    list = adding ? [...list, name] : list.filter((n) => n !== name)
+    list = !adding ? list.filter((n) => n !== name)
+      : at == null ? [...list, name] : [...list.slice(0, at), name, ...list.slice(at)]
     write(list)
     const old = !adding && !calm() && rail.querySelector(`.fav__card[data-name="${CSS.escape(name)}"]`)
     if (old) {
@@ -36522,83 +37316,272 @@ function mount({ root, onOpen } = {}) {
 
   /* ── the picker ── built on first open; the filters stay as left between
      opens except the site, which opens on the site the reports speak for */
-  let sheet = null
-  const f = { q: '', site: 'all', show: 'all', klass: null }
-  const chipBtn = (group, value, label, on, n) =>
+  let sheet = null, el = null, live = false
+  const f = { q: '', site: 'all', klass: null, isNew: false }
+  const $ = (sel) => el.querySelector(sel)
+  const chipBtn = (group, value, label, on) =>
     `<button type="button" class="fsp__chip" data-group="${group}" data-value="${esc(value)}" aria-pressed="${on}">` +
-      `${esc(label)}${n != null ? ` <span class="fsp__n">${n}</span>` : ''}</button>`
+      `${esc(label)} <span class="fsp__n"></span></button>`
+  const SMOOTH = () => curve('--spring-smooth', 'cubic-bezier(.32, .72, 0, 1)')
+  const BOUNCE = () => curve('--spring-bounce', 'cubic-bezier(.34, 1.3, .64, 1)')
+  const moving = () => live && !calm()
 
-  function drawSheet({ rows = true } = {}) {
-    const atSite = all.filter((s) => f.site === 'all' || s.sites.includes(f.site))
-    const q = f.q.trim().toLowerCase()
-    const shown = atSite
-      .filter((s) => f.show !== 'new' || s.isNew)
-      .filter((s) => f.show !== 'mine' || list.includes(s.name))
-      .filter((s) => !f.klass || s.klass === f.klass)
-      .filter((s) => !q || s.name.toLowerCase().includes(q))
-    if (f.show === 'new') shown.sort((a, b) => a.added - b.added)
-    if (f.show === 'mine') shown.sort((a, b) => list.indexOf(a.name) - list.indexOf(b.name))
-    const b = sheet.body
-    b.querySelector('.fsp__sites').innerHTML = scope.options().map((o) =>
-      chipBtn('site', o.id, o.label, f.site === o.id, all.filter((s) => o.id === 'all' || s.sites.includes(o.id)).length)).join('')
-    b.querySelector('.fsp__shows').innerHTML =
-      chipBtn('show', 'all', 'All', f.show === 'all') +
-      chipBtn('show', 'new', 'Newly added', f.show === 'new', atSite.filter((s) => s.isNew).length) +
-      chipBtn('show', 'mine', 'Selected', f.show === 'mine', atSite.filter((s) => list.includes(s.name)).length) +
-      `<span class="fsp__rule" aria-hidden="true"></span>` +
-      CLASS_FILTERS.map((c) => chipBtn('klass', c.key, c.label, f.klass === c.key)).join('')
-    b.querySelector('.fsp__summary').textContent =
-      `${plural(shown.length, 'species', 'species')}${f.site === 'all' ? '' : ` at ${siteShort(f.site)}`} · ${list.length} in My Species`
-    if (rows) b.querySelector('.fsp__list').innerHTML = shown.length
-      ? shown.map((s) => row(s, list.includes(s.name), f.show === 'new')).join('')
-      : `<li class="fsp__none">No species match${q ? ` “${esc(f.q.trim())}”` : ''} here</li>`
+  /* what each filter leaves: the counts are faceted, so a chip says what a
+     tap on it would show — a class counts under New, New under the class */
+  const passes = (s, { klass = f.klass, isNew = f.isNew } = {}) =>
+    (f.site === 'all' || s.sites.includes(f.site)) && (!klass || s.klass === klass) && (!isNew || s.isNew) &&
+    (!f.q.trim() || s.name.toLowerCase().includes(f.q.trim().toLowerCase()))
+
+  function drawChips() {
+    const n = (sel, v) => { const c = $(sel); if (c) c.querySelector('.fsp__n').textContent = v }
+    const byClass = all.filter((s) => passes(s, { klass: null }))
+    n('.fsp__chip[data-group="klass"][data-value=""]', byClass.length)
+    for (const c of CLASS_FILTERS) n(`.fsp__chip[data-group="klass"][data-value="${c.key}"]`, byClass.filter((s) => s.klass === c.key).length)
+    n('.fsp__chip[data-group="new"]', all.filter((s) => passes(s, { isNew: true })).length)
+    for (const c of el.querySelectorAll('.fsp__chip[data-group="klass"]')) c.setAttribute('aria-pressed', String((c.dataset.value || null) === f.klass))
+    $('.fsp__chip[data-group="new"]').setAttribute('aria-pressed', String(f.isNew))
+    const o = scope.options().find((x) => x.id === f.site) || scope.options()[0]
+    $('.fsp__site-v').textContent = o.label
+    $('.fsp__site select').value = o.id
+    $('.fsp__clear').hidden = !f.q
+    ink()
+  }
+  /* the class fill: under the chosen chip, sliding there once the sheet is
+     up (a hidden sheet has no widths to measure, so it waits for the show) */
+  function ink() {
+    const row = $('.fsp__chips'), on = $('.fsp__chip[data-group="klass"][aria-pressed="true"]')
+    if (!live || !on) return
+    const bar = $('.fsp__ink')
+    bar.style.width = on.offsetWidth + 'px'
+    bar.style.transform = `translateX(${on.offsetLeft}px)`
+    row.classList.add('has-ink')
+    if (on.offsetLeft < row.scrollLeft || on.offsetLeft + on.offsetWidth > row.scrollLeft + row.clientWidth)
+      row.scrollTo({ left: on.offsetLeft - 16, behavior: calm() ? 'auto' : 'smooth' })
+  }
+
+  function drawCounts() {
+    const n = list.length
+    $('.gsx-sheet__note').innerHTML = n ? `<b>${n}</b> on your home · tap a photo to add or remove` : 'Tap a photo to put it on your home'
+    for (const s of el.querySelectorAll('[data-picked]')) {
+      const k = all.filter((x) => x.klass === s.dataset.picked && list.includes(x.name) && passes(x, { klass: s.dataset.picked })).length
+      s.textContent = k ? `${k} picked` : ''
+    }
+    drawFoot()
+  }
+
+  /* the grid, in class sections under All. With `glide`, what stays moves
+     from where it was to where it lands, what arrives fades up in a short
+     wave, and what leaves fades where it stood, drawn on the stage above
+     the grid it has already left */
+  function drawGrid({ glide = false } = {}) {
+    const grid = $('.fsp__grid'), stage = $('.fsp__stage')
+    for (const g of stage.querySelectorAll('.fsp__ghost')) g.remove()
+    const box = grid.getBoundingClientRect()
+    const before = new Map()
+    if (glide && moving()) for (const x of grid.querySelectorAll('[data-flip]')) {
+      const r = x.getBoundingClientRect()
+      if (r.bottom > box.top && r.top < box.bottom) before.set(x.dataset.flip, { r, x })
+    }
+    const shown = all.filter((s) => passes(s))
+    const q = f.q.trim()
+    grid.innerHTML = shown.length ? CLASS_FILTERS.map((c) => {
+      const items = shown.filter((s) => s.klass === c.key)
+      if (!items.length) return ''
+      return `<section class="fsp__sec" aria-label="${c.label}"><h3 class="fsp__sec-h" data-flip="h:${c.key}">${c.label} <span>${items.length}</span><small data-picked="${c.key}"></small></h3>` +
+        `<div class="fsp__tiles">${items.map((s) => tile(s, list.indexOf(s.name))).join('')}</div></section>`
+    }).join('') : `<div class="fsp__none"><p>No species match${q ? ` “${esc(q)}”` : ''}${f.site === 'all' ? '' : ` at ${esc(siteShort(f.site))}`}</p>` +
+      `<button type="button" data-reset>Clear filters</button></div>`
+    if (glide) grid.scrollTop = 0
+    if (!before.size) return
+    const sb = stage.getBoundingClientRect()
+    let wave = 0
+    for (const x of grid.querySelectorAll('[data-flip]')) {
+      const r = x.getBoundingClientRect()
+      if (r.top > box.bottom) continue
+      const was = before.get(x.dataset.flip)
+      if (was) {
+        before.delete(x.dataset.flip)
+        const dx = was.r.left - r.left, dy = was.r.top - r.top
+        if (Math.abs(dx) + Math.abs(dy) > 1) x.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 520, easing: SMOOTH() })
+      } else {
+        x.animate([{ opacity: 0, transform: 'translateY(10px) scale(.94)' }, { opacity: 1, transform: 'none' }],
+          { duration: 460, delay: 80 + Math.min(wave++, 12) * 20, easing: SMOOTH(), fill: 'backwards' })
+      }
+    }
+    for (const { r, x } of before.values()) {
+      const g = x.cloneNode(true)
+      g.classList.add('fsp__ghost'); g.removeAttribute('data-flip'); g.setAttribute('aria-hidden', 'true'); g.inert = true
+      Object.assign(g.style, { left: r.left - sb.left + 'px', top: r.top - sb.top + 'px', width: r.width + 'px', height: r.height + 'px' })
+      stage.append(g)
+      g.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.92)' }], { duration: 200, easing: 'ease-out', fill: 'forwards' }).onfinish = () => g.remove()
+    }
+  }
+  const drawAll = (opts) => { drawChips(); drawGrid(opts); drawCounts() }
+
+  /* the sheet's first frames: the photos rise into place a beat behind the
+     sheet's own spring, row by row */
+  function enter() {
+    const grid = $('.fsp__grid'), box = grid.getBoundingClientRect()
+    let i = 0
+    for (const x of grid.querySelectorAll('[data-flip]')) {
+      if (x.getBoundingClientRect().top > box.bottom) break
+      x.animate([{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }],
+        { duration: 560, delay: 140 + Math.min(i++, 14) * 22, easing: SMOOTH(), fill: 'backwards' })
+    }
+  }
+
+  /* a tap: the photo changes where it is — the ring and the mark are its
+     transitions — and every later pick's number steps down or up to match */
+  function pick(name, at = null) {
+    const was = list.indexOf(name)
+    toggle(name, at)
+    for (const t of el.querySelectorAll('.fsp__grid .fsp__tile')) {
+      const i = list.indexOf(t.dataset.name), ord = t.querySelector('.fsp__ord')
+      const wasOn = t.getAttribute('aria-pressed') === 'true'
+      if (i >= 0 && ord.textContent !== String(i + 1)) {
+        ord.textContent = i + 1
+        if (wasOn && moving()) { ord.classList.remove('is-bump'); void ord.offsetWidth; ord.classList.add('is-bump') }
+      }
+      t.setAttribute('aria-pressed', String(i >= 0))
+    }
+    drawCounts()
+    if (was >= 0) undo(name, was)
+    else undo(null)
+  }
+
+  /* the foot: a face per pick in rail order, six at most and a +n after;
+     a face that joins springs in, one that goes shrinks out of the row */
+  const MAX_FACES = 6
+  function drawFoot() {
+    const faces = sheet.foot.querySelector('.fsp__faces')
+    const want = list.slice(0, MAX_FACES)
+    for (const x of faces.querySelectorAll('.fsp__face:not(.is-leaving)')) {
+      if (want.includes(x.dataset.name)) continue
+      if (!moving()) { x.remove(); continue }
+      x.classList.add('is-leaving')
+      x.animate([{ transform: 'none', opacity: 1, width: '34px', marginRight: '-8px' }, { transform: 'scale(.4)', opacity: 0, width: '0px', marginRight: '0px' }],
+        { duration: 260, easing: 'ease-in', fill: 'forwards' }).onfinish = () => x.remove()
+    }
+    for (const n of want) {
+      let x = faces.querySelector(`.fsp__face[data-name="${CSS.escape(n)}"]:not(.is-leaving)`)
+      if (!x) {
+        x = document.createElement('button')
+        x.type = 'button'; x.className = 'fsp__face'; x.dataset.name = n; x.setAttribute('aria-label', `Show ${n}`)
+        x.innerHTML = `<img src="${photo(n)}" alt="" decoding="async">`
+        if (moving()) x.animate([{ transform: 'scale(.3)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 480, easing: BOUNCE() })
+      }
+      faces.append(x)
+    }
+    let more = faces.querySelector('.fsp__more')
+    if (list.length > MAX_FACES) {
+      if (!more) { more = document.createElement('span'); more.className = 'fsp__more' }
+      more.textContent = `+${list.length - MAX_FACES}`
+      faces.append(more)
+    } else if (more) more.remove()
+    sheet.foot.querySelector('.fsp__sum').innerHTML = list.length ? `<b>${list.length}</b> on your home` : 'Nothing picked yet'
+  }
+
+  /* a face shows its photo: back to every species if a filter hides it,
+     then scrolled to and nudged */
+  function reveal(name) {
+    let t = $(`.fsp__grid .fsp__tile[data-name="${CSS.escape(name)}"]`)
+    if (!t) { Object.assign(f, { q: '', site: 'all', klass: null, isNew: false }); $('.fsp__search input').value = ''; drawAll({ glide: true }) }
+    t = $(`.fsp__grid .fsp__tile[data-name="${CSS.escape(name)}"]`)
+    if (!t) return
+    t.scrollIntoView({ block: 'nearest', behavior: calm() ? 'auto' : 'smooth' })
+    if (!calm()) t.animate([{ transform: 'none' }, { transform: 'scale(1.05)' }, { transform: 'none' }], { duration: 560, delay: 220, easing: 'ease-in-out' })
+    t.focus({ preventScroll: true })
+  }
+
+  /* one removal can be taken back, for four seconds or until the next tap */
+  let undoing = null, undoTimer = 0
+  function undo(name, at) {
+    const toast = $('.fsp__toast')
+    clearTimeout(undoTimer)
+    if (!name) {
+      undoing = null
+      if (toast.hidden) return
+      if (!moving()) { toast.hidden = true; return }
+      toast.animate([{ opacity: 1 }, { opacity: 0, transform: 'translate(-50%, 8px)' }], { duration: 180, easing: 'ease-in' }).onfinish = () => { if (!undoing) toast.hidden = true }
+      return
+    }
+    undoing = { name, at }
+    toast.querySelector('span').textContent = `Removed ${name}`
+    el.style.setProperty('--fsp-foot', sheet.foot.offsetHeight + 'px')
+    const was = toast.hidden
+    toast.hidden = false
+    if (was && moving()) toast.animate([{ opacity: 0, transform: 'translate(-50%, 16px)' }, { opacity: 1, transform: 'translate(-50%, 0)' }], { duration: 420, easing: SMOOTH() })
+    undoTimer = setTimeout(() => undo(null), 4000)
+  }
+
+  function build() {
+    sheet = __req('js/components/GlobalSearch.js').createSheet({
+      title: 'My Species', note: 'Tap a photo to put it on your home', className: 'fsp-sheet', draggable: true })
+    el = sheet.body.closest('.gsx-sheet')
+    sheet.body.innerHTML =
+      `<div class="fsp__bar">` +
+        `<label class="fsp__search">${icon('search')}<input type="search" placeholder="Search species" aria-label="Search species" autocomplete="off">` +
+          `<button type="button" class="fsp__clear" aria-label="Clear search" hidden>${icon('close')}</button></label>` +
+        `<label class="fsp__site">${icon('pin')}<span class="fsp__site-v"></span>${icon('chev-down')}` +
+          `<select aria-label="Site">${scope.options().map((o) => `<option value="${esc(o.id)}">${esc(o.label)}</option>`).join('')}</select></label>` +
+      `</div>` +
+      `<div class="fsp__chips" role="group" aria-label="Filter"><span class="fsp__ink" aria-hidden="true"></span>` +
+        chipBtn('klass', '', 'All', true) + CLASS_FILTERS.map((c) => chipBtn('klass', c.key, c.label, false)).join('') +
+        `<span class="fsp__rule" aria-hidden="true"></span>` + chipBtn('new', '1', 'New', false) +
+      `</div>` +
+      `<div class="fsp__stage"><div class="fsp__grid"></div></div>`
+    sheet.foot.innerHTML =
+      `<div class="fsp__picked"><span class="fsp__faces"></span><span class="fsp__sum" aria-live="polite"></span></div>` +
+      `<button type="button" class="gsx-btn gsx-btn--go fsp__done">Done</button>`
+    el.insertAdjacentHTML('beforeend', `<div class="fsp__toast" role="status" hidden><span></span><button type="button">Undo</button></div>`)
+
+    const input = $('.fsp__search input')
+    input.addEventListener('input', () => { f.q = input.value; drawAll({ glide: true }) })
+    $('.fsp__clear').addEventListener('click', () => { input.value = ''; f.q = ''; drawAll({ glide: true }); input.focus() })
+    $('.fsp__site select').addEventListener('change', (e) => {
+      f.site = e.target.value
+      drawAll({ glide: true })
+      if (moving()) $('.fsp__site-v').animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: SMOOTH() })
+    })
+    $('.fsp__chips').addEventListener('click', (e) => {
+      const c = e.target.closest('.fsp__chip')
+      if (!c) return
+      if (c.dataset.group === 'new') f.isNew = !f.isNew
+      else f.klass = c.dataset.value && f.klass !== c.dataset.value ? c.dataset.value : null
+      drawAll({ glide: true })
+    })
+    $('.fsp__grid').addEventListener('click', (e) => {
+      if (e.target.closest('[data-reset]')) {
+        Object.assign(f, { q: '', site: 'all', klass: null, isNew: false }); input.value = ''
+        return drawAll({ glide: true })
+      }
+      const t = e.target.closest('.fsp__tile')
+      if (t) pick(t.dataset.name)
+    })
+    sheet.foot.addEventListener('click', (e) => {
+      const face = e.target.closest('.fsp__face')
+      if (face) reveal(face.dataset.name)
+      else if (e.target.closest('.fsp__done')) sheet.close()
+    })
+    $('.fsp__toast button').addEventListener('click', () => { if (undoing) pick(undoing.name, undoing.at) })
+    addEventListener('resize', () => { if (live) ink() })
   }
 
   function openSheet() {
-    if (!sheet) {
-      sheet = __req('js/components/GlobalSearch.js').createSheet({
-        title: 'My Species', note: 'Tap a species to add it to your home, tap again to remove it', className: 'fsp-sheet', draggable: true })
-      sheet.body.innerHTML =
-        `<label class="fsp__search">${icon('search')}<input type="search" placeholder="Search species" aria-label="Search species" autocomplete="off"></label>` +
-        `<div class="fsp__filters">` +
-          `<div class="fsp__chips fsp__sites" role="group" aria-label="Site"></div>` +
-          `<div class="fsp__chips fsp__shows" role="group" aria-label="Show"></div>` +
-        `</div>` +
-        `<p class="fsp__summary" aria-live="polite"></p>` +
-        `<ul class="fsp__list"></ul>`
-      sheet.foot.innerHTML = `<button type="button" class="gsx-btn gsx-btn--go fsp__done">Done</button>`
-      sheet.foot.querySelector('.fsp__done').addEventListener('click', () => sheet.close())
-      sheet.body.querySelector('input').addEventListener('input', (e) => { f.q = e.target.value; drawSheet() })
-      sheet.body.addEventListener('click', (e) => {
-        const c = e.target.closest('.fsp__chip')
-        if (c) {
-          const { group, value } = c.dataset
-          if (group === 'site') f.site = value
-          else if (group === 'show') f.show = value
-          else f.klass = f.klass === value ? null : value
-          drawSheet()
-          /* the chips were redrawn under the finger; focus goes back to this one */
-          const again = sheet.body.querySelector(`.fsp__chip[data-group="${group}"][data-value="${CSS.escape(value)}"]`)
-          if (again) again.focus()
-          return
-        }
-        const it = e.target.closest('.fsp__item')
-        if (!it) return
-        toggle(it.dataset.name)
-        /* the row changes in place and the list is not redrawn: under
-           Selected, a removed row stays until the filter changes, so a slip
-           is one tap to undo; the chips and the summary recount */
-        const on = list.includes(it.dataset.name)
-        it.setAttribute('aria-pressed', String(on))
-        const tick = it.querySelector('.fsp__tick')
-        tick.innerHTML = icon(on ? 'check' : 'plus')
-        tick.classList.remove('is-pop'); void tick.offsetWidth; tick.classList.add('is-pop')
-        drawSheet({ rows: false })
-      })
-    }
+    if (!sheet) build()
     f.site = scope.get()
-    drawSheet()
-    sheet.show()
+    live = false
+    $('.fsp__chips').classList.remove('is-live', 'has-ink')
+    drawAll()
+    sheet.show(() => { live = false; undo(null) })
+    /* one frame for the sheet to have a size: the fill takes its place
+       unseen, then moves from there on; the photos come up behind it */
+    requestAnimationFrame(() => {
+      live = true
+      ink()
+      requestAnimationFrame(() => $('.fsp__chips').classList.add('is-live'))
+      if (!calm()) enter()
+    })
   }
 
   rail.addEventListener('click', (e) => {
@@ -37421,6 +38404,7 @@ function createRecentObservations({ root, items = OBSERVATIONS, onViewAll, onOpe
   if (!rail) return null
   if (!items.length) { root.hidden = true; return null }
   for (const o of items) rail.append(renderCard(o))
+  rail.__items = items   /* what was drawn — V2's popup opens the card as shown */
 
   /* LIKE AND BOOKMARK ARE REAL, AND LOCAL. There is nowhere to send them, but
      they are the user's own state and can be held here honestly — the count
@@ -37489,6 +38473,85 @@ function createRecentObservations({ root, items = OBSERVATIONS, onViewAll, onOpe
   __x.createRecentObservations = createRecentObservations;
 });
 
+__def('js/components/DetailPopup.js', function (__x, __req) {
+/**
+ * THE DETAIL POPUP — a card, opened (owner, 25 Sep 2026)
+ * ───────────────────────────────────────────────────────────────────────────
+ * "If i click … it has open Centre popup, when i scroll it has to change Full
+ * screen." Opens CENTRED over a veil; the first scroll inside it — a wheel,
+ * a swipe up, the Down arrow, or the content itself scrolling — grows it to
+ * FULL SCREEN, and scrolling back past the top in full screen settles it to
+ * the centre. Closes on ×, Escape and a tap on the veil, and hands focus
+ * back to the card it came from. The stylesheet's `.dpop` holds the motion.
+ *
+ * `media` and `body` are the caller's HTML; `vars` sets custom properties on
+ * the box (a note passes its priority colours). One open at a time.
+ */
+const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches
+let current = null
+
+function openDetail({ media = '', body = '', label = 'Details', labelledBy = '', vars = {}, from = null } = {}) {
+  if (current) closeDetail()
+  const veil = document.createElement('div'); veil.className = 'dpop-veil'
+  const box = document.createElement('div')
+  box.className = 'dpop'
+  box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true')
+  if (labelledBy) box.setAttribute('aria-labelledby', labelledBy); else box.setAttribute('aria-label', label)
+  for (const [k, v] of Object.entries(vars)) if (v) box.style.setProperty(k, v)
+  box.innerHTML =
+    `<button type="button" class="dpop__x" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>` +
+    `<div class="dpop__scroll" tabindex="-1">${media ? `<div class="dpop__media">${media}</div>` : ''}<div class="dpop__body">${body}</div></div>` +
+    `<span class="dpop__hint" aria-hidden="true">Scroll for full screen</span>`
+  document.body.append(veil, box)
+  document.body.classList.add('dpop-open')
+
+  const sc = box.querySelector('.dpop__scroll')
+  const isFull = () => box.classList.contains('is-full')
+  const full = (on) => box.classList.toggle('is-full', on)
+  /* the first scroll grows it even when the text is too short to scroll */
+  box.addEventListener('wheel', (e) => {
+    if (e.deltaY > 0 && !isFull()) { e.preventDefault(); full(true) }
+    else if (e.deltaY < 0 && isFull() && sc.scrollTop <= 0) full(false)
+  }, { passive: false })
+  let ty = null
+  box.addEventListener('touchstart', (e) => { ty = e.touches[0].clientY }, { passive: true })
+  box.addEventListener('touchmove', (e) => {
+    if (ty == null) return
+    const dy = ty - e.touches[0].clientY
+    if (dy > 10 && !isFull()) { full(true); ty = null }
+    else if (dy < -24 && isFull() && sc.scrollTop <= 0) { full(false); ty = null }
+  }, { passive: true })
+  sc.addEventListener('scroll', () => { if (sc.scrollTop > 4) full(true) })
+  const key = (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeDetail() }
+    else if (['ArrowDown', 'PageDown', ' '].includes(e.key) && !isFull()) full(true)
+  }
+  document.addEventListener('keydown', key, true)
+  box.querySelector('.dpop__x').addEventListener('click', () => closeDetail())
+  veil.addEventListener('click', () => closeDetail())
+
+  current = { veil, box, key, from }
+  void box.offsetWidth
+  veil.classList.add('is-on'); box.classList.add('is-on')
+  box.querySelector('.dpop__x').focus({ preventScroll: true })
+  return { close: closeDetail, full }
+}
+
+function closeDetail() {
+  if (!current) return
+  const { veil, box, key, from } = current
+  current = null
+  document.removeEventListener('keydown', key, true)
+  document.body.classList.remove('dpop-open')
+  veil.classList.remove('is-on'); box.classList.remove('is-on')
+  const gone = () => { veil.remove(); box.remove() }
+  if (calm()) gone(); else setTimeout(gone, 320)
+  from?.focus({ preventScroll: true })
+}
+  __x.openDetail = openDetail;
+  __x.closeDetail = closeDetail;
+});
+
 __def('js/components/AnnouncementDeck.js', function (__x, __req) {
 /**
  * THE STACKED DECK — V2's announcements (owner, 24 Sep 2026)
@@ -37506,7 +38569,6 @@ __def('js/components/AnnouncementDeck.js', function (__x, __req) {
  */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
 const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches
-const EASE = 'cubic-bezier(.32,.72,0,1)'
 /* the chip's word, as the node sets it — upper case in the string, not by CSS.
    The node draws ANNOUNCEMENT (green) and IMPORTANT (red); a Did You Know card
    has no chip of its own there, so it wears the announcement's. */
@@ -37526,8 +38588,9 @@ function createAnnouncementDeck({ root, items = [], onViewAll } = {}) {
   root.className = 'adeck'
   root.setAttribute('aria-labelledby', 'adeckTitle')
   root.innerHTML =
-    `<div class="adeck__head"><h2 class="adeck__title" id="adeckTitle">Announcements</h2>` +
-      `<button class="adeck__all" type="button">View all<img src="assets/icon/arrow-forward.svg" alt="" width="18" height="18"></button></div>` +
+    /* node 753:20981 (25 Sep 2026): no head — the band's name stays for a
+       screen reader, and View all moves to the foot row beside the dots */
+    `<h2 class="sr-only" id="adeckTitle">Announcements</h2>` +
     `<div class="adeck__stack"><span class="adeck__dwell" aria-hidden="true"></span>` + items.map((b, i) => {
       const k = kindOf(b)
       /* the footer's second span carries the node's own " • " with its leading space */
@@ -37541,7 +38604,8 @@ function createAnnouncementDeck({ root, items = [], onViewAll } = {}) {
         (b.image ? `<div class="adeck__img"><img src="${esc(b.image)}" alt="" decoding="async" style="object-position:${esc(b.imagePos || '50% 50%')}"></div>` : '') +
         `</article>`
     }).join('') + `</div>` +
-    `<div class="adeck__dots" aria-hidden="true">${items.map(() => '<i></i>').join('')}</div>`
+    `<div class="adeck__foot"><div class="adeck__dots" aria-hidden="true">${items.map(() => '<i></i>').join('')}</div>` +
+      `<button class="adeck__all" type="button">View all<img src="assets/icon/arrow-forward-16.svg" alt="" width="16" height="16"></button></div>`
 
   const stack = root.querySelector('.adeck__stack')
   const card = (ai) => stack.querySelector(`[data-ai="${ai}"]`)
@@ -37557,22 +38621,66 @@ function createAnnouncementDeck({ root, items = [], onViewAll } = {}) {
     root.querySelectorAll('.adeck__dots i').forEach((d, i) => d.classList.toggle('on', i === f))
     restartDwell()
   }
+  /* THE TURN IS ONE MOTION ("Animation need more smooth", 25 Sep 2026). It
+     was two: the front card flew off in 380ms, fading to .2 on the way so the
+     card beneath showed through it while it was still over the stack, and
+     only once it had gone did the deck behind it rise — and as its animation
+     ended the leaver snapped back to the front at full opacity for the
+     frames the rising card took to cover it: a white flash at the band's
+     left edge. Now the deck is reordered the moment the leaver starts to
+     go, so the next card rises under it while it leaves, on the same clock
+     (--adeck-ms / --adeck-ease, set on the stack per turn); the leaver stays
+     above the deck (.is-flying) and opaque until it has all but left the
+     band (it flies 1.1 widths, so four fifths of the way its last 50px are
+     going), fading only across the margin; and it holds its last frame
+     until it is put down at the back at opacity 0, where there is nothing
+     to snap back from. An auto-turn eases in from rest; a flick carries the
+     finger's speed and keeps its ease-out. A leaver that had keyboard focus
+     hands it to the card that takes its place. */
+  const TURN = { auto: { ms: 640, ease: 'cubic-bezier(.4, 0, .2, 1)' }, flick: { ms: 480, ease: 'cubic-bezier(.22, .61, .36, 1)' } }
+  const clock = (t) => { stack.style.setProperty('--adeck-ms', `${t.ms}ms`); stack.style.setProperty('--adeck-ease', t.ease) }
+  const refocus = (from) => { if (document.activeElement === from) card(order[0]).focus({ preventScroll: true }) }
+  const gone = (w) => `translateX(${-w * 1.1}px) rotate(-6deg)`
+  /* the flight: fill forwards so the last frame holds while the deck's own
+     transitions finish, then the animation is cancelled with the card
+     already styled for where it landed — .is-flying has no transition, and
+     the reflow before it comes off means none starts when it does */
+  const fly = (c, frames, t) => {
+    c.classList.add('is-flying')
+    const a = c.animate(frames, { duration: t.ms, easing: t.ease, fill: 'forwards' })
+    a.finished.then(() => { a.cancel(); c.style.transform = ''; void c.offsetWidth; c.classList.remove('is-flying') }, () => {})
+    return a
+  }
   function next(velocity = 0) {
     const c = card(order[0]), w = stack.clientWidth
-    const done = () => { c.style.transform = ''; c.classList.remove('is-dragging'); order = [...order.slice(1), order[0]]; paint() }
-    if (calm()) return done()
-    c.classList.add('is-dragging')
-    c.animate([{ transform: c.style.transform || 'none' }, { transform: `translateX(${-w * 1.1}px) rotate(-6deg)`, opacity: .2 }],
-      { duration: Math.max(220, 380 - velocity * 120), easing: 'cubic-bezier(.3,.7,.4,1)' }).finished.then(done)
+    const turn = () => { order = [...order.slice(1), order[0]]; paint(); refocus(c) }
+    c.classList.remove('is-dragging')
+    if (calm()) { c.style.transform = ''; return turn() }
+    const t = velocity ? { ms: Math.max(260, TURN.flick.ms - velocity * 120), ease: TURN.flick.ease } : TURN.auto
+    clock(t)
+    fly(c, [{ transform: c.style.transform || 'none', opacity: 1 }, { opacity: 1, offset: .8 }, { transform: gone(w), opacity: 0 }], t)
+    turn()
   }
-  function prev() {
+  /* `from` is where a finger left the incoming card (a rightward drag, see
+     below); without it the card comes in from off the left edge, as the
+     arrow key has always done */
+  function prev(from = null, velocity = 0) {
+    const c = card(order[0]), w = stack.clientWidth
+    const p = card(order[order.length - 1])
+    c.classList.remove('is-dragging'); c.style.transform = ''
+    clearPull(p)
     order = [order[order.length - 1], ...order.slice(0, -1)]
-    paint()
-    if (!calm()) card(order[0]).animate([{ transform: `translateX(${-stack.clientWidth * 1.1}px) rotate(-6deg)`, opacity: .2 }, { transform: 'none', opacity: 1 }], { duration: 480, easing: EASE })
+    const t = velocity ? { ms: Math.max(260, TURN.flick.ms - velocity * 120), ease: TURN.flick.ease } : TURN.auto
+    clock(t); paint(); refocus(c)
+    if (!calm()) fly(p, from
+      ? [{ transform: from, opacity: 1 }, { transform: 'none', opacity: 1 }]
+      : [{ transform: gone(w), opacity: 0 }, { opacity: 1, offset: .2 }, { transform: 'none', opacity: 1 }], t)
   }
+  /* the card a rightward drag pulls in, back to what its data-i says */
+  const clearPull = (p) => { if (!p) return; p.style.transition = ''; p.style.transform = ''; p.style.opacity = ''; p.style.zIndex = '' }
   function goTo(ai) {
     if (ai === order[0]) return
-    const idx = order.indexOf(ai), run = () => { order = [...order.slice(idx), ...order.slice(0, idx)]; paint() }
+    const idx = order.indexOf(ai), run = () => { order = [...order.slice(idx), ...order.slice(0, idx)]; clock(TURN.auto); paint() }
     if (calm()) return run()
     card(order[0]).animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-10px) scale(.96)' }], { duration: 200, easing: 'ease-in' }).finished.then(run)
   }
@@ -37589,27 +38697,59 @@ function createAnnouncementDeck({ root, items = [], onViewAll } = {}) {
     const c = e.target.closest('.adeck__card'); if (!c || c.dataset.i !== '0' || e.button > 0) return
     dg = { c, x0: e.clientX, y0: e.clientY, t0: performance.now(), dx: 0, on: false, pid: e.pointerId }
   })
+  /* LEFT TO RIGHT BRINGS THE LAST CARD BACK (owner, 25 Sep 2026: "left to
+     right that card has to come"). It had only damped the front card to a
+     third of the finger and sprung it back. Now a rightward drag pulls the
+     previous card in from off the left edge — under the finger, straightening
+     as it comes — while the front card eases back to the first peek; let go
+     past 28% of the width (or flick) and it takes the front, short of that
+     both spring back. */
+  const pullTo = (dx) => {
+    const w = stack.clientWidth, p = card(order[order.length - 1]), c = dg.c
+    const x = Math.min(0, -w * 1.1 + dx * 1.25), k = Math.min(1, dx / (w * .6))
+    if (p && p !== c) { p.style.transition = 'none'; p.style.zIndex = '4'; p.style.opacity = '1'; p.style.transform = `translateX(${x}px) rotate(${(-6 * x / (-w * 1.1)).toFixed(2)}deg)` }
+    c.style.transform = `translate(${16 * k}px, ${10 * k}px) scale(${1 - .0624 * k}, ${1 - .0935 * k})`
+  }
   stack.addEventListener('pointermove', (e) => {
     if (!dg || e.pointerId !== dg.pid) return
     const dx = e.clientX - dg.x0, dy = e.clientY - dg.y0
     if (!dg.on) { if (Math.abs(dx) < 8) return; if (Math.abs(dy) > Math.abs(dx)) { dg = null; return } dg.on = true; dg.c.classList.add('is-dragging'); dg.c.setPointerCapture(e.pointerId) }
     dg.dx = dx
-    const x = dx > 0 ? dx * .35 : dx
-    dg.c.style.transform = `translateX(${x}px) rotate(${x * .02}deg)`
-    const k = Math.min(1, Math.abs(x) / (stack.clientWidth * .5)), n = card(order[1])
-    if (n && dx < 0) { n.style.transition = 'none'; n.style.transform = `translate(${16 - 16 * k}px, ${10 - 10 * k}px) scale(${.9376 + .0624 * k}, ${.9065 + .0935 * k})` }
+    const n = card(order[1])
+    if (dx > 0 && items.length > 1) {
+      if (n) { n.style.transition = ''; n.style.transform = '' }
+      return pullTo(dx)
+    }
+    clearPull(card(order[order.length - 1]) === dg.c ? null : card(order[order.length - 1]))
+    dg.c.style.transform = `translateX(${dx}px) rotate(${dx * .02}deg)`
+    const k = Math.min(1, Math.abs(dx) / (stack.clientWidth * .5))
+    if (n) { n.style.transition = 'none'; n.style.transform = `translate(${16 - 16 * k}px, ${10 - 10 * k}px) scale(${.9376 + .0624 * k}, ${.9065 + .0935 * k})` }
   })
   const drop = () => {
     if (!dg) return
     const d = dg; dg = null
     const n = card(order[1]); if (n) { n.style.transition = ''; n.style.transform = '' }
     if (!d.on) return
-    const v = Math.abs(d.dx) / Math.max(1, performance.now() - d.t0)
-    if (d.dx < -stack.clientWidth * .28 || (d.dx < -30 && v > .5)) next(v)
-    else { d.c.classList.remove('is-dragging'); d.c.style.transform = '' }
+    const v = Math.abs(d.dx) / Math.max(1, performance.now() - d.t0), w = stack.clientWidth
+    if (d.dx < -w * .28 || (d.dx < -30 && v > .5)) return next(v)
+    const p = card(order[order.length - 1])
+    if (d.dx > 0 && items.length > 1) {
+      if (d.dx > w * .28 || (d.dx > 30 && v > .5)) return prev(p.style.transform, v)
+      /* short of it: the pulled card goes back out the way it came */
+      const from = p.style.transform
+      d.c.classList.remove('is-dragging'); d.c.style.transform = ''
+      if (calm() || !from) return clearPull(p)
+      /* hold the last frame, then put it away with transitions off, so it
+         never snaps back to where the finger left it on the way */
+      const a = p.animate([{ transform: from, opacity: 1 }, { transform: gone(w), opacity: 0 }], { duration: 320, easing: TURN.flick.ease, fill: 'forwards' })
+      const done = () => { p.style.transition = 'none'; p.style.transform = ''; p.style.opacity = ''; p.style.zIndex = ''; void p.offsetWidth; a.cancel(); void p.offsetWidth; p.style.transition = '' }
+      a.finished.then(done, done)
+      return
+    }
+    d.c.classList.remove('is-dragging'); d.c.style.transform = ''
   }
   stack.addEventListener('pointerup', drop)
-  stack.addEventListener('pointercancel', () => { if (dg) { dg.c.classList.remove('is-dragging'); dg.c.style.transform = ''; dg = null } })
+  stack.addEventListener('pointercancel', () => { if (dg) { dg.c.classList.remove('is-dragging'); dg.c.style.transform = ''; clearPull(card(order[order.length - 1])); const n = card(order[1]); if (n) { n.style.transition = ''; n.style.transform = '' } dg = null } })
 
   paint()
   return { root, next, prev, goTo }
@@ -37711,6 +38851,44 @@ function enhanceNotes(band) {
   })
   rail.addEventListener('contextmenu', (e) => { const c = e.target.closest('.obs'); if (!c) return; e.preventDefault(); open(c) })
   rail.addEventListener('click', (e) => { if (held) { e.stopPropagation(); e.preventDefault(); held = false } }, true)
+
+  /* A TAP OPENS THE NOTE (owner, 25 Sep 2026: "I want for Notes") — the
+     centred popup that grows to full screen on scroll, DetailPopup.js. Not
+     from the like/comment/save controls, not after a hold (the capture
+     listener above eats that click), and from the keyboard on Enter. */
+  const drawn = rail.__items || OBSERVATIONS
+  const { openDetail } = __req('js/components/DetailPopup.js')
+  const e2 = (v) => String(v ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]))
+  const initials = (n) => String(n || '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase()
+  function openNote(c) {
+    const o = drawn.find((x) => x.id === c.dataset.id); if (!o) return
+    const cs = getComputedStyle(c), en = o.entity || {}, th = en.photo || {}
+    const pri = c.querySelector('.obs__pri .sr-only')?.textContent || ''
+    const media =
+      (o.photo ? `<img src="${e2(o.photo.src)}" alt="" style="object-position:${e2(o.photo.focus || '50% 50%')}">` : '') +
+      `<div class="dpop__plate"><img src="${e2(th.src || '')}" alt="" style="object-position:${e2(th.focus || '50% 50%')}">` +
+        `<span><b>${e2(en.id)}</b><small>${e2(en.name)}</small></span>${o.more ? `<em>+${e2(o.more)}</em>` : ''}</div>`
+    const body =
+      `<span class="dpop__pri">${e2(pri)}</span>` +
+      `<h2 class="dpop__title" id="dpopTitle">${e2(o.title)}</h2>` +
+      `<ul class="dpop__tags">${(o.tags || []).map((t) => `<li>${e2(t)}</li>`).join('')}</ul>` +
+      `<p class="dpop__note">${e2(o.body)}</p>` +
+      `<span class="dpop__date">${e2(o.date)}</span>` +
+      `<div class="dpop__foot"><span class="dpop__who"><span class="dpop__av" aria-hidden="true">${e2(initials(o.by))}</span>${e2(o.by)}</span>` +
+        `<span class="dpop__n"><img src="assets/icon/v2-comment.svg" alt="">${e2(o.comments ?? 0)}<span class="sr-only"> comments</span></span>` +
+        `<span class="dpop__n"><img src="assets/icon/v2-like.svg" alt="">${e2(o.likes ?? 0)}<span class="sr-only"> likes</span></span></div>`
+    openDetail({ media, body, labelledBy: 'dpopTitle', from: c, vars: {
+      '--dpop-slab': cs.getPropertyValue('--obs-slab').trim(), '--dpop-badge': cs.getPropertyValue('--obs-badge').trim(), '--dpop-glyph': cs.getPropertyValue('--obs-glyph').trim() } })
+  }
+  cards().forEach((c) => { c.tabIndex = 0; c.setAttribute('aria-haspopup', 'dialog') })
+  rail.addEventListener('click', (e) => {
+    const c = e.target.closest('.obs'); if (!c || e.target.closest('.obs__act, button, a')) return
+    openNote(c)
+  })
+  rail.addEventListener('keydown', (e) => {
+    const c = e.target.closest('.obs'); if (!c || e.target !== c) return
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openNote(c) }
+  })
   veil.addEventListener('click', () => close())
   menu.addEventListener('click', (e) => {
     const b = e.target.closest('button'); if (!b) return
@@ -37733,8 +38911,126 @@ function arrive(sections) {
   })
 }
 
+/* ── KEY INSIGHTS · node 757:9930 — see `.kins` in the stylesheet ──
+   Four cards under the notes, each a list that scrolls inside itself.
+   Natality and Mortality are the lifecycle seed's own ten-day listings —
+   the same rows V4's Circle of Life tiles read — so the numbers here agree
+   with every other place that counts births and deaths. External Transfers
+   and Food Wastage have no source in this build yet; their rows are seed
+   rows, kept here and marked so, until a transfers register and the diet
+   kitchen's waste log exist. */
+const KI_TRANSFERS = [   /* SEED — no transfers register in this build */
+  { key: 'blackbuck', count: 1 },
+  { key: 'tortoise', count: 1 },
+]
+const KI_WASTE_KG = { 'bg-safari': 4.003, 'bg-zoo': 2.418, 'hg-field': 1.162 }   /* SEED — no waste log yet */
+function keyInsights(after) {
+  if (!after) return
+  const { summarise, SPECIES, CLASSES } = __req('js/data/lifecycle.js')
+  const { SITES } = __req('js/data/sites.js')
+  const e = (v) => String(v ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]))
+  const slug = (n) => n.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  const one = (k) => CLASSES.find((c) => c.key === k)?.one || 'Other'
+  const tags = (r) => `${one(r.klass)} \u2022 ${r.schedule ? `Schedule ${r.schedule}` : 'Not scheduled'}`
+  const speciesRow = (r) => `<li class="kins__row"><img class="kins__av" src="assets/img/species/${slug(r.common)}.jpg" alt="" loading="lazy" decoding="async">` +
+    `<span class="kins__txt"><b>${e(r.common)}</b><small>${e(tags(r))}</small></span><span class="kins__n">${e(r.count)}</span></li>`
+  const kg = (n) => `${n.toFixed(3).replace(/\.?0+$/, '')}Kg`
+  const nat = summarise('natality', 10), mor = summarise('mortality', 10)
+  const tr = KI_TRANSFERS.map((t) => ({ ...SPECIES[t.key], key: t.key, count: t.count })).filter((r) => r.common)
+  const waste = (SITES || []).filter((x) => KI_WASTE_KG[x.id] != null).map((x) => ({ name: x.short || x.name, kg: KI_WASTE_KG[x.id] }))
+  const cards = [
+    { k: 'natality', mark: 'ki-natality.svg', w: 13.461, h: 18.154, name: `Natality - ${nat.total}`, rows: nat.rows.map(speciesRow) },
+    { k: 'mortality', mark: 'ki-mortality.svg', w: 18, h: 8.379, name: `Mortality - ${mor.total}`, rows: mor.rows.map(speciesRow) },
+    { k: 'transfer', mark: 'ki-transfer.svg', w: 18, h: 19.2, name: `External Transfers - ${tr.reduce((n, r) => n + r.count, 0)}`, rows: tr.map(speciesRow) },
+    { k: 'food', mark: 'ki-food.svg', w: 18, h: 18, name: `Food Wastage - ${waste.length}`, rows: waste.map((w) =>
+      `<li class="kins__row"><img class="kins__av" src="assets/img/diet-kitchen.jpg" alt="" loading="lazy" decoding="async">` +
+      `<span class="kins__txt"><b>${e(w.name)}</b></span><span class="kins__n">${e(kg(w.kg))}</span></li>`) },
+  ]
+  const band = document.createElement('section')
+  band.className = 'kins'; band.id = 'keyInsights'; band.setAttribute('aria-labelledby', 'kinsTitle')
+  band.innerHTML =
+    `<div class="kins__head"><h2 class="kins__title" id="kinsTitle">Key Insights</h2>` +
+      `<button type="button" class="kins__all">View all<img src="assets/icon/ki-arrow.svg" alt="" width="18" height="18"></button></div>` +
+    `<div class="kins__rail" role="list">` + cards.map((c) =>
+      `<article class="kins__card" data-k="${c.k}" role="listitem" aria-labelledby="kins-${c.k}">` +
+        `<div class="kins__cap"><span class="kins__mark"><img src="assets/icon/${c.mark}" alt="" width="${c.w}" height="${c.h}"></span>` +
+        `<span class="kins__name" id="kins-${c.k}">${e(c.name)}</span></div>` +
+        `<ul class="kins__list" tabindex="0" aria-label="${e(c.name)}">${c.rows.join('')}</ul>` +
+        `<span class="kins__thumb" aria-hidden="true"></span></article>`).join('') + `</div>`
+  after.after(band)
+  /* the thumb: 52 tall, riding the list's own height, placed off its scroll */
+  band.querySelectorAll('.kins__card').forEach((card) => {
+    const list = card.querySelector('.kins__list'), thumb = card.querySelector('.kins__thumb')
+    const place = () => {
+      const room = list.scrollHeight - list.clientHeight
+      card.classList.toggle('is-scrollable', room > 1)
+      const track = Math.max(0, list.clientHeight - 52), k = room > 0 ? list.scrollTop / room : 0
+      thumb.style.transform = `translateY(${(list.offsetTop + track * k).toFixed(1)}px)`
+    }
+    list.addEventListener('scroll', place, { passive: true })
+    addEventListener('resize', place)
+    list.querySelectorAll('img').forEach((im) => im.complete || im.addEventListener('load', place, { once: true }))
+    place()
+  })
+  band.querySelector('.kins__all').addEventListener('click', () => console.info('[antz] Key Insights: view all — no insights page in this build'))
+  return band
+}
+
+/* ── THE MODULES CHIP · see `.mhint` in the stylesheet ── */
+function modulesHint() {
+  const head = document.getElementById('modulesHead'), grid = document.getElementById('moduleGrid')
+  if (!head || !grid) return
+  let tries = 0
+  const start = () => {
+    const row = document.querySelector('.qa-row')
+    if (!row) { if (tries++ < 120) requestAnimationFrame(start); return }
+    const chip = document.createElement('button')
+    chip.type = 'button'; chip.className = 'mhint is-off'
+    chip.innerHTML =
+      `<span class="mhint__n">Modules</span>` +
+      `<img class="mhint__chev" src="assets/icon/v2-modules-chevron.svg" alt="" width="20" height="20">`
+    row.prepend(chip)   /* in the row: the three are centred as one group */
+    const count = () => grid.querySelectorAll('.card').length
+    /* the chip says "Modules"; the count lives in its name for a screen reader */
+    const label = () => chip.setAttribute('aria-label', `${count()} modules below. Go to Modules`)
+    /* reached: any of the head is above the row's footprint — or scrolled past */
+    const reached = () => head.getBoundingClientRect().top < row.getBoundingClientRect().top - 8
+    /* all three must fit with 16 a side: the pill's widest (label showing)
+       + the disc + the gaps + the chip in full; if not, the count goes */
+    const place = () => {
+      const pill = row.querySelector('.qa-pill'), disc = row.querySelector('.qa-chat')
+      const need = (pill?.scrollWidth || 170) + (disc?.offsetWidth || 56) + 24 + 124 + 32
+      chip.classList.toggle('is-compact', need > innerWidth)
+    }
+    let raf = 0
+    const update = () => { raf = 0; label(); chip.classList.toggle('is-off', reached()); place() }
+    const soon = () => { if (!raf) raf = requestAnimationFrame(update) }
+    addEventListener('scroll', soon, { passive: true })
+    addEventListener('resize', soon)
+    row.addEventListener('transitionend', soon)   /* the pill's label collapsing changes the row's width */
+    new MutationObserver(soon).observe(grid, { childList: true })
+    chip.addEventListener('click', () => {
+      /* land the head under the sticky search row, not beneath it */
+      const bar = document.querySelector('.search-row')
+      /* its height once STUCK, which is taller than at rest (it gains its
+         padding as it sticks): read it live when stuck, else the 72 it
+         measures stuck at every width */
+      const stuck = bar?.classList.contains('is-stuck') ? bar.getBoundingClientRect().bottom : 72
+      /* the layout position, not the painted one: until the band has
+         arrived (.v2-arrive) it is drawn 22px low, and the box would say so */
+      let y = 0; for (let e = head; e; e = e.offsetParent) y += e.offsetTop
+      const top = y - stuck - 16
+      scrollTo({ top, behavior: calm() ? 'auto' : 'smooth' })
+    })
+    update()
+  }
+  start()
+}
+
 function mount() {
   enhanceNotes(document.getElementById('recentObs'))
+  keyInsights(document.getElementById('recentObs'))
+  modulesHint()
   arrive([document.getElementById('recentObs'), document.getElementById('reports'), document.querySelector('.modules-band')])
 }
   __x.mount = mount;
@@ -38458,6 +39754,14 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
     }
   }
 
+  /* WHILE OPEN THE PILL SAYS WHAT IT DOES NOW (owner, 25 Sep 2026: "it has
+     to show Close instead of Quick Actions"). The glyph already turns into
+     an ×; on V2 the word follows it. The other pages keep their label. */
+  function pillLabel(open) {
+    if (document.documentElement.dataset.home !== 'v2') return
+    const t = pill.querySelector('.qa-pill__t')
+    if (t) t.textContent = open ? 'Close' : 'Quick Actions'
+  }
   function show({ viaKeyboard = false } = {}) {
     if (open) return
     open = true
@@ -38477,6 +39781,9 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
 
        Set while `hidden` is still on, none of it transitions: an element
        arriving from `display: none` has no previous value to animate from. */
+    /* the word becomes "Close" BEFORE the box is read: the clip window has
+       to be the pill as it will be while open, not as it was a moment ago */
+    pillLabel(true)
     const box = pill.getBoundingClientRect()
 
     /* the panel is as tall as it needs to be until the window is shorter than
@@ -38592,6 +39899,7 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
     root.classList.add('is-closing')
     root.classList.remove('is-open')
     pill.setAttribute('aria-expanded', 'false')
+    pillLabel(false)
     document.removeEventListener('keydown', onKeydown)
 
     /* hidden only once the whole reverse has run, or the panel vanishes
@@ -39385,11 +40693,33 @@ if (PAGE_VERSION === '1' || isV4()) {
   /* V4's deck carries the Did You Know cards; V1's is the deck as it was */
   /* V2's announcements are the stacked deck (AnnouncementDeck.js) on V4's list */
   if (isV2()) __req('js/components/AnnouncementDeck.js').createAnnouncementDeck({ root: document.getElementById('heroStage'), items: HOME_BANNERS_V2 })
+  /* the climate background — live on V2, dev switcher under ?climate (25 Sep 2026) */
+  if (isV2()) __req('js/components/ClimateBackground.js').mountClimate()
   else createHeroBanners({ root: document.getElementById('heroStage'), items: isV4() ? HOME_BANNERS_V4 : HOME_BANNERS })
 
   /* the rail between the announcements and the modules, node 196:7243 */
   const { createRecentObservations } = __req('js/components/RecentObservations.js')
-  createRecentObservations({ root: document.getElementById('recentObs') })
+  /* V2's NOTES ARE NODE 718:17322's (page feedback, 25 Sep 2026: "Animal in
+     Figma is Different"). The frame's three visible cards are a CRITICAL note
+     on a photograph of a TIGER, a HIGH note on its coral slab, and a LOW note
+     on its cyan slab — no photograph on either. So on V2 the first note wears
+     the frame's own tiger (assets/img/v2-note-tiger.jpg, the node's source
+     image; the plate keeps the Big Bull it names), and the low note with no
+     photograph moves up to third, ahead of the leopard. V1's rail is not
+     touched: it draws OBSERVATIONS as they are.
+     AND EVERY PLATE IS THE FRAME'S ("No it like same", same day): the node
+     draws one plate on all three cards — the Big Bull, AAID : 87546/24, +2 —
+     and a source's repetition is intent, so V2 repeats it. The notes'
+     own entities stay in OBSERVATIONS, where the filter still reads them. */
+  const { OBSERVATIONS } = __req('js/data/observations.js')
+  const obsV2 = () => {
+    const tiger = (o) => (o.id === 'obs-1' ? { ...o, photo: { src: 'assets/img/v2-note-tiger.jpg', focus: '50% 30%' } } : o)
+    const lead = ['obs-1', 'obs-2', 'obs-4']
+    const plate = OBSERVATIONS.find((o) => o.id === 'obs-1')
+    const same = (o) => ({ ...o, entity: plate.entity, more: plate.more })
+    return [...lead.map((id) => OBSERVATIONS.find((o) => o.id === id)).filter(Boolean), ...OBSERVATIONS.filter((o) => !lead.includes(o.id))].map(tiger).map(same)
+  }
+  createRecentObservations({ root: document.getElementById('recentObs'), ...(isV2() ? { items: obsV2() } : {}) })
   /* V4 calls the rail what it holds (owner, 24 Sep 2026: "Recent Notes") */
   if (isV4()) document.getElementById('obsTitle').textContent = 'Recent Notes'
   /* V2's heads are node 718:17169's: "Observation Notes" (the frame spells it
@@ -39598,6 +40928,10 @@ const sizePopover = createSizePopover({
 })
 
 const picker = createModulePicker({
+  /* a card already on the page shows disabled in the gallery (25 Sep 2026) */
+  isPlaced: (variantId) => cards().some((c) => c.variantId === variantId),
+  /* V2 offers no size choice: a card arrives at its default (25 Sep 2026) */
+  canSize: () => !isV2(),
   /**
    * A BATCH, NOT A CARD. The picker hands over everything in its basket in the
    * order it was picked, and it arrives in one store write — see addCards() —
@@ -39649,6 +40983,7 @@ const edit = createEditMode({
   /* V2 draws node 718:17643's "✎ Edit" in the Modules head, so the button
      goes there and not into the Quick Actions row */
   actionsHost: isV2() ? null : document.getElementById('qaEdit'),
+  editingHost: isV2() ? document.getElementById('qaEdit') : null,
   /* the pill goes with the mode, so the panel it opened cannot stay */
   onEnter: () => quickActions?.close(),
   onAdd: () => picker.open(),

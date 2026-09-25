@@ -868,7 +868,7 @@ def main():
           oldDeck: document.querySelectorAll('.hero-stage__deck').length,
           dots: document.querySelectorAll('.adeck__dots i').length,
           on: [...document.querySelectorAll('.adeck__dots i')].findIndex(i => i.classList.contains('on')),
-          head: document.querySelector('.adeck__title')?.textContent || '', all: !!document.querySelector('.adeck__all'),
+          head: document.querySelector('#adeckTitle')?.textContent || '', headShown: !!document.querySelector('#adeckTitle:not(.sr-only)'), all: !!document.querySelector('.adeck__foot .adeck__all'),
           pager: document.querySelectorAll('.adeck__btn, .adeck__count, .adeck__index').length,
           seg: [...document.querySelectorAll('.v2seg__opt')].map(b => b.dataset.k),
           plate: getComputedStyle(document.querySelector('.fav__txt')).backdropFilter || getComputedStyle(document.querySelector('.fav__txt')).webkitBackdropFilter || '',
@@ -885,45 +885,97 @@ def main():
         g2 = c.eval("""(()=>{const q=s=>document.querySelector(s);const R=e=>e.getBoundingClientRect();const r=v=>Math.round(v*10)/10;
           const cards=[...document.querySelectorAll('#moduleGrid .card')].map(x=>R(x));const grid=R(q('#moduleGrid'));
           const pad=parseFloat(getComputedStyle(q('.main-frame')).paddingLeft), col=innerWidth-2*pad;
-          return {pad, col, mint:getComputedStyle(q('.home-header')).backgroundColor, page:getComputedStyle(document.body).backgroundColor,
+          return {pad, col, mint:getComputedStyle(q('.home-header')).backgroundColor, page:getComputedStyle(document.documentElement).backgroundColor,
+            climate:(()=>{const e=q('.climate'),h=q('.home-header'),f=q('#favSpecies');if(!e||!h||!f)return null;const a=R(e),b=R(h),c=R(f);return [r(a.top-b.top), r(a.bottom-c.bottom), getComputedStyle(e).zIndex]})(),
             greetY:r(R(q('.greeting__word')).top+scrollY), nameH:r(R(q('.greeting__name')).height), searchW:r(R(q('.search')).width), scanX:r(R(q('.search-btn')).left),
-            favCard:[r(R(q('.fav__card')).width), r(R(q('.fav__card')).height)], plate:getComputedStyle(q('.fav__txt')).backgroundColor, favRadius:getComputedStyle(q('#favSpecies')).borderBottomLeftRadius,
+            favCard:[r(R(q('.fav__card')).width), r(R(q('.fav__card')).height)], plate:getComputedStyle(q('.fav__txt')).backgroundColor, favImg:r(R(q('.fav__card .fav__img')).height), favFade:getComputedStyle(q('.fav__card'),'::after').display, favRadius:getComputedStyle(q('#favSpecies')).borderBottomLeftRadius,
             bandsW:[r(R(q('#heroStage')).width), r(R(q('#recentObs')).width)], obs:[r(R(q('.obs')).width), r(R(q('.obs')).height)], obsHeadX:r(R(q('#recentObs .obs-head')).left),
             headH:r(R(q('#modulesHead')).height), heroH:r(R(q('.hero--estate')).height), row:r(cards[0].height), gridW:r(grid.width), banner:r(R(q('.hero--estate')).top-R(q('#modulesHead')).bottom),
             headTxt:[q('#obsTitle').textContent, q('#modulesTitle').textContent, q('#modulesHead .link-btn span')?.textContent]}})()""")
-        check("a mint block on a white page: the header's fill and the body's", g2["mint"] == "rgba(175, 239, 235, 0.5)" and g2["page"] == "rgb(255, 255, 255)", f"{g2['mint']} / {g2['page']}")
+        # THE CLIMATE BACKGROUND replaced the mint on 25 Sep 2026 ("implement the
+        # climate change"): the band goes clear and the scene behind it is measured
+        # to exactly the header's top and My Species' foot, under the UI.
+        check("a climate scene on a white page: the band clear, the scene fitted to it and behind it",
+              g2["mint"] == "rgba(0, 0, 0, 0)" and g2["page"] == "rgb(255, 255, 255)" and g2["climate"] == [0, 0, "-1"],
+              f"{g2['mint']} / {g2['page']} / {g2['climate']}")
         col, pad = g2["col"], g2["pad"]
         check("the greeting at 40, a 34px name line, the field the column less the scan and one gap", g2["greetY"] == 40 and g2["nameH"] == 34 and g2["searchW"] == col - 60 and g2["scanX"] == pad + col - 52, str(g2))
-        check("species cards 148×158 on black plates, the block's corners rounded 20", g2["favCard"] == [148, 158] and g2["plate"] == "rgb(0, 0, 0)" and g2["favRadius"] == "20px", str(g2))
+        # V4's card at V2's size since 25 Sep 2026 ("version 2 make like this
+        # card, But Fix the card height same as v2"): the photograph fills the
+        # 158 and the words sit on the dark fade, no black plate
+        check("species cards 148×158, the photograph filling the card under the fade, the block's corners rounded 20",
+              g2["favCard"] == [148, 158] and g2["favImg"] == 158 and g2["favFade"] == "block" and g2["plate"] == "rgba(0, 0, 0, 0)" and g2["favRadius"] == "20px", str(g2))
         check("both bands the column plus 8 a side; a 290×430 note card, the notes head 24 inside", g2["bandsW"] == [col + 16, col + 16] and g2["obs"] == [290, 430] and g2["obsHeadX"] == pad - 8 + 24, str(g2))
         row = round((col - 48) / 4 / 1.125, 1)   # 144 on the 744 artboard
         check("Modules: a 19px head, the banner 16 under it, banner and rows at the node's 162:144", g2["headH"] == 19 and g2["banner"] == 16 and g2["heroH"] == row and g2["row"] == row and g2["gridW"] == col, str(g2))
         check("the heads say Observation Notes, Modules and Edit", g2["headTxt"] == ["Observation Notes", "Modules", "Edit"], str(g2["headTxt"]))
         check("the announcements are the stacked deck, not V4's carousel", o["deck"] >= 5 and o["oldDeck"] == 0, f"{o['deck']} cards, old deck {o['oldDeck']}")
         check("…opening on the first, one dot per card and the first lit", o["dots"] == o["deck"] and o["on"] == 0, f"{o['dots']} dots, on={o['on']}")
-        check("…under the node's head — Announcements, View all — and no pager, counter or index", o["head"] == "Announcements" and o["all"] and o["pager"] == 0, f"{o['head']!r} all={o['all']} pager={o['pager']}")
+        # NODE 753:20981 (25 Sep 2026): no visible head — the band keeps its
+        # name for a screen reader — and View all sits in the foot row
+        check("…named Announcements but with no visible head, View all in the foot, and no pager, counter or index", o["head"] == "Announcements" and not o["headShown"] and o["all"] and o["pager"] == 0, f"{o['head']!r} shown={o['headShown']} all={o['all']} pager={o['pager']}")
 
         # THE DECK IS NODE 718:18106's (24 Sep 2026): the band 8 wider than the
         # column each side, padded 16; the front card the stack less 32; the
         # two behind it out by 16 and 32; a 36px chip, a 180px photograph,
         # 8px dots with the lit one 20 wide; 36 under the species, 40 over
-        # the next head
+        # the next head. And since 25 Sep the card is the node's FIXED BOX —
+        # 210 tall on every card, checked below by turning the whole deck.
         g = c.eval("""(()=>{const q=s=>document.querySelector(s);const R=e=>e.getBoundingClientRect();
           const band=R(q('#heroStage')), col=R(q('#panel-modules')), st=R(q('.adeck__stack')), f=R(q('.adeck__card[data-i="0"]')), p1=R(q('.adeck__card[data-i="1"]')), p2=R(q('.adeck__card[data-i="2"]'));
           const r=v=>Math.round(v*10)/10;
-          return {bandW:r(band.width-col.width), bandPadL:r(st.left-band.left), bandPadT:r(R(q('.adeck__head')).top-band.top), headH:r(R(q('.adeck__head')).height), headGap:r(st.top-R(q('.adeck__head')).bottom),
+          return {bandW:r(band.width-col.width), bandPadL:r(st.left-band.left), bandPadT:r(st.top-band.top), bandH:r(band.height), foot:r(R(q('.adeck__foot')).height), footGap:r(R(q('.adeck__foot')).top-st.bottom), footPadB:r(band.bottom-R(q('.adeck__foot')).bottom), allRight:r(band.right-R(q('.adeck__all')).right),
             frontIn:r(st.width-f.width), p1out:r(p1.right-f.right), p2out:r(p2.right-f.right), p1down:r(p1.top-f.top),
             chip:r(R(q('.adeck__card[data-i="0"] .adeck__chip')).height), photo:q('.adeck__card[data-i="0"] .adeck__img')?r(R(q('.adeck__card[data-i="0"] .adeck__img')).width):180,
-            dot:r(R(q('.adeck__dots i:not(.on)')).width), dotOn:r(R(q('.adeck__dots i.on')).width), dotsGap:r(R(q('.adeck__dots')).top-st.bottom),
+            dot:r(R(q('.adeck__dots i:not(.on)')).width), dotOn:r(R(q('.adeck__dots i.on')).width), dotsGap:r(R(q('.adeck__dots')).top-st.bottom), dotsCentre:(()=>{const ds=[...document.querySelectorAll('.adeck__dots i')].map(R),a=R(q('.adeck__all')),f=R(q('.adeck__foot'));return r((Math.min(...ds.map(x=>x.left))+Math.max(...ds.map(x=>x.right)))/2-(f.left+(a.left-f.left)/2))})(),
             above:r(band.top-R(q('#favSpecies')).bottom), below:r(R(q('#recentObs .obs-head')).top-band.bottom)}})()""")
-        check("the band is the column plus 8 a side, padded 16", g["bandW"] == 16 and g["bandPadL"] == 16 and g["bandPadT"] == 16, str(g))
-        check("the head is 19 tall with 16 to the stack", g["headH"] == 19 and g["headGap"] == 16, f"{g['headH']} / {g['headGap']}")
+        check("the band is the column plus 8 a side, padded 16, the stack straight under its top", g["bandW"] == 16 and g["bandPadL"] == 16 and g["bandPadT"] == 16, str(g))
+        check("the node's 275: a 17px foot row 16 under the stack and 16 over the band's foot, View all 16 in", g["bandH"] == 275 and g["foot"] == 17 and g["footGap"] == 16 and g["footPadB"] == 16 and g["allRight"] == 16, str(g))
         check("the front card is the stack less 32; the peeks stand out 16 and 32, the first 10 down", g["frontIn"] == 32 and abs(g["p1out"] - 16) < .6 and abs(g["p2out"] - 32) < .6 and g["p1down"] == 10, str(g))
         check("a 36px chip and a 180px photograph", g["chip"] == 36 and g["photo"] == 180, f"{g['chip']} / {g['photo']}")
-        check("8px dots, the lit one 20 wide, 16 under the stack", g["dot"] == 8 and g["dotOn"] == 20 and g["dotsGap"] == 16, str(g))
+        check("8px dots, the lit one 20 wide, centred in the foot row left of View all", g["dot"] == 8 and g["dotOn"] == 20 and abs(g["dotsCentre"]) <= .5, str(g))
         check("16 under the species block, 40 to the notes head (16 to its band, 24 inside it)", g["above"] == 16 and g["below"] == 40, f"{g['above']} / {g['below']}")
+
+        # THE CARD IS A FIXED BOX ("Announcement card has fixed size. Do not
+        # reduce the Size", 25 Sep 2026): the node's 210 on EVERY card — the
+        # title cut at its two lines, the body at its three, the photograph
+        # the 186 column, the chip 12 from the top and the byline 12 from the
+        # foot — so the band is one height whichever card is in front. The
+        # deck is turned right round (reduced motion: each turn is instant)
+        # and ends where it began, on the first card.
+        key = lambda k: c.eval(f"document.querySelector('.adeck__stack').dispatchEvent(new KeyboardEvent('keydown', {{key: '{k}', bubbles: true}})); 1")
+        box = lambda: c.eval("""(()=>{const q=s=>document.querySelector(s);const R=e=>e.getBoundingClientRect();const f=q('.adeck__card[data-i="0"]');const r=v=>Math.round(v*10)/10;
+          return {ai:f.dataset.ai, card:r(R(f).height), stack:r(R(q('.adeck__stack')).height), hl:r(R(f.querySelector('.adeck__hl')).height), desc:r(R(f.querySelector('.adeck__desc')).height),
+            chipTop:r(R(f.querySelector('.adeck__chip')).top-R(f).top), metaBot:r(R(f).bottom-R(f.querySelector('.adeck__meta')).bottom), img:f.querySelector('.adeck__img')?r(R(f.querySelector('.adeck__img')).height):186}})()""")
+        hs = []
+        for _ in range(o["deck"]):
+            hs.append(box()); key("ArrowRight"); time.sleep(0.25)
+        check("every card in front is the node's 210, and so is the stack", all(h["card"] == 210 and h["stack"] == 210 for h in hs) and len({h["ai"] for h in hs}) == o["deck"], str([(h["ai"], h["card"], h["stack"]) for h in hs]))
+        check("…the title within two lines, the body within three, the photograph the 186 column", all(h["hl"] <= 39 and h["desc"] <= 60 and h["img"] == 186 for h in hs), str([(h["ai"], h["hl"], h["desc"], h["img"]) for h in hs]))
+        check("…the chip 12 from the top and the byline 12 from the foot, on each", all(h["chipTop"] == 12 and h["metaBot"] == 12 for h in hs), str([(h["ai"], h["chipTop"], h["metaBot"]) for h in hs]))
+        check("…and a full turn of the deck is back on the first card", box()["ai"] == "0", box()["ai"])
         check("the notes filter has its four", o["seg"] == ["all", "urgent", "animal", "enclosure"], str(o["seg"]))
-        check("the species plate is the node's black, not a frosted one", "blur" not in o["plate"], o["plate"])
+
+        # KEY INSIGHTS · node 757:9930 (25 Sep 2026: "Add this section under
+        # notes. Make sure Each Container has to Scroll inside"): the band
+        # under the notes, four 297×430 cards, and each list scrolling INSIDE
+        # its card — a real wheel over a list moves the list, not the page
+        k = c.eval("""(()=>{const q=s=>document.querySelector(s),R=e=>e.getBoundingClientRect(),r=v=>Math.round(v*10)/10;const b=q('#keyInsights');if(!b)return {n:0};
+          const cards=[...document.querySelectorAll('.kins__card')];return {n:1, after:b.previousElementSibling?.id, gap:r(R(b).top-R(q('#recentObs')).bottom), wide:r(R(b).width-R(q('#panel-modules')).width),
+            cards:cards.map(x=>[r(R(x).width),r(R(x).height)]), kinds:cards.map(x=>x.dataset.k), rowH:r(R(q('.kins__row')).height),
+            scrollable:cards.map(x=>x.classList.contains('is-scrollable')), over:cards.map(x=>{const l=x.querySelector('.kins__list');return l.scrollHeight>l.clientHeight}),
+            broken:[...b.querySelectorAll('img')].filter(i=>i.complete&&!i.naturalWidth).length}})()""")
+        check("Key Insights sits 16 under the notes, the column plus 8 a side", k.get("n") == 1 and k.get("after") == "recentObs" and k.get("gap") == 16 and k.get("wide") == 16, str(k))
+        check("…four 297×430 cards — natality, mortality, transfers, food — with 43px rows and every image loaded",
+              k.get("kinds") == ["natality", "mortality", "transfer", "food"] and all(x == [297, 430] for x in k.get("cards", [])) and k.get("rowH") == 43 and k.get("broken") == 0, str(k))
+        check("…the thumb shows exactly on the cards whose list overflows", k.get("scrollable") == k.get("over"), str(k))
+        c.eval("document.getElementById('keyInsights').scrollIntoView({block:'center'}); 1"); time.sleep(0.4)
+        pt = json.loads(c.eval("(r=>JSON.stringify([r.left+r.width/2,r.top+r.height/2]))(document.querySelector('.kins__card .kins__list').getBoundingClientRect())"))
+        y0 = c.eval("scrollY")
+        c.cmd("Input.dispatchMouseEvent", type="mouseWheel", x=pt[0], y=pt[1], deltaX=0, deltaY=80); time.sleep(0.5)
+        inner = c.eval("document.querySelector('.kins__card .kins__list').scrollTop"); moved = c.eval("scrollY") - y0
+        check("…and a wheel over a card scrolls its list inside the card, not the page", inner > 0 and moved == 0, f"list {inner}, page {moved}")
+        check("the species words sit on the fade, not on a frosted plate", "blur" not in o["plate"], o["plate"])
         check("the Quick Actions panel stays contextual", o["ctx"], "")
         check("no page-level sideways scroll", o["ovf"] == 0, str(o["ovf"]))
 
@@ -942,6 +994,17 @@ def main():
         c.cmd("Input.dispatchMouseEvent", type="mouseReleased", x=x - 320, y=y, button="left", clickCount=1); time.sleep(0.9)
         thrown = lit()
         check("a flick sends the front card to the back", thrown == 1, str(thrown))
+        # LEFT TO RIGHT BRINGS THE LAST CARD BACK (25 Sep 2026: "left to right
+        # that card has to come") — a real rightward drag, the same input path
+        r = json.loads(c.eval("(r=>JSON.stringify([r.left,r.top,r.width,r.height]))(document.querySelector('.adeck__card[data-i=\"0\"]').getBoundingClientRect())"))
+        x, y = r[0] + r[2] * .25, r[1] + r[3] / 2
+        c.cmd("Input.dispatchMouseEvent", type="mousePressed", x=x, y=y, button="left", clickCount=1)
+        for i in range(1, 9):
+            c.cmd("Input.dispatchMouseEvent", type="mouseMoved", x=x + i * 45, y=y, button="left", buttons=1); time.sleep(0.016)
+        c.cmd("Input.dispatchMouseEvent", type="mouseReleased", x=x + 360, y=y, button="left", clickCount=1); time.sleep(0.9)
+        back = lit()
+        clean = c.eval("[...document.querySelectorAll('.adeck__card')].filter(c=>c.style.transform||c.style.opacity||c.style.zIndex).length")
+        check("a rightward drag brings the previous card back to the front", back == 0 and clean == 0, f"lit={back} inline={clean}")
         # THE DWELL UNDER REDUCED MOTION: no animation, so the deck never turns by itself
         check("under reduced motion the deck's dwell runs no animation", c.eval("document.querySelector('.adeck__dwell').getAnimations().length") == 0, "")
 
@@ -968,6 +1031,27 @@ def main():
         first = lit()
         c.eval("document.querySelector('.adeck__dwell').getAnimations()[0].finish(); 1"); time.sleep(0.9)
         check("its end turns the deck, and the next front card starts its own", first == 1 and lit() == 2, f"{first} -> {lit()}")
+        # THE TURN IS ONE MOTION ("Animation need more smooth", 25 Sep 2026):
+        # the moment the dwell ends the leaver is on its way AND the next card
+        # is already rising — both animating in the same frame — the leaver
+        # above the deck and still opaque at half time, when three quarters
+        # of it has gone (no translucent card crossing the stack); and once
+        # it has gone it rests
+        # at the back at opacity 0 with nothing running on it — no snap back
+        # to the front, no fade in the open. The flight is paused and seeked,
+        # not waited for.
+        c.eval("document.querySelector('.adeck__dwell').getAnimations()[0].finish(); 1"); time.sleep(0.08)
+        m = c.eval("""(()=>{const l=document.querySelector('.adeck__card.is-flying'), f=document.querySelector('.adeck__card[data-i="0"]');
+          if(!l||!f) return {leaver:!!l, front:!!f};
+          const a=l.getAnimations()[0]; const T=a.effect.getTiming(); a.pause(); a.currentTime=T.duration*.5;
+          const o=getComputedStyle(l).opacity, z=getComputedStyle(l).zIndex, x=Math.round(l.getBoundingClientRect().left-f.getBoundingClientRect().left);
+          const out={leaver:true, front:true, rising:f.getAnimations().length>0, o, z, x, ms:T.duration, i:l.dataset.i}; a.play(); return out})()""")
+        check("the leaver and the riser move in the same frame, the leaver above the deck", m.get("rising") and m.get("z") == "4" and m.get("i") == "3", str(m))
+        check("…a 640ms flight, still opaque at half time with most of the card gone", m.get("ms") == 640 and m.get("o") == "1" and m.get("x", 0) < -300, str(m))
+        time.sleep(1.0)
+        after = c.eval("""(()=>{const cs=[...document.querySelectorAll('.adeck__card')];const back=cs.filter(x=>x.dataset.i==='3');
+          return {flying:cs.filter(x=>x.classList.contains('is-flying')).length, running:back.reduce((n,x)=>n+x.getAnimations().length,0), o:back.map(x=>getComputedStyle(x).opacity), stack:document.querySelector('.adeck__stack').getBoundingClientRect().height}})()""")
+        check("…and once gone it rests at the back at opacity 0 with nothing running, the stack still 210", after["flying"] == 0 and after["running"] == 0 and all(v == "0" for v in after["o"]) and after["stack"] == 210, str(after))
         r = c.eval("(r => [r.left + r.width / 2, r.top + r.height / 2])(document.querySelector('.adeck__card[data-i=\"0\"]').getBoundingClientRect())")
         c.cmd("Input.dispatchMouseEvent", type="mouseMoved", x=r[0], y=r[1]); time.sleep(0.3)
         check("a pointer over the band holds it", c.eval("document.querySelector('.adeck__dwell').getAnimations()[0].playState") == "paused", "")
@@ -1407,7 +1491,9 @@ def main():
         # and there would be no way out of edit mode. Hidden is correct;
         # gone is a trap, and it is the kind that passes a visual check.
         bar = json.loads(c.eval("""(()=>{
-          const shown=[...document.querySelectorAll('.qa-row button')]
+          // the Modules chip (.mhint, 25 Sep 2026) hangs off the row by design
+          // and is asserted on its own below; anything else is still a stray
+          const shown=[...document.querySelectorAll('.qa-row button:not(.mhint)')]
             .filter(b=>getComputedStyle(b).display!=='none')
             .map(b=>b.textContent.trim()||b.getAttribute('aria-label')||'?');
           const v2=document.documentElement.dataset.home==='v2';
@@ -1416,6 +1502,21 @@ def main():
             anchorHidden:a?getComputedStyle(a).display==='none':null})})()"""))
         check("…and the resting bar is the pill and the disc, nothing more",
               bar["shown"] == ["Quick Actions", "Chat"], str(bar["shown"]))
+        # THE MODULES CHIP (25 Sep 2026): IN the row, so chip + pill + disc
+        # are centred as one group ("Bottom actions not center aligned"), and
+        # it opts back in to pointers — `.qa` passes taps through, and a chip
+        # that did not opt in let a tap open the note under it. Hit-tested
+        # at its own centre, because element.click() skips that failure.
+        mh = c.eval("""(()=>{const ch=document.querySelector('.mhint'); if(!ch) return {n:0, v2:document.documentElement.dataset.home==='v2'};
+          const R=e=>e.getBoundingClientRect(); const els=[ch, document.querySelector('.qa-pill'), document.querySelector('.qa-chat')].filter(e=>e&&R(e).width>1);
+          const L=Math.min(...els.map(e=>R(e).left)), Rr=Math.max(...els.map(e=>R(e).right)); const r=R(ch);
+          const hit=document.elementFromPoint(r.left+r.width/2, r.top+r.height/2);
+          return {n:document.querySelectorAll('.mhint').length, inRow:ch.parentElement.classList.contains('qa-row'), centreOff:Math.round((L+Rr)/2-innerWidth/2),
+            hit:!!hit?.closest('.mhint'), label:ch.getAttribute('aria-label'), v2:document.documentElement.dataset.home==='v2'}})()""")
+        if mh.get("v2"):
+            check("V2's Modules chip sits in the row, the three centred as one group", mh["n"] == 1 and mh["inRow"] and abs(mh["centreOff"]) <= 1, str(mh))
+            check("…a tap at its centre reaches the chip, not the note under it", mh["hit"], str(mh))
+            check("…and says how many modules are below", str(mh.get("label", "")).endswith("modules below. Go to Modules"), str(mh.get("label")))
         v2 = c.eval("document.documentElement.dataset.home === 'v2'")
         check("…with the mode's swap anchor kept" + (" in the Modules head, shown (node 718:17649)" if v2 else ", and kept hidden"),
               bar["anchorPresent"] and (not bar["anchorHidden"] if v2 else bar["anchorHidden"]),
@@ -1755,7 +1856,12 @@ def main():
         check("the panel is wholly on screen", m["onScreen"], f"{m['w']}x{m['h']}")
         # THE LABEL COMES BACK WHILE IT IS OPEN, scrolled or not: the control
         # that opened the panel must not change shape under the finger.
-        check("…and the pill wears its label again while open", m["labelW"] > 60, str(m["labelW"]))
+        # On V2 the word is "Close" while open (owner, 25 Sep 2026) — shorter,
+        # so the pill does change width there; the label must still show.
+        v2 = c.eval("document.documentElement.dataset.home === 'v2'")
+        word = c.eval("document.querySelector('.qa-pill__t').textContent")
+        check("…and the pill wears its label again while open",
+              (m["labelW"] > 30 and word == "Close") if v2 else m["labelW"] > 60, f"{m['labelW']} {word!r}")
         check("Escape closes it", c.eval(
             "(()=>{document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));"
             "return 1})()") == 1)
