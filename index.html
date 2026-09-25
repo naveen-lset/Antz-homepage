@@ -14188,6 +14188,9 @@ const VARIANTS = [
   {
     id: 'species.schedule', scopedData() { return scaleData(this.data) }, moduleId: 'species', name: 'Which schedule',
     layout: 'schedule', purpose: 'UNDERSTAND', passive: true,
+    /* each V5 data card on a different tile gradient from the theme, so the
+       four do not read as one green block (owner, 25 Sep 2026) */
+    gradient: '--g-pharmacy',
     supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
     data: {
       title: 'Which schedule',
@@ -14210,7 +14213,7 @@ const VARIANTS = [
      housing kinds folded into seven families; counts are placeholders. */
   {
     id: 'housing.types', scopedData() { return scaleData(this.data) }, moduleId: 'housing', name: 'Enclosures by type',
-    layout: 'treemap', purpose: 'UNDERSTAND',
+    layout: 'treemap', purpose: 'UNDERSTAND', gradient: '--g-lab',
     supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
     data: {
       title: 'Enclosures by type', unit: 'enclosures',
@@ -14228,7 +14231,7 @@ const VARIANTS = [
   },
   {
     id: 'species.appendix', scopedData() { return scaleData(this.data) }, moduleId: 'species', name: 'CITES appendix',
-    layout: 'waffle', purpose: 'UNDERSTAND',
+    layout: 'waffle', purpose: 'UNDERSTAND', gradient: '--g-approvals-wash',
     supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
     data: {
       title: 'CITES appendix', unit: 'species',
