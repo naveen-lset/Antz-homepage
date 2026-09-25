@@ -6294,7 +6294,20 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 /* ON THE MODULE'S OWN GRADIENT, like every tile around them (owner, 25 Sep
    2026: the white plates did not blend). White text; cells, blocks and the
    switch are white washes of the fill, deeper where the figure is larger. */
-.l-sch, .l-wf, .l-tm, .l-cc { color: var(--c-white); }
+.l-sch, .l-wf, .l-et, .l-cc { color: var(--c-white); }
+/* ENCLOSURES BY TYPE (V5) · a compact table on the gold */
+.l-et { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 4px; min-height: 0; text-shadow: 0 1px 2px rgba(92, 70, 10, .3); }
+.l-et__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
+.l-et__top .c-head { margin: 0; min-width: 0; }
+.l-et__all { flex: none; font-size: var(--fs-micro); opacity: .9; white-space: nowrap; }
+.l-et__all b { font-family: var(--font-num); font-size: 16px; }
+.l-et__grid { display: flex; flex: 1 1 auto; flex-direction: column; justify-content: space-between; min-height: 0; }
+/* six rows in a 148px tile: 12px type on a 1.15 line is what fits */
+.l-et__row { display: grid; grid-template-columns: minmax(0, 1fr) 3.4em 4.6em 4.8em; gap: 6px; align-items: baseline; font-size: 12px; line-height: 1.15; }
+.l-et__row > span:not(:first-child) { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.l-et__row--head { font-size: 9.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; opacity: .85; }
+.l-et__row--head > span:not(:first-child) { font-weight: 700; }
+.l-et__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* COLLECTION (V5) · one thick white column per class, height = animals,
    the count on top and the class and its species underneath */
 .l-cc { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; }
@@ -6341,18 +6354,6 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .site-tabs__tab:hover { color: var(--ink); }
 .site-tabs__tab[aria-selected='true'] { background: var(--c-white); color: var(--viz-900); box-shadow: 0 1px 3px rgba(31, 65, 91, .12); }
 .site-tabs__tab:focus-visible { outline: 2px solid var(--viz-700); outline-offset: 1px; }
-.l-tm { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; }
-.l-tm__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
-.l-tm__top .c-head { margin: 0; min-width: 0; }
-.l-tm__all { flex: none; font-size: var(--fs-micro); opacity: .85; }
-.l-tm__all b { font-family: var(--font-num); font-size: 16px; }
-.l-tm__map { display: flex; flex: 1 1 auto; flex-direction: column; gap: 4px; min-height: 0; }
-/* the smallest row still has to hold a figure and a two-line name */
-.l-tm__row { display: flex; gap: 4px; min-height: 68px; }
-.l-tm__b { display: flex; flex-direction: column; justify-content: flex-end; gap: 1px; min-width: 76px; padding: 6px 10px; border-radius: 10px; overflow: hidden;
-  background: rgba(255, 255, 255, calc(.1 + var(--h) * .22)); }
-.l-tm__b b { font-family: var(--font-num); font-size: 18px; line-height: 1.1; }
-.l-tm__b small { font-size: var(--fs-micro); line-height: 1.2; opacity: .88; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .l-seg { display: inline-flex; flex: none; padding: 3px; border-radius: var(--r-pill); background: rgba(255, 255, 255, .18); }
 .l-seg__opt { border: 0; padding: 4px 12px; border-radius: var(--r-pill); background: none; color: rgba(255, 255, 255, .9); font: inherit; font-size: var(--fs-label); font-weight: 600; cursor: pointer; }
 .l-seg__opt[aria-pressed='true'] { background: var(--c-white); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
@@ -12635,7 +12636,7 @@ function scaleData(d) {
   return {
     ...d,
     ...(d.views ? { views: d.views.map((w) => ({ ...w, base: sc(w.base), rows: rows(w.rows) })) } : {}),
-    ...(d.parts ? { parts: d.parts.map((p) => ({ ...p, n: sc(p.n) })) } : {}),
+    ...(d.parts ? { parts: d.parts.map((p) => ({ ...p, n: sc(p.n), ...(p.species != null ? { species: sc(p.species), animals: sc(p.animals) } : {}) })) } : {}),
   }
 }
 /**
@@ -14207,22 +14208,24 @@ const VARIANTS = [
     },
   },
   /* ENCLOSURES BY TYPE · V5 (owner, 25 Sep 2026). The project's sixteen
-     housing kinds folded into seven families; counts are placeholders. */
+     housing kinds folded into seven families, each with its species and
+     animals; a 2x1 table, so the three smallest fold into "Other". All
+     counts are placeholders. */
   {
     id: 'housing.types', scopedData() { return scaleData(this.data) }, moduleId: 'housing', name: 'Enclosures by type',
-    layout: 'treemap', purpose: 'UNDERSTAND', gradient: '--g-lab',
-    supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
+    layout: 'enctable', purpose: 'UNDERSTAND', gradient: '--g-lab',
+    supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
     data: {
       title: 'Enclosures by type', unit: 'enclosures',
       summary: 'Cages 62, Aviaries 41, Paddocks and open ranges 38, Buildings 31, Moated and island 22, Vivaria and aquaria 12, Hospital units 8',
       parts: [
-        { label: 'Cages', n: 62 },
-        { label: 'Aviaries', n: 41 },
-        { label: 'Paddocks & open ranges', n: 38 },
-        { label: 'Buildings', n: 31 },
-        { label: 'Moated & island', n: 22 },
-        { label: 'Vivaria & aquaria', n: 12 },
-        { label: 'Hospital units', n: 8 },
+        { label: 'Cages',             n: 62, species: 18, animals: 540 },
+        { label: 'Aviaries',          n: 41, species: 26, animals: 780 },
+        { label: 'Paddocks & ranges', n: 38, species: 14, animals: 910 },
+        { label: 'Buildings',         n: 31, species: 21, animals: 460 },
+        { label: 'Moated & island',   n: 22, species: 9,  animals: 310 },
+        { label: 'Vivaria & aquaria', n: 12, species: 15, animals: 640 },
+        { label: 'Hospital units',    n: 8,  species: 4,  animals: 257 },
       ],
     },
   },
@@ -15265,9 +15268,9 @@ const V5_LAYOUT = DEFAULT_LAYOUT.filter((e) => !V5_PULLED.includes(e.variantId))
      ...DEFAULT_LAYOUT.filter((d) => V5_PULLED.includes(d.variantId)),
      { variantId: 'species.schedule', size: 'large' },
      { variantId: 'species.appendix', size: 'large' },
-     { variantId: 'housing.types', size: 'large' }] : [e]))
+     { variantId: 'housing.types', size: 'medium' }] : [e]))
 /* a saved V5 grid from an older seed is an older ORDER; it falls back */
-const V5_SEED = 4
+const V5_SEED = 5
 const REQUIRED_V5 = V5_LAYOUT.filter((e) => ['species.byclass', 'species.schedule', 'species.appendix', 'housing.types'].includes(e.variantId))
 
 const V4_LAYOUT = [
@@ -25533,19 +25536,22 @@ const LAYOUTS = {
       `<span class="l-sch__body">${scheduleBody(data.views[0])}</span>` +
     `</span>`,
 
-  /* ENCLOSURES BY TYPE · a three-row treemap — two, two, then the rest —  each row as tall as its share and each block as wide
-     as its share of the row. Larger blocks take a deeper (still pale) wash. */
-  treemap: (mod, variant, data) => {
+  /* ENCLOSURES BY TYPE · a table, largest type first: enclosures, species
+     and animals. Past four rows the rest fold into one "Other" row, which
+     is all a 2x1 tile holds legibly. */
+  enctable: (mod, variant, data) => {
     const parts = [...data.parts].sort((a, b) => b.n - a.n)
-    const all = parts.reduce((t, p) => t + p.n, 0) || 1
-    const top = parts[0].n
-    const rows = [parts.slice(0, 2), parts.slice(2, 4), parts.slice(4)].filter((r) => r.length)
-    const block = (p) => `<span class="l-tm__b" style="flex:${p.n} 1 0;--h:${(p.n / top).toFixed(2)}">` +
-      `<b>${fmtN(p.n)}</b><small>${esc(p.label)}</small></span>`
-    return `<span class="l-tm">` +
-      `<span class="l-tm__top">${head(mod, variant, data)}<span class="l-tm__all"><b>${fmtN(all)}</b> ${esc(data.unit)}</span></span>` +
-      `<span class="l-tm__map">` + rows.map((r) =>
-        `<span class="l-tm__row" style="flex:${r.reduce((t, p) => t + p.n, 0)} 1 0">${r.map(block).join('')}</span>`).join('') +
+    const sum = (ps, k) => ps.reduce((t, p) => t + p[k], 0)
+    const rest = parts.slice(4)
+    const rows = rest.length > 1
+      ? [...parts.slice(0, 4), { label: 'Other', n: sum(rest, 'n'), species: sum(rest, 'species'), animals: sum(rest, 'animals'), of: rest.map((p) => p.label).join(', ') }]
+      : parts
+    const cell = (x) => `<span>${fmtN(x)}</span>`
+    return `<span class="l-et">` +
+      `<span class="l-et__top">${head(mod, variant, data)}<span class="l-et__all"><b>${fmtN(sum(parts, 'n'))}</b> ${esc(data.unit)}</span></span>` +
+      `<span class="l-et__grid" role="table">` +
+        `<span class="l-et__row l-et__row--head" role="row"><span>Type</span><span>Encl.</span><span>Species</span><span>Animals</span></span>` +
+        rows.map((r) => `<span class="l-et__row" role="row"${r.of ? ` title="${esc(r.of)}"` : ''}><span class="l-et__label">${esc(r.label)}</span>${cell(r.n)}${cell(r.species)}${cell(r.animals)}</span>`).join('') +
       `</span></span>`
   },
 
