@@ -6298,14 +6298,31 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .card[data-variant='species.byclass'] .l-meters__unit { font-size: var(--fs-micro); }
 .card[data-variant='species.byclass'] .l-meters__rows { gap: 4px; }
 
-/* WHICH SCHEDULE and APPENDIX, BY CLASS (V5) · white plates, teal only */
-.l-sch, .l-xt { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
+/* WHICH SCHEDULE and CITES APPENDIX (V5) */
+.l-sch, .l-wf { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
 .l-sch__top { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); min-width: 0; }
 .l-sch__top .c-head { margin: 0; min-width: 0; }
 /* ON THE MODULE'S OWN GRADIENT, like every tile around them (owner, 25 Sep
    2026: the white plates did not blend). White text; cells, blocks and the
    switch are white washes of the fill, deeper where the figure is larger. */
-.l-sch, .l-xt, .l-tm { color: var(--c-white); }
+.l-sch, .l-wf, .l-tm { color: var(--c-white); }
+.l-sch__foot { margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, .22); font-size: var(--fs-label); opacity: .92; }
+.l-sch__foot b { font-variant-numeric: tabular-nums; }
+.l-wf { --wf-0: rgba(255, 255, 255, .95); --wf-1: rgba(255, 255, 255, .62); --wf-2: rgba(255, 255, 255, .38); --wf-3: rgba(255, 255, 255, .16); }
+.l-wf__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
+.l-wf__top .c-head { margin: 0; min-width: 0; }
+.l-wf__all { flex: none; font-size: var(--fs-micro); opacity: .85; }
+.l-wf__all b { font-family: var(--font-num); font-size: 16px; }
+.l-wf__body { display: flex; flex: 1 1 auto; align-items: center; gap: 20px; min-height: 0; }
+.l-wf__grid { display: grid; flex: none; grid-template-columns: repeat(10, 1fr); gap: 3px; width: min(168px, 48%); aspect-ratio: 1; }
+.l-wf__grid i { border-radius: 3px; }
+.l-wf__legend { display: flex; flex: 1 1 auto; flex-direction: column; gap: 10px; min-width: 0; }
+.l-wf__key { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.l-wf__name { display: flex; align-items: center; gap: 6px; font-size: var(--fs-micro); opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.l-wf__name i { flex: none; width: 9px; height: 9px; border-radius: 2px; }
+.l-wf__fig { display: flex; align-items: baseline; gap: 6px; padding-left: 15px; }
+.l-wf__fig b { font-family: var(--font-num); font-size: 17px; font-variant-numeric: tabular-nums; }
+.l-wf__fig small { font-size: var(--fs-micro); opacity: .8; }
 
 /* SITE TABS (V5) · a light pill track above the banner, the selected site a
    white pill; it scrolls sideways rather than wrapping on a phone */
@@ -6318,8 +6335,6 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .site-tabs__tab:hover { color: var(--ink); }
 .site-tabs__tab[aria-selected='true'] { background: var(--c-white); color: var(--viz-900); box-shadow: 0 1px 3px rgba(31, 65, 91, .12); }
 .site-tabs__tab:focus-visible { outline: 2px solid var(--viz-700); outline-offset: 1px; }
-.l-xt__row--head > span:not(:first-child) { color: rgba(255, 255, 255, .92); }
-.l-xt__n.is-heat { justify-self: end; min-width: 2.4em; padding: 2px 5px; border-radius: 6px; background: rgba(255, 255, 255, calc(.1 + var(--h) * .26)); font-weight: 600; }
 .l-tm { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; }
 .l-tm__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
 .l-tm__top .c-head { margin: 0; min-width: 0; }
@@ -6336,29 +6351,20 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .l-seg__opt { border: 0; padding: 4px 12px; border-radius: var(--r-pill); background: none; color: rgba(255, 255, 255, .9); font: inherit; font-size: var(--fs-label); font-weight: 600; cursor: pointer; }
 .l-seg__opt[aria-pressed='true'] { background: var(--c-white); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
 .l-seg__opt:focus-visible { outline: 2px solid var(--c-white); outline-offset: 1px; }
-.l-sch__body { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
-.l-sch__viz { display: flex; align-items: center; gap: 20px; }
-.l-sch__donut { position: relative; flex: none; width: 100px; height: 100px; }
+.l-sch__body { display: flex; flex: 1 1 auto; flex-direction: column; gap: 12px; min-height: 0; }
+.l-sch__viz { display: flex; flex: 1 1 auto; align-items: center; gap: 24px; }
+.l-sch__donut { position: relative; flex: none; width: 132px; height: 132px; }
 .l-sch__donut svg { width: 100%; height: 100%; transform: rotate(0deg); }
 .l-sch__mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
-.l-sch__mid b { font-family: var(--font-num); font-size: 20px; font-weight: 700; }
+.l-sch__mid b { font-family: var(--font-num); font-size: 26px; font-weight: 700; }
 .l-sch__mid small { font-size: var(--fs-micro); opacity: .82; }
-.l-sch__legend { display: flex; flex: 1 1 auto; flex-direction: column; gap: 8px; min-width: 0; }
-.l-sch__key { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto 3.6em; align-items: center; gap: 8px; font-size: var(--fs-label); }
-.l-sch__key i { width: 10px; height: 10px; border-radius: 3px; }
-.l-sch__key span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.l-sch__key b { font-variant-numeric: tabular-nums; }
-.l-sch__key small { opacity: .8; text-align: right; font-variant-numeric: tabular-nums; }
-.l-xt__grid { display: flex; flex-direction: column; min-width: 0; font-size: var(--fs-label); }
-.l-xt__row { display: grid; grid-template-columns: 6.8em repeat(calc(var(--cols) + 1), minmax(min-content, 1fr)); align-items: center; gap: 6px; padding: 4px 0; }
-.l-xt__row > span:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
-.l-xt__row--head { font-size: var(--fs-micro); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .9; border-top: 1px solid rgba(255, 255, 255, .22); padding-top: 8px; }
-.l-xt > .l-xt__grid .l-xt__row--head { border-top: 0; padding-top: 0; }
-.l-xt__row--foot { border-top: 1px solid rgba(255, 255, 255, .22); margin-top: 2px; padding-top: 6px; font-weight: 700; }
-.l-xt__label { opacity: .9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.l-xt__row--foot .l-xt__label { opacity: 1; }
-.l-xt__n.is-zero { opacity: .5; }
-.l-xt .l-xt__grid { flex: 1 1 auto; justify-content: space-between; }
+.l-sch__legend { display: flex; flex: 1 1 auto; flex-direction: column; gap: 14px; min-width: 0; }
+.l-sch__key { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.l-sch__name { display: flex; align-items: center; gap: 6px; font-size: var(--fs-label); opacity: .92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.l-sch__name i { flex: none; width: 10px; height: 10px; border-radius: 3px; }
+.l-sch__fig { display: flex; align-items: baseline; gap: 6px; padding-left: 16px; }
+.l-sch__fig b { font-family: var(--font-num); font-size: 20px; font-variant-numeric: tabular-nums; }
+.l-sch__fig small { font-size: var(--fs-micro); opacity: .8; }
 .card[data-variant='species.byclass'] .l-meters__row {
   display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr) 3.4em;
   align-items: center; column-gap: var(--s3);
@@ -12625,11 +12631,10 @@ const { BY_CLASS } = __req('js/data/collection.js')
 const siteScale = () => __req('js/state/reportScope.js').scale
 function scaleData(d) {
   const sc = siteScale()
-  const rows = (rs) => rs.map((r) => ({ ...r, by: r.by.map(sc) }))
+  const rows = (rs) => rs.map((r) => ({ ...r, n: sc(r.n) }))
   return {
     ...d,
-    ...(d.rows ? { rows: rows(d.rows) } : {}),
-    ...(d.views ? { views: d.views.map((w) => ({ ...w, rows: rows(w.rows) })) } : {}),
+    ...(d.views ? { views: d.views.map((w) => ({ ...w, base: sc(w.base), rows: rows(w.rows) })) } : {}),
     ...(d.parts ? { parts: d.parts.map((p) => ({ ...p, n: sc(p.n) })) } : {}),
   }
 }
@@ -14175,28 +14180,28 @@ const VARIANTS = [
       }
     },
   },
-  /* WHICH SCHEDULE and APPENDIX, BY CLASS · V5's home (owner, 25 Sep 2026,
-     from two reference screenshots). Teal only, per the one-palette rule, not
-     the screenshots' coral and yellow. The Species figures are the
-     screenshot's; the ANIMALS FIGURES ARE PLACEHOLDERS the owner asked to be
-     made up so the switch can be reviewed — replace both with real reads. */
+  /* WHICH SCHEDULE and CITES APPENDIX · V5's home (owner, 25 Sep 2026, from
+     two reference screenshots — their content, not their colours). Neither
+     splits by entity or class any more (owner: "not required"). The Species
+     figures are the screenshots'; the ANIMALS FIGURES, and the animals base,
+     ARE PLACEHOLDERS made up so the switch can be reviewed. */
   {
     id: 'species.schedule', scopedData() { return scaleData(this.data) }, moduleId: 'species', name: 'Which schedule',
     layout: 'schedule', purpose: 'UNDERSTAND', passive: true,
     supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
     data: {
       title: 'Which schedule',
-      summary: 'Species: Schedule I 126, Schedule II 73',
-      entities: ['GZRRC', 'KWT', 'RKT'],
+      summary: 'Species: Schedule I 126, Schedule II 73, of 2,453',
+      /* `base` is everything counted, scheduled or not, for the footer line */
       views: [
-        { label: 'Species', unit: 'scheduled', rows: [
-          { label: 'Schedule I',  by: [125, 0, 1] },
-          { label: 'Schedule II', by: [73, 0, 0] },
+        { label: 'Species', unit: 'scheduled', base: 2453, rows: [
+          { label: 'Schedule I',  n: 126 },
+          { label: 'Schedule II', n: 73 },
         ] },
         /* PLACEHOLDER — invented, see above */
-        { label: 'Animals', unit: 'scheduled', rows: [
-          { label: 'Schedule I',  by: [1250, 0, 34] },
-          { label: 'Schedule II', by: [640, 0, 2] },
+        { label: 'Animals', unit: 'scheduled', base: 97421, rows: [
+          { label: 'Schedule I',  n: 1284 },
+          { label: 'Schedule II', n: 642 },
         ] },
       ],
     },
@@ -14222,18 +14227,17 @@ const VARIANTS = [
     },
   },
   {
-    id: 'species.appendix', scopedData() { return scaleData(this.data) }, moduleId: 'species', name: 'Appendix, by class',
-    layout: 'appendix', purpose: 'UNDERSTAND',
+    id: 'species.appendix', scopedData() { return scaleData(this.data) }, moduleId: 'species', name: 'CITES appendix',
+    layout: 'waffle', purpose: 'UNDERSTAND',
     supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
     data: {
-      title: 'Appendix, by class',
+      title: 'CITES appendix', unit: 'species',
       summary: 'Appendix I 251, Appendix II 858, Appendix III 82, not in CITES 1,262',
-      cols: ['Aves', 'Mam', 'Rep', 'Oth'],
-      rows: [
-        { label: 'Appendix I',   by: [24, 7, 2, 218] },
-        { label: 'Appendix II',  by: [64, 15, 11, 768] },
-        { label: 'Appendix III', by: [1, 0, 0, 81] },
-        { label: 'Not in CITES', by: [33, 12, 4, 1213] },
+      parts: [
+        { label: 'Appendix I',   n: 251 },
+        { label: 'Appendix II',  n: 858 },
+        { label: 'Appendix III', n: 82 },
+        { label: 'Not in CITES', n: 1262 },
       ],
     },
   },
@@ -24823,26 +24827,8 @@ function renderCard(variant, opts = {}) {
  */
 const fmtN = (n) => n.toLocaleString('en-IN')
 
-/* A footed cross-table: a row per label, a column per group, ALL on the
-   right and Total underneath. Zeros are drawn quiet. */
-function crossTable(corner, cols, rows) {
-  const sum = (a) => a.reduce((t, x) => t + x, 0)
-  const cell = (n) => `<span class="l-xt__n${n === 0 ? ' is-zero' : ''}">${fmtN(n)}</span>`
-  /* the body cells carry a pale teal wash in proportion to the largest one,
-     so the table reads as a light heatmap; ALL and Total stay plain */
-  const top = Math.max(1, ...rows.flatMap((r) => r.by))
-  const heat = (n) => n === 0 ? cell(0)
-    : `<span class="l-xt__n is-heat" style="--h:${(Math.sqrt(n / top)).toFixed(2)}">${fmtN(n)}</span>`
-  const foot = cols.map((_, i) => sum(rows.map((r) => r.by[i])))
-  return `<span class="l-xt__grid" style="--cols:${cols.length}" role="table">` +
-    `<span class="l-xt__row l-xt__row--head" role="row"><span>${esc(corner)}</span>${cols.map((c) => `<span>${esc(c)}</span>`).join('')}<span>All</span></span>` +
-    rows.map((r) => `<span class="l-xt__row" role="row"><span class="l-xt__label">${esc(r.label)}</span>${r.by.map(heat).join('')}${cell(sum(r.by))}</span>`).join('') +
-    `<span class="l-xt__row l-xt__row--foot" role="row"><span class="l-xt__label">Total</span>${foot.map(cell).join('')}${cell(sum(foot))}</span>` +
-  `</span>`
-}
-
-function scheduleBody(view, entities) {
-  const totals = view.rows.map((r) => r.by.reduce((t, x) => t + x, 0))
+function scheduleBody(view) {
+  const totals = view.rows.map((r) => r.n)
   const all = totals.reduce((t, x) => t + x, 0) || 1
   const tones = ['rgba(255, 255, 255, .95)', 'rgba(255, 255, 255, .38)']
   let at = 0
@@ -24857,11 +24843,25 @@ function scheduleBody(view, entities) {
       `<span class="l-sch__donut"><svg viewBox="0 0 42 42" aria-hidden="true">${arcs}</svg>` +
         `<span class="l-sch__mid"><b>${fmtN(all)}</b><small>${esc(view.unit)}</small></span></span>` +
       `<span class="l-sch__legend">` + view.rows.map((r, i) =>
-        `<span class="l-sch__key"><i style="background:${tones[i]}"></i><span>${esc(r.label)}</span>` +
-        `<b>${fmtN(totals[i])}</b><small>${((totals[i] / all) * 100).toFixed(1)}%</small></span>`).join('') +
+        `<span class="l-sch__key"><span class="l-sch__name"><i style="background:${tones[i]}"></i>${esc(r.label)}</span>` +
+        `<span class="l-sch__fig"><b>${fmtN(totals[i])}</b><small>${((totals[i] / all) * 100).toFixed(1)}%</small></span></span>`).join('') +
       `</span>` +
     `</span>` +
-    crossTable('By entity', entities, view.rows)
+    `<span class="l-sch__foot"><b>${fmtN(all)}</b> of ${fmtN(view.base)} ${esc(view.label.toLowerCase())} are scheduled` +
+      ` (${view.base ? Math.round((all / view.base) * 100) : 0}%)</span>`
+}
+
+/* A 10x10 WAFFLE: a hundred squares shared out by largest remainder, so the
+   squares always add to 100 and every group above zero shows at least one */
+function waffleSquares(parts) {
+  const all = parts.reduce((t, p) => t + p.n, 0) || 1
+  const raw = parts.map((p) => (p.n / all) * 100)
+  const got = raw.map((x, i) => (parts[i].n > 0 ? Math.max(1, Math.floor(x)) : 0))
+  let left = 100 - got.reduce((t, x) => t + x, 0)
+  const order = raw.map((x, i) => [x - Math.floor(x), i]).sort((a, b) => b[0] - a[0])
+  for (let k = 0; left > 0; k = (k + 1) % order.length) { const i = order[k][1]; if (parts[i].n > 0) { got[i]++; left-- } }
+  for (let i = got.length - 1; left < 0; i = (i + got.length - 1) % got.length) if (got[i] > 1) { got[i]--; left++ }
+  return got
 }
 
 const BEHAVIOUR = {
@@ -24873,7 +24873,7 @@ const BEHAVIOUR = {
       b.addEventListener('click', (e) => {
         e.stopPropagation()
         for (const o of el.querySelectorAll('.l-seg__opt')) o.setAttribute('aria-pressed', String(o === b))
-        body.innerHTML = scheduleBody(data.views[Number(b.dataset.i)], data.entities)  // `data` is this paint's scoped copy
+        body.innerHTML = scheduleBody(data.views[Number(b.dataset.i)])  // `data` is this paint's scoped copy
       })
     }
   },
@@ -25525,7 +25525,7 @@ const LAYOUTS = {
           data.views.map((w, i) => `<button type="button" class="l-seg__opt" data-i="${i}" aria-pressed="${i === 0}">${esc(w.label)}</button>`).join('') +
         `</span>` +
       `</span>` +
-      `<span class="l-sch__body">${scheduleBody(data.views[0], data.entities)}</span>` +
+      `<span class="l-sch__body">${scheduleBody(data.views[0])}</span>` +
     `</span>`,
 
   /* ENCLOSURES BY TYPE · a three-row treemap — two, two, then the rest —  each row as tall as its share and each block as wide
@@ -25544,11 +25544,22 @@ const LAYOUTS = {
       `</span></span>`
   },
 
-  /* APPENDIX, BY CLASS · the CITES appendices against the classes, footed */
-  appendix: (mod, variant, data) =>
-    `<span class="l-xt">${head(mod, variant, data)}` +
-      crossTable('Appendix', data.cols, data.rows) +
-    `</span>`,
+  /* CITES APPENDIX · a waffle of a hundred squares, one tint per appendix
+     from most protected (solid) to not listed (faintest), keyed on the right */
+  waffle: (mod, variant, data) => {
+    const all = data.parts.reduce((t, p) => t + p.n, 0)
+    const sq = waffleSquares(data.parts)
+    const tone = (i) => `var(--wf-${i})`
+    return `<span class="l-wf">` +
+      `<span class="l-wf__top">${head(mod, variant, data)}<span class="l-wf__all"><b>${fmtN(all)}</b> ${esc(data.unit)}</span></span>` +
+      `<span class="l-wf__body">` +
+        `<span class="l-wf__grid" aria-hidden="true">` + sq.flatMap((k, i) => Array.from({ length: k }, () => `<i style="background:${tone(i)}"></i>`)).join('') + `</span>` +
+        `<span class="l-wf__legend">` + data.parts.map((p, i) =>
+          `<span class="l-wf__key"><span class="l-wf__name"><i style="background:${tone(i)}"></i>${esc(p.label)}</span>` +
+          `<span class="l-wf__fig"><b>${fmtN(p.n)}</b><small>${all ? Math.round((p.n / all) * 100) : 0}%</small></span></span>`).join('') +
+        `</span>` +
+      `</span></span>`
+  },
 
   meters: (mod, variant, data) =>
     `<span class="l-meters">${head(mod, variant, data)}` +
