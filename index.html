@@ -6286,17 +6286,6 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .card[data-h='1'] .l-attn__split { display: none; }
 .card[data-h='1'] .l-meters__hero { margin-bottom: var(--s2); }
 .card[data-h='1'] .l-meters__rows { gap: var(--s2); }
-/* COLLECTION BY CLASS (V5) · one line a class, as its wireframe drew it:
-   name, bar, animals. Four stacked meters are 2x the height a 164px tile has
-   (measured: the last two rows clipped at every width); side by side they fit.
-   `display: contents` lifts the name and value into the row's grid so the bar
-   can sit between them without changing the shared renderer. */
-/* the totals ride on the title's line: stacked beneath it they cost 33px,
-   which is the fourth row (measured: rows need 90px, had 61) */
-.card[data-variant='species.byclass'] .l-meters__hero { position: absolute; top: 0; right: 0; margin: 0; gap: 6px; }
-.card[data-variant='species.byclass'] .l-meters__total { font-size: 16px; }
-.card[data-variant='species.byclass'] .l-meters__unit { font-size: var(--fs-micro); }
-.card[data-variant='species.byclass'] .l-meters__rows { gap: 4px; }
 
 /* WHICH SCHEDULE and CITES APPENDIX (V5) */
 .l-sch, .l-wf { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
@@ -6305,7 +6294,24 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 /* ON THE MODULE'S OWN GRADIENT, like every tile around them (owner, 25 Sep
    2026: the white plates did not blend). White text; cells, blocks and the
    switch are white washes of the fill, deeper where the figure is larger. */
-.l-sch, .l-wf, .l-tm { color: var(--c-white); }
+.l-sch, .l-wf, .l-tm, .l-cc { color: var(--c-white); }
+/* COLLECTION (V5) · one thick white column per class, height = animals,
+   the count on top and the class and its species underneath */
+.l-cc { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; }
+.l-cc__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
+.l-cc__top .c-head { margin: 0; min-width: 0; }
+.l-cc__all { flex: none; font-size: var(--fs-micro); opacity: .85; white-space: nowrap; }
+.l-cc__all b { font-family: var(--font-num); font-size: 16px; }
+.l-cc__plot { display: grid; flex: 1 1 auto; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px; min-height: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .35); }
+.l-cc__col { display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 4px; min-height: 0; }
+.l-cc__col b { font-family: var(--font-num); font-size: 18px; line-height: 1; font-variant-numeric: tabular-nums; }
+.l-cc__bar { display: block; flex: none; height: calc(var(--h) * (100% - 26px)); min-height: 3px; border-radius: 8px 8px 0 0;
+  background: rgba(255, 255, 255, calc(.4 + var(--h) * .5)); }
+.l-cc__keys { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px; margin-top: -4px; }
+.l-cc__key { display: flex; flex-direction: column; min-width: 0; }
+.l-cc__key span { font-size: var(--fs-label); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.l-cc__key small { font-size: var(--fs-micro); opacity: .82; white-space: nowrap; }
 .l-sch__foot { margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, .22); font-size: var(--fs-label); opacity: .92; }
 .l-sch__foot b { font-variant-numeric: tabular-nums; }
 .l-wf { --wf-0: rgba(255, 255, 255, .95); --wf-1: rgba(255, 255, 255, .62); --wf-2: rgba(255, 255, 255, .38); --wf-3: rgba(255, 255, 255, .16); }
@@ -6365,14 +6371,6 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .l-sch__fig { display: flex; align-items: baseline; gap: 6px; padding-left: 16px; }
 .l-sch__fig b { font-family: var(--font-num); font-size: 20px; font-variant-numeric: tabular-nums; }
 .l-sch__fig small { font-size: var(--fs-micro); opacity: .8; }
-.card[data-variant='species.byclass'] .l-meters__row {
-  display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr) 3.4em;
-  align-items: center; column-gap: var(--s3);
-}
-.card[data-variant='species.byclass'] .l-meters__line { display: contents; }
-.card[data-variant='species.byclass'] .l-meters__name { grid-column: 1; line-height: 1.25; }
-.card[data-variant='species.byclass'] .l-meters__track { grid-column: 2; grid-row: 1; height: 6px; }
-.card[data-variant='species.byclass'] .l-meters__val { grid-column: 3; text-align: right; font-size: var(--fs-label); opacity: 1; font-weight: 600; }
 /* ONE ROW LEAVES 124px, AND A FEATURED ENTITY WANTS MORE THAN THAT.
    Name, subtitle, two facts and a footed line come to 168. So at 2×1 the
    card keeps its subject and its figures and gives up the two supporting
@@ -14160,8 +14158,8 @@ const VARIANTS = [
      are placeholder figures. */
   {
     id: 'species.byclass', moduleId: 'species', name: 'Collection by Class',
-    layout: 'meters', purpose: 'UNDERSTAND',
-    supportedSizes: ['medium', 'large'], defaultSize: 'medium', priority: 'secondary',
+    layout: 'classcols', purpose: 'UNDERSTAND',
+    supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
     scopedData() {
       const sc = siteScale()
       const rows = BY_CLASS.map((r) => ({ ...r, species: sc(r.species), animals: sc(r.animals) }))
@@ -14172,11 +14170,8 @@ const VARIANTS = [
       const animals = rows.reduce((t, r) => t + r.animals, 0)
       return {
         title: 'Collection', total: n(animals), unit: `animals \u00b7 ${n(species)} species`,
-        rows: rows.map((r) => ({
-          text: `${r.label} \u00b7 ${n(r.species)} species`,
-          value: n(r.animals),
-          pct: Math.round((r.animals / top) * 100),
-        })),
+        summary: rows.map((r) => `${r.label}: ${n(r.animals)} animals, ${n(r.species)} species`).join('; '),
+        cols: rows.map((r) => ({ label: r.label, animals: n(r.animals), species: n(r.species), h: r.animals / top })),
       }
     },
   },
@@ -15259,13 +15254,18 @@ const V3_LAYOUT = [
 /* the three data cards follow straight after, on a fresh row, so the data
    sits together near the top and the plain module doors come after it
    (owner, 25 Sep 2026: "this has to come somewhere on top") */
-const V5_LAYOUT = DEFAULT_LAYOUT.flatMap((e) => (e.variantId === 'species.stats'
-  ? [e, { variantId: 'species.byclass', size: 'medium' },
-     { variantId: 'species.schedule', size: 'large', newRow: true },
+/* Collection is 2x2 beside Medical and Species, which leaves a strip three
+   columns wide under those two: Hospital and Housing (2 + 1) are pulled up
+   from further down to fill it exactly, before the data row starts. */
+const V5_PULLED = ['hospital.photo', 'housing.default']
+const V5_LAYOUT = DEFAULT_LAYOUT.filter((e) => !V5_PULLED.includes(e.variantId)).flatMap((e) => (e.variantId === 'species.stats'
+  ? [e, { variantId: 'species.byclass', size: 'large' },
+     ...DEFAULT_LAYOUT.filter((d) => V5_PULLED.includes(d.variantId)),
+     { variantId: 'species.schedule', size: 'large' },
      { variantId: 'species.appendix', size: 'large' },
      { variantId: 'housing.types', size: 'large' }] : [e]))
 /* a saved V5 grid from an older seed is an older ORDER; it falls back */
-const V5_SEED = 2
+const V5_SEED = 4
 const REQUIRED_V5 = V5_LAYOUT.filter((e) => ['species.byclass', 'species.schedule', 'species.appendix', 'housing.types'].includes(e.variantId))
 
 const V4_LAYOUT = [
@@ -25546,6 +25546,18 @@ const LAYOUTS = {
         `<span class="l-tm__row" style="flex:${r.reduce((t, p) => t + p.n, 0)} 1 0">${r.map(block).join('')}</span>`).join('') +
       `</span></span>`
   },
+
+  /* COLLECTION · a column per class, height by animals, species beneath */
+  classcols: (mod, variant, data) =>
+    `<span class="l-cc" style="--n:${data.cols.length}">` +
+      `<span class="l-cc__top">${head(mod, variant, data)}<span class="l-cc__all"><b>${esc(data.total)}</b> ${esc(data.unit)}</span></span>` +
+      `<span class="l-cc__plot" aria-hidden="true">` + data.cols.map((c) =>
+        `<span class="l-cc__col"><b>${esc(c.animals)}</b><i class="l-cc__bar" style="--h:${c.h.toFixed(3)}"></i></span>`).join('') +
+      `</span>` +
+      `<span class="l-cc__keys">` + data.cols.map((c) =>
+        `<span class="l-cc__key"><span>${esc(c.label)}</span><small>${esc(c.species)} species</small></span>`).join('') +
+      `</span>` +
+    `</span>`,
 
   /* CITES APPENDIX · a waffle of a hundred squares, one tint per appendix
      from most protected (solid) to not listed (faintest), keyed on the right */
