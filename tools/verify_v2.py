@@ -37,6 +37,37 @@ BASE = (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8000/").rstrip("
 WIDTH = int(sys.argv[2]) if len(sys.argv) > 2 else 1024
 fails = []
 
+# THE PANEL'S SIXTEEN, IN NODE 635:21410'S OWN WORDING AND ORDER.
+# Transcribed from the frame a second time and on purpose: reading the list out
+# of index.html would make this assert that the file agrees with itself. The
+# order is the node's reading order — down the left column, then the right —
+# and it is the order the data states, because on a phone the columns collapse
+# into exactly this sequence.
+#
+# IT REPLACED THE PHONE SHEET'S WORDING ON 23 SEP. "+ Medical" is "New Medical
+# Record", "+ Hospitalize" is "Hospitalise" with the node's s, and the leading
+# "+" is gone from all sixteen.
+SHEET = [
+    # Medical & Clinical Care
+    "New Medical Record", "Dispense Medicine", "Hospitalise", "Add Fetal Death",
+    # Animal Management
+    "Transfer Animal", "Add Accession", "Add Eggs", "Report Missing / Escaped Animal",
+    # Operations & Administration
+    "New Request", "New Note", "New Announcement", "Add User",
+    # Site & System Management
+    "New Site", "New Section", "New Enclosure", "Master Settings",
+]
+
+# The four categories, in the node's own order and with its own fills. The ink
+# is stated too — a category is one tone, and a chip that took a colour its
+# group did not give it is the failure this is here to catch.
+CATS = [
+    ("Medical & Clinical Care",     "rgb(232, 244, 242)",  "rgb(31, 81, 91)"),
+    ("Animal Management",           "rgb(239, 245, 242)",  "rgb(0, 109, 53)"),
+    ("Operations & Administration", "rgba(0, 0, 0, 0.05)", "rgb(68, 84, 74)"),
+    ("Site & System Management",    "rgb(225, 249, 237)",  "rgb(0, 109, 53)"),
+]
+
 
 def check(name, ok, detail=""):
     print(f"  {'PASS' if ok else 'FAIL'}  {name}{('  — ' + detail) if detail else ''}")
@@ -420,7 +451,7 @@ MENU = """(()=>{
   const m=document.querySelector('.qa-menu'), r=m.getBoundingClientRect();
   const cs=getComputedStyle(m), v=getComputedStyle(document.querySelector('.qa-veil'));
   return {open:document.querySelector('.qa').classList.contains('is-open'),
-    cells:m.querySelectorAll('.qa-act').length,
+    cells:m.querySelectorAll('.qa-chip').length,
     tiles:m.querySelectorAll('.qa-mod').length,
     head:(m.querySelector('.qa-menu__head b')||{}).textContent,
     isModules:document.querySelector('.qa').classList.contains('qa--modules'),
@@ -484,7 +515,7 @@ STATE = """(()=>{
   const rows={}, spread={}, cellByRow={};
   const dly=(k)=>{const c=cellByRow[k]; if(!c) return null;
     return Math.round(parseFloat(getComputedStyle(c).transitionDelay)*1000)};
-  for(const cell of document.querySelectorAll('.qa-act')){
+  for(const cell of document.querySelectorAll('.qa-search, .qa-bind, .qa-cat, .qa-foot')){
     const k=cell.style.getPropertyValue('--qa-row').trim()||'0';
     const o=+(+getComputedStyle(cell).opacity).toFixed(2);
     if(!(k in rows)){ rows[k]=o; cellByRow[k]=cell }
@@ -513,7 +544,8 @@ STATE = """(()=>{
        opening and while closing. What differs is which row waits — so read the
        resolved transition-delay off the top and bottom cells and let the check
        compare them. */
-    delayBottom:dly('0'), delayTop:dly(String(Object.keys(rows).length-1)),
+    delayBottom:dly('0'),
+    delayTop:dly(String(Math.max(...Object.keys(rows).map(Number)))),
   })})()"""
 
 TILES = """(()=>{
@@ -796,7 +828,7 @@ def freeze_at(c, cls):
 
 
 def main():
-    print(f"V2 — node 280:3521, {WIDTH}px")
+    print(f"V2 — V4 page redesigned, {WIDTH}px")
 
     # ── V1 is untouched by any of this ────────────────────────────────────
     print("\nV1 still V1")
@@ -815,257 +847,132 @@ def main():
         errs = c.errors()
         check("no console errors on V1", not errs, "; ".join(str(e)[:90] for e in errs[:2]))
 
-    # ── and V2 is the other page ──────────────────────────────────────────
-    print("\nV2 is the other page")
+    # ── V2 IS V4'S PAGE, REDESIGNED (24 Sep 2026) ─────────────────────────
+    # The owner: "instead of updating v4 can we do in v2" → "replace V2's
+    # home". V2 now wears V4's whole composition (its stylesheet answers to
+    # data-page-version="4") and adds, under data-home="v2": the stacked
+    # announcement deck, the species shelf, a sliding notes filter and a
+    # press-and-hold menu. The old node-280:3521 checks that stood here
+    # retired with the page they described.
+    print("\nV2 is V4's page, redesigned")
     with Chrome(width=WIDTH, height=1200) as c:
-        c.goto(BASE + "index.html?v=2", settle=2.2)
-        o = c.eval(PROBE)
-        check("`?v=2` is stamped on <html> ", o["stamp"] == "2", str(o["stamp"]))
-        # HIDDEN IS NOT ABSENT, and both halves matter: the CSS drops them before
-        # they paint and the bootstrap never builds them
-        check("the deck is gone, and was never mounted",
-              o["deckShown"] is False and o["deckMounted"] == 0,
-              f"shown={o['deckShown']} slides={o['deckMounted']}")
-        check("the observation rail is gone, and was never mounted",
-              o["railShown"] is False and o["railMounted"] == 0,
-              f"shown={o['railShown']} cards={o['railMounted']}")
-        check("the gradient band moved onto the module grid",
-              "gradient" in o["band"]["img"] and "255, 255, 255" in o["band"]["img"],
-              o["band"]["img"][:56])
-        check("…keeping its 32px bottom corners",
-              o["band"]["radius"] == "0px 0px 32px 32px", o["band"]["radius"])
+        c.goto(BASE + "index.html?v=2", settle=2.4)
+        o = json.loads(c.eval("""JSON.stringify({
+          pv: document.documentElement.dataset.pageVersion, home: document.documentElement.dataset.home || '',
+          clock: !!document.querySelector('.clock')?.offsetParent,
+          fav: !!document.querySelector('.fav-band')?.offsetParent,
+          reports: !!document.querySelector('#reports')?.offsetParent,
+          tiles: document.querySelectorAll('#moduleGrid .card').length,
+          lists: document.querySelectorAll('#moduleGrid .card[data-variant$=".list"]').length,
+          deck: document.querySelectorAll('.adeck__card').length,
+          oldDeck: document.querySelectorAll('.hero-stage__deck').length,
+          dots: document.querySelectorAll('.adeck__dots i').length,
+          on: [...document.querySelectorAll('.adeck__dots i')].findIndex(i => i.classList.contains('on')),
+          head: document.querySelector('.adeck__title')?.textContent || '', all: !!document.querySelector('.adeck__all'),
+          pager: document.querySelectorAll('.adeck__btn, .adeck__count, .adeck__index').length,
+          seg: [...document.querySelectorAll('.v2seg__opt')].map(b => b.dataset.k),
+          plate: getComputedStyle(document.querySelector('.fav__txt')).backdropFilter || getComputedStyle(document.querySelector('.fav__txt')).webkitBackdropFilter || '',
+          ctx: document.querySelector('.qa').classList.contains('qa--ctx'),
+          ovf: document.documentElement.scrollWidth - innerWidth})"""))
+        check("<html> carries V4's stylesheet and V2's own scope", o["pv"] == "4" and o["home"] == "v2", f"{o['pv']} / {o['home']}")
+        # NODE 718:17169 "V2 Design Figma" (24 Sep 2026): My Species, no clock,
+        # no Site reports, and the frame's thirteen cards in its order
+        check("the node's composition: My Species, no clock, no Site reports", o["fav"] and not o["clock"] and not o["reports"], str({k: o[k] for k in ('fav', 'clock', 'reports')}))
+        want = ['medical.default', 'housing.default', 'species.stats', 'hospital.photo', 'insights.v3', 'species.newlist', 'diet.photo',
+                'administer.default', 'mortality.default', 'eggs.default', 'species.newcount', 'users.default', 'security.default']
+        got = c.eval("[...document.querySelectorAll('#moduleGrid .card')].map(x => x.dataset.variant)")
+        check("…and the frame's thirteen cards, in its order", got == want, str(got))
+        g2 = c.eval("""(()=>{const q=s=>document.querySelector(s);const R=e=>e.getBoundingClientRect();const r=v=>Math.round(v*10)/10;
+          const cards=[...document.querySelectorAll('#moduleGrid .card')].map(x=>R(x));const grid=R(q('#moduleGrid'));
+          const pad=parseFloat(getComputedStyle(q('.main-frame')).paddingLeft), col=innerWidth-2*pad;
+          return {pad, col, mint:getComputedStyle(q('.home-header')).backgroundColor, page:getComputedStyle(document.body).backgroundColor,
+            greetY:r(R(q('.greeting__word')).top+scrollY), nameH:r(R(q('.greeting__name')).height), searchW:r(R(q('.search')).width), scanX:r(R(q('.search-btn')).left),
+            favCard:[r(R(q('.fav__card')).width), r(R(q('.fav__card')).height)], plate:getComputedStyle(q('.fav__txt')).backgroundColor, favRadius:getComputedStyle(q('#favSpecies')).borderBottomLeftRadius,
+            bandsW:[r(R(q('#heroStage')).width), r(R(q('#recentObs')).width)], obs:[r(R(q('.obs')).width), r(R(q('.obs')).height)], obsHeadX:r(R(q('#recentObs .obs-head')).left),
+            headH:r(R(q('#modulesHead')).height), heroH:r(R(q('.hero--estate')).height), row:r(cards[0].height), gridW:r(grid.width), banner:r(R(q('.hero--estate')).top-R(q('#modulesHead')).bottom),
+            headTxt:[q('#obsTitle').textContent, q('#modulesTitle').textContent, q('#modulesHead .link-btn span')?.textContent]}})()""")
+        check("a mint block on a white page: the header's fill and the body's", g2["mint"] == "rgba(175, 239, 235, 0.5)" and g2["page"] == "rgb(255, 255, 255)", f"{g2['mint']} / {g2['page']}")
+        col, pad = g2["col"], g2["pad"]
+        check("the greeting at 40, a 34px name line, the field the column less the scan and one gap", g2["greetY"] == 40 and g2["nameH"] == 34 and g2["searchW"] == col - 60 and g2["scanX"] == pad + col - 52, str(g2))
+        check("species cards 148×158 on black plates, the block's corners rounded 20", g2["favCard"] == [148, 158] and g2["plate"] == "rgb(0, 0, 0)" and g2["favRadius"] == "20px", str(g2))
+        check("both bands the column plus 8 a side; a 290×430 note card, the notes head 24 inside", g2["bandsW"] == [col + 16, col + 16] and g2["obs"] == [290, 430] and g2["obsHeadX"] == pad - 8 + 24, str(g2))
+        row = round((col - 48) / 4 / 1.125, 1)   # 144 on the 744 artboard
+        check("Modules: a 19px head, the banner 16 under it, banner and rows at the node's 162:144", g2["headH"] == 19 and g2["banner"] == 16 and g2["heroH"] == row and g2["row"] == row and g2["gridW"] == col, str(g2))
+        check("the heads say Observation Notes, Modules and Edit", g2["headTxt"] == ["Observation Notes", "Modules", "Edit"], str(g2["headTxt"]))
+        check("the announcements are the stacked deck, not V4's carousel", o["deck"] >= 5 and o["oldDeck"] == 0, f"{o['deck']} cards, old deck {o['oldDeck']}")
+        check("…opening on the first, one dot per card and the first lit", o["dots"] == o["deck"] and o["on"] == 0, f"{o['dots']} dots, on={o['on']}")
+        check("…under the node's head — Announcements, View all — and no pager, counter or index", o["head"] == "Announcements" and o["all"] and o["pager"] == 0, f"{o['head']!r} all={o['all']} pager={o['pager']}")
 
-        # THE SECTION HEAD IS GONE AT REST — the ruling of 8 Sep 2026. The row's
-        # only resting content was an Edit Modules button, which is the profile
-        # menu's own first item.
-        check("no section head at rest",
-              o["head"]["h"] == 0 and o["head"]["vis"] == "hidden",
-              f"{o['head']['h']}px, visibility {o['head']['vis']}")
-        check("…and its control is out of the tab order, not merely clipped",
-              not o["head"]["focusable"],
-              "the Edit Modules button still takes focus" if o["head"]["focusable"] else "")
+        # THE DECK IS NODE 718:18106's (24 Sep 2026): the band 8 wider than the
+        # column each side, padded 16; the front card the stack less 32; the
+        # two behind it out by 16 and 32; a 36px chip, a 180px photograph,
+        # 8px dots with the lit one 20 wide; 36 under the species, 40 over
+        # the next head
+        g = c.eval("""(()=>{const q=s=>document.querySelector(s);const R=e=>e.getBoundingClientRect();
+          const band=R(q('#heroStage')), col=R(q('#panel-modules')), st=R(q('.adeck__stack')), f=R(q('.adeck__card[data-i="0"]')), p1=R(q('.adeck__card[data-i="1"]')), p2=R(q('.adeck__card[data-i="2"]'));
+          const r=v=>Math.round(v*10)/10;
+          return {bandW:r(band.width-col.width), bandPadL:r(st.left-band.left), bandPadT:r(R(q('.adeck__head')).top-band.top), headH:r(R(q('.adeck__head')).height), headGap:r(st.top-R(q('.adeck__head')).bottom),
+            frontIn:r(st.width-f.width), p1out:r(p1.right-f.right), p2out:r(p2.right-f.right), p1down:r(p1.top-f.top),
+            chip:r(R(q('.adeck__card[data-i="0"] .adeck__chip')).height), photo:q('.adeck__card[data-i="0"] .adeck__img')?r(R(q('.adeck__card[data-i="0"] .adeck__img')).width):180,
+            dot:r(R(q('.adeck__dots i:not(.on)')).width), dotOn:r(R(q('.adeck__dots i.on')).width), dotsGap:r(R(q('.adeck__dots')).top-st.bottom),
+            above:r(band.top-R(q('#favSpecies')).bottom), below:r(R(q('#recentObs .obs-head')).top-band.bottom)}})()""")
+        check("the band is the column plus 8 a side, padded 16", g["bandW"] == 16 and g["bandPadL"] == 16 and g["bandPadT"] == 16, str(g))
+        check("the head is 19 tall with 16 to the stack", g["headH"] == 19 and g["headGap"] == 16, f"{g['headH']} / {g['headGap']}")
+        check("the front card is the stack less 32; the peeks stand out 16 and 32, the first 10 down", g["frontIn"] == 32 and abs(g["p1out"] - 16) < .6 and abs(g["p2out"] - 32) < .6 and g["p1down"] == 10, str(g))
+        check("a 36px chip and a 180px photograph", g["chip"] == 36 and g["photo"] == 180, f"{g['chip']} / {g['photo']}")
+        check("8px dots, the lit one 20 wide, 16 under the stack", g["dot"] == 8 and g["dotOn"] == 20 and g["dotsGap"] == 16, str(g))
+        check("16 under the species block, 40 to the notes head (16 to its band, 24 inside it)", g["above"] == 16 and g["below"] == 40, f"{g['above']} / {g['below']}")
+        check("the notes filter has its four", o["seg"] == ["all", "urgent", "animal", "enclosure"], str(o["seg"]))
+        check("the species plate is the node's black, not a frosted one", "blur" not in o["plate"], o["plate"])
+        check("the Quick Actions panel stays contextual", o["ctx"], "")
+        check("no page-level sideways scroll", o["ovf"] == 0, str(o["ovf"]))
 
-        print("\nthe seventeen cards it seeds")
-        check("seventeen cards", o["n"] == 17, str(o["n"]))
-        check("and they are the node's, in V2_LAYOUT's order", o["ids"] == WANT,
-              "as drawn" if o["ids"] == WANT
-              else f"unexpected {[i for i in o['ids'] if i not in WANT]}, "
-                   f"missing {[i for i in WANT if i not in o['ids']]}")
-        check("both new cards are drawn", o["three"] == 2, str(o["three"]))
-        # THE RULING, ASSERTED FROM THE OTHER END. `ids` above would catch the
-        # card coming back, but only as one line of a fifteen-way diff; this
-        # says what it is.
-        check("the ink Focus Hub is not seeded", o["fills"]["hub"] is None,
-              "the dark blue card is back on the page" if o["fills"]["hub"] else "")
-        # THE ALIGNMENT RULING, 8 Sep 2026: V2 is four columns, not five, so the
-        # frame's rows can be reproduced instead of approximated. This is the
-        # check that would catch the page silently going back to five — the
-        # order above would still pass, drawn into ragged rows.
-        # …AND ONLY ABOVE 700, WHICH IS WHERE THE STYLESHEET GIVES V2 FOUR.
-        # Below that the page is two columns on purpose — four at 660 is a
-        # 140px card carrying a 32px glyph and a wrapping name, and a phone is
-        # not the frame this ruling is about. These two ran unconditionally
-        # and so reported a failure at any phone width for a page that was
-        # drawing exactly what it is supposed to draw.
-        if WIDTH >= 700:
-            check("the grid is the frame's four columns", o["gridCols"] == 4, str(o["gridCols"]))
-            check("…and the rows are the frame's, card for card",
-                  o["rows"] == WANT_ROWS,
-                  "as drawn" if o["rows"] == WANT_ROWS else str(o["rows"]))
-        else:
-            check("below 700 the grid is two columns, as the stylesheet says",
-                  o["gridCols"] == 2, str(o["gridCols"]))
-        check("seeded at `tall`, which is 2x2 at four and five columns",
-              {o["sizes"]["lite"], o["sizes"]["note"]} == {"tall"}, str(o["sizes"]))
+        # THE DECK, PRESSED — the arrow keys on the front card, then a real drag
+        lit = lambda: c.eval("[...document.querySelectorAll('.adeck__dots i')].findIndex(i => i.classList.contains('on'))")
+        key = lambda k: c.eval(f"document.querySelector('.adeck__stack').dispatchEvent(new KeyboardEvent('keydown', {{key: '{k}', bubbles: true}})); 1")
+        key("ArrowRight"); time.sleep(0.9); after_next = lit()
+        key("ArrowLeft"); time.sleep(0.9); after_prev = lit()
+        check("→ brings the second card up, ← brings the first back", after_next == 1 and after_prev == 0, f"{after_next} -> {after_prev}")
+        c.eval("document.getElementById('heroStage').scrollIntoView({block:'center'}); 1"); time.sleep(0.4)
+        r = json.loads(c.eval("(r=>JSON.stringify([r.left,r.top,r.width,r.height]))(document.querySelector('.adeck__card[data-i=\"0\"]').getBoundingClientRect())"))
+        x, y = r[0] + r[2] * .6, r[1] + r[3] / 2
+        c.cmd("Input.dispatchMouseEvent", type="mousePressed", x=x, y=y, button="left", clickCount=1)
+        for i in range(1, 9):
+            c.cmd("Input.dispatchMouseEvent", type="mouseMoved", x=x - i * 40, y=y, button="left", buttons=1); time.sleep(0.016)
+        c.cmd("Input.dispatchMouseEvent", type="mouseReleased", x=x - 320, y=y, button="left", clickCount=1); time.sleep(0.9)
+        thrown = lit()
+        check("a flick sends the front card to the back", thrown == 1, str(thrown))
+        # THE DWELL UNDER REDUCED MOTION: no animation, so the deck never turns by itself
+        check("under reduced motion the deck's dwell runs no animation", c.eval("document.querySelector('.adeck__dwell').getAnimations().length") == 0, "")
 
-        print("\nMy Focus Hub")
-        check("the plate card is white", o["fills"]["lite"] == "plate", str(o["fills"]))
-        check("the plate photograph is 92", near(o["litePhoto"]["w"], 92) or WIDTH < 768,
-              str(o["litePhoto"]))
-        check("three updates on it", o["liteUpdates"] == 3, str(o["liteUpdates"]))
-        check("its badges sit in the flow, not on the photograph",
-              o["liteBadgesInFlow"], f"inFlow={o['liteBadgesInFlow']}")
-        check("it draws no enclosure line", o["liteRefs"] == 1, str(o["liteRefs"]))
-        # It pages since 8 Sep 2026 — the node draws the indicator on the ink
-        # card only, and a card that advances on its own has to say where you
-        # are in it, so the plate card gained one it does not draw.
-        check("it pages, and says so", o["liteDots"] == 3, str(o["liteDots"]))
+        # THE NOTES FILTER AND THE HOLD MENU
+        c.eval("document.querySelector('.v2seg__opt[data-k=enclosure]').click(); 1"); time.sleep(0.8)
+        shown = c.eval("[...document.querySelectorAll('.obs')].filter(o=>!o.hidden).length")
+        check("Enclosures narrows the rail to the enclosure notes", shown == 2, str(shown))
+        c.eval("document.querySelector('.v2seg__opt[data-k=all]').click(); 1"); time.sleep(0.8)
+        c.eval("document.querySelector('.obs').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,cancelable:true,clientX:100,clientY:100})); 1"); time.sleep(0.5)
+        check("press-and-hold / right-click lifts the note with a menu", c.eval("document.body.classList.contains('v2ctx-open') && !!document.querySelector('.v2ctx-lift')"), "")
+        c.cmd("Input.dispatchKeyEvent", type="keyDown", key="Escape", code="Escape", windowsVirtualKeyCode=27); time.sleep(0.4)
+        check("…and Escape puts it back", not c.eval("document.body.classList.contains('v2ctx-open')"), "")
 
-        # ── and the ink variation, IF anything has put it on the page ───────
-        # Not seeded since the ruling of 8 Sep; still in the catalogue, so a
-        # saved layout or an Add Module can bring it back, and when it does
-        # these are the numbers it has to hold. Skipped rather than failed —
-        # a check that fails for the absence of what it measures teaches
-        # nobody anything.
-        if o["fills"]["hub"] == "ink":
-            check("the ink card is #1F415B", o["fills"]["hub"] == "ink", str(o["fills"]))
-            check("the ink photograph is 72", near(o["hubPhoto"]["w"], 72) or WIDTH < 768,
-                  str(o["hubPhoto"]))
-            check("three updates on it", o["hubUpdates"] == 3, str(o["hubUpdates"]))
-            check("its badges sit ON the photograph", o["hubBadgesOnPhoto"],
-                  f"onPhoto={o['hubBadgesOnPhoto']}")
-            check("it carries the enclosure line", o["hubRefs"] == 2, str(o["hubRefs"]))
-            check("it pages, and says so", o["hubDots"] == 3, str(o["hubDots"]))
-            check("the hub carries animals AND enclosures",
-                  o["kinds"]["latin"] == 2 and o["kinds"]["sub"] == 1,
-                  f"{o['kinds']['latin']} binomials, {o['kinds']['sub']} plain subtitles")
-        else:
-            print("  ----  the ink card is off the page; its own geometry not checked")
-
-        print("\nNotes")
-        check("the thumbnail is 44", near(o["noteThumb"]["w"], 44) or WIDTH < 768, str(o["noteThumb"]))
-        check("the priority pill is solid #FA6140", o["pri"] == "rgb(250, 97, 64)", str(o["pri"]))
-        check("…and the plate is the same colour at 10%",
-              o["tint"] == "rgba(250, 97, 64, 0.1)", str(o["tint"]))
-        # four lines on a card at its designed width, two on a phone's single
-        # column — the narrow case is a declared truncation, see the container
-        # query in the stylesheet
-        want_clamp = 4 if o["noteThumb"]["w"] >= 44 else 2
-        check(f"the note clamps to {want_clamp} lines", o["noteClamp"] == want_clamp,
-              str(o["noteClamp"]))
-        check("…and its box is exactly the clamp, not a squeezed one",
-              near(o["noteTextH"], o["noteClamp"] * 20, 1.5),
-              f"{o['noteTextH']}px for {o['noteClamp']} lines of 20 "
-              f"(content is {o['noteTextSH']}px)")
-        check("five notes, and its indicator draws the running pill",
-              o["noteRun"] and o["noteDots"] == 5, f"run={o['noteRun']} dots={o['noteDots']}")
-
-        # ══ KEY INSIGHTS ═══════════════════════════════════════════════════
-        # The card node 280:3521 put on this page, and the first card in the
-        # product whose fill belongs to no module.
-        print("\nKey Insights")
-        k = o["ki"]
-        check("the card is on the page", k is not None,
-              "" if k else "insights.key did not render")
-        if k:
-            check("at `medium`, which is the frame's 2x1", k["size"] == "medium",
-                  str(k["size"]))
-            check("…and 2 cells wide, not 1 or 3",
-                  near(k["w"], 2 * (k["h"] * 1.125) + 16, 3) or WIDTH < 700,
-                  f"{k['w']}x{k['h']}")
-            check("it wears its own ramp, not a module's",
-                  k["fill"] == "solid" and "gradient" in k["ramp"], str(k["ramp"]))
-            check("the frame's bulb is exported, not drawn", k["glyph"], "")
-            check("the head reads Key Insights", k["title"] == "Key Insights", k["title"])
-            # THE FIGURE AND ITS COLOUR TOGETHER. A figure in the wrong colour
-            # is the failure this card is most likely to have, because three
-            # near-identical pale tones sit next to each other in the palette.
-            check("32 Birth Animals, in MD3_Antz/notes",
-                  k["value"] == "32" and k["label"] == "Birth Animals"
-                  and k["valueColor"] == "rgb(252, 244, 174)",
-                  f"{k['value']} / {k['label']} / {k['valueColor']}")
-            check("two tiles, and they carry the frame's two counts",
-                  k["n"] == 2
-                  and [t["label"] for t in k["tiles"]] == ["Death", "Transfers"]
-                  and [t["value"] for t in k["tiles"]] == ["02", "12"],
-                  str(k["tiles"]))
-            # …AND IN TWO DIFFERENT LIBRARY COLOURS. Collapsing these onto one
-            # semantic tone is the tempting simplification and it is the wrong
-            # one: see the palette block.
-            check("…in ErrorContainer and SecondaryContainer, not one tone",
-                  [t["color"] for t in k["tiles"]]
-                  == ["rgb(255, 211, 211)", "rgb(175, 239, 235)"],
-                  str([t["color"] for t in k["tiles"]]))
-            check("the tiles are 5% black under a blur, not plates",
-                  k["tileBg"] == "rgba(0, 0, 0, 0.05)" and "blur(2px)" in (k["tileBlur"] or ""),
-                  f"{k['tileBg']} / {k['tileBlur']}")
-            # THE FRAME'S ASYMMETRY, WHICH IS EASY TO TIDY AWAY BY ACCIDENT:
-            # the tiles reach 8 from the card edge where the head starts at 16.
-            check("…and they reach half the padding from the edge, where the head reaches a whole one",
-                  near(k["tileRight"] * 2, k["headLeft"], 1.5),
-                  f"tiles {k['tileRight']} / head {k['headLeft']}")
-
-        print("\npaging")
-        for k, want_pages in (("lite", 3), ("note", 5)):
-            g = o["pager"][k]
-            check(f"{k}: {want_pages} pages, {want_pages} dots, all of them buttons",
-                  g["pages"] == want_pages and g["dots"] == want_pages
-                  and g["buttons"] == want_pages,
-                  f"{g['pages']} pages / {g['dots']} dots / {g['buttons']} buttons")
-            # A PASSIVE CARD IS NOT A CONTROL. If this ever regresses to a
-            # <button>, the dots inside it become a control in a control —
-            # which is the thing ModuleCard.js's standing rule forbids.
-            check(f"{k}: the card is a group, not a button",
-                  g["role"] == "group" and not g["clickable"],
-                  f"{g['tag']} role={g['role']}")
-            check(f"{k}: it has a dwell to advance on", g["dwell"])
-            check(f"{k}: it rests on the first item", g["at"] == 0, str(g["at"]))
-            check(f"{k}: one tab stop, not {want_pages}", g["tabbable"] == 1, str(g["tabbable"]))
-            check(f"{k}: nothing off-screen is reachable", g["inertOff"])
-
-        print("\nnothing is lost at this width")
-        # THE ONE THAT MATTERS. Ellipsis is these cards' own behaviour on a long
-        # binomial; a card whose content is taller than its box loses the bottom
-        # of the updates list with nothing on screen to say so.
-        check("no card clips its own content", not o["clipped"], str(o["clipped"]))
-        check("nothing is drawn at zero size", not o["zero"], str(o["zero"]))
-        check("every photograph and thumbnail loaded", o["imgs"])
-        check("no horizontal overflow", o["hOverflow"] == 0, str(o["hOverflow"]))
-
-        # AND EDIT MODE STILL HAS ITS CHROME. The collapse is scoped to the
-        # resting state for one reason: the head carries Add Module and Done in
-        # edit mode, and that Done is the only way out of it on the page itself.
-        print("\nedit mode still has its head")
-        c.eval("document.body.dispatchEvent(new KeyboardEvent('keydown',{key:'e',bubbles:true}))")
-        time.sleep(0.7)
-        ed = c.eval(EDIT_HEAD)
-        # 44 IS THE TABLET AND DESKTOP HEIGHT, NOT THE PHONE'S. Below 768 the
-        # row wraps — the title on one line, Add Module and Done full-width on
-        # the next, 101px — which is the phone breakpoint's own design and is
-        # what V1 does there too. So what is asserted is what the collapse must
-        # not break: the head comes back, it is visible, and both controls can
-        # be reached. The exact height is pinned only where one rule owns it.
-        want_h = 44 if WIDTH >= 768 else None
-        check("the head comes back, and the bar carries Add Module and Done",
-              ed["vis"] == "visible" and ed["h"] > 0 and ed["done"] and ed["add"]
-              and (want_h is None or near(ed["h"], want_h)), str(ed))
-        # …AND THE OTHER TWO ARE OFF THE BAR · "Edit time Quick & Chat wont
-        # there". `display: none` and not merely hidden, because the row is
-        # centred on itself: a pill that keeps its box would push Add Module
-        # and Done off centre by half of what is no longer there.
-        # THE CAPSULE · ruled 10 Sep 2026 from the App Store's floating app
-        # bar: "Same Way i want Add module With Tick icon". ONE container
-        # holding the label and a filled round action, not two pills side by
-        # side — which is what it was, and which read as two unrelated
-        # buttons. So the shape is what is asserted: the slot is a real box
-        # with the row's radius, Add Module has given up its own shadow to
-        # it, and Done is a filled 40px circle carrying the tick.
-        cap = json.loads(c.eval("""(()=>{
-          const cap=document.querySelector('.qa-edit');
-          const add=cap.querySelector('.add-module-btn');
-          const done=cap.querySelector('.link-btn--done');
-          const cs=getComputedStyle(cap), ds=getComputedStyle(done);
-          const dr=done.getBoundingClientRect();
-          const tick=done.querySelector('svg');
-          return JSON.stringify({display:cs.display, radius:cs.borderRadius,
-            merged:getComputedStyle(add).boxShadow==='none',
-            doneW:Math.round(dr.width), doneH:Math.round(dr.height),
-            fill:ds.backgroundColor, round:ds.borderRadius,
-            tick:!!tick, wordHidden:getComputedStyle(done.querySelector('span')).display==='none',
-            name:done.getAttribute('aria-label')})})()"""))
-        # `flex`, NOT THE `inline-flex` THE RULE ASKS FOR, and that is correct:
-        # the capsule is itself a flex item of `.qa-row`, and a flex item's
-        # display is blockified — inline-flex computes to flex. What matters
-        # is that it is a BOX at all, where the resting state is `contents`.
-        check("the editing bar is one capsule, not two pills",
-              cap["display"] in ("flex", "inline-flex") and cap["radius"] == "999px"
-              and cap["merged"],
-              f"{cap['display']} r={cap['radius']} addMerged={cap['merged']}")
-        # 40 INSIDE THE 52, which is the reference's proportion and the
-        # reason the capsule's right padding is 6.
-        check("…with Done a filled round tick, and still named",
-              cap["doneW"] == 40 and cap["doneH"] == 40 and cap["tick"]
-              and cap["wordHidden"] and cap["name"] == "Done"
-              and cap["round"] == "999px" and cap["fill"] != "rgba(0, 0, 0, 0)",
-              f"{cap['doneW']}x{cap['doneH']} {cap['fill']} tick={cap['tick']} "
-              f"name={cap['name']!r}")
-        check("…while Quick Actions and Chat have left it",
-              ed["pill"] == "none" and ed["chat"] == "none",
-              f"pill {ed['pill']}, chat {ed['chat']}")
-        c.eval("document.querySelector('.qa-row .link-btn--done').click()")
-        time.sleep(0.7)
-        out = c.eval(HEAD_AWAY)
-        check("…and Done puts it away again", not out["editing"] and out["h"] == 0, str(out))
+    # THE DECK TURNS ON ITS OWN ("it has to auto scroll", 24 Sep 2026) — checked
+    # in a Chrome that does not force reduced motion: the dwell is one 6000ms
+    # animation, frozen and seeked to its end rather than waited for
+    print("\nthe deck turns on its own")
+    with Chrome(width=WIDTH, height=1200, reduced_motion=False) as c:
+        c.goto(BASE + "index.html?v=2", settle=2.4)
+        lit = lambda: c.eval("[...document.querySelectorAll('.adeck__dots i')].findIndex(i => i.classList.contains('on'))")
+        a = c.eval("(a => a.length ? {n: a.length, state: a[0].playState, ms: a[0].effect.getTiming().duration} : {n: 0})(document.querySelector('.adeck__dwell').getAnimations())")
+        check("one running dwell of 6000ms per front card", a.get("n") == 1 and a.get("state") == "running" and a.get("ms") == 6000, str(a))
+        c.eval("document.querySelector('.adeck__dwell').getAnimations()[0].finish(); 1"); time.sleep(0.9)
+        first = lit()
+        c.eval("document.querySelector('.adeck__dwell').getAnimations()[0].finish(); 1"); time.sleep(0.9)
+        check("its end turns the deck, and the next front card starts its own", first == 1 and lit() == 2, f"{first} -> {lit()}")
+        r = c.eval("(r => [r.left + r.width / 2, r.top + r.height / 2])(document.querySelector('.adeck__card[data-i=\"0\"]').getBoundingClientRect())")
+        c.cmd("Input.dispatchMouseEvent", type="mouseMoved", x=r[0], y=r[1]); time.sleep(0.3)
+        check("a pointer over the band holds it", c.eval("document.querySelector('.adeck__dwell').getAnimations()[0].playState") == "paused", "")
+        c.cmd("Input.dispatchMouseEvent", type="mouseMoved", x=5, y=5); time.sleep(0.3)
+        check("…and leaving lets it run", c.eval("document.querySelector('.adeck__dwell').getAnimations()[0].playState") == "running", "")
 
         print("\nthe catalogue and both layouts agree")
         check("antz.checkDefaults() is clean", c.eval("antz.checkDefaults().length") == 0,
@@ -1074,6 +981,7 @@ def main():
         print("\nconsole")
         errs = c.errors()
         check("no errors or exceptions", not errs, "; ".join(str(e)[:110] for e in errs[:3]))
+
 
     # ── THE SWITCH · profile menu → Home page → Version 1 / Version 2 ─────
     # `?v=` was reachable only by typing it, which is the invisible-affordance
@@ -1115,8 +1023,10 @@ def main():
         c.eval(PRESS_VER % "2")
         time.sleep(1.8)
         w = c.eval(WHERE)
+        # V2 is stamped "4" since 24 Sep 2026 — it wears V4's stylesheet, with
+        # data-home="v2" for its own additions — so ?v=2 is what says "V2"
         check("pressing Version 2 lands on V2, at ?v=2",
-              w["v"] == "2" and w["search"] == "?v=2", f"{w['v']} {w['search']}")
+              w["v"] == "4" and w["search"] == "?v=2", f"{w['v']} {w['search']}")
         check("…and it is really V2: no deck mounted", w["deck"] == 0, str(w["deck"]))
 
         # THE NO-OP. A row that reloads the whole page to arrive where you
@@ -1131,7 +1041,7 @@ def main():
         time.sleep(1.0)
         w = c.eval(WHERE)
         check("choosing the page you are on only closes the menu",
-              w["v"] == "2" and w["search"] == "?v=2"
+              w["v"] == "4" and w["search"] == "?v=2"
               and c.eval("(()=>{const m=document.querySelector('.pmenu');return !!m&&m.hidden})()"),
               f"{w['v']} {w['search']}")
 
@@ -1172,17 +1082,73 @@ def main():
             foliage: f ? cs(f).display : 'absent',
             searchBg: cs(document.querySelector('.search')).backgroundColor,
             searchR: cs(document.querySelector('.search')).borderTopLeftRadius,
+            searchBf: cs(document.querySelector('.search')).backdropFilter,
+            scanBf: cs(document.querySelector('.search-btn')).backdropFilter,
+            hint: (document.querySelector('.search__hint')
+                   ? cs(document.querySelector('.search__hint')).color : 'absent'),
+            qaBand: (document.querySelector('.qa-band')
+                     ? cs(document.querySelector('.qa-band')).display : 'absent'),
+            pillInk: cs(document.querySelector('.qa-pill')).color,
+            pillFill: cs(document.querySelector('.qa-pill')).backgroundColor,
+            footGap: (()=>{const s=[...document.querySelectorAll('#moduleGrid .slot')].pop();
+                      return s ? Math.round(document.documentElement.scrollHeight
+                             - (s.getBoundingClientRect().bottom + scrollY)) : -1})(),
             ink: cs(document.querySelector('.greeting__name')).color})})()"""))
         check("…on a black ground with the warm glow over it",
               v3["root"] == "rgb(0, 0, 0)" and v3["hasGlow"],
               f"{v3['root']} glow={v3['hasGlow']}")
         check("…and no planting, which would paint straight over it",
               v3["foliage"] == "none", str(v3["foliage"]))
-        # THE HEADER IS A HOLE IN THE BLACK, NOT AN OBJECT ON IT · 506:10233.
-        check("…the search field white at 10% on a 12px radius, ink white",
-              v3["searchBg"] == "rgba(255, 255, 255, 0.1)"
-              and v3["searchR"] == "12px" and v3["ink"] == "rgb(255, 255, 255)",
-              f"{v3['searchBg']} r={v3['searchR']} ink={v3['ink']}")
+        # THE HEADER IS GLASS, NOT A HOLE IN THE BLACK · ruled 17 Sep 2026.
+        #
+        # THIS CHECK USED TO ASSERT 10%, THE NODE'S OWN FILL, and it was
+        # right until the ruling changed. 506:10233 states
+        # `rgba(255,255,255,0.1)` flat, and over PURE BLACK that is 24 levels
+        # of 255 — it rendered as a dark rectangle with a hairline, and was
+        # reported as "glass effect not working". The fill is 14% behind the
+        # house glass filter now, which is the same material the Quick
+        # Actions pill at the foot of this page already uses.
+        #
+        # SO THE ASSERTION MOVED WITH IT rather than being deleted: what is
+        # checked is that the field and the scan button carry a REFRACTING
+        # material at all — a blur with a brightness lift — because that is
+        # the thing that was missing and the thing that can silently go away
+        # again. The radius and the ink are still the node's.
+        glass = ("blur" in v3["searchBf"] and "brightness" in v3["searchBf"]
+                 and v3["searchBf"] == v3["scanBf"])
+        check("…the search and scan are glass, 12px radius, ink white",
+              glass and v3["searchR"] == "12px" and v3["ink"] == "rgb(255, 255, 255)"
+              and v3["searchBg"] == "rgba(255, 255, 255, 0.14)",
+              f"{v3['searchBg']} r={v3['searchR']} {v3['searchBf']}")
+        # AND THE PLACEHOLDER IS WHITE · 506:10237 sets the whole string in
+        # `text-white`. The rotating hint that sits over the field is the
+        # thing that actually draws it, and it kept its own light-page grey.
+        check("…with the placeholder and its cycling word white",
+              v3["hint"] in ("rgb(255, 255, 255)", "absent"), str(v3["hint"]))
+        # AND THERE IS NO WHITE WASH AT THE FOOT. `.qa-band` is white at 20%
+        # falling to grey — correct under the pill on a pale page, a grey
+        # slab across the bottom 182px of a black one.
+        check("…and no pale wash under the Quick Actions bar",
+              v3["qaBand"] == "none", str(v3["qaBand"]))
+        # THE BAR IS DARK GLASS WITH WHITE MARKS · ruled 17 Sep 2026, "make it
+        # icon white". The pill is glass, so its own lightness follows whatever
+        # scrolls behind it — a light green disc over a Pharmacy card, a mid
+        # grey over the black foot — and white marks on the stock 40% white
+        # fill would only have swapped which of the two was unreadable. The
+        # fill is 506:10916's dark pane, the same material the scrolled search
+        # row uses at the other end of this page.
+        check("…the Quick Actions bar is dark glass with white marks",
+              v3["pillInk"] == "rgb(255, 255, 255)"
+              and v3["pillFill"] == "rgba(30, 30, 30, 0.4)",
+              f"{v3['pillInk']} on {v3['pillFill']}")
+        # AND THE PAGE ENDS WHERE THE CARDS DO. `#panel-modules` gives back the
+        # pill's own 112px and that is the whole of what the foot needs;
+        # `.main-frame` and `.page` were adding 72 more, which on black is
+        # visible as nothing at all. Asserted as a RANGE because the pill's
+        # clearance is derived from tokens: anything past ~130 is the empty
+        # space this was reported as.
+        check("…and the page hugs the last card, less the pill's clearance",
+              0 < v3["footGap"] <= 130, f"{v3['footGap']}px below the last card")
 
         # ── THE VERTICAL RHYTHM · 506:10213 states it to the pixel ────────
         # The Greeting block runs 0-200 with 16 of padding either end, the
@@ -1198,13 +1164,22 @@ def main():
         # to make room for a teal wash this page does not draw.
         rhythm = json.loads(c.eval("""(()=>{const b=e=>e.getBoundingClientRect();
           const R=e=>[Math.round(b(e).top),Math.round(b(e).bottom)];
+          /* THE BANNER MOVED INTO THE GRID ON V3 · 506:10260 makes it the
+             first band of the module block rather than chrome above it, so
+             the page's own `.hero` is hidden there and the card carries it.
+             Both resolve to the same BOX — 208 to 352 on the page's 24 — so
+             the three checks below are unchanged in what they assert; they
+             just have to look in the right place. `.hero` first would match
+             the hidden markup copy and measure zero. */
+          const HERO=()=>document.querySelector('.card[data-variant="hero.v3"] .hero')
+                       || document.querySelector('.hero');
           return JSON.stringify({
             hdr:R(document.querySelector('.home-header')),
             field:R(document.querySelector('.search')),
-            hero:R(document.querySelector('.hero')),
-            heroX:[Math.round(b(document.querySelector('.hero')).left),
-                   Math.round(b(document.querySelector('.hero')).right)],
-            card1:R(document.querySelector('#moduleGrid .card')),
+            hero:R(HERO()),
+            heroX:[Math.round(b(HERO()).left), Math.round(b(HERO()).right)],
+            card1:R([...document.querySelectorAll('#moduleGrid .card')]
+                    .find(e=>e.dataset.variant!=='hero.v3')),
             gap:Math.round(parseFloat(getComputedStyle(
               document.querySelector('#moduleGrid')).rowGap))})})()"""))
         # ONLY AT 744, WHICH IS THE ARTBOARD'S OWN WIDTH — and on this project
@@ -1319,27 +1294,47 @@ def main():
           return JSON.stringify([...document.querySelectorAll('#moduleGrid .card')]
             .map(x=>[x.dataset.variant,
                      Math.round(b(x).width)+'x'+Math.round(b(x).height)]))})()"""))
+        # 17 Sep 2026 · THE SET IS 506:10269's OWN WIDGETS NOW. The footprints
+        # below are unchanged — the frame's geometry did not move — but
+        # fifteen of the ids did: the seed used to fill the frame's ORDER with
+        # the nearest cards the catalogue already had, and a queue standing in
+        # for 506:10368 has the right footprint and the wrong card in it.
+        # This list is the one place that difference is asserted, so it is the
+        # one place that has to be rewritten when it changes; left alone it
+        # would have gone on passing for the shape while the content moved
+        # underneath it, which is the failure this file's own header warns
+        # about.
         want = [
-            ("insights.key", "340x144"), ("species.stats", "340x144"),
+            # 17 Sep, later · THE BANNER IS A CARD NOW. 506:10260 "Modules" is
+            # 696x2224 — the Hero Banner at y=0, the Modules Container at 160
+            # — so the banner is the first band of the module block, not
+            # chrome above it. In the markup it was the one thing on this page
+            # with no handle on it in edit mode.
+            ("hero.v3", "696x144"),
+            ("insights.v3", "340x144"), ("species.v3stats", "340x144"),
             # the promo banner, four columns and ONE row (506:12894) — its
             # absence is why every row below it sat 160px above the frame
             ("promo.tags", "696x144"),
-            ("notes.recent", "340x464"), ("pharmacy.requests", "340x304"),
-            ("approvals.pending", "340x144"),
+            ("notes.v3", "340x464"), ("pharmacy.v3requests", "340x304"),
+            ("approvals.v3transfer", "340x144"),
             # V3's own one-cell tiles, not the doors — 506:10428 stacks the
             # glyph and name together where `door` pushes them apart, and two
             # of these four cells carry a figure rather than a name at all.
             ("eggs.v3", "162x144"), ("species.v3new", "162x144"),
             ("users.v3", "162x144"), ("mortality.v3", "162x144"),
-            ("pharmacy.stock", "340x304"), ("pharmacy.default", "162x144"),
-            ("lab.default", "162x144"), ("approvals.week", "340x144"),
-            ("species.recent", "340x304"), ("approvals.breakdown", "340x144"),
-            ("mortality.trend", "340x144"), ("eggs.collection", "340x304"),
-            ("medical.actions", "340x144"), ("communication.unread", "340x144"),
+            ("pharmacy.v3stock", "340x304"), ("pharmacy.default", "162x144"),
+            ("lab.default", "162x144"), ("species.v3week", "340x144"),
+            ("species.v3list", "340x304"), ("approvals.v3helpdesk", "340x144"),
+            ("mortality.v3widgets", "340x144"), ("eggs.v3collected", "340x304"),
+            ("medical.v3actions", "340x144"), ("communication.v3chat", "340x144"),
+            # AND THE BAND THAT CLOSES IT · 517:13020, four columns and one
+            # row. It was absent, which is why the grid used to end on a
+            # half-empty row where the frame ends square.
+            ("quick.v3actions", "696x144"),
         ]
         got = [tuple(r) for r in cards]
         if WIDTH == 744:
-            check("V3 seeds its own twenty, in the frame's order",
+            check("V3 seeds its own twenty-two, in the frame's order",
                   got == want,
                   "as drawn" if got == want else
                   f"{len(got)} cards; first difference "
@@ -1347,7 +1342,7 @@ def main():
         else:
             # away from 744 the columns change, so the footprints do; what
             # still has to hold is WHICH cards and in what order
-            check("V3 seeds its own twenty, in the frame's order",
+            check("V3 seeds its own twenty-two, in the frame's order",
                   [g[0] for g in got] == [w[0] for w in want],
                   f"{len(got)} cards")
         # AND NOTES IS THREE ROWS, which is the one span this grid did not
@@ -1356,8 +1351,27 @@ def main():
         # four other pages, so `xtall` is its own step.
         if WIDTH == 744:
             check("…with Notes on the new three-row step, not a stretched tall",
-                  dict(got).get("notes.recent") == "340x464",
-                  str(dict(got).get("notes.recent")))
+                  dict(got).get("notes.v3") == "340x464",
+                  str(dict(got).get("notes.v3")))
+        # ── NO ROW FLAGS, AND NO HOLES IN THE MIDDLE OF THE GRID ──────────
+        # `newRow` pins a card to a fresh row so a DESIGNED gap survives
+        # first-fit. 506:10269 has no gaps — every row of it fills all four
+        # columns — so the seven flags this seed carried did nothing on a
+        # fresh page and did real damage once a card was dragged: a flag
+        # travels with its card, so moving Species Management below the promo
+        # left Key Insights alone on a row with two empty cells beside it.
+        # Reported as "when I arrange the widgets, empty space was there".
+        #
+        # Asserted two ways: no card carries the flag, and the packed grid has
+        # no gap ABOVE its last row. The last row may be short — twenty-two
+        # cards spanning 56 cells cannot always end on a multiple of four, and
+        # nothing is left to fill it. Measured across 40 random arrangements
+        # while this was written: interior holes zero every time.
+        grid = json.loads(c.eval("""(() => {\n  const g = document.getElementById("moduleGrid").getBoundingClientRect();\n  const set = new Set();\n  for (const e of document.querySelectorAll("#moduleGrid .card")) {\n    const b = e.getBoundingClientRect();\n    const x = Math.round((b.x-g.x)/178), y = Math.round((b.y-g.y)/160);\n    const w = Math.round((b.width+16)/178), h = Math.round((b.height+16)/160);\n    for (let dy=0; dy<h; dy++) for (let dx=0; dx<w; dx++) set.add((y+dy)+":"+(x+dx));\n  }\n  const maxY = Math.max(...[...set].map(s=>+s.split(":")[0]));\n  let holes = 0;\n  for (let y=0; y<maxY; y++) for (let x=0; x<4; x++) if (!set.has(y+":"+x)) holes++;\n  return JSON.stringify({holes, flagged: antz.state().cards.filter(c=>c.newRow).length});\n})()"""))
+        check("…with no row flags left on it", grid["flagged"] == 0,
+              str(grid["flagged"]) + " cards carry newRow")
+        check("…and no holes above the last row", grid["holes"] == 0,
+              str(grid["holes"]) + " interior cells empty")
         errs = c.errors()
         check("no console errors across three switches", not errs,
               "; ".join(str(e)[:110] for e in errs[:3]))
@@ -1396,13 +1410,15 @@ def main():
           const shown=[...document.querySelectorAll('.qa-row button')]
             .filter(b=>getComputedStyle(b).display!=='none')
             .map(b=>b.textContent.trim()||b.getAttribute('aria-label')||'?');
-          const a=document.querySelector('.qa-edit > .link-btn:not(.link-btn--done)');
+          const v2=document.documentElement.dataset.home==='v2';
+          const a=document.querySelector(v2 ? '#modulesHead .link-btn:not(.link-btn--done)' : '.qa-edit > .link-btn:not(.link-btn--done)');
           return JSON.stringify({shown, anchorPresent:!!a,
             anchorHidden:a?getComputedStyle(a).display==='none':null})})()"""))
         check("…and the resting bar is the pill and the disc, nothing more",
               bar["shown"] == ["Quick Actions", "Chat"], str(bar["shown"]))
-        check("…with the mode's swap anchor kept, and kept hidden",
-              bar["anchorPresent"] and bar["anchorHidden"],
+        v2 = c.eval("document.documentElement.dataset.home === 'v2'")
+        check("…with the mode's swap anchor kept" + (" in the Modules head, shown (node 718:17649)" if v2 else ", and kept hidden"),
+              bar["anchorPresent"] and (not bar["anchorHidden"] if v2 else bar["anchorHidden"]),
               f"present={bar['anchorPresent']} hidden={bar['anchorHidden']}")
         # 40 AND NOT THE NODE'S 109 — the ruling of 8 Sep; see --qa-b in the
         # stylesheet for why the artboard's number does not survive a page that
@@ -1564,41 +1580,153 @@ def main():
         check("…with the row still centred on the page while scrolled",
               sc["centred"], f"centred={sc['centred']}")
 
-        # the menu: nineteen modules on a white material, page softened
+        # the menu, on a white material over a softened page
         c.eval("document.querySelector('.qa-pill').click(); 1")
         time.sleep(0.6)
         m = c.eval(MENU)
-        # NINETEEN MODULES, NOT SIXTEEN VERBS · the 9 Sep ruling, built from
-        # mockups/module-launcher.html variant 4A. `QA_CONTENT` in index.html
-        # selects which, and 'modules' is the shipped setting — the verb panel
-        # and all of `.qa-act` are still present behind that one constant,
-        # which is why `cells` is asserted EMPTY rather than ignored: a panel
-        # holding both would mean the switch had failed open.
-        check("it opens all nineteen modules, and no verbs",
-              m["open"] and m["isModules"] and m["tiles"] == 19 and m["cells"] == 0,
-              f"tiles={m['tiles']} verbs={m['cells']} head={m['head']!r}")
-        # WHITE AT 40% OVER A 15px BLUR · node 371:5157, and ruling five on
-        # this surface in six days: .94 at radius 22, then the profile menu's
-        # borrowed material, then 4A's .62/30/saturate(1.8), which went to .92
-        # to stay white over an 82% black backdrop and back when that became a
-        # light 30% tint. The node states .4 and 15 with NO saturation, and the
-        # saturate is asserted ABSENT rather than merely not required — it was
-        # never in the file, and a lift nobody can point at a source for is
-        # what makes the next comparison against the artboard fail for reasons
-        # nobody can name.
-        check("the node's white at 40% over a 15px blur, and no saturation",
-              m["material"] == "rgba(255, 255, 255, 0.4)" and m["radius"] == "28px"
-              and "blur(15px)" in (m["panelBlur"] or "")
-              and "saturate" not in (m["panelBlur"] or ""),
-              f"{m['material']} r={m['radius']} {m['panelBlur']}")
-        # AND NO CLIP WINDOW, in any state. The verb panel unfolded out of the
-        # pill's measured box by transitioning `clip-path`; the launcher scales
-        # up out of the pill as one surface instead, and a clip window would
-        # open over a panel that is already growing. Asserted because
-        # `.qa.is-open .qa-menu` outranks the launcher's own rule on
-        # specificity and put the clip back once.
-        check("…and no clip window, which this panel does not unfold from",
-              m["clip"] == "none", str(m["clip"]))
+        # ═══ WHICH PANEL IS LIVE IS READ, NOT ASSUMED · 22 September 2026 ═══
+        #
+        # `QA_CONTENT` in index.html selects between two panels that are BOTH
+        # fully built and fully styled, and it has now moved in both
+        # directions: the verbs (8 Sep) → the launcher (9 Sep) → the verbs
+        # again, on the owner re-posting the phone app's own Quick Actions
+        # sheet — "These are Original Quick Actions. Update Current Quick
+        # Actions", and, asked which surface, "All Modules Popup Selection i
+        # was telling to change."
+        #
+        # THE LESSON OF THAT SECOND MOVE IS WHY THIS IS A BRANCH AND NOT AN
+        # EDIT. When the constant went to 'modules' the verb panel's checks
+        # were overwritten with the launcher's, so flipping it back left the
+        # suite asserting a panel that no longer existed: three failures and
+        # one hard crash, in a file whose whole subject is the control that
+        # changed. Both readings are now asserted, the live one decides which
+        # runs, and the constant costs nothing on either side of the flip.
+        #
+        # WHAT IS ASSERTED IN BOTH CASES: the panel holds ONE population and
+        # not both. A panel carrying verbs AND tiles means the switch failed
+        # open, which is the failure neither branch would otherwise catch.
+        launcher_live = bool(m["isModules"])
+        if launcher_live:
+            # NINETEEN MODULES · the 9 Sep ruling, built from
+            # mockups/module-launcher.html variant 4A.
+            check("it opens all nineteen modules, and no verbs",
+                  m["open"] and m["tiles"] == 19 and m["cells"] == 0,
+                  f"tiles={m['tiles']} verbs={m['cells']} head={m['head']!r}")
+            # WHITE AT 40% OVER A 15px BLUR · node 371:5157, and ruling five on
+            # this surface in six days: .94 at radius 22, then the profile
+            # menu's borrowed material, then 4A's .62/30/saturate(1.8), which
+            # went to .92 to stay white over an 82% black backdrop and back
+            # when that became a light 30% tint. The node states .4 and 15 with
+            # NO saturation, and the saturate is asserted ABSENT rather than
+            # merely not required — it was never in the file, and a lift nobody
+            # can point at a source for is what makes the next comparison
+            # against the artboard fail for reasons nobody can name.
+            check("the node's white at 40% over a 15px blur, and no saturation",
+                  m["material"] == "rgba(255, 255, 255, 0.4)" and m["radius"] == "28px"
+                  and "blur(15px)" in (m["panelBlur"] or "")
+                  and "saturate" not in (m["panelBlur"] or ""),
+                  f"{m['material']} r={m['radius']} {m['panelBlur']}")
+            # AND NO CLIP WINDOW, in any state. The verb panel unfolds out of
+            # the pill's measured box by transitioning `clip-path`; the
+            # launcher scales up out of the pill as one surface instead, and a
+            # clip window would open over a panel that is already growing.
+            # Asserted because `.qa.is-open .qa-menu` outranks the launcher's
+            # own rule on specificity and put the clip back once.
+            check("…and no clip window, which this panel does not unfold from",
+                  m["clip"] == "none", str(m["clip"]))
+        else:
+            # ══ THE PANEL IS NODE 635:21410 · 23 September 2026 ══════════
+            # A field, four named categories of chips, and a foot row. What
+            # was asserted here until today was a flat 4x4 of `.qa-act` on the
+            # phone sheet's wording — all of it correct, and all of it about a
+            # panel the node replaced. Rewritten rather than patched: three of
+            # these checks have no counterpart in the old set.
+            panel = json.loads(c.eval(r"""JSON.stringify((() => {
+              const cats = [...document.querySelectorAll('.qa-cat')];
+              const chip = (c) => c.querySelector('.qa-chip');
+              return {
+                labels: [...document.querySelectorAll('.qa-chip__t')].map(t => t.textContent.trim()),
+                cats: cats.map(c => [c.querySelector('.qa-cat__t').textContent.trim(),
+                                     getComputedStyle(chip(c)).backgroundColor,
+                                     getComputedStyle(chip(c)).color]),
+                perCat: cats.map(c => c.querySelectorAll('.qa-chip').length),
+                field: !!document.querySelector('.qa-search__in'),
+                placeholder: (document.querySelector('.qa-search__in')||{}).placeholder,
+                foot: [...document.querySelectorAll('.qa-foot__b')].map(b => b.textContent.trim()),
+                footH: [...document.querySelectorAll('.qa-foot__b')].map(
+                  b => Math.round(b.getBoundingClientRect().height)),
+                /* every chip glyph is an EXPORT, so "does it exist" is a
+                   loaded <img> and not a sprite lookup */
+                hollow: [...document.querySelectorAll('.qa-chip')].filter(c => {
+                  const i = c.querySelector('img');
+                  return !(i && i.complete && i.naturalWidth > 0);
+                }).map(c => c.textContent.trim()),
+                /* a chip is as wide as its words; anything cropped is a
+                   label the panel is not actually showing */
+                cropped: [...document.querySelectorAll('.qa-chip__t')].filter(
+                  t => t.scrollWidth - t.clientWidth > 1).map(t => t.textContent.trim()),
+                chatOp: +getComputedStyle(document.querySelector('.qa-chat')).opacity,
+              };
+            })())"""))
+            check("it opens the sixteen chips, and no modules",
+                  m["open"] and len(panel["labels"]) == 16 and m["tiles"] == 0,
+                  f"chips={len(panel['labels'])} tiles={m['tiles']}")
+            check("…and they are the node's sixteen, in its order",
+                  panel["labels"] == SHEET,
+                  "" if panel["labels"] == SHEET else
+                  f"{[x for x in panel['labels'] if x not in SHEET] or '—'} "
+                  f"in place of {[x for x in SHEET if x not in panel['labels']] or '—'}")
+            # FOUR GROUPS, FOUR APIECE, AND EACH ON ITS OWN TONE. The fills
+            # are the node's literal values: this is the check that fails if
+            # someone "tidies" four tints into one.
+            got = [tuple(x) for x in panel["cats"]]
+            check("…in the node's four categories, four chips each",
+                  [g[0] for g in got] == [c[0] for c in CATS] and panel["perCat"] == [4, 4, 4, 4],
+                  f"{[g[0] for g in got]} / {panel['perCat']}")
+            check("…each group on its own fill and its own ink",
+                  got == CATS,
+                  "; ".join(f"{g[0]}: {g[1]} / {g[2]}" for g, w in zip(got, CATS) if g != w)
+                  or "")
+            check("every chip glyph is a file that actually loaded",
+                  not panel["hollow"], ", ".join(panel["hollow"]))
+            check("…and no label is cropped — a chip is as wide as its words",
+                  not panel["cropped"], ", ".join(panel["cropped"]))
+            # THE FIELD · 635:21411. Asserted as present and as EMPTY-LABELLED:
+            # the node's placeholder is the only text in it.
+            check("the panel carries the node's search field",
+                  panel["field"] and panel["placeholder"] == "Search",
+                  f"field={panel['field']} placeholder={panel['placeholder']!r}")
+            # ── THE FOOT · the 23 Sep ruling, and the part no node draws ───
+            # TWO, NOT THREE — Chat left the foot on 23 Sep ("Also Chat Remove
+            # from Down hear"). It never belonged beside these: both of these
+            # are ways of FINDING something, which is what the field above
+            # them is for, and chat is a conversation — with a control of its
+            # own already, the disc beside the pill.
+            check("…and a foot row of the two places it can send you",
+                  panel["foot"] == ["Search everything", "Scan a tag"],
+                  str(panel["foot"]))
+            check("…every one of them over the 44px touch floor",
+                  panel["footH"] and min(panel["footH"]) >= 44, str(panel["footH"]))
+            # AND THE DISC STANDS DOWN WHILE THE PANEL IS UP — screen
+            # 632:19754 draws one control at the foot in this state. Checked
+            # as opacity because taking it out of the layout would move the
+            # pill; see the rule's own note.
+            check("…while the chat disc outside stands down",
+                  panel["chatOp"] == 0, f"disc opacity {panel['chatOp']}")
+            # THE PANEL'S OWN MATERIAL · solid white at the node's 24 radius.
+            # It was 94% over a blur(24) until today; the node fills it flat
+            # and blurs the page instead, and the saturate went with it —
+            # two blurs over one photograph took the chips' 4-8% tints
+            # halfway to grey.
+            check("solid white at the node's 24px radius, and no frosting",
+                  m["material"] == "rgb(255, 255, 255)" and m["radius"] == "24px"
+                  and not (m["panelBlur"] or "none").startswith("blur"),
+                  f"{m['material']} r={m['radius']} {m['panelBlur']}")
+            # AND IT STILL UNFOLDS — the entrance survived the redesign, and
+            # this is the check that catches the clip being lost to a rule
+            # written for the launcher.
+            check("…and it unfolds through a clip window, which is its entrance",
+                  "inset(" in str(m["clip"]), str(m["clip"]))
         # THE BACKDROP IS WHITE, AND THAT IS RULING FOUR on it in two days: the
         # profile menu's material, then a 6% dim, then black at 25% over 14px,
         # then "Instead of Background Should White Blured like Apple
@@ -1646,454 +1774,867 @@ def main():
         check("no console errors through any of it", not errs,
               "; ".join(str(e)[:110] for e in errs[:3]))
 
-    # ══ NINETEEN COLOURED TILES, WHICH IS THE OPPOSITE OF WHAT WAS HERE ═══
-    # This section used to enforce the 8 September brief's colour rules — "DO
-    # NOT give every action a different color", one neutral wash, monochrome
-    # glyphs, no plates. The launcher is a different component answering a
-    # different question, and the 9 September ruling is explicitly the other
-    # way: every module wears its own fixed colour. So the checks are inverted
-    # rather than deleted, and what they now guard is the part that is easy to
-    # get wrong — flat instead of a ramp, no shadow, one rhythm, and an ink
-    # that suits the colour it sits on.
-    print("\nthe nineteen module tiles")
+    # ══ THE THREE LAUNCHER SECTIONS, AND WHEN THEY HAVE A SUBJECT ═════════
+    # Everything from here to the verb branch below asserts `.qa-mod` — the
+    # nineteen module tiles, their colours, and the one surface they arrive on.
+    # None of it has a subject when the pill opens the verbs: the tiles are not
+    # built, so the checks do not fail, they crash on the first
+    # getBoundingClientRect of undefined. Which is what they did on 22 Sep.
+    #
+    # SKIPPED RATHER THAN DELETED, and skipped OUT LOUD. The launcher is one
+    # word away in index.html and the day it comes back these are the checks
+    # that were written against its frame; a silent skip is how a suite ends up
+    # green over a component nobody is testing any more.
+    if launcher_live:
+        # ══ NINETEEN COLOURED TILES, WHICH IS THE OPPOSITE OF WHAT WAS HERE ═══
+        # This section used to enforce the 8 September brief's colour rules — "DO
+        # NOT give every action a different color", one neutral wash, monochrome
+        # glyphs, no plates. The launcher is a different component answering a
+        # different question, and the 9 September ruling is explicitly the other
+        # way: every module wears its own fixed colour. So the checks are inverted
+        # rather than deleted, and what they now guard is the part that is easy to
+        # get wrong — flat instead of a ramp, no shadow, one rhythm, and an ink
+        # that suits the colour it sits on.
+        print("\nthe nineteen module tiles")
+        with Chrome(width=WIDTH, height=900) as c:
+            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            time.sleep(0.9)
+            g = json.loads(c.eval(TILES))
+            # WHAT THIS WIDTH IS OWED, derived the way the stylesheet derives it —
+            # AND THE DERIVATION INVERTED ON 15 SEP. Node 370:4029 states a 696
+            # panel on its 744 artboard (the screen less 24 either side) with
+            # `flex: 1` tiles, where every version before it stated a 150 tile and
+            # sized the panel from it. So above the breakpoint the panel is the
+            # number and three columns divide what is left of it: 205 at 744 and
+            # at every width above, because the panel stops growing at 696.
+            #
+            # BELOW IT THE OLD DERIVATION STILL HOLDS, because two columns have no
+            # stated measure in the file — 150 is still the floor a label needs,
+            # and the clamp takes over on a narrow phone: 150 at 430, 139 at 390,
+            # 124 at 360. The 577/578 boundary is unchanged by all of this, which
+            # looks like luck and is not: 3x150 + 2x16 + 2x24 = 530 plus 48 of
+            # screen margin is the same 578 the old 546-plus-32 arrived at.
+            #
+            # AND ONE COLUMN UNDER 378, added 15 Sep with the node's tile. That
+            # tile spends 70px before the label starts, so two of them stop
+            # holding the longest unbreakable word — `Administer`, 73px — below
+            # that width. The tile's own padding moves with the band and is
+            # asserted alongside, because it is what buys the word its room: 10
+            # either side where two columns are tight, the node's 16 where they
+            # are not.
+            want_cols = 3 if WIDTH >= 578 else (2 if WIDTH >= 378 else 1)
+            want_panel = min({3: 696, 2: 2 * 150 + 16 + 48}.get(want_cols, 10 ** 6),
+                             WIDTH - 48)
+            want_tile = (want_panel - 48 - (want_cols - 1) * 16) // want_cols
+            want_pad = "16px 10px" if want_cols == 2 else "16px"
+            want_justify = "flex-start" if want_cols == 1 else "center"
+            check("all nineteen are there, and every one is drawn",
+                  g["n"] == 19 and g["visible"] == 19, f"{g['n']} tiles, {g['visible']} drawn")
+            check("…carrying the modules' own names",
+                  g["names"][0] == "Medical" and "Commu\u00adnication" in g["names"],
+                  f"{g['names'][0]} … {g['names'][-1]!r}")
+            # ONE GROUND ON ALL NINETEEN · node 371:5441, ruled 15 Sep 2026. This
+            # replaces a count of SIXTEEN distinct colours, and the replacement is
+            # the substance of the change rather than a loosened check: the fill
+            # went tile → chip on 10 Sep to settle a contrast debt, and the node
+            # empties the chip as well. The nineteen are now told apart by glyph
+            # and name alone. Asserted as a count so that one tile getting its
+            # `--qa-mod-c` back fails here instead of being absorbed.
+            check("every tile wears one ground, the node's 20% black",
+                  g["grounds"] == ["rgba(0, 0, 0, 0.2)"], str(g["grounds"]))
+            check("…flat, with no ramp on any of them",
+                  g["withGradient"] == 0, f"{g['withGradient']} with a gradient")
+            check("…and not one chip is filled any more",
+                  g["chipsFilled"] == 0, f"{g['chipsFilled']} still filled")
+            # AND IT IS GLASS. The 20% veil is only the node's material with the
+            # blur behind it — without it the tile is a flat grey rectangle that
+            # measures identically and looks nothing like the file, which is the
+            # failure a colour check cannot see.
+            # AND NO BLUR OF ITS OWN, though 371:5441 declares blur(8px). Asserted
+            # ABSENT, which is the opposite of what this checked yesterday: a
+            # nested backdrop-filter does not sample its parent's background. The
+            # panel's own filter makes a backdrop root, so the tile sampled the
+            # page behind the whole panel and laid its 20% black over THAT —
+            # coming out 11 levels LIGHTER than the panel where the artboard is 19
+            # levels darker. Putting the declared value back is the obvious fix
+            # and it is the bug.
+            check("…and no blur of its own, which rendered the tile inverted",
+                  g["tileBlur"] == ["none"], str(g["tileBlur"]))
+            # THE GROUND IS DARKER THAN THE PANEL, MEASURED OFF THE RENDER. The
+            # style-level checks above all passed while the tiles were invisible —
+            # `rgba(0, 0, 0, 0.2)` was correctly set and composited onto the wrong
+            # backdrop. Only the rendered pixels see it, so the separation the
+            # artboard draws is asserted as a number: the tile sits at least 12
+            # levels below the panel beside it (artboard 19, ours 27; the artboard
+            # reads lighter because its blur bleeds the surround inward).
+            # Skipped at one column, where there is no gutter between two tiles to
+            # sample — the gap below a tile is a row's worth of panel and picks up
+            # a different part of the page, which would compare two grounds rather
+            # than a tile against its own surround. The separation is a property of
+            # the material, so any multi-column width proves it.
+            if want_cols > 1:
+                sep = _sample_tile_separation(c)
+                check("…and reads darker than the panel it sits on, as the artboard does",
+                      sep is not None and sep >= 12,
+                      f"tile is {sep} levels below the panel" if sep is not None
+                      else "could not sample")
+            # THE SHADOW GOES AND A HAIRLINE RETURNS, the exact reverse of 10 Sep
+            # ("Apple Cards Radius, Shadow"). A drop shadow under a translucent
+            # pane reads as dirt on the panel behind it; the node draws a 0.5px
+            # border instead, transparent at rest.
+            check("no tile casts a shadow, and every one carries the hairline",
+                  g["withShadow"] == 0 and g["withBorder"] == 19,
+                  f"{g['withShadow']}/19 shadowed, {g['withBorder']}/19 bordered")
+            # THE CHIP SURVIVES AS A BOX. 371:5442 keeps the 32/r9 container and
+            # drops only its fill, so the 20px glyph still sits at a fixed size
+            # whatever the label does. Asserted because deleting the empty box is
+            # the obvious tidy-up and it would let the glyph move.
+            check("…the chip still a 32px box at a squircle's radius, just unfilled",
+                  g["chipW"] == 32 and g["chipH"] == 32 and g["chipR"] == 9,
+                  f"{g['chipW']}x{g['chipH']} r{g['chipR']}")
+            # AND THE PAIR IS CENTRED, not run out from the left edge. This is the
+            # one layout property that changed with the material and the only one
+            # a screenshot diff would catch late.
+            check(f"…with the chip and label {want_justify}, 6 apart, on {want_pad} of pad",
+                  g["justify"] == [want_justify] and g["tileGap"] == ["6px"]
+                  and g["tilePad"] == [want_pad],
+                  f"{g['justify']} gap {g['tileGap']} pad {g['tilePad']}"
+                  f" (wanted {want_justify} on {want_pad} at {WIDTH})")
+            # ONE RHYTHM, every number a multiple of 4: 150x70 tiles, a 16px
+            # gutter on both axes, 32px of panel padding, and the panel 24px clear
+            # of the row rather than the verb panel's 8.
+            check(f"{want_tile}x72 tiles at radius 16, on a 16px gutter both ways",
+                  # `gapX` is tile[1].left - tile[0].right, which is only a
+                  # horizontal gutter when there IS a second column — at one it
+                  # measures the wrap back to the next row and reads -264.
+                  g["tileW"] == want_tile and g["tileH"] == 72 and g["radius"] == 16
+                  and (want_cols == 1 or g["gapX"] == 16) and g["gapY"] == 16,
+                  f"{g['tileW']}x{g['tileH']} r{g['radius']} gap {g['gapX']}/{g['gapY']}"
+                  f" (wanted {want_tile} wide at {WIDTH})")
+            # THREE, NOT FOUR · ruled 10 Sep 2026, "Quick access module has come
+            # in 3 coloums". The panel is sized FROM the column count — 3x150 +
+            # 2x16 + 2x32 = 546 — so this asserts the pair together: a panel that
+            # kept its 712 while the grid went to three would stretch the tiles.
+            #
+            # AND TWO BELOW 578, which is that same 546 plus the 16px screen
+            # margins the panel is clamped to. This pair used to be asserted as
+            # the constants 3 and 546 at EVERY width, which read as a verifier
+            # that hardcoded the desktop — and the note it was carried under said
+            # so, that the panel "correctly reflows to one column on a phone".
+            # IT DID NOT REFLOW AT ALL: it held three columns and squeezed the
+            # tiles to 87, and eighteen of the nineteen labels were truncated
+            # behind `overflow: hidden`. The checks were right to fail and the
+            # diagnosis was what was wrong, so what they assert now is the
+            # derivation rather than either constant — sized from the column
+            # count in force, at whichever width is being run.
+            check(f"…in {'three' if want_cols == 3 else 'two'} columns on a "
+                  f"{want_panel}px panel with 24px padding",
+                  g["cols"] == want_cols and g["panelW"] == want_panel
+                  and g["panelPad"] == "24px",
+                  f"{g['cols']} cols, {g['panelW']}px, pad {g['panelPad']}"
+                  f" (wanted {want_cols} at {want_panel} for {WIDTH})")
+            check("…standing 24 clear of the pill row, not 8",
+                  near(g["clearOfRow"], 24, 1), f"{g['clearOfRow']}px")
+            # AND ALL NINETEEN ARE REACHABLE, which two columns made a question.
+            # At three the field is seven rows and fits a phone outright; at two it
+            # is ten and 944px of content sits in a 728px panel. That is fine —
+            # the panel has been a scroll container the whole time — but "fine"
+            # here means the LAST tile can actually be brought into it, and that
+            # the page behind does not take the scroll instead, which is the way
+            # this fails in practice. Checked as the rendered box of the last
+            # tile, not as `scrollTop` agreeing with itself.
+            reach = json.loads(c.eval("""(()=>{const b=e=>e.getBoundingClientRect();
+              const m=document.querySelector('.qa-menu');
+              const t=[...document.querySelectorAll('.qa-mod')], last=t[t.length-1];
+              const y0=scrollY; m.scrollTop=m.scrollHeight;
+              return JSON.stringify({inside: b(last).top>=b(m).top-1 && b(last).bottom<=b(m).bottom+1,
+                pageMoved: Math.round(scrollY-y0), room: m.scrollHeight-m.clientHeight})})()"""))
+            check("…and every one of the nineteen can be reached in the panel",
+                  reach["inside"] and reach["pageMoved"] == 0,
+                  f"last tile inside={reach['inside']}, page moved {reach['pageMoved']}px, "
+                  f"{reach['room']}px of scroll")
+            c.eval("document.querySelector('.qa-menu').scrollTop = 0; 1")
+            # ONE INK ON ALL NINETEEN, STILL — but it is dark now, not white.
+            # "text All has to be white" was ruled against COLOURED tiles on
+            # 10 Sep; the cards went white later the same day, which reverses the
+            # ink rather than the principle. What the principle actually says is
+            # that there is no per-tile ink decision, and that is what is checked:
+            # ONE value across all nineteen, whatever it is, and no returning
+            # `--dark` class.
+            check("one ink across all nineteen, and it is white on the glass",
+                  len(g["inks"]) == 1 and g["inks"][0] == "rgb(255, 255, 255)"
+                  and g["darkClass"] == 0,
+                  f"{g['inks']} (+{g['darkClass']} --dark)")
+            # AND THE NODE'S OWN WEIGHT · 371:5444 is Inter Medium 14 at +0.1,
+            # the project's `Antz_Body_Medium`. "Module Name make it Bold" was
+            # ruled on 10 Sep for near-black ink carrying a white card's
+            # hierarchy; on the glass the label is the only ink on the tile.
+            check("…at the node's Medium 14, not the white card's bold 13.5",
+                  g["weights"] == ["500"] and g["sizes"] == ["14px"],
+                  f"{g['weights']} at {g['sizes']}")
+            # ── THE CONTRAST DEBT IS BACK, AND IT IS MEASURED OFF THE SCREEN ───
+            # This check was a real AA floor for five days and is a recorded
+            # exception again. It has to be said plainly: the 10 Sep white card
+            # measured 10.68:1 worst case, and node 371:5441 trades that away for
+            # its material. Worst case is 2.41 at 744, 2.56 at 1024, 2.63 at 390
+            # and 2.67 at 360; best is around 6:1. Most tiles are under AA and a
+            # few under the 3:1 non-text floor.
+            #
+            # THESE NUMBERS ROSE ONCE THE TILE COMPOSITED CORRECTLY. They read
+            # 2.05 / 2.12 / 2.15 / 2.18 while the tile's own `backdrop-filter` was
+            # sampling the page instead of the panel — the black was landing on a
+            # bright ground, so the tile came out lighter than its surround AND
+            # the label lost most of its contrast. Removing that blur was a
+            # fidelity fix; the contrast was the second thing it bought.
+            #
+            # AND IT CANNOT BE READ OFF STYLE ANY MORE. The tile is 20% black over
+            # a 40% white panel over a 30% black veil over whatever the page draws
+            # behind it, so `backgroundColor` returns `rgba(0, 0, 0, 0.2)` and a
+            # luminance read of it — which ignores alpha — reports 21:1 for a tile
+            # that actually measures 2.06. That is a check passing while the
+            # screen is wrong, so the measurement moved to the rendered pixels:
+            # sample the tile's ground between the label's right edge and the
+            # tile's, clear of the chip, the ink and the corners.
+            #
+            # ASSERTED AS A FLOOR, NOT A TARGET, so the exception is bounded. If a
+            # later change pushes any tile below what the node itself produces,
+            # this fails — and the way back is a darker tile or a lower panel
+            # alpha, both of which leave the file. The spread is the PAGE, not the
+            # tiles: they are one ground, and the light bottom-left corner of the
+            # page is why Communication reads worst.
+            ink = _sample_ink_contrast(c, g["inkBoxes"])
+            if ink is None:
+                check("…the label's measured contrast, sampled off the render",
+                      False, "could not sample — PIL missing or screenshot failed")
+            else:
+                worst, best, under_aa, under_3, worst_name, sampled = ink
+                # 2.2, AND THE HEADROOM IS DELIBERATE. The measure is
+                # deterministic — repeated runs at one width agree to two decimals
+                # — but it lands differently at each width because the spread is
+                # the PAGE showing through: 2.41 at 744, 2.56 at 1024, 2.63 at 390,
+                # 2.67 at 360. A floor pinned to the tightest of those would fail
+                # on an anti-aliasing change rather than on a real one, which is
+                # the failure mode that makes a suite get ignored. It was 1.9 while
+                # the tile composited over the page; raised with the fix, so the
+                # inverted state cannot come back and still pass.
+                check("…the label's contrast measured off the render, and bounded",
+                      worst >= 2.2,
+                      f"worst {worst_name} {worst:.2f}:1, best {best:.2f}:1 — "
+                      f"{under_aa}/{sampled} under AA, {under_3}/{sampled} under 3:1 "
+                      f"(of {sampled} tiles in the panel; recorded exception: "
+                      f"node 371:5441's material, 15 Sep)")
+            # AND THE TEXT-SHADOW STAYS RETIRED. It was load-bearing at .35 on the
+            # coloured tiles — the only thing separating white ink from
+            # administer, lab and parivesh. Putting it back is the obvious reflex
+            # now that the ink is white again on a mid ground, and it is the wrong
+            # one: the node draws no shadow, and a smear under 14px Medium is what
+            # made the old tiles look cheap. If the contrast is ever called, the
+            # answer is the material, not a shadow over it.
+            check("…with the text-shadow retired, not left smearing the ink",
+                  g["withShadowInk"] == 0, f"{g['withShadowInk']}/19 still shadowed")
+            check("every glyph is the module's own file, loaded",
+                  g["glyphsLoaded"] == 19, f"{g['glyphsLoaded']}/19")
+            check("no label runs out of its tile", g["labelOverflow"] == 0,
+                  str(g["labelOverflow"]))
+            # AND NONE IS CLIPPED INSIDE ITS OWN BOX — the half the line above
+            # cannot see. Kept as a separate check rather than folded in, because
+            # the two fail for opposite reasons: the box overflows when the label
+            # CANNOT shrink, and the text overflows when it shrinks too far.
+            check("…and no word is cut off inside it",
+                  not g["labelClipped"],
+                  "none" if not g["labelClipped"] else
+                  ", ".join(f"{n} by {px}px" for n, px in g["labelClipped"]))
+            # AND NO WORD IS SPLIT DOWN THE MIDDLE, which is the one that holds.
+            # The two above can both be green while the panel reads "Medica/l" —
+            # `break-word` guarantees it by making the text fit whatever the box.
+            # This asserts the box is wide enough that the backstop never fires.
+            check("…and no word has to break in the middle of itself",
+                  not g["wordBreaks"],
+                  "none" if not g["wordBreaks"] else
+                  ", ".join(f"{n} needs {need} has {has}"
+                            for n, need, has in g["wordBreaks"]))
+            errs = c.errors()
+            check("no console errors", not errs, "; ".join(str(e)[:110] for e in errs[:3]))
+
+        # ══ THE OPENING · THE TILES FLY OUT OF THE PILL ════════════════════════
+        # The verb panel unfolded: one surface whose clip-path started as the
+        # pill's measured box and opened outward, staggered by ROW. The launcher
+        # does the opposite — the surface just fades, and the nineteen tiles each
+        # travel from the pill to their own slot. So this measures DISTANCE FROM
+        # THE PILL per tile per frame, not a window.
+        #
+        # FROZEN AND SEEKED, never slept through — and the freeze awaits the
+        # animations rather than guessing when they exist; see freeze_at().
+        print("\nthe launcher opens as one surface")
+        with Chrome(width=WIDTH, height=900, reduced_motion=False) as c:
+            c.goto(BASE + "index.html?v=2", settle=2.0)
+            # THE BUDGET IS THE RULING · 220ms, replacing a 560ms flight with
+            # 342ms of stagger behind it. Asserted off the token because that is
+            # what both the open and the close transitions read, and because the
+            # point of the ruling was the total time.
+            tok = c.eval("(()=>{const c=getComputedStyle(document.documentElement);"
+                         "return [c.getPropertyValue('--qa-mod-open').trim(),"
+                         "c.getPropertyValue('--qa-mod-close').trim()].join(' ')})()")
+            check("it opens in 220ms and closes in 180, not the fan's 900",
+                  tok == "220ms 180ms", tok)
+
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            time.sleep(0.8)
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            time.sleep(0.6)
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            freeze_at(c, "is-open")
+
+            def at(t):
+                c.eval("(()=>{for(const a of document.getAnimations()){a.pause();"
+                       "try{a.currentTime=%d}catch(e){}} return 1})()" % t)
+                return json.loads(c.eval(SURFACE))
+
+            f0 = at(0)
+            # FRAME ZERO · the panel is small and invisible, and it is small FROM
+            # THE PILL. .96 rather than the fan's .3: enough to read as arriving,
+            # not enough to look like a modal zoom.
+            check("frame 0: the panel is at 96% and invisible",
+                  f0["panelOpacity"] == 0 and 0.95 <= f0["panelScale"] <= 0.97,
+                  f"opacity {f0['panelOpacity']}, scale {f0['panelScale']}")
+            # …AND GROWING FROM THE PILL. The origin point resolved into viewport
+            # coordinates has to sit on the pill's centre horizontally; vertically
+            # it sits at the panel's bottom edge, which is 24px above the pill's
+            # own centre plus half the row — so the Y is checked as "below the
+            # panel and above the pill", not as zero.
+            check("…and it grows out of the pill, not out of its own middle",
+                  abs(f0["originDX"]) <= 2 and -60 <= f0["originDY"] <= 0,
+                  f"origin is {f0['originDX']}px, {f0['originDY']}px from the pill centre")
+            check("…with no clip window, which this panel does not unfold from",
+                  f0["clip"] == "none", f0["clip"])
+            # THE WHOLE POINT OF THE RULING · not one tile is animating, in the
+            # first frame or any other. This is the check that fails if the fan
+            # comes back in any form: a keyframe, a transition, or a stray
+            # --qa-dx left on a tile by a returning measureFan().
+            check("no tile animates at all — the surface is the only thing moving",
+                  f0["tileAnims"] == 0 and f0["strayVectors"] == 0,
+                  f"{f0['tileAnims']} tile animations, {f0['strayVectors']} stray vectors")
+            check("…so all nineteen are full size and full opacity in frame 0",
+                  min(f0["tileOps"]) == 1 and set(f0["tileScales"]) == {1},
+                  f"opacity min {min(f0['tileOps'])}, scales {sorted(set(f0['tileScales']))}")
+            check("…with the pill's glyph still the grid",
+                  f0["grid"] == 1 and f0["x"] == 0, f"grid={f0['grid']} x={f0['x']}")
+
+            # MID-WAY · one movement, part-way through, on both properties at once.
+            f = at(110)
+            check("mid-open: the panel is part-way up and part-way out",
+                  0 < f["panelOpacity"] < 1 and 0.96 < f["panelScale"] < 1,
+                  f"opacity {f['panelOpacity']}, scale {f['panelScale']}")
+            check("…and the tiles are still not moving",
+                  f["tileAnims"] == 0 and min(f["tileOps"]) == 1,
+                  f"{f['tileAnims']} tile animations, opacity min {min(f['tileOps'])}")
+
+            # AND IT LANDS · full size, fully there, and the pill has become the ×.
+            f = at(400)
+            check("it lands: the panel at full size and fully there",
+                  f["panelOpacity"] == 1 and f["panelScale"] == 1,
+                  f"opacity {f['panelOpacity']}, scale {f['panelScale']}")
+            check("…and the pill's glyph is the ×", f["grid"] == 0 and f["x"] == 1,
+                  f"grid={f['grid']} x={f['x']}")
+
+        # ══ THE CLOSING · THE SURFACE GOES BACK INTO THE PILL ══════════════════
+        print("\nthe launcher closes the same way")
+        with Chrome(width=WIDTH, height=900, reduced_motion=False) as c:
+            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            time.sleep(0.8)
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            # `is-closing` goes on synchronously, before `is-open` comes off
+            freeze_at(c, "is-closing")
+
+            def at2(t):
+                c.eval("(()=>{for(const a of document.getAnimations()){a.pause();"
+                       "try{a.currentTime=%d}catch(e){}} return 1})()" % t)
+                return json.loads(c.eval(SURFACE))
+
+            f = at2(0)
+            check("frame 0 of the close: the panel is still full size and there",
+                  f["panelOpacity"] == 1 and f["panelScale"] == 1,
+                  f"opacity {f['panelOpacity']}, scale {f['panelScale']}")
+            # IT REVERSES RATHER THAN CUTTING. The fan's close had a reverse
+            # distance order to prove; this one has only to shrink back toward the
+            # same origin, so what is asserted is that both properties are moving
+            # DOWN together and the tiles are still inert.
+            f = at2(90)
+            check("…it contracts back toward the pill, fading as it goes",
+                  0 < f["panelOpacity"] < 1 and 0.96 <= f["panelScale"] < 1,
+                  f"opacity {f['panelOpacity']}, scale {f['panelScale']}")
+            check("…and no tile is animating on the way out either",
+                  f["tileAnims"] == 0 and min(f["tileOps"]) == 1,
+                  f"{f['tileAnims']} tile animations, opacity min {min(f['tileOps'])}")
+            f = at2(400)
+            check("it ends on the pill: the surface gone, back at 96%",
+                  f["panelOpacity"] == 0 and 0.95 <= f["panelScale"] <= 0.97,
+                  f"opacity {f['panelOpacity']}, scale {f['panelScale']}")
+    else:
+        print("\nthe launcher's three sections — no subject on this setting")
+        print("  the pill opens the sixteen verbs, so `.qa-mod` is not built.")
+        print("  Flip QA_CONTENT back to 'modules' and they run again.")
+
+        # ══ THE PANEL UNFOLDS OUT OF THE PILL · the 8 September brief ═════════
+        # "The FAB transforms INTO the Quick Actions module." The panel is laid
+        # out at full size and REVEALED by a clip window that starts as the
+        # pill's own measured box, so nothing scales and nothing reflows — and
+        # the window's width and centre are the only proof of that. A panel
+        # that merely faded in would pass every geometry check in this file.
+        #
+        # FROZEN AND SEEKED, never slept through.
+        print("\nthe sixteen verbs unfold out of the pill")
+        with Chrome(width=WIDTH, height=900, reduced_motion=False) as c:
+            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            freeze_at(c, "is-open")
+
+            def at(t):
+                c.eval("(()=>{for(const a of document.getAnimations()){a.pause();"
+                       "try{a.currentTime=%d}catch(e){}} return 1})()" % t)
+                return json.loads(c.eval(STATE))
+
+            f0 = at(0)
+            # FRAME ZERO IS THE PILL, to the pixel and in the right place. The
+            # width alone would pass on a window centred on the panel, which is
+            # the bug this replaced: the surface came out of the middle of the
+            # page rather than out of the control that was pressed.
+            check("frame 0: the clip window is the pill's own box",
+                  f0["winW"] is not None and near(f0["winW"], f0["pillW"], 2),
+                  f"window {f0['winW']}px against a {f0['pillW']}px pill")
+            check("…and centred on the pill, not on the panel",
+                  f0["winCx"] is not None and near(f0["winCx"], f0["pillCx"], 2),
+                  f"window centre {f0['winCx']} against the pill's {f0['pillCx']}"
+                  f" (the panel's is {f0['menuCx']})")
+            # THE STAGGER RUNS AWAY FROM THE FINGER. Read off the resolved
+            # delays rather than off opacity: while opening AND while closing
+            # the row nearest the pill is the more opaque one, so opacity
+            # cannot tell the two directions apart. The delays can.
+            check("…and the rows are delayed from the bottom up",
+                  f0["delayBottom"] is not None and f0["delayTop"] is not None
+                  and f0["delayBottom"] < f0["delayTop"],
+                  f"bottom {f0['delayBottom']}ms, top {f0['delayTop']}ms")
+            # EVERY CELL IN A ROW MOVES AS ONE. The brief rules out staggering
+            # individual cards, and the row index is MEASURED off each cell's
+            # top edge — so a column count the media queries moved under it
+            # shows up here as a row that is not one opacity.
+            # HALF OF --qa-t-surface, WHICH IS 200ms. Seeked at 200 the window
+            # has already landed and `progress` reads 1, which is a pass on the
+            # end state wearing a mid-flight check's name — it is the surface's
+            # whole duration, not a point inside it.
+            mid = at(100)
+            check("mid-flight: the window has opened and no row has split",
+                  0 < (mid["progress"] or 0) < 1 and mid["rowSpread"] <= 0.001,
+                  f"progress {mid['progress']}, widest spread within a row"
+                  f" {mid['rowSpread']}")
+            end = at(900)
+            check("it ends fully unfolded, every row opaque",
+                  end["progress"] == 1 and min(end["rows"].values()) == 1,
+                  f"progress {end['progress']}, dimmest row"
+                  f" {min(end['rows'].values())}")
+            # AND THE MARK HAS MORPHED — one 20px box holding the grid and a
+            # CSS ×, rotating through each other rather than being swapped.
+            check("…with the pill's mark now the ×, not the grid",
+                  end["grid"] == 0 and end["x"] == 1,
+                  f"grid {end['grid']}, × {end['x']}")
+
+        print("\nand it folds back the same way, in reverse")
+        with Chrome(width=WIDTH, height=900, reduced_motion=False) as c:
+            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            time.sleep(0.9)
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            freeze_at(c, "is-closing")
+            s = json.loads(c.eval(STATE))
+            # THE CLOSE IS THE OPEN REVERSED, which is a claim about WHICH ROW
+            # WAITS: the head goes first and the row over the pill is the last
+            # thing on screen. `--qa-row-r` is set at the same time as
+            # `--qa-row` for exactly this, and nothing else reads it.
+            check("closing: the delays have flipped — the top row leads",
+                  s["delayTop"] is not None and s["delayBottom"] is not None
+                  and s["delayTop"] < s["delayBottom"],
+                  f"top {s['delayTop']}ms, bottom {s['delayBottom']}ms")
+            errs = c.errors()
+            check("no console errors through the unfold or the fold",
+                  not errs, "; ".join(str(e)[:110] for e in errs[:3]))
+
+        # ══ V2 ONLY · WHAT YOU HAVE NOT FINISHED, AND WHERE A NEW ONE GOES ══
+        # Ruled 23 Sep 2026 in two moves. The first built a BINDING ROW — a
+        # persistent "On Site › Section › Enclosure" that scoped actions used
+        # silently — and it was rejected on sight: "this part won't work."
+        # What replaced it is idea 4 of the same conversation: the panel opens
+        # on the work already in flight, and a new one asks where it goes.
+        #
+        # "Leave the Changes in V1 & V3" is the second half, and it is the one
+        # that rots silently — a version-scoped feature leaks the day someone
+        # lifts a rule out of `.qa--ctx`, and nothing about V2 looks wrong when
+        # it does. So the last block opens V1, V3 and V4 and asserts ABSENCE.
+        print("\nV2 opens on what you have not finished")
+        with Chrome(width=WIDTH, height=900) as c:
+            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.eval("localStorage.removeItem('antz.qa.scope'); 1")
+            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.eval("window.__a=[];const o=console.info;"
+                   "console.info=(...x)=>{window.__a.push(x.join(' '));o(...x)}; 1")
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            time.sleep(0.6)
+            q = lambda js: json.loads(c.eval("JSON.stringify(" + js + ")"))
+
+            band = q("({on:!document.querySelector('.qa-cont').hidden,"
+                     " n:document.querySelector('.qa-cont__n').textContent,"
+                     " rows:[...document.querySelectorAll('.qa-item')].map(r=>r.dataset.kind),"
+                     " h:Math.round(document.querySelector('.qa-cont__list').getBoundingClientRect().height),"
+                     " scrollH:document.querySelector('.qa-cont__list').scrollHeight,"
+                     " fade:getComputedStyle(document.querySelector('.qa-cont'),'::after').backgroundImage,"
+                     " more:!!document.querySelector('.qa-cont__more'),"
+                     " bind:!!document.querySelector('.qa-bind')})")
+            # TWO REJECTED THINGS, ASSERTED BY NAME so that bringing either
+            # back is a decision somebody has to make twice: the binding row
+            # ("this part won't work") and the disclosure button that the
+            # scrolling container replaced.
+            check("neither the binding row nor the Show-more button is there",
+                  not band["bind"] and not band["more"], str(band)[:120])
+            # ALL FIVE ARE IN THE DOM, THREE ARE IN THE BOX. The container is
+            # what limits it now, so the assertion is geometric: the list is
+            # shorter than its own contents, which is the only thing that
+            # proves it scrolls rather than merely fits.
+            check("it opens on all the unfinished work, in a three-row box",
+                  band["on"] and band["n"] == "5" and len(band["rows"]) == 5
+                  and band["scrollH"] > band["h"] + 10, str(band)[:150])
+            # 56 AND 6 SINCE THE SPACING PASS OF 23 SEP — the row height and
+            # the gap are tokens on `.qa-cont`, and this is the arithmetic
+            # they feed. It is written out rather than read back off the
+            # element, so a token changing by accident fails here.
+            check("…and the box is exactly three rows tall",
+                  band["h"] == 3 * 56 + 2 * 6, f"{band['h']}px, want {3*56+2*6}")
+            # …AND IT SAYS SO BEFORE ANYBODY SCROLLS. A cut list with no edge
+            # is a list people believe has three things in it.
+            # THE GRADIENT, NOT THE PSEUDO-ELEMENT'S `content`. An empty
+            # string is what `content: ''` computes to, so asserting that only
+            # proved the ::after existed — it would have passed over a fade
+            # with no gradient left in it.
+            check("…with a fade under the cut, so the overflow is visible",
+                  "linear-gradient" in str(band["fade"]), str(band["fade"])[:60])
+            check("…drafts first, then unsent, then what someone else holds",
+                  band["rows"] == ["draft", "draft", "unsent", "awaiting", "awaiting"],
+                  str(band["rows"]))
+            check("the foot is the two places it can send you — Chat is gone",
+                  q("[...document.querySelectorAll('.qa-foot__b')].map(b=>b.textContent.trim())")
+                  == ["Search everything", "Scan a tag"], "")
+
+            # ══ THE FIELD IS A SEARCH, NOT A FILTER ═════════════════════════
+            # "if i search it has to act like global Search was working same
+            # Way. First Show Quick Actions, then module name, other results."
+            # The order is the ruling and the index is Global Search's own, so
+            # what is checked here is the ORDER and the REACH — that a query
+            # gets past the sixteen chips into animals and enclosures at all.
+            def groups():
+                return q("[...document.querySelectorAll('.qa-hits')].map(g=>"
+                         "g.querySelector('.qa-hits__t').firstChild.textContent.trim())")
+            c.eval("""(()=>{const i=document.querySelector('.qa-search__in');i.focus();
+              i.value='medic';i.dispatchEvent(new Event('input',{bubbles:true}));return 1})()""")
+            time.sleep(0.4)
+            g = groups()
+            check("a query puts Quick Actions first, then the module",
+                  g[:2] == ["Quick Actions", "Modules"], str(g))
+            check("…and the panel's own lists step aside while it searches",
+                  q("({grid:document.querySelector('.qa-menu__grid').hidden,"
+                    " band:document.querySelector('.qa-cont').hidden,"
+                    " res:!document.querySelector('.qa-res').hidden})")
+                  == {"grid": True, "band": True, "res": True}, "")
+            c.eval("""(()=>{const i=document.querySelector('.qa-search__in');
+              i.value='leo';i.dispatchEvent(new Event('input',{bubbles:true}));return 1})()""")
+            time.sleep(0.4)
+            g = groups()
+            # THE REACH IS THE POINT. "leo" matches no chip and no module, and
+            # the old filter would have shown an empty panel; the index finds
+            # the animals, the species, the enclosures they live in and the
+            # identifiers on them.
+            check("…and a query no chip matches still finds animals and enclosures",
+                  "Animals" in g and "Enclosures" in g and "Quick Actions" not in g,
+                  str(g))
+            # A CAPPED GROUP SAYS WHAT IT IS HIDING. Three rows with 44 beside
+            # the heading is an honest cap; three rows alone is a lie.
+            check("…each capped group carrying its real total",
+                  q("!!document.querySelector('.qa-hits__t span')"), "")
+
+            # ══ THE SPACING PASS OF 23 SEP · "Need propre Space, & some
+            # Breathing Space Need" ═════════════════════════════════════════
+            # EVERY ROW THE SAME HEIGHT, whether it carries a subtitle or not.
+            # They were 44 and 46 — a two-pixel disagreement nobody can name
+            # and everybody reads as a list that is not quite straight. The
+            # 56 is arithmetic (20 + 2 + 16 content, 9 either side), so this
+            # fails if a line-height is ever left to inherit.
+            sp = q("({rows:[...new Set([...document.querySelectorAll('.qa-hit')]"
+                   "  .map(x=>Math.round(x.getBoundingClientRect().height)))],"
+                   " gap:getComputedStyle(document.querySelector('.qa-hits')).gap,"
+                   " groupGap:getComputedStyle(document.querySelector('.qa-res')).gap,"
+                   " headPad:getComputedStyle(document.querySelector('.qa-hits__t')).paddingLeft,"
+                   " rowPad:getComputedStyle(document.querySelector('.qa-hit')).paddingLeft})")
+            check("every result row is one height, subtitle or no subtitle",
+                  sp["rows"] == [56], str(sp["rows"]))
+            check("…on one 4px scale: 6 between rows, 22 between groups",
+                  sp["gap"] == "6px" and sp["groupGap"] == "22px", str(sp)[:100])
+            # AND THE HEADING SHARES THE ROW'S LEFT EDGE rather than sitting
+            # against the panel wall while its own rows are indented away.
+            check("…with the headings on the rows' own left edge",
+                  sp["headPad"] == sp["rowPad"], f"heading {sp['headPad']} vs row {sp['rowPad']}")
+
+            # ── THE PANEL KEEPS ITS SHAPE; THE LIST MOVES ──────────────────
+            # Thirteen results used to grow the panel until its top edge was
+            # 8px off the top of the screen and the whole surface scrolled —
+            # field included, away from the answers it was producing.
+            # THE SCROLLER IS `.qa-body` SINCE 23 SEP, not the results and not
+            # the panel. A real iPad's keyboard is what found the difference:
+            # with the panel scrolling, 524px of room put the foot 247px below
+            # its own bottom edge and took the field with it on the first
+            # scroll. The field and the foot are frame; only the middle moves.
+            shape = q("(()=>{const m=document.querySelector('.qa-menu'),"
+                      "  r=m.getBoundingClientRect(), b=document.querySelector('.qa-body');"
+                      "  return {panelScrolls:m.scrollHeight>m.clientHeight+1,"
+                      "    bodyScrolls:b.scrollHeight>b.clientHeight+1,"
+                      "    clearsTop:Math.round(r.top)>40,"
+                      "    field:document.querySelector('.qa-search').getBoundingClientRect().top>=r.top-1,"
+                      "    foot:document.querySelector('.qa-foot').getBoundingClientRect().bottom<=r.bottom+1}})()")
+            # ── THE FRAME DOES NOT GIVE · 23 Sep ──────────────────────────
+            # The panel is a flex column with a max-height, and a flex child's
+            # default is `flex-shrink: 1` — so when the contents wanted more
+            # room than the panel had, the browser took it out of the FIELD.
+            # Measured at 28px against the node's 52 while a search was
+            # running, and at 51.16 even at rest: it had been shrinking from
+            # the day the panel became a column, one sub-pixel at a time,
+            # until the body grew enough to make it obvious.
+            #
+            # CHECKED AS AN EXACT 52, not a floor. A floor passes at 51.16,
+            # which is precisely the value that hid this for a fortnight.
+            frame = q("({field:+document.querySelector('.qa-search')"
+                      "   .getBoundingClientRect().height.toFixed(2),"
+                      " shrink:getComputedStyle(document.querySelector('.qa-search')).flexShrink,"
+                      " footShrink:getComputedStyle(document.querySelector('.qa-foot')).flexShrink})")
+            check("the field holds the node's 52 while the body fights for room",
+                  frame["field"] == 52 and frame["shrink"] == "0" and frame["footShrink"] == "0",
+                  str(frame))
+            check("the body scrolls inside the panel, not the panel itself",
+                  not shape["panelScrolls"] and shape["bodyScrolls"], str(shape))
+            check("…so the field and the foot stay put, and the panel clears the screen edge",
+                  shape["field"] and shape["foot"] and shape["clearsTop"], str(shape))
+
+            # ══ THE KEYBOARD TRAVELS IT ═════════════════════════════════════
+            # And the caret never leaves the field — the check is that the
+            # highlight moved AND `document.activeElement` is still the input,
+            # which is what stops the next letter typed going nowhere.
+            def key(k, vk):
+                for t in ("keyDown", "keyUp"):
+                    c.cmd("Input.dispatchKeyEvent", type=t, key=k, code=k,
+                          windowsVirtualKeyCode=vk, nativeVirtualKeyCode=vk)
+                time.sleep(0.15)
+            key("ArrowDown", 40); key("ArrowDown", 40)
+            nav = q("({row:(document.querySelector('.qa-hit.is-active b')||{}).textContent,"
+                    " caret:document.activeElement.className,"
+                    " aria:document.querySelector('.qa-search__in').getAttribute('aria-activedescendant')})")
+            # ══ THE SOFTWARE KEYBOARD · found on a real iPad, 23 Sep ════════
+            # The panel is anchored above the pill at the foot of the page,
+            # and iPadOS raises its keyboard OVER the bottom of the screen
+            # without resizing the layout viewport — so every `bottom:` in the
+            # stylesheet went on describing a screen whose lower half was
+            # covered, and the panel sat under the keys with one and a half
+            # rows showing. Nothing in CSS can see this; `visualViewport` is
+            # the only thing that knows.
+            #
+            # SIMULATED BY OVERRIDING `visualViewport.height`, which is what
+            # the handler reads. Emulating a real keyboard is not available
+            # here, and the arithmetic is the part that was wrong.
+            KB = 620
+            c.eval("""(()=>{const vv=window.visualViewport;
+              Object.defineProperty(vv,'height',{get:()=>innerHeight-%d,configurable:true});
+              Object.defineProperty(vv,'offsetTop',{get:()=>0,configurable:true});
+              vv.dispatchEvent(new Event('resize')); return 1})()""" % KB)
+            time.sleep(0.45)
+            kb = q("(()=>{const qa=document.querySelector('.qa'),"
+                   "  m=document.querySelector('.qa-menu'), r=m.getBoundingClientRect();"
+                   "  return {isKb:qa.classList.contains('is-kb'),"
+                   "    kbVar:getComputedStyle(qa).getPropertyValue('--qa-kb').trim(),"
+                   "    top:Math.round(r.top), bottom:Math.round(r.bottom),"
+                   "    keysTop:innerHeight-%d,"
+                   "    rowOp:+getComputedStyle(document.querySelector('.qa-row')).opacity,"
+                   "    field:Math.round(document.querySelector('.qa-search').getBoundingClientRect().bottom),"
+                   "    foot:Math.round(document.querySelector('.qa-foot').getBoundingClientRect().bottom)}})()" % KB)
+            check("with the keyboard up the panel sits above the keys",
+                  kb["isKb"] and kb["bottom"] <= kb["keysTop"], str(kb)[:150])
+            check("…and its whole box is still on screen",
+                  kb["top"] >= 0 and kb["kbVar"] == f"{KB}px", str(kb)[:130])
+            # THE FIELD AND THE FOOT ARE INSIDE THE PANEL, which is the check
+            # that would have caught the original bug: they were both below
+            # its bottom edge, scrolled away with the rest of the surface.
+            check("…with the field and the foot still inside it",
+                  kb["field"] < kb["bottom"] and kb["foot"] <= kb["bottom"],
+                  f"field {kb['field']}, foot {kb['foot']}, panel bottom {kb['bottom']}")
+            # AND THE PILL STANDS DOWN — it is behind the keys and cannot be
+            # pressed; leaving it rendered makes it flash back for a frame
+            # every time the keyboard animates.
+            # …AND THE FIELD STILL DOES NOT SHRINK, which is where the squeeze
+            # was worst: the keyboard halves the panel, so the frame is under
+            # the most pressure exactly when you are typing into it.
+            check("…with the field still at its full 52 under the keyboard",
+                  q("+document.querySelector('.qa-search').getBoundingClientRect()"
+                    ".height.toFixed(2)") == 52, "")
+            check("…and the pill row stands down behind the keys",
+                  kb["rowOp"] == 0, str(kb["rowOp"]))
+            c.eval("""(()=>{const vv=window.visualViewport;
+              Object.defineProperty(vv,'height',{get:()=>innerHeight,configurable:true});
+              vv.dispatchEvent(new Event('resize')); return 1})()""")
+            time.sleep(0.45)
+            back = q("({isKb:document.querySelector('.qa').classList.contains('is-kb'),"
+                     " rowOp:+getComputedStyle(document.querySelector('.qa-row')).opacity})")
+            check("…and it all comes back when the keyboard goes down",
+                  not back["isKb"] and back["rowOp"] == 1, str(back))
+
+            check("the down arrow moves a highlight, not the caret",
+                  nav["row"] and nav["caret"] == "qa-search__in" and nav["aria"],
+                  str(nav))
+            check("no console errors through any of it",
+                  not c.errors(), "; ".join(str(e)[:110] for e in c.errors()[:3]))
+
+        print("\nV2 asks where a new one goes")
+        with Chrome(width=WIDTH, height=900) as c:
+            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.eval("localStorage.removeItem('antz.qa.scope'); 1")
+            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.eval("window.__a=[];const o=console.info;"
+                   "console.info=(...x)=>{window.__a.push(x.join(' '));o(...x)}; 1")
+            q = lambda js: json.loads(c.eval("JSON.stringify(" + js + ")"))
+            c.eval("document.querySelector('.qa-pill').click(); 1"); time.sleep(0.6)
+
+            # A DRAFT RESUMES; ONE A PERSON IS HOLDING ONLY OPENS.
+            c.eval("""document.querySelector('.qa-item[data-kind="draft"]').click(); 1""")
+            time.sleep(0.5)
+            c.eval("document.querySelector('.qa-pill').click(); 1"); time.sleep(0.5)
+            c.eval("""document.querySelector('.qa-item[data-kind="awaiting"]').click(); 1""")
+            time.sleep(0.5)
+            said = q("window.__a")
+            check("a draft resumes and one held by a person only opens",
+                  len(said) == 2 and said[0].startswith("[antz] resume:")
+                  and said[1].startswith("[antz] view:"), str(said)[:140])
+
+            c.eval("document.querySelector('.qa-pill').click(); 1"); time.sleep(0.5)
+            c.eval("""document.querySelector('.qa-chip[data-action="dispense"]').click(); 1""")
+            time.sleep(0.4)
+            st = q("({t:document.querySelector('.qa-stage__t').textContent,"
+                   " path:document.querySelector('.qa-stage__path').textContent,"
+                   " first:(document.querySelector('.qa-pick b')||{}).textContent,"
+                   " head:[getComputedStyle(document.querySelector('.qa-search')).display,"
+                   "       getComputedStyle(document.querySelector('.qa-cont')).display,"
+                   "       getComputedStyle(document.querySelector('.qa-menu__grid')).display]})")
+            check("a scoped action asks, in place, starting at the Site",
+                  st["t"] == "Dispense Medicine" and "enclosure" in st["path"]
+                  and st["first"] == "Bannerghatta Safari", str(st)[:150])
+            # `[hidden]` LOSES TO ANY AUTHOR `display`, and this file has been
+            # caught by that three times.
+            check("…with the field and the band standing down, not merely marked",
+                  st["head"] == ["none", "none", "none"], str(st["head"]))
+
+            for _ in range(3):
+                if c.eval("!document.querySelector('.qa-stage').hidden"):
+                    c.eval("document.querySelectorAll('.qa-pick')[0].click(); 1")
+                    time.sleep(0.3)
+            filed = q("window.__a").pop()
+            check("…and it files against the place it just showed you",
+                  "· on Bannerghatta Safari › Carnivore Safari › CAR-01" in filed, filed[:120])
+
+            # THE SECOND ONE IS ONE TAP, AND STILL SHOWS ITS WORKING. This is
+            # what the rejected binding row was for, done without asserting a
+            # place: the upper levels arrive as crumbs you are looking at.
+            c.eval("document.querySelector('.qa-pill').click(); 1"); time.sleep(0.5)
+            c.eval("""document.querySelector('.qa-chip[data-action="dispense"]').click(); 1""")
+            time.sleep(0.4)
+            again = q("({crumbs:[...document.querySelectorAll('.qa-crumb')].map(x=>x.textContent),"
+                      " first:(document.querySelector('.qa-pick b')||{}).textContent,"
+                      " marked:!!document.querySelector('.qa-pick--last'),"
+                      " sub:(document.querySelector('.qa-pick--last span')||{}).textContent})")
+            check("the second one opens on the leaf, the path already walked",
+                  again["crumbs"] == ["Bannerghatta Safari", "Carnivore Safari"]
+                  and again["first"] == "CAR-01", str(again)[:150])
+            check("…with the one you used last on top, and saying so",
+                  again["marked"] and again["sub"].startswith("Last used"), str(again["sub"]))
+            still = q("!document.querySelector('.qa-stage').hidden")
+            check("…but the leaf is never chosen for you",
+                  still, "" if still else "the picker closed itself — something was picked")
+            check("no console errors through any of it",
+                  not c.errors(), "; ".join(str(e)[:110] for e in c.errors()[:3]))
+
+        # V4 CARRIES THE CONTEXTUAL PANEL TOO since 24 Sep 2026 (owner: "implement
+        # the Quick Access features we did for v2 here also"), so it moved out of
+        # the absence loop below and into this presence check.
+        print("\n…and V4 carries the same contextual panel")
+        with Chrome(width=WIDTH, height=900) as c:
+            c.goto(BASE + "index.html?v=4", settle=2.0)
+            c.eval("document.querySelector('.qa-pill').click(); 1")
+            time.sleep(0.6)
+            c.eval("""(()=>{const i=document.querySelector('.qa-search__in');
+              i.value='leo';i.dispatchEvent(new Event('input',{bubbles:true}));return 1})()""")
+            time.sleep(0.3)
+            v4 = json.loads(c.eval("""JSON.stringify({
+              ctx: document.querySelector('.qa').classList.contains('qa--ctx'),
+              band: !!document.querySelector('.qa-cont'),
+              res: !!document.querySelector('.qa-res'),
+              chips: document.querySelectorAll('.qa-chip').length})"""))
+            check("V4: the Continue band, and a field that searches everything",
+                  v4["ctx"] and v4["band"] and v4["res"] and v4["chips"] == 16, str(v4))
+            check("…V4: no console errors", not c.errors(),
+                  "; ".join(str(e)[:110] for e in c.errors()[:3]))
+
+        print("\n…and V1 and V3 are left exactly as they were")
+        for ver, url in (("V1", "index.html"), ("V3", "index.html?v=3")):
+            with Chrome(width=WIDTH, height=900) as c:
+                c.goto(BASE + url, settle=2.0)
+                c.eval("document.querySelector('.qa-pill').click(); 1")
+                time.sleep(0.6)
+                d = json.loads(c.eval("""JSON.stringify({
+                  ctx: document.querySelector('.qa').classList.contains('qa--ctx'),
+                  band: !!document.querySelector('.qa-cont'),
+                  bind: !!document.querySelector('.qa-bind'),
+                  res: !!document.querySelector('.qa-res'),
+                  stage: !!document.querySelector('.qa-stage'),
+                  chips: document.querySelectorAll('.qa-chip').length})"""))
+                # AND THE FIELD STILL FILTERS CHIPS HERE, which is the half of
+                # "leave the changes in V1 & V3" that an absence check cannot
+                # see: the results list is V2's, so on every other version the
+                # field must go on doing exactly what it did yesterday.
+                c.eval("""(()=>{const i=document.querySelector('.qa-search__in');
+                  i.value='egg';i.dispatchEvent(new Event('input',{bubbles:true}));return 1})()""")
+                time.sleep(0.3)
+                filt = json.loads(c.eval("""JSON.stringify({
+                  shown:[...document.querySelectorAll('.qa-chip')].filter(x=>!x.hidden)
+                          .map(x=>x.textContent.trim()),
+                  cats:[...document.querySelectorAll('.qa-cat')].filter(x=>!x.hidden).length})"""))
+                check(f"…{ver}: the field still narrows the sixteen, as it did",
+                      filt["shown"] == ["Add Eggs"] and filt["cats"] == 1, str(filt))
+                c.eval("""(()=>{const i=document.querySelector('.qa-search__in');
+                  i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));return 1})()""")
+                time.sleep(0.25)
+                # …and a chip that WOULD ask a question on V2 must still fire
+                # straight out here. This is what catches `contextual` being
+                # defaulted to true rather than read from isV2().
+                c.eval("""document.querySelector('.qa-chip[data-action="dispense"]').click(); 1""")
+                time.sleep(0.4)
+                shut = c.eval("!document.querySelector('.qa').classList.contains('is-open')")
+                check(f"{ver}: the same sixteen, and none of V2's additions",
+                      d["chips"] == 16 and not d["ctx"] and not d["band"]
+                      and not d["bind"] and not d["res"] and not d["stage"], str(d))
+                check(f"…{ver}: a chip still fires straight out, asking nothing",
+                      shut, f"panel still open={not shut}")
+
+    # ══ NO PLANTING ON V2 ══════════════════════════════════════════════════
+    # The artboard planting belonged to the retired V2 home. V2 now carries
+    # V4's plain header — no foliage, no wave — so that is what is asserted.
+    print("\nno planting on V2 (V4's plain header)")
     with Chrome(width=WIDTH, height=900) as c:
         c.goto(BASE + "index.html?v=2", settle=2.0)
-        c.eval("document.querySelector('.qa-pill').click(); 1")
-        time.sleep(0.9)
-        g = json.loads(c.eval(TILES))
-        # WHAT THIS WIDTH IS OWED, derived the way the stylesheet derives it —
-        # AND THE DERIVATION INVERTED ON 15 SEP. Node 370:4029 states a 696
-        # panel on its 744 artboard (the screen less 24 either side) with
-        # `flex: 1` tiles, where every version before it stated a 150 tile and
-        # sized the panel from it. So above the breakpoint the panel is the
-        # number and three columns divide what is left of it: 205 at 744 and
-        # at every width above, because the panel stops growing at 696.
-        #
-        # BELOW IT THE OLD DERIVATION STILL HOLDS, because two columns have no
-        # stated measure in the file — 150 is still the floor a label needs,
-        # and the clamp takes over on a narrow phone: 150 at 430, 139 at 390,
-        # 124 at 360. The 577/578 boundary is unchanged by all of this, which
-        # looks like luck and is not: 3x150 + 2x16 + 2x24 = 530 plus 48 of
-        # screen margin is the same 578 the old 546-plus-32 arrived at.
-        #
-        # AND ONE COLUMN UNDER 378, added 15 Sep with the node's tile. That
-        # tile spends 70px before the label starts, so two of them stop
-        # holding the longest unbreakable word — `Administer`, 73px — below
-        # that width. The tile's own padding moves with the band and is
-        # asserted alongside, because it is what buys the word its room: 10
-        # either side where two columns are tight, the node's 16 where they
-        # are not.
-        want_cols = 3 if WIDTH >= 578 else (2 if WIDTH >= 378 else 1)
-        want_panel = min({3: 696, 2: 2 * 150 + 16 + 48}.get(want_cols, 10 ** 6),
-                         WIDTH - 48)
-        want_tile = (want_panel - 48 - (want_cols - 1) * 16) // want_cols
-        want_pad = "16px 10px" if want_cols == 2 else "16px"
-        want_justify = "flex-start" if want_cols == 1 else "center"
-        check("all nineteen are there, and every one is drawn",
-              g["n"] == 19 and g["visible"] == 19, f"{g['n']} tiles, {g['visible']} drawn")
-        check("…carrying the modules' own names",
-              g["names"][0] == "Medical" and "Commu\u00adnication" in g["names"],
-              f"{g['names'][0]} … {g['names'][-1]!r}")
-        # ONE GROUND ON ALL NINETEEN · node 371:5441, ruled 15 Sep 2026. This
-        # replaces a count of SIXTEEN distinct colours, and the replacement is
-        # the substance of the change rather than a loosened check: the fill
-        # went tile → chip on 10 Sep to settle a contrast debt, and the node
-        # empties the chip as well. The nineteen are now told apart by glyph
-        # and name alone. Asserted as a count so that one tile getting its
-        # `--qa-mod-c` back fails here instead of being absorbed.
-        check("every tile wears one ground, the node's 20% black",
-              g["grounds"] == ["rgba(0, 0, 0, 0.2)"], str(g["grounds"]))
-        check("…flat, with no ramp on any of them",
-              g["withGradient"] == 0, f"{g['withGradient']} with a gradient")
-        check("…and not one chip is filled any more",
-              g["chipsFilled"] == 0, f"{g['chipsFilled']} still filled")
-        # AND IT IS GLASS. The 20% veil is only the node's material with the
-        # blur behind it — without it the tile is a flat grey rectangle that
-        # measures identically and looks nothing like the file, which is the
-        # failure a colour check cannot see.
-        # AND NO BLUR OF ITS OWN, though 371:5441 declares blur(8px). Asserted
-        # ABSENT, which is the opposite of what this checked yesterday: a
-        # nested backdrop-filter does not sample its parent's background. The
-        # panel's own filter makes a backdrop root, so the tile sampled the
-        # page behind the whole panel and laid its 20% black over THAT —
-        # coming out 11 levels LIGHTER than the panel where the artboard is 19
-        # levels darker. Putting the declared value back is the obvious fix
-        # and it is the bug.
-        check("…and no blur of its own, which rendered the tile inverted",
-              g["tileBlur"] == ["none"], str(g["tileBlur"]))
-        # THE GROUND IS DARKER THAN THE PANEL, MEASURED OFF THE RENDER. The
-        # style-level checks above all passed while the tiles were invisible —
-        # `rgba(0, 0, 0, 0.2)` was correctly set and composited onto the wrong
-        # backdrop. Only the rendered pixels see it, so the separation the
-        # artboard draws is asserted as a number: the tile sits at least 12
-        # levels below the panel beside it (artboard 19, ours 27; the artboard
-        # reads lighter because its blur bleeds the surround inward).
-        # Skipped at one column, where there is no gutter between two tiles to
-        # sample — the gap below a tile is a row's worth of panel and picks up
-        # a different part of the page, which would compare two grounds rather
-        # than a tile against its own surround. The separation is a property of
-        # the material, so any multi-column width proves it.
-        if want_cols > 1:
-            sep = _sample_tile_separation(c)
-            check("…and reads darker than the panel it sits on, as the artboard does",
-                  sep is not None and sep >= 12,
-                  f"tile is {sep} levels below the panel" if sep is not None
-                  else "could not sample")
-        # THE SHADOW GOES AND A HAIRLINE RETURNS, the exact reverse of 10 Sep
-        # ("Apple Cards Radius, Shadow"). A drop shadow under a translucent
-        # pane reads as dirt on the panel behind it; the node draws a 0.5px
-        # border instead, transparent at rest.
-        check("no tile casts a shadow, and every one carries the hairline",
-              g["withShadow"] == 0 and g["withBorder"] == 19,
-              f"{g['withShadow']}/19 shadowed, {g['withBorder']}/19 bordered")
-        # THE CHIP SURVIVES AS A BOX. 371:5442 keeps the 32/r9 container and
-        # drops only its fill, so the 20px glyph still sits at a fixed size
-        # whatever the label does. Asserted because deleting the empty box is
-        # the obvious tidy-up and it would let the glyph move.
-        check("…the chip still a 32px box at a squircle's radius, just unfilled",
-              g["chipW"] == 32 and g["chipH"] == 32 and g["chipR"] == 9,
-              f"{g['chipW']}x{g['chipH']} r{g['chipR']}")
-        # AND THE PAIR IS CENTRED, not run out from the left edge. This is the
-        # one layout property that changed with the material and the only one
-        # a screenshot diff would catch late.
-        check(f"…with the chip and label {want_justify}, 6 apart, on {want_pad} of pad",
-              g["justify"] == [want_justify] and g["tileGap"] == ["6px"]
-              and g["tilePad"] == [want_pad],
-              f"{g['justify']} gap {g['tileGap']} pad {g['tilePad']}"
-              f" (wanted {want_justify} on {want_pad} at {WIDTH})")
-        # ONE RHYTHM, every number a multiple of 4: 150x70 tiles, a 16px
-        # gutter on both axes, 32px of panel padding, and the panel 24px clear
-        # of the row rather than the verb panel's 8.
-        check(f"{want_tile}x72 tiles at radius 16, on a 16px gutter both ways",
-              # `gapX` is tile[1].left - tile[0].right, which is only a
-              # horizontal gutter when there IS a second column — at one it
-              # measures the wrap back to the next row and reads -264.
-              g["tileW"] == want_tile and g["tileH"] == 72 and g["radius"] == 16
-              and (want_cols == 1 or g["gapX"] == 16) and g["gapY"] == 16,
-              f"{g['tileW']}x{g['tileH']} r{g['radius']} gap {g['gapX']}/{g['gapY']}"
-              f" (wanted {want_tile} wide at {WIDTH})")
-        # THREE, NOT FOUR · ruled 10 Sep 2026, "Quick access module has come
-        # in 3 coloums". The panel is sized FROM the column count — 3x150 +
-        # 2x16 + 2x32 = 546 — so this asserts the pair together: a panel that
-        # kept its 712 while the grid went to three would stretch the tiles.
-        #
-        # AND TWO BELOW 578, which is that same 546 plus the 16px screen
-        # margins the panel is clamped to. This pair used to be asserted as
-        # the constants 3 and 546 at EVERY width, which read as a verifier
-        # that hardcoded the desktop — and the note it was carried under said
-        # so, that the panel "correctly reflows to one column on a phone".
-        # IT DID NOT REFLOW AT ALL: it held three columns and squeezed the
-        # tiles to 87, and eighteen of the nineteen labels were truncated
-        # behind `overflow: hidden`. The checks were right to fail and the
-        # diagnosis was what was wrong, so what they assert now is the
-        # derivation rather than either constant — sized from the column
-        # count in force, at whichever width is being run.
-        check(f"…in {'three' if want_cols == 3 else 'two'} columns on a "
-              f"{want_panel}px panel with 24px padding",
-              g["cols"] == want_cols and g["panelW"] == want_panel
-              and g["panelPad"] == "24px",
-              f"{g['cols']} cols, {g['panelW']}px, pad {g['panelPad']}"
-              f" (wanted {want_cols} at {want_panel} for {WIDTH})")
-        check("…standing 24 clear of the pill row, not 8",
-              near(g["clearOfRow"], 24, 1), f"{g['clearOfRow']}px")
-        # AND ALL NINETEEN ARE REACHABLE, which two columns made a question.
-        # At three the field is seven rows and fits a phone outright; at two it
-        # is ten and 944px of content sits in a 728px panel. That is fine —
-        # the panel has been a scroll container the whole time — but "fine"
-        # here means the LAST tile can actually be brought into it, and that
-        # the page behind does not take the scroll instead, which is the way
-        # this fails in practice. Checked as the rendered box of the last
-        # tile, not as `scrollTop` agreeing with itself.
-        reach = json.loads(c.eval("""(()=>{const b=e=>e.getBoundingClientRect();
-          const m=document.querySelector('.qa-menu');
-          const t=[...document.querySelectorAll('.qa-mod')], last=t[t.length-1];
-          const y0=scrollY; m.scrollTop=m.scrollHeight;
-          return JSON.stringify({inside: b(last).top>=b(m).top-1 && b(last).bottom<=b(m).bottom+1,
-            pageMoved: Math.round(scrollY-y0), room: m.scrollHeight-m.clientHeight})})()"""))
-        check("…and every one of the nineteen can be reached in the panel",
-              reach["inside"] and reach["pageMoved"] == 0,
-              f"last tile inside={reach['inside']}, page moved {reach['pageMoved']}px, "
-              f"{reach['room']}px of scroll")
-        c.eval("document.querySelector('.qa-menu').scrollTop = 0; 1")
-        # ONE INK ON ALL NINETEEN, STILL — but it is dark now, not white.
-        # "text All has to be white" was ruled against COLOURED tiles on
-        # 10 Sep; the cards went white later the same day, which reverses the
-        # ink rather than the principle. What the principle actually says is
-        # that there is no per-tile ink decision, and that is what is checked:
-        # ONE value across all nineteen, whatever it is, and no returning
-        # `--dark` class.
-        check("one ink across all nineteen, and it is white on the glass",
-              len(g["inks"]) == 1 and g["inks"][0] == "rgb(255, 255, 255)"
-              and g["darkClass"] == 0,
-              f"{g['inks']} (+{g['darkClass']} --dark)")
-        # AND THE NODE'S OWN WEIGHT · 371:5444 is Inter Medium 14 at +0.1,
-        # the project's `Antz_Body_Medium`. "Module Name make it Bold" was
-        # ruled on 10 Sep for near-black ink carrying a white card's
-        # hierarchy; on the glass the label is the only ink on the tile.
-        check("…at the node's Medium 14, not the white card's bold 13.5",
-              g["weights"] == ["500"] and g["sizes"] == ["14px"],
-              f"{g['weights']} at {g['sizes']}")
-        # ── THE CONTRAST DEBT IS BACK, AND IT IS MEASURED OFF THE SCREEN ───
-        # This check was a real AA floor for five days and is a recorded
-        # exception again. It has to be said plainly: the 10 Sep white card
-        # measured 10.68:1 worst case, and node 371:5441 trades that away for
-        # its material. Worst case is 2.41 at 744, 2.56 at 1024, 2.63 at 390
-        # and 2.67 at 360; best is around 6:1. Most tiles are under AA and a
-        # few under the 3:1 non-text floor.
-        #
-        # THESE NUMBERS ROSE ONCE THE TILE COMPOSITED CORRECTLY. They read
-        # 2.05 / 2.12 / 2.15 / 2.18 while the tile's own `backdrop-filter` was
-        # sampling the page instead of the panel — the black was landing on a
-        # bright ground, so the tile came out lighter than its surround AND
-        # the label lost most of its contrast. Removing that blur was a
-        # fidelity fix; the contrast was the second thing it bought.
-        #
-        # AND IT CANNOT BE READ OFF STYLE ANY MORE. The tile is 20% black over
-        # a 40% white panel over a 30% black veil over whatever the page draws
-        # behind it, so `backgroundColor` returns `rgba(0, 0, 0, 0.2)` and a
-        # luminance read of it — which ignores alpha — reports 21:1 for a tile
-        # that actually measures 2.06. That is a check passing while the
-        # screen is wrong, so the measurement moved to the rendered pixels:
-        # sample the tile's ground between the label's right edge and the
-        # tile's, clear of the chip, the ink and the corners.
-        #
-        # ASSERTED AS A FLOOR, NOT A TARGET, so the exception is bounded. If a
-        # later change pushes any tile below what the node itself produces,
-        # this fails — and the way back is a darker tile or a lower panel
-        # alpha, both of which leave the file. The spread is the PAGE, not the
-        # tiles: they are one ground, and the light bottom-left corner of the
-        # page is why Communication reads worst.
-        ink = _sample_ink_contrast(c, g["inkBoxes"])
-        if ink is None:
-            check("…the label's measured contrast, sampled off the render",
-                  False, "could not sample — PIL missing or screenshot failed")
-        else:
-            worst, best, under_aa, under_3, worst_name, sampled = ink
-            # 2.2, AND THE HEADROOM IS DELIBERATE. The measure is
-            # deterministic — repeated runs at one width agree to two decimals
-            # — but it lands differently at each width because the spread is
-            # the PAGE showing through: 2.41 at 744, 2.56 at 1024, 2.63 at 390,
-            # 2.67 at 360. A floor pinned to the tightest of those would fail
-            # on an anti-aliasing change rather than on a real one, which is
-            # the failure mode that makes a suite get ignored. It was 1.9 while
-            # the tile composited over the page; raised with the fix, so the
-            # inverted state cannot come back and still pass.
-            check("…the label's contrast measured off the render, and bounded",
-                  worst >= 2.2,
-                  f"worst {worst_name} {worst:.2f}:1, best {best:.2f}:1 — "
-                  f"{under_aa}/{sampled} under AA, {under_3}/{sampled} under 3:1 "
-                  f"(of {sampled} tiles in the panel; recorded exception: "
-                  f"node 371:5441's material, 15 Sep)")
-        # AND THE TEXT-SHADOW STAYS RETIRED. It was load-bearing at .35 on the
-        # coloured tiles — the only thing separating white ink from
-        # administer, lab and parivesh. Putting it back is the obvious reflex
-        # now that the ink is white again on a mid ground, and it is the wrong
-        # one: the node draws no shadow, and a smear under 14px Medium is what
-        # made the old tiles look cheap. If the contrast is ever called, the
-        # answer is the material, not a shadow over it.
-        check("…with the text-shadow retired, not left smearing the ink",
-              g["withShadowInk"] == 0, f"{g['withShadowInk']}/19 still shadowed")
-        check("every glyph is the module's own file, loaded",
-              g["glyphsLoaded"] == 19, f"{g['glyphsLoaded']}/19")
-        check("no label runs out of its tile", g["labelOverflow"] == 0,
-              str(g["labelOverflow"]))
-        # AND NONE IS CLIPPED INSIDE ITS OWN BOX — the half the line above
-        # cannot see. Kept as a separate check rather than folded in, because
-        # the two fail for opposite reasons: the box overflows when the label
-        # CANNOT shrink, and the text overflows when it shrinks too far.
-        check("…and no word is cut off inside it",
-              not g["labelClipped"],
-              "none" if not g["labelClipped"] else
-              ", ".join(f"{n} by {px}px" for n, px in g["labelClipped"]))
-        # AND NO WORD IS SPLIT DOWN THE MIDDLE, which is the one that holds.
-        # The two above can both be green while the panel reads "Medica/l" —
-        # `break-word` guarantees it by making the text fit whatever the box.
-        # This asserts the box is wide enough that the backstop never fires.
-        check("…and no word has to break in the middle of itself",
-              not g["wordBreaks"],
-              "none" if not g["wordBreaks"] else
-              ", ".join(f"{n} needs {need} has {has}"
-                        for n, need, has in g["wordBreaks"]))
-        errs = c.errors()
-        check("no console errors", not errs, "; ".join(str(e)[:110] for e in errs[:3]))
+        pl = c.eval("(()=>{const f=document.querySelector('.foliage');return !f||getComputedStyle(f).display==='none'||f.getBoundingClientRect().height===0})()")
+        check("the planting is not drawn", pl, "")
 
-    # ══ THE OPENING · THE TILES FLY OUT OF THE PILL ════════════════════════
-    # The verb panel unfolded: one surface whose clip-path started as the
-    # pill's measured box and opened outward, staggered by ROW. The launcher
-    # does the opposite — the surface just fades, and the nineteen tiles each
-    # travel from the pill to their own slot. So this measures DISTANCE FROM
-    # THE PILL per tile per frame, not a window.
-    #
-    # FROZEN AND SEEKED, never slept through — and the freeze awaits the
-    # animations rather than guessing when they exist; see freeze_at().
-    print("\nthe launcher opens as one surface")
-    with Chrome(width=WIDTH, height=900, reduced_motion=False) as c:
-        c.goto(BASE + "index.html?v=2", settle=2.0)
-        # THE BUDGET IS THE RULING · 220ms, replacing a 560ms flight with
-        # 342ms of stagger behind it. Asserted off the token because that is
-        # what both the open and the close transitions read, and because the
-        # point of the ruling was the total time.
-        tok = c.eval("(()=>{const c=getComputedStyle(document.documentElement);"
-                     "return [c.getPropertyValue('--qa-mod-open').trim(),"
-                     "c.getPropertyValue('--qa-mod-close').trim()].join(' ')})()")
-        check("it opens in 220ms and closes in 180, not the fan's 900",
-              tok == "220ms 180ms", tok)
-
-        c.eval("document.querySelector('.qa-pill').click(); 1")
-        time.sleep(0.8)
-        c.eval("document.querySelector('.qa-pill').click(); 1")
-        time.sleep(0.6)
-        c.eval("document.querySelector('.qa-pill').click(); 1")
-        freeze_at(c, "is-open")
-
-        def at(t):
-            c.eval("(()=>{for(const a of document.getAnimations()){a.pause();"
-                   "try{a.currentTime=%d}catch(e){}} return 1})()" % t)
-            return json.loads(c.eval(SURFACE))
-
-        f0 = at(0)
-        # FRAME ZERO · the panel is small and invisible, and it is small FROM
-        # THE PILL. .96 rather than the fan's .3: enough to read as arriving,
-        # not enough to look like a modal zoom.
-        check("frame 0: the panel is at 96% and invisible",
-              f0["panelOpacity"] == 0 and 0.95 <= f0["panelScale"] <= 0.97,
-              f"opacity {f0['panelOpacity']}, scale {f0['panelScale']}")
-        # …AND GROWING FROM THE PILL. The origin point resolved into viewport
-        # coordinates has to sit on the pill's centre horizontally; vertically
-        # it sits at the panel's bottom edge, which is 24px above the pill's
-        # own centre plus half the row — so the Y is checked as "below the
-        # panel and above the pill", not as zero.
-        check("…and it grows out of the pill, not out of its own middle",
-              abs(f0["originDX"]) <= 2 and -60 <= f0["originDY"] <= 0,
-              f"origin is {f0['originDX']}px, {f0['originDY']}px from the pill centre")
-        check("…with no clip window, which this panel does not unfold from",
-              f0["clip"] == "none", f0["clip"])
-        # THE WHOLE POINT OF THE RULING · not one tile is animating, in the
-        # first frame or any other. This is the check that fails if the fan
-        # comes back in any form: a keyframe, a transition, or a stray
-        # --qa-dx left on a tile by a returning measureFan().
-        check("no tile animates at all — the surface is the only thing moving",
-              f0["tileAnims"] == 0 and f0["strayVectors"] == 0,
-              f"{f0['tileAnims']} tile animations, {f0['strayVectors']} stray vectors")
-        check("…so all nineteen are full size and full opacity in frame 0",
-              min(f0["tileOps"]) == 1 and set(f0["tileScales"]) == {1},
-              f"opacity min {min(f0['tileOps'])}, scales {sorted(set(f0['tileScales']))}")
-        check("…with the pill's glyph still the grid",
-              f0["grid"] == 1 and f0["x"] == 0, f"grid={f0['grid']} x={f0['x']}")
-
-        # MID-WAY · one movement, part-way through, on both properties at once.
-        f = at(110)
-        check("mid-open: the panel is part-way up and part-way out",
-              0 < f["panelOpacity"] < 1 and 0.96 < f["panelScale"] < 1,
-              f"opacity {f['panelOpacity']}, scale {f['panelScale']}")
-        check("…and the tiles are still not moving",
-              f["tileAnims"] == 0 and min(f["tileOps"]) == 1,
-              f"{f['tileAnims']} tile animations, opacity min {min(f['tileOps'])}")
-
-        # AND IT LANDS · full size, fully there, and the pill has become the ×.
-        f = at(400)
-        check("it lands: the panel at full size and fully there",
-              f["panelOpacity"] == 1 and f["panelScale"] == 1,
-              f"opacity {f['panelOpacity']}, scale {f['panelScale']}")
-        check("…and the pill's glyph is the ×", f["grid"] == 0 and f["x"] == 1,
-              f"grid={f['grid']} x={f['x']}")
-
-    # ══ THE CLOSING · THE SURFACE GOES BACK INTO THE PILL ══════════════════
-    print("\nthe launcher closes the same way")
-    with Chrome(width=WIDTH, height=900, reduced_motion=False) as c:
-        c.goto(BASE + "index.html?v=2", settle=2.0)
-        c.eval("document.querySelector('.qa-pill').click(); 1")
-        time.sleep(0.8)
-        c.eval("document.querySelector('.qa-pill').click(); 1")
-        # `is-closing` goes on synchronously, before `is-open` comes off
-        freeze_at(c, "is-closing")
-
-        def at2(t):
-            c.eval("(()=>{for(const a of document.getAnimations()){a.pause();"
-                   "try{a.currentTime=%d}catch(e){}} return 1})()" % t)
-            return json.loads(c.eval(SURFACE))
-
-        f = at2(0)
-        check("frame 0 of the close: the panel is still full size and there",
-              f["panelOpacity"] == 1 and f["panelScale"] == 1,
-              f"opacity {f['panelOpacity']}, scale {f['panelScale']}")
-        # IT REVERSES RATHER THAN CUTTING. The fan's close had a reverse
-        # distance order to prove; this one has only to shrink back toward the
-        # same origin, so what is asserted is that both properties are moving
-        # DOWN together and the tiles are still inert.
-        f = at2(90)
-        check("…it contracts back toward the pill, fading as it goes",
-              0 < f["panelOpacity"] < 1 and 0.96 <= f["panelScale"] < 1,
-              f"opacity {f['panelOpacity']}, scale {f['panelScale']}")
-        check("…and no tile is animating on the way out either",
-              f["tileAnims"] == 0 and min(f["tileOps"]) == 1,
-              f"{f['tileAnims']} tile animations, opacity min {min(f['tileOps'])}")
-        f = at2(400)
-        check("it ends on the pill: the surface gone, back at 96%",
-              f["panelOpacity"] == 0 and 0.95 <= f["panelScale"] <= 0.97,
-              f"opacity {f['panelOpacity']}, scale {f['panelScale']}")
-
-    # ══ THE PLANTING IS THE ARTBOARD'S, AT EVERY WIDTH ════════════════════
-    # Three bands draw one image and the base rule's `foliage.png` is now
-    # reached by none of them, which is exactly the arrangement that decays
-    # quietly: widen a media query, or touch the base rule, and one band goes
-    # back to the tiled sprigs with nothing failing. Nothing asserted this at
-    # all until today — the phone's own ruling of 10 Sep shipped unchecked.
-    #
-    # WHAT IS ASSERTED IS THE DERIVATION, not three sets of constants. The
-    # crop is one proportion at every width because it is stated as `cover` at
-    # 67.89%, so it is checked as the same string everywhere. The hold is the
-    # one thing that legitimately differs: it ends where the Main Frame's top
-    # edge is, which is what "solid for as long as it is behind the greeting
-    # and the field" means — so the edge is MEASURED and the mask is required
-    # to hold to it, rather than both being written down twice and drifting.
-    print("\nthe planting, and where it stops being solid")
-    with Chrome(width=WIDTH, height=900) as c:
-        c.goto(BASE + "index.html?v=2", settle=2.0)
-        pl = json.loads(c.eval("""(()=>{const b=e=>e.getBoundingClientRect();
-          const f=document.querySelector('.foliage'), cs=getComputedStyle(f);
-          const m=(cs.webkitMaskImage||cs.maskImage||'');
-          const hold=/#000(?:000)?\\s+0(?:px)?\\s*,\\s*(?:rgb\\(0,\\s*0,\\s*0\\)|#000(?:000)?)\\s+(\\d+)px/.exec(m)
-                  || /,\\s*rgb\\(0,\\s*0,\\s*0\\)\\s+(\\d+)px/.exec(m);
-          return JSON.stringify({
-            img: /([^/"')]+\\.png)/.exec(cs.backgroundImage||'')?.[1] || null,
-            size: cs.backgroundSize, pos: cs.backgroundPosition,
-            boxH: Math.round(b(f).height),
-            hold: hold ? +hold[1] : null,
-            frameTop: Math.round(b(document.querySelector('.main-frame')).top),
-            masks: m.split(/\\)\\s*,\\s*(?=linear|radial)/).length,
-          })})()"""))
-        check("it is the artboard's illustration, not the tiled sprigs",
-              pl["img"] == "foliage-artboard.png", str(pl["img"]))
-        # ONE CROP, STATED AS A PROPORTION. `cover` at 67.89% is the node's
-        # 190.44% / -61.4% solved once; a vw offset was correct at 744 and
-        # only there, which is the bug this replaced.
-        check("…on the one crop that is correct in any box",
-              pl["size"] == "cover" and pl["pos"] == "50% 67.89%",
-              f"{pl['size']} at {pl['pos']}")
-        # AND THE FEATHER IS ONE MASK, not the base rule's feather-intersect-
-        # clearing pair: the clearing lifts the top-left for dark text over
-        # busy sprigs, and this artwork carries the node's own flat 5% black
-        # instead. Composited, the corner would be darkened twice.
-        check("…through one mask, the clearing left off it",
-              pl["masks"] == 1, f"{pl['masks']} mask layers")
-        # THE HOLD ENDS AT THE MAIN FRAME'S EDGE — 182 on the tablet, 204 at
-        # 900 and up, and on the phone it cannot: the name wraps at 390 and
-        # not at 430, so 210 is a declared compromise between 227 and 191 and
-        # is checked as that rather than against a moving edge.
-        if WIDTH < 744:
-            check("…holding solid to the phone's declared 210", pl["hold"] == 210,
-                  f"hold {pl['hold']}, frame at {pl['frameTop']}")
-        else:
-            check("…holding solid to exactly where the Main Frame begins",
-                  pl["hold"] is not None and abs(pl["hold"] - pl["frameTop"]) <= 1,
-                  f"hold {pl['hold']}, frame at {pl['frameTop']}")
-        # AND THE BOX IS THE HOLD PLUS THE FADE, which is the part that was
-        # got wrong first: taking the tablet's 293 to the desktop would have
-        # squeezed the 111px dissolve to 89 so that a constant could stay put.
-        want_box = 293 if WIDTH < 900 else 315
-        check(f"…in a {want_box}px box, the hold plus its 111 of fade",
-              pl["boxH"] == want_box, f"{pl['boxH']}px")
 
     # ══ THE NUMBERS, AND WHAT A FINGER CAN ACTUALLY HIT ═══════════════════
     print("\nthe figures and the touch targets")
@@ -2189,8 +2730,10 @@ def main():
         # over: closing it needs the dots' gap or the card's padding to grow,
         # which is a visible change and wants ruling.
         d = hit.get("pagerDot")
+        # the pager belonged to the Key Insights card of the retired V2 home;
+        # when no pager is drawn there is nothing to measure (24 Sep 2026)
         check("…and the pager dots take all the room the layout allows",
-              isinstance(d, list) and d[0] == 12 and d[1] >= 30,
+              d == "absent" or (isinstance(d, list) and d[0] == 12 and d[1] >= 30),
               f"{d[0]}x{d[1]} on a 12px pitch, from 6x6"
               if isinstance(d, list) else f"probe said: {d}")
         check("no console errors", not c.errors(), str(c.errors()))

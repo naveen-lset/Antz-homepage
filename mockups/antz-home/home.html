@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>ANTZ Home — Redesign Mock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <!-- ISOLATED MOCK · design review only. Mock data, local state, no APIs.
+       The live Home (index.html at the repo root) is not touched by this. -->
+
+  <header class="hdr" id="hdr">
+    <div class="hdr__bg"></div>
+    <div class="hdr__greet" aria-hidden="true"><div class="hdr__hello" id="hello">Good afternoon,</div><div class="hdr__name" id="uname">Sourav Tambe</div></div>
+    <div class="hdr__row">
+      <div class="hdr__compact" id="compactTitle">Home<small>Bannerghatta Safari</small></div>
+      <div class="hdr__spacer"></div>
+      <div class="hdr__when" id="when"><b>--:--</b>—</div>
+      <button class="icon-btn" type="button" aria-label="Notifications, 4 new" data-toast="Notifications would open here"><svg class="icon"><use href="#i-bell"/></svg><span class="dot"></span></button>
+      <button class="avatar" type="button" aria-label="Profile" data-toast="Profile would open here"><img src="../../assets/img/avatar.png" alt=""></button>
+    </div>
+    <div class="hdr__search" id="hdrSearch">
+      <label class="search" id="searchBox"><svg class="icon"><use href="#i-search"/></svg><input id="q" type="search" placeholder="Search animals, species, modules…" autocomplete="off" aria-label="Search" aria-controls="ss" aria-expanded="false"><kbd>⌘K</kbd></label>
+      <button class="icon-btn scan-btn" type="button" aria-label="Scan a tag" data-toast="Scanner would open here"><svg class="icon"><use href="#i-scan"/></svg></button>
+    </div>
+  </header>
+
+  <div class="ss-veil" id="ssVeil"></div>
+  <div class="ss" id="ss" role="listbox" aria-label="Search results"></div>
+
+  <main class="main" id="main">
+    <div class="hdr-spacer"></div>
+    <div class="page">
+      <div class="page__cols">
+        <div class="stream" id="stream">
+
+          <div class="topband">
+          <section class="sec" id="secSpecies" data-reveal style="--d:60ms">
+            <div class="sec__head"><h2 class="sec__title">My Species</h2><span class="sec__count" id="spCount"></span><div class="sec__actions"><button class="link" type="button" data-toast="The species picker opens here (it is live on V4)">Edit</button></div></div>
+            <div class="rail rail--shelf"><span class="rail__edge rail__edge--l"></span><div class="rail__track" id="railSpecies" data-stagger></div><span class="rail__edge rail__edge--r"></span></div>
+          </section>
+
+          <section class="sec" id="secAnn" data-reveal style="--d:120ms">
+            <div class="sec__head"><h2 class="sec__title">Announcements</h2><span class="sec__count" id="annCount"></span><div class="sec__actions"><button class="link" type="button" data-toast="All announcements would open">See all <svg class="icon"><use href="#i-arrow"/></svg></button></div></div>
+            <div class="deckzone"><div class="deckwrap">
+              <div>
+                <div class="deck" id="deck" aria-roledescription="carousel" aria-label="Announcements"></div>
+                <div class="deck__ctl">
+                  <button class="icon-btn" type="button" id="deckPrev" aria-label="Previous announcement"><svg class="icon"><use href="#i-back"/></svg></button>
+                  <button class="icon-btn" type="button" id="deckNext" aria-label="Next announcement"><svg class="icon"><use href="#i-chev"/></svg></button>
+                  <div class="deck__dots" id="deckDots" aria-hidden="true"></div>
+                  <span class="deck__count" id="deckCount" aria-live="polite"></span>
+                </div>
+              </div>
+              <div class="deck__index" id="deckIndex" role="tablist" aria-label="All announcements"><span class="deck__index-thumb" id="deckThumb"></span></div>
+            </div></div>
+          </section>
+          </div>
+
+          <section class="sec" id="secNotes" data-reveal style="--d:180ms">
+            <div class="sec__head"><h2 class="sec__title">Recent Notes</h2><span class="sec__count" id="ntCount"></span><div class="sec__actions"><button class="link" type="button" data-toast="All notes would open">View all <svg class="icon"><use href="#i-arrow"/></svg></button></div></div>
+            <div class="seg" id="ntSeg" role="group" aria-label="Filter notes" style="margin-bottom:6px"></div>
+            <div class="rail rail--notes"><span class="rail__edge rail__edge--l"></span><div class="rail__track" id="railNotes" data-stagger></div><span class="rail__edge rail__edge--r"></span></div>
+          </section>
+
+          <section class="sec" id="secReports" data-reveal style="--d:240ms">
+            <div class="sec__head"><h2 class="sec__title">Site reports</h2><span class="sec__count" id="repCount"></span><div class="sec__actions"><label class="site-pick"><span class="sr">Site</span><select id="sitePick"><option>All sites</option><option>Bannerghatta Safari</option><option>Zoo Core</option><option>Hesaraghatta</option><option>Mysuru Rescue</option></select></label></div></div>
+            <div class="feed"><div class="feed__filters"><div class="seg" id="repSeg" role="group" aria-label="Filter reports"></div></div><div id="repRows"></div></div>
+          </section>
+
+          <section class="sec sec--sticky" id="secModules" data-reveal style="--d:300ms">
+            <div class="sec__head" id="modHead">
+              <h2 class="sec__title">All Modules</h2>
+              <div class="sec__actions">
+                <span class="view-bar" style="display:contents">
+                  <button class="link" type="button" data-toast="All Modules would open — every module, including the ones not on Home">See all <svg class="icon"><use href="#i-arrow"/></svg></button>
+                  <button class="btn btn--tonal" type="button" id="editBtn"><svg class="icon"><use href="#i-sliders"/></svg>Edit Home</button>
+                </span>
+                <span class="edit-bar">
+                  <button class="btn btn--ghost" type="button" id="restoreBtn">Restore Default</button>
+                  <button class="btn btn--tonal" type="button" id="addBtn"><svg class="icon"><use href="#i-plus"/></svg>Add Module</button>
+                  <button class="btn btn--primary" type="button" id="doneBtn">Done</button>
+                </span>
+              </div>
+            </div>
+            <a class="cc-banner press" href="#" data-toast="Would open the ANTZ Command Centre"><img src="../../assets/img/hero-banner.jpg" alt=""><span class="cc-banner__t">Antz Command Centre<small>A clear view of what’s happening across every site</small></span><span class="cc-banner__ico"><svg class="icon"><use href="#i-cmd"/></svg></span></a>
+            <div class="mgrid" id="mgrid"></div>
+          </section>
+        </div>
+
+        <aside class="today" id="today" aria-label="Today"></aside>
+      </div>
+    </div>
+  </main>
+
+  <div class="qa-veil" id="qaVeil"></div>
+  <div class="qa-palette" id="qaPalette" role="dialog" aria-label="Quick actions"></div>
+  <div class="fab" id="fab">
+    <button class="qa-btn" id="qaBtn" type="button" aria-expanded="false" aria-controls="qaPalette"><span class="qa-btn__g"><svg class="icon qa-btn__grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" stroke="none"/><rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" stroke="none"/><rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" stroke="none"/><path d="M17 13.5l3.5 3.5-3.5 3.5-3.5-3.5z" fill="currentColor" stroke="none"/></svg><svg class="icon qa-btn__x"><use href="#i-close"/></svg></span><span class="qa-btn__label">Quick Actions</span></button>
+    <button class="chat-btn" type="button" aria-label="Assistant" data-toast="The assistant would open here"><svg class="icon" viewBox="0 0 24 24"><path d="M12 4c4.97 0 9 3.36 9 7.5S16.97 19 12 19c-1 0-1.96-.13-2.86-.38L4.5 20.5l1.3-3.6C4.07 15.55 3 13.62 3 11.5 3 7.36 7.03 4 12 4Z" fill="currentColor" stroke="none"/><circle cx="8.5" cy="11.5" r="1.2" fill="#3CC6BE" stroke="none"/><circle cx="12" cy="11.5" r="1.2" fill="#3CC6BE" stroke="none"/><circle cx="15.5" cy="11.5" r="1.2" fill="#3CC6BE" stroke="none"/></svg></button>
+  </div>
+
+  <div class="detail" id="detail" role="dialog" aria-modal="true"><div class="detail__content" id="detailContent"></div></div>
+
+  <div class="sheet-veil" id="sheetVeil"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Add Module"></div>
+
+  <div class="ctx-veil" id="ctxVeil"></div>
+  <div class="ctx-menu" id="ctxMenu" role="menu"></div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+      <symbol id="i-sidebar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></symbol>
+      <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+      <symbol id="i-scan" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+      <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+      <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><path d="M17.5 14v7M14 17.5h7"/></symbol>
+      <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+      <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></symbol>
+      <symbol id="i-medical" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/><path d="M3.2 12h3.3l2-3 3 6 2-3h7.3"/></symbol>
+      <symbol id="i-species" viewBox="0 0 24 24"><circle cx="11" cy="4.5" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="15" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.05Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></symbol>
+      <symbol id="i-hospital" viewBox="0 0 24 24"><path d="M12 6v4M14 8h-4"/><path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"/><path d="M2 22h20M6 13H4a2 2 0 0 0-2 2v7M18 13h2a2 2 0 0 1 2 2v7"/></symbol>
+      <symbol id="i-pharmacy" viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></symbol>
+      <symbol id="i-lab" viewBox="0 0 24 24"><path d="M10 2v7.5L4.5 19a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9.5V2M8.5 2h7M7 16h10"/></symbol>
+      <symbol id="i-tasks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol>
+      <symbol id="i-housing" viewBox="0 0 24 24"><path d="M4 21V8l3-3 3 3v13M14 21V8l3-3 3 3v13M2 12h20M2 17h20"/></symbol>
+      <symbol id="i-diet" viewBox="0 0 24 24"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></symbol>
+      <symbol id="i-administer" viewBox="0 0 24 24"><path d="m18 2 4 4M17 7l3-3M19 9 8.7 19.3a2.4 2.4 0 0 1-3.4 0l-.6-.6a2.4 2.4 0 0 1 0-3.4L15 5M9 11l4 4M5 19l-3 3M14 4l6 6"/></symbol>
+      <symbol id="i-approvals" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+      <symbol id="i-security" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+      <symbol id="i-comms" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+      <symbol id="i-reports" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M8 18v-2M12 18v-5M16 18v-3"/></symbol>
+      <symbol id="i-eggs" viewBox="0 0 24 24"><path d="M12 22c4.4 0 7-3 7-7.5C19 9 15.5 2 12 2S5 9 5 14.5C5 19 7.6 22 12 22Z"/></symbol>
+      <symbol id="i-mortality" viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></symbol>
+      <symbol id="i-transfer" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></symbol>
+      <symbol id="i-accession" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M12 11v6M9 14h6"/></symbol>
+      <symbol id="i-request" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11"/></symbol>
+      <symbol id="i-reorder" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></symbol>
+      <symbol id="i-discharge" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+      <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></symbol>
+      <symbol id="i-animal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></symbol>
+      <symbol id="i-like" viewBox="0 0 24 24"><path d="M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></symbol>
+      <symbol id="i-comment" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+      <symbol id="i-save" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+      <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 17 4 12l5-5M20 18v-2a4 4 0 0 0-4-4H4"/></symbol>
+      <symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></symbol>
+      <symbol id="i-cmd" viewBox="0 0 24 24"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    </defs>
+  </svg>
+
+  <script src="data.js"></script>
+  <script src="home.js"></script>
+</body>
+</html>
