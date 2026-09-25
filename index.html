@@ -1321,10 +1321,12 @@ button { font: inherit; color: inherit; }
   white-space: nowrap;
 }
 
-:root[data-page-version='4'] .clock { display: flex; }
+:root[data-page-version='4'] .clock,
+:root[data-page-version='5'] .clock { display: flex; }
 /* A phone-width viewport has no room for it, and the greeting matters more. */
 @media (max-width: 767px) {
-  :root[data-page-version='4'] .clock { display: none; }
+  :root[data-page-version='4'] .clock,
+  :root[data-page-version='5'] .clock { display: none; }
 }
 
 /* ── 4 · header icons · Figma gap 20px ───────────────────────────────────*/
@@ -3715,7 +3717,8 @@ body.is-report { overflow: hidden; }
    on the right. A chip is a white pill with the species' initial on a disc
    in its class's colour; in edit mode the pressed ones fill. */
 .fav-band { display: none; }
-:root[data-page-version='4'] .fav-band:not([hidden]) {
+:root[data-page-version='4'] .fav-band:not([hidden]),
+:root[data-page-version='5'] .fav-band:not([hidden]) {
   display: flex; align-items: center; gap: 12px;
   margin: 20px 0 0;
 }
@@ -3742,7 +3745,8 @@ body.is-report { overflow: hidden; }
 .fav__edit { flex: none; height: 28px; padding: 0 12px; border: 0; border-radius: var(--r-pill); background: transparent; font: inherit; font-size: var(--fs-label); font-weight: 500; color: var(--c-action-ink); cursor: pointer; }
 .fav__none { font-size: var(--fs-label); color: var(--ink-mute); }
 @media (max-width: 743px) {
-  :root[data-page-version='4'] .fav-band:not([hidden]) { flex-wrap: wrap; }
+  :root[data-page-version='4'] .fav-band:not([hidden]),
+  :root[data-page-version='5'] .fav-band:not([hidden]) { flex-wrap: wrap; }
   .fav__rail { order: 3; flex-basis: 100%; }
 }
 
@@ -4320,8 +4324,10 @@ body.is-report { overflow: hidden; }
 /* V4 · the same ruling as V3's on the planting, and the wave goes with it:
    it is an emoji, which is two glyphs a tablet without the font draws as
    two boxes, and it was the only one in the product. */
-:root[data-page-version='4'] .foliage { display: none; }
-:root[data-page-version='4'] .greeting__wave { display: none; }
+:root[data-page-version='4'] .foliage,
+:root[data-page-version='5'] .foliage { display: none; }
+:root[data-page-version='4'] .greeting__wave,
+:root[data-page-version='5'] .greeting__wave { display: none; }
 
 
 /* ── THE HEADER'S CONTROLS ARE WHITE AT 10%, AT RADIUS 12 ────────────────
@@ -11501,7 +11507,7 @@ body.is-editing .qa-chat { display: none; }
        what an unknown value or a stale link should answer with. Kept as an
        explicit list rather than a range check so that adding a version is a
        visible edit in both of the two places `?v=` is read. */
-    if (q === '2' || q === '3' || q === '4') v = q;
+    if (q === '2' || q === '3' || q === '4' || q === '5') v = q;
   } catch (e) { /* no URLSearchParams, no version: V1 is the default anyway */ }
   document.documentElement.dataset.pageVersion = v;
 })();
@@ -14598,7 +14604,7 @@ __def('js/lib/pageVersion.js', function (__x, __req) {
 const PAGE_VERSION = (() => {
   try {
     const q = new URLSearchParams(location.search).get('v')
-    return q === '2' || q === '3' || q === '4' ? q : '1'
+    return q === '2' || q === '3' || q === '4' || q === '5' ? q : '1'
   } catch {
     return '1'
   }
@@ -14612,6 +14618,13 @@ const isV3 = () => PAGE_VERSION === '3'
    the three pages already in use: nothing checks `isV4()` except the things
    V4 adds, so everywhere else it is V1. */
 const isV4 = () => PAGE_VERSION === '4'
+/* V5 IS V4 DOWN TO RECENT OBSERVATIONS, THEN V1's ALL MODULES (owner, 25 Sep
+   2026). `hasV4Top()` is everything V4 adds above that cut — the clock, the
+   ranked search, My species, the Did You Know deck — and is true on both.
+   What V4 adds below it (the reports, the drawn tiles, V4's layout) still
+   asks `isV4()` alone, so V5's grid is V1's grid under its own key. */
+const isV5 = () => PAGE_VERSION === '5'
+const hasV4Top = () => isV4() || isV5()
 
 /**
  * SWITCH THE PAGE — A NAVIGATION, AND IT CANNOT BE ANYTHING ELSE.
@@ -14642,7 +14655,7 @@ function setPageVersion(v) {
   try {
     const url = new URL(location.href)
     const want = String(v)
-    if (want === '2' || want === '3' || want === '4') url.searchParams.set('v', want)
+    if (want === '2' || want === '3' || want === '4' || want === '5') url.searchParams.set('v', want)
     else url.searchParams.delete('v')
     if (url.href === location.href) return false
     location.assign(url.href)
@@ -14657,6 +14670,8 @@ function setPageVersion(v) {
   __x.isV2 = isV2;
   __x.isV3 = isV3;
   __x.isV4 = isV4;
+  __x.isV5 = isV5;
+  __x.hasV4Top = hasV4Top;
   __x.setPageVersion = setPageVersion;
 });
 
@@ -14681,7 +14696,7 @@ __def('js/state/layoutStore.js', function (__x, __req) {
 const { createStore } = __req('js/state/store.js');
 const { getVariant } = __req('js/data/cardVariants.js');
 const { normalise } = __req('js/lib/pack.js');
-const { isV2, isV3, isV4 } = __req('js/lib/pageVersion.js');
+const { isV2, isV3, isV4, isV5 } = __req('js/lib/pageVersion.js');
 
 /**
  * ONE KEY PER PAGE VERSION, and not one key with a version field in it.
@@ -14692,7 +14707,7 @@ const { isV2, isV3, isV4 } = __req('js/lib/pageVersion.js');
  * working: a saved V2 layout cannot be read as a V1 one and repaired into
  * something neither version drew.
  */
-const KEY = isV4() ? 'antz.home.layout.v4' : isV2() ? 'antz.home.layout.v2' : 'antz.home.layout'
+const KEY = isV5() ? 'antz.home.layout.v5' : isV4() ? 'antz.home.layout.v4' : isV2() ? 'antz.home.layout.v2' : 'antz.home.layout'
 
 /**
  * VERSION 4 — every card is a composition now rather than a stack of blocks,
@@ -30566,7 +30581,7 @@ __def('js/components/GlobalSearch.js', function (__x, __req) {
 const { icon } = __req('js/icons.js');
 const { TYPES, TAGS, search } = __req('js/data/searchIndex.js');
 const { prefersReducedMotion } = __req('js/lib/motion.js');
-const { isV4 } = __req('js/lib/pageVersion.js');
+const { hasV4Top } = __req('js/lib/pageVersion.js');
 
 const RECENT_KEY = 'antz.search.recent'
 const RECENT_MAX = 8
@@ -31029,7 +31044,7 @@ function createGlobalSearch({ trigger, input, getScope, onNavigate }) {
       return
     }
 
-    const groups = search(q, { type: token ? token.key : null, scope, tags: picked, cap: CAP, rank: isV4() })
+    const groups = search(q, { type: token ? token.key : null, scope, tags: picked, cap: CAP, rank: hasV4Top() })
     flat = []
     for (const g of groups) for (const r of g.rows) flat.push(r)
     cursor = flat.length ? 0 : -1
@@ -31222,7 +31237,7 @@ function createGlobalSearch({ trigger, input, getScope, onNavigate }) {
   /* ⌘K / Ctrl+K opens the search from anywhere on V4, as it does on every
      page of the compliance web; pressed again while it is open, it closes.
      Not bound on the older versions, whose keyboard is the artboard's. */
-  if (isV4()) {
+  if (hasV4Top()) {
     window.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() !== 'k' || !(e.metaKey || e.ctrlKey) || e.altKey) return
       e.preventDefault()
@@ -33074,7 +33089,7 @@ __def('js/components/Favourites.js', function (__x, __req) {
  * blocked, so every touch is guarded and the seed is what a blocked
  * browser sees every time.
  */
-const { isV4 } = __req('js/lib/pageVersion.js')
+const { hasV4Top } = __req('js/lib/pageVersion.js')
 const { SPECIES, CLASSES } = __req('js/data/lifecycle.js')
 const { PROTECTED } = __req('js/data/collection.js')
 const { esc } = __req('js/components/LifePanel.js')
@@ -33104,7 +33119,7 @@ const chip = (sp, { pressed = null } = {}) =>
   `</button>`
 
 function mount({ root, onOpen } = {}) {
-  if (!root || !isV4()) return null
+  if (!root || !hasV4Top()) return null
   const rail = root.querySelector('.fav__rail')
   const edit = root.querySelector('.fav__edit')
   const all = catalogue()
@@ -34619,7 +34634,7 @@ mountIconSprite()
    would mean two more `?v=` branches in the HTML for no gain: V1 needs them,
    V2's CSS drops them before they paint, and an empty `.hero-stage` in the DOM
    of a page that never displays it costs nothing. */
-const { PAGE_VERSION, isV2, isV3, setPageVersion, isV4 } = __req('js/lib/pageVersion.js')
+const { PAGE_VERSION, isV2, isV3, setPageVersion, isV4, isV5, hasV4Top } = __req('js/lib/pageVersion.js')
 /* `=== '1'`, NOT `!== '2'`. The deck and the rail are V1's alone, and the
    negative form meant "anything that is not V2" — which was the same thing
    right up until V3 existed, and would then have mounted V1's two bands into
@@ -34627,11 +34642,11 @@ const { PAGE_VERSION, isV2, isV3, setPageVersion, isV4 } = __req('js/lib/pageVer
 /* AND V4, which is V1's page — the one place V4 has to say so, because the
    positive form above is exactly right and would otherwise leave V4 with an
    empty stage and an empty rail where V1 draws both. */
-if (PAGE_VERSION === '1' || isV4()) {
+if (PAGE_VERSION === '1' || hasV4Top()) {
   const { createHeroBanners } = __req('js/components/HeroBanners.js')
   const { HOME_BANNERS, HOME_BANNERS_V4 } = __req('js/data/homeBanners.js')
   /* V4's deck carries the Did You Know cards; V1's is the deck as it was */
-  createHeroBanners({ root: document.getElementById('heroStage'), items: isV4() ? HOME_BANNERS_V4 : HOME_BANNERS })
+  createHeroBanners({ root: document.getElementById('heroStage'), items: hasV4Top() ? HOME_BANNERS_V4 : HOME_BANNERS })
 
   /* the rail between the announcements and the modules, node 196:7243 */
   const { createRecentObservations } = __req('js/components/RecentObservations.js')
@@ -34938,6 +34953,8 @@ const profileMenu = createProfileMenu({
           note: 'The black page — node 506:10213' },
         { id: 'ver:4', label: 'Version 4', checked: isV4(),
           note: 'Live clock, no planting, today\u2019s births and deaths' },
+        { id: 'ver:5', label: 'Version 5', checked: isV5(),
+          note: 'Version 4 to the observations, then Version 1\u2019s modules' },
 
         null,
         { id: 'reset', icon: 'refresh', label: 'Reset Home Page',
@@ -35779,7 +35796,7 @@ const searchHint = createSearchHint({
        "Blackbuck", "Lion House 2" — so the field says what it can find and
        what to type, which a category alone does not (the compliance web's
        search-hints.ts, whose examples are lifted from its own sheet) */
-    if (!isV4()) return cats
+    if (!hasV4Top()) return cats
     const ex = __req('js/data/searchIndex.js').examples(6)
     return cats.flatMap((c, i) => (ex[i] ? [c, ex[i]] : [c]))
   },
@@ -37420,7 +37437,7 @@ __def('js/components/Clock.js', function (__x, __req) {
  * from it every hour the tab stays open.
  */
 
-const { isV4 } = __req('js/lib/pageVersion.js');
+const { hasV4Top } = __req('js/lib/pageVersion.js');
 
 const fmtTime = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
 const fmtDate = new Intl.DateTimeFormat(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
@@ -37441,7 +37458,7 @@ const iso = d => {
 };
 
 function mount() {
-  if (!isV4()) return
+  if (!hasV4Top()) return
   const time = document.getElementById('clockTime');
   const date = document.getElementById('clockDate');
   const word = document.getElementById('greetWord');
