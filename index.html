@@ -3628,6 +3628,9 @@ body.is-report { overflow: hidden; }
 .lt__split small { display: inline-flex; align-items: baseline; gap: 4px; font-size: 10px; color: var(--ink-mute); white-space: nowrap; }
 .lt__split b { font-family: var(--font-num); font-size: var(--fs-label); font-weight: 700; color: var(--ink); }
 @media (max-width: 743px) { .lt__row { grid-template-columns: 14px minmax(0, 1fr) 24px 46px; } .l-rep__capfigs { gap: var(--s3); } }
+/* V5's tiles are shorter than V4's below desktop; a pixel off each row's
+   padding keeps all six rows and the foot inside the card */
+@media (max-width: 1023px) { :root[data-page-version='5'] .lt__row { padding: 2px 0; min-height: 28px; } }
 
 /* the listing on the 2×2 births and deaths tiles */
 .mv-list { display: flex; flex-direction: column; width: 100%; }
@@ -12650,7 +12653,7 @@ function moveItem(cards, from, to) {
 });
 
 __def('js/data/cardVariants.js', function (__x, __req) {
-const { isV4 } = __req('js/lib/pageVersion.js')
+const { isV4, isV5 } = __req('js/lib/pageVersion.js')
 const { BY_CLASS } = __req('js/data/collection.js')
 /* THE SITE TABS (V5) re-scope the data cards. `scale` is reportScope's mock
    share of an all-sites figure; lazy, so the catalogue loads without it. */
@@ -14664,11 +14667,14 @@ const VARIANTS = [
      the ten-day species listing on them (owner, 18 Sep 2026: "natality and
      mortality as a separate card with the listing itself on the homepage").
      `door` is only the fallback layout: on V4 ModuleTiles.js draws them. */
-  ...(isV4() ? [
+  /* …and on V5, which reuses these two as they are (owner, 25 Sep 2026) */
+  ...(isV4() || isV5() ? [
     { id: 'mortality.list', moduleId: 'mortality', name: 'Ten-day listing', layout: 'door', purpose: 'UNDERSTAND',
       supportedSizes: ['large', 'tall'], defaultSize: 'large', priority: 'secondary', data: {} },
     { id: 'natality.list', moduleId: 'natality', name: 'Ten-day listing', layout: 'door', purpose: 'UNDERSTAND',
       supportedSizes: ['large', 'tall'], defaultSize: 'large', priority: 'secondary', data: {} },
+  ] : []),
+  ...(isV4() ? [
     /* the Circle of Life's other two counts as tiles (owner, 18 Sep 2026) */
     { id: 'mortality.neonatal', moduleId: 'mortality', name: 'Neonatal deaths', layout: 'door', purpose: 'UNDERSTAND',
       supportedSizes: ['small', 'medium'], defaultSize: 'small', priority: 'secondary', data: {} },
@@ -15293,10 +15299,14 @@ const V5_LAYOUT = DEFAULT_LAYOUT.filter((e) => !V5_PULLED.includes(e.variantId))
      ...DEFAULT_LAYOUT.filter((d) => V5_PULLED.includes(d.variantId)),
      { variantId: 'species.schedule', size: 'large' },
      { variantId: 'species.appendix', size: 'large' },
+     /* V4's two ten-day lists, side by side, before Enclosures: a 2x1 ahead
+        of them staggers the pair, and a fresh row leaves a hole */
+     { variantId: 'mortality.list', size: 'large' },
+     { variantId: 'natality.list', size: 'large' },
      { variantId: 'housing.types', size: 'medium' }] : [e]))
 /* a saved V5 grid from an older seed is an older ORDER; it falls back */
-const V5_SEED = 5
-const REQUIRED_V5 = V5_LAYOUT.filter((e) => ['species.byclass', 'species.schedule', 'species.appendix', 'housing.types'].includes(e.variantId))
+const V5_SEED = 8
+const REQUIRED_V5 = V5_LAYOUT.filter((e) => ['species.byclass', 'species.schedule', 'species.appendix', 'housing.types', 'mortality.list', 'natality.list'].includes(e.variantId))
 
 const V4_LAYOUT = [
   ...DEFAULT_LAYOUT.filter((e) => e.variantId !== 'mortality.default' && e.variantId !== 'security.default')
@@ -24685,7 +24695,7 @@ __def('js/components/ModuleCard.js', function (__x, __req) {
  */
 
 const { getModule } = __req('js/data/modules.js');
-const { isV4 } = __req('js/lib/pageVersion.js');
+const { isV4, isV5 } = __req('js/lib/pageVersion.js');
 const { summarise, daily } = __req('js/data/lifecycle.js');
 const { icon } = __req('js/icons.js');
 
@@ -24724,7 +24734,9 @@ function renderCard(variant, opts = {}) {
   /* V4: a module tile carries its report — the drawing and figures from
      ModuleTiles.js — and opens the report page, so it is a button, not the
      module's link. Lazy, so the catalogue never depends on the reports. */
-  const rt = isV4() && !isStatic ? __req('js/components/ModuleTiles.js').tileFor(variant) : null
+  /* V5 borrows only the two ten-day lists; every other V5 tile is V1's */
+  const V5_TILES = ['mortality.list', 'natality.list']
+  const rt = (isV4() || (isV5() && V5_TILES.includes(variant.id))) && !isStatic ? __req('js/components/ModuleTiles.js').tileFor(variant) : null
   const isLink = !isStatic && !isPassive && !rt && !!mod?.href
   const el = document.createElement(isStatic || isPassive ? 'div' : isLink ? 'a' : 'button')
   el.className = 'card'
