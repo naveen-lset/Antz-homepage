@@ -17,3 +17,4 @@
 - [ ] push — never push unless the owner says so
 - [x] v4-focus-tiles — Preventive Care report + tile, Lab split from Operations, Fetal Death and Follow Up small tiles
 - [x] v5-v4-top-v1-modules — Version 5: V4 page down to Recent Observations, then V1 All Modules (own layout key)
+- [x] v5-collection-by-class — V5 home: one card, animals per class as bars, species count per class, totals on the title line

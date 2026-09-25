@@ -6286,6 +6286,25 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .card[data-h='1'] .l-attn__split { display: none; }
 .card[data-h='1'] .l-meters__hero { margin-bottom: var(--s2); }
 .card[data-h='1'] .l-meters__rows { gap: var(--s2); }
+/* COLLECTION BY CLASS (V5) · one line a class, as its wireframe drew it:
+   name, bar, animals. Four stacked meters are 2x the height a 164px tile has
+   (measured: the last two rows clipped at every width); side by side they fit.
+   `display: contents` lifts the name and value into the row's grid so the bar
+   can sit between them without changing the shared renderer. */
+/* the totals ride on the title's line: stacked beneath it they cost 33px,
+   which is the fourth row (measured: rows need 90px, had 61) */
+.card[data-variant='species.byclass'] .l-meters__hero { position: absolute; top: 0; right: 0; margin: 0; gap: 6px; }
+.card[data-variant='species.byclass'] .l-meters__total { font-size: 16px; }
+.card[data-variant='species.byclass'] .l-meters__unit { font-size: var(--fs-micro); }
+.card[data-variant='species.byclass'] .l-meters__rows { gap: 4px; }
+.card[data-variant='species.byclass'] .l-meters__row {
+  display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr) 3.4em;
+  align-items: center; column-gap: var(--s3);
+}
+.card[data-variant='species.byclass'] .l-meters__line { display: contents; }
+.card[data-variant='species.byclass'] .l-meters__name { grid-column: 1; line-height: 1.25; }
+.card[data-variant='species.byclass'] .l-meters__track { grid-column: 2; grid-row: 1; height: 6px; }
+.card[data-variant='species.byclass'] .l-meters__val { grid-column: 3; text-align: right; font-size: var(--fs-label); opacity: 1; font-weight: 600; }
 /* ONE ROW LEAVES 124px, AND A FEATURED ENTITY WANTS MORE THAN THAT.
    Name, subtitle, two facts and a footed line come to 168. So at 2×1 the
    card keeps its subject and its figures and gives up the two supporting
@@ -12535,6 +12554,7 @@ function moveItem(cards, from, to) {
 
 __def('js/data/cardVariants.js', function (__x, __req) {
 const { isV4 } = __req('js/lib/pageVersion.js')
+const { BY_CLASS } = __req('js/data/collection.js')
 /**
  * CARD VARIATIONS
  * ───────────────────────────────────────────────────────────────────────────
@@ -14048,6 +14068,33 @@ const VARIANTS = [
   },
 
   /* ── SPECIES MANAGEMENT ──────────────────────────────────────────────── */
+  /* COLLECTION BY CLASS · V5's home (owner, 25 Sep 2026: "a single card that
+     shows, class-wise, how many species and animals" — then "only one [graph]
+     for animal, but show species count and animal count"). One bar per class
+     on one scale, sized by animals; the species count rides in the row's name.
+     Read from BY_CLASS, the table V4's reports use; its totals are not the
+     Species Management tile's, and the owner has accepted that while both
+     are placeholder figures. */
+  (() => {
+    const rows = [...BY_CLASS].sort((a, b) => b.animals - a.animals)
+    const top = rows[0].animals
+    const n = (x) => x.toLocaleString('en-IN')
+    const species = rows.reduce((t, r) => t + r.species, 0)
+    const animals = rows.reduce((t, r) => t + r.animals, 0)
+    return {
+      id: 'species.byclass', moduleId: 'species', name: 'Collection by Class',
+      layout: 'meters', purpose: 'UNDERSTAND',
+      supportedSizes: ['medium', 'large'], defaultSize: 'medium', priority: 'secondary',
+      data: {
+        title: 'Collection', total: n(animals), unit: `animals \u00b7 ${n(species)} species`,
+        rows: rows.map((r) => ({
+          text: `${r.label} \u00b7 ${n(r.species)} species`,
+          value: n(r.animals),
+          pct: Math.round((r.animals / top) * 100),
+        })),
+      },
+    }
+  })(),
   {
     id: 'species.classes', moduleId: 'species', name: 'By Class',
     layout: 'taxa', purpose: 'UNDERSTAND',
@@ -15059,6 +15106,11 @@ const V3_LAYOUT = [
    tiles sat in this grid for a day (18 Sep 2026) and were moved by the owner
    to the head of the Circle of Life band, where the lists they summarise
    are; `RETIRED_V4` is how a layout saved that day loses them. */
+/* V5's GRID IS V1's, plus Collection by Class beside Species Management */
+const V5_LAYOUT = DEFAULT_LAYOUT.flatMap((e) => (e.variantId === 'species.stats'
+  ? [e, { variantId: 'species.byclass', size: 'medium' }] : [e]))
+const REQUIRED_V5 = V5_LAYOUT.filter((e) => e.variantId === 'species.byclass')
+
 const V4_LAYOUT = [
   ...DEFAULT_LAYOUT.filter((e) => e.variantId !== 'mortality.default' && e.variantId !== 'security.default')
     /* owner, 18 Sep 2026: "a 2 blocks wide card, number of sites and enclosure count" */
@@ -15170,7 +15222,7 @@ function seed() {
      survived repair() but never made it out of the default. */
   /* EACH PAGE SEEDS ITS OWN SET. V3's is node 506:10213's, row by row — see
      V3_LAYOUT above for how the frame's geometry was read into grid cells. */
-  const layout = isV4() ? V4_LAYOUT : isV3() ? V3_LAYOUT : isV2() ? V2_LAYOUT : DEFAULT_LAYOUT
+  const layout = isV5() ? V5_LAYOUT : isV4() ? V4_LAYOUT : isV3() ? V3_LAYOUT : isV2() ? V2_LAYOUT : DEFAULT_LAYOUT
   return layout.map((d) => ({ ...d, uid: newUid() }))
 }
 
@@ -15192,6 +15244,10 @@ function load() {
       if (raw && isV4()) {
         raw = raw.filter((c) => !RETIRED_V4.has(c.variantId))
         for (const e of REQUIRED_V4) if (!raw.some((c) => c.variantId === e.variantId)) raw.push({ ...e })
+      }
+      /* a V5 grid saved before Collection by Class existed gains it */
+      if (raw && isV5()) {
+        for (const e of REQUIRED_V5) if (!raw.some((c) => c.variantId === e.variantId)) raw.push({ ...e })
       }
     }
   } catch {
