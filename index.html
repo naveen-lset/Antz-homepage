@@ -3749,31 +3749,26 @@ body.is-report { overflow: hidden; }
 :root[data-page-version='5'] .fav-band:not([hidden]) { flex-wrap: wrap; justify-content: space-between; }
 :root[data-page-version='5'] .fav__rail { order: 3; flex-basis: 100%; gap: 12px; padding: 4px 2px 8px; margin-bottom: 12px; }
 .fav-card {
-  flex: none; display: flex; flex-direction: column; gap: 10px; width: 216px; padding: 14px 16px;
-  border: 0; border-radius: 18px; text-align: left; font: inherit; color: var(--ink); cursor: pointer;
-  background: linear-gradient(160deg, var(--c-white) 55%, var(--viz-100) 100%);
-  box-shadow: var(--shadow-card), inset 0 0 0 1px rgba(0, 171, 171, .14);
+  position: relative; flex: none; width: 188px; height: 132px; padding: 0; overflow: hidden;
+  border: 0; border-radius: 18px; font: inherit; color: var(--c-white); text-align: left; cursor: pointer;
+  background: var(--viz-100); box-shadow: var(--shadow-card);
   transition: transform .15s ease, box-shadow .15s ease;
 }
 .fav-card:hover { transform: translateY(-2px); }
+.fav-card:hover .fav-card__img img { transform: scale(1.05); }
 .fav-card:focus-visible { outline: 2px solid var(--c-action-ink); outline-offset: 2px; }
-.fav-card__head { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.fav-card__dot { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
-  background: var(--viz-300); color: var(--viz-900); font-weight: 700; font-size: 16px; }
-.fav-card__id { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
-.fav-card__id b { font-size: var(--fs-label); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fav-card__id small { font-size: var(--fs-micro); color: var(--ink-mute); }
-.fav-card__n { font-size: var(--fs-label); color: var(--ink-2); }
-.fav-card__n b { font-family: var(--font-num); font-size: 22px; color: var(--viz-900); margin-right: 2px; }
-.fav-card__tags { display: flex; flex-wrap: wrap; gap: 4px; }
-.fav-card__tags i { font-style: normal; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: var(--r-pill); background: var(--viz-100); color: var(--viz-900); }
-.fav-card__tags i.is-none { background: rgba(31, 65, 91, .06); color: var(--ink-mute); }
-.fav-card__moved { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: var(--fs-micro); font-weight: 600;
-  padding-top: 8px; border-top: 1px solid rgba(31, 65, 91, .08); }
-.fav-card__up { color: var(--viz-900); }
-.fav-card__down { color: var(--c-tertiary); }
-.fav-card__quiet { color: var(--ink-mute); font-weight: 500; }
-.fav-card__moved small { color: var(--ink-mute); font-weight: 500; }
+.fav-card__img { position: absolute; inset: 0; display: grid; place-items: center; }
+/* no photo: the initial, large, on the pale teal */
+.fav-card__img::before { content: attr(data-initial); font-size: 44px; font-weight: 700; color: var(--viz-500); }
+.fav-card__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.fav-card__foot { position: absolute; inset: auto 0 0 0; display: flex; flex-direction: column; gap: 1px; padding: 28px 12px 10px;
+  background: linear-gradient(180deg, rgba(10, 30, 36, 0) 0%, rgba(10, 30, 36, .72) 100%); }
+.fav-card__foot b { font-size: var(--fs-label); font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fav-card__foot small { font-size: var(--fs-micro); opacity: .9; }
+.fav-card__marks { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
+.fav-card__mark { padding: 2px 7px; border-radius: var(--r-pill); font-size: 10.5px; font-weight: 700; background: rgba(255, 255, 255, .92); }
+.fav-card__mark.is-up { color: var(--viz-900); }
+.fav-card__mark.is-down { color: var(--c-tertiary); }
 @media (max-width: 743px) {
   :root[data-page-version='4'] .fav-band:not([hidden]),
   :root[data-page-version='5'] .fav-band:not([hidden]) { flex-wrap: wrap; }
@@ -33499,17 +33494,22 @@ function facts(name, klass) {
   }
 }
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`
+/* the photo is Wikimedia Commons' lead image for the species, credited in
+   assets/img/species/CREDITS.md; a species without one keeps its initial */
+const photo = (name) => `assets/img/species/${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}.jpg`
+/* A PHOTO, A NAME, A COUNT (owner, 25 Sep 2026: "I don't want too much
+   text. There should be a nice image"). Births and deaths show only when
+   there were some, as a small mark in the corner. */
 const favCard = (sp) => {
   const f = facts(sp.name, sp.klass)
-  const tags = [f.schedule && `Sch ${f.schedule}`, f.cites && `CITES ${f.cites}`].filter(Boolean)
-  const moved = [f.births && `<span class="fav-card__up">\u25B2 ${plural(f.births, 'birth', 'births')}</span>`,
-                 f.deaths && `<span class="fav-card__down">\u25BC ${plural(f.deaths, 'death', 'deaths')}</span>`].filter(Boolean)
-  return `<button type="button" class="fav-card" role="listitem" data-name="${esc(sp.name)}">` +
-    `<span class="fav-card__head"><span class="fav-card__dot" aria-hidden="true">${esc(sp.name.charAt(0))}</span>` +
-      `<span class="fav-card__id"><b>${esc(sp.name)}</b><small>${esc(f.klass)}</small></span></span>` +
-    `<span class="fav-card__n">${f.animals == null ? '\u2014' : `<b>${f.animals.toLocaleString('en-IN')}</b> ${f.animals === 1 ? 'animal' : 'animals'}`}</span>` +
-    `<span class="fav-card__tags">${tags.length ? tags.map((t) => `<i>${esc(t)}</i>`).join('') : '<i class="is-none">Not protected</i>'}</span>` +
-    `<span class="fav-card__moved">${moved.length ? moved.join('') : '<span class="fav-card__quiet">No births or deaths</span>'}<small> \u00b7 ${DAYS} days</small></span>` +
+  const marks = [f.births && `<span class="fav-card__mark is-up" title="${plural(f.births, 'birth', 'births')} in ${DAYS} days">\u25B2 ${f.births}</span>`,
+                 f.deaths && `<span class="fav-card__mark is-down" title="${plural(f.deaths, 'death', 'deaths')} in ${DAYS} days">\u25BC ${f.deaths}</span>`].filter(Boolean)
+  return `<button type="button" class="fav-card" role="listitem" data-name="${esc(sp.name)}"` +
+    ` aria-label="${esc(sp.name)}${f.animals == null ? '' : `, ${f.animals} animals`}${f.births ? `, ${plural(f.births, 'birth', 'births')}` : ''}${f.deaths ? `, ${plural(f.deaths, 'death', 'deaths')}` : ''}${f.births || f.deaths ? ` in ${DAYS} days` : ''}">` +
+    `<span class="fav-card__img" aria-hidden="true" data-initial="${esc(sp.name.charAt(0))}"><img src="${photo(sp.name)}" alt="" loading="lazy" onerror="this.remove()"></span>` +
+    (marks.length ? `<span class="fav-card__marks" aria-hidden="true">${marks.join('')}</span>` : '') +
+    `<span class="fav-card__foot" aria-hidden="true"><b>${esc(sp.name)}</b>` +
+      `${f.animals == null ? '' : `<small>${f.animals.toLocaleString('en-IN')} ${f.animals === 1 ? 'animal' : 'animals'}</small>`}</span>` +
   `</button>`
 }
 
