@@ -592,6 +592,10 @@
                   rgb(31, 81, 91) 74.4%,
                   rgb(31, 81, 91) 84.2%,
                   rgb(31, 81, 91) 94.0%);
+  /* NOT FROM FIGMA. V5's Pending card is a sticky note (owner, 25 Sep 2026):
+     classic pale yellow, lighter at the top where the adhesive strip holds it
+     flat and a touch deeper towards the free end. */
+  --g-note:            linear-gradient(172deg, rgb(255, 247, 196) 0%, rgb(255, 240, 166) 70%, rgb(252, 232, 146) 100%);
 
 
   /* The scrim under a label on a photographic card: a band across the bottom
@@ -1428,10 +1432,12 @@ button { font: inherit; color: inherit; }
   white-space: nowrap;
 }
 
-:root[data-page-version='4'] .clock { display: flex; }
+:root[data-page-version='4'] .clock,
+:root[data-page-version='5'] .clock { display: flex; }
 /* A phone-width viewport has no room for it, and the greeting matters more. */
 @media (max-width: 767px) {
-  :root[data-page-version='4'] .clock { display: none; }
+  :root[data-page-version='4'] .clock,
+  :root[data-page-version='5'] .clock { display: none; }
 }
 
 /* ── 4 · header icons · Figma gap 20px ───────────────────────────────────*/
@@ -3812,6 +3818,9 @@ body.is-report { overflow: hidden; }
   .card[data-size='full'] .lt__more--6 { display: none; }
   .card[data-size='full'] .lt__more--10 { display: inline; }
 }
+/* V5's tiles are shorter than V4's below desktop; a pixel off each row's
+   padding keeps all six rows and the foot inside the card */
+@media (max-width: 1023px) { :root[data-page-version='5'] .lt__row { padding: 2px 0; min-height: 28px; } }
 
 /* the listing on the 2×2 births and deaths tiles */
 .mv-list { display: flex; flex-direction: column; width: 100%; }
@@ -3902,7 +3911,8 @@ body.is-report { overflow: hidden; }
    photo is the card; the name and the count sit on a dark wash at its foot,
    so white text reads on any picture. Edit and Add open the picker sheet. */
 .fav-band { display: none; }
-:root[data-page-version='4'] .fav-band:not([hidden]) {
+:root[data-page-version='4'] .fav-band:not([hidden]),
+:root[data-page-version='5'] .fav-band:not([hidden]) {
   display: flex; flex-direction: column; gap: 12px;
   /* no top margin: the Main Frame's own 32px is the gap (owner, 24 Sep 2026:
      "reduce the top gap") */
@@ -6180,8 +6190,10 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 /* V4 · the same ruling as V3's on the planting, and the wave goes with it:
    it is an emoji, which is two glyphs a tablet without the font draws as
    two boxes, and it was the only one in the product. */
-:root[data-page-version='4'] .foliage { display: none; }
-:root[data-page-version='4'] .greeting__wave { display: none; }
+:root[data-page-version='4'] .foliage,
+:root[data-page-version='5'] .foliage { display: none; }
+:root[data-page-version='4'] .greeting__wave,
+:root[data-page-version='5'] .greeting__wave { display: none; }
 
 
 /* ── THE HEADER'S CONTROLS ARE WHITE AT 10%, AT RADIUS 12 ────────────────
@@ -8261,6 +8273,125 @@ body.is-editing .pager-dwell { animation-play-state: paused; }
 .card[data-h='1'] .l-attn__split { display: none; }
 .card[data-h='1'] .l-meters__hero { margin-bottom: var(--s2); }
 .card[data-h='1'] .l-meters__rows { gap: var(--s2); }
+
+/* WHICH SCHEDULE and CITES APPENDIX (V5) */
+.l-sch, .l-wf { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
+.l-sch__top { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); min-width: 0; }
+.l-sch__top .c-head { margin: 0; min-width: 0; }
+/* ON THE MODULE'S OWN GRADIENT, like every tile around them (owner, 25 Sep
+   2026: the white plates did not blend). White text; cells, blocks and the
+   switch are white washes of the fill, deeper where the figure is larger. */
+.l-sch, .l-wf, .l-et, .l-cc { color: var(--c-white); }
+/* ENCLOSURES BY TYPE (V5) · a compact table on the gold */
+.l-et { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 4px; min-height: 0; text-shadow: 0 1px 2px rgba(92, 70, 10, .3); }
+.l-et__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
+.l-et__top .c-head { margin: 0; min-width: 0; }
+.l-et__all { flex: none; font-size: var(--fs-micro); opacity: .9; white-space: nowrap; }
+.l-et__all b { font-family: var(--font-num); font-size: 16px; }
+.l-et__grid { display: flex; flex: 1 1 auto; flex-direction: column; justify-content: space-between; min-height: 0; }
+/* six rows in a 148px tile: 12px type on a 1.15 line is what fits */
+.l-et__row { display: grid; grid-template-columns: minmax(0, 1fr) 3.4em 4.6em 4.8em; gap: 6px; align-items: baseline; font-size: 12px; line-height: 1.15; }
+.l-et__row > span:not(:first-child) { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.l-et__row--head { font-size: 9.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; opacity: .85; }
+.l-et__row--head > span:not(:first-child) { font-weight: 700; }
+.l-et__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* PENDING (V5) · a sticky note on the grid: pale yellow paper tilted a
+   degree, a strip of tape across the top, ruled lines, dark ink, and the
+   bottom-right corner curling up. No bars and no coral (owner, 25 Sep 2026). */
+.card:has(.l-pd) { rotate: -1deg; border-radius: 4px 4px 4px 4px; box-shadow: 0 1px 1px rgba(90, 70, 0, .08), 0 10px 18px -8px rgba(90, 70, 0, .35); }
+.card:has(.l-pd)::after { content: ''; position: absolute; right: 0; bottom: 0; z-index: 3; width: 26px; height: 26px; pointer-events: none;
+  background: linear-gradient(315deg, transparent 0 50%, rgb(242, 222, 128) 50% 100%); border-top-left-radius: 6px; filter: drop-shadow(-1px -1px 2px rgba(90, 70, 0, .22)); }
+.l-pd { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 8px; min-height: 0; color: rgb(62, 52, 20); }
+.l-pd .c-head { color: rgb(62, 52, 20); }
+/* the module glyph is a white SVG drawn for the gradients; on paper it inks */
+.l-pd .c-head__icon img { filter: brightness(0) saturate(100%) opacity(.8); }
+.l-pd__tape { position: absolute; top: calc(var(--pad-card) * -1); left: 50%; width: 92px; height: 18px; translate: -50% -4px; rotate: 2deg;
+  background: rgba(150, 214, 208, .7); box-shadow: 0 1px 2px rgba(40, 70, 60, .18); }
+.l-pd__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); padding-bottom: 6px; border-bottom: 2px solid rgba(214, 120, 90, .45); }
+.l-pd__top .c-head { margin: 0; min-width: 0; }
+.l-pd__all { flex: none; font-size: var(--fs-micro); opacity: .75; white-space: nowrap; }
+.l-pd__all b { font-family: var(--font-num); font-size: 16px; opacity: 1; }
+.l-pd__grid { display: grid; flex: 1 1 auto; grid-auto-rows: 1fr; min-height: 0; }
+.l-pd__row { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: 10px; font-size: var(--fs-label); line-height: 1.15; border-bottom: 1px solid rgba(80, 130, 170, .28); }
+.l-pd__box { display: block; width: 12px; height: 12px; border: 1.5px solid rgba(62, 52, 20, .55); border-radius: 3px; }
+.l-pd__label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.l-pd__row b { font-family: var(--font-num); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.l-pd__row--none { opacity: .5; }
+.l-pd__row--none .l-pd__label, .l-pd__row--none b { text-decoration: line-through; }
+/* COLLECTION (V5) · one thick white column per class, height = animals,
+   the count on top and the class and its species underneath */
+.l-cc { position: relative; z-index: 2; display: flex; flex: 1 0 0; flex-direction: column; gap: 12px; min-height: 0; }
+.l-cc__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
+.l-cc__top .c-head { margin: 0; min-width: 0; }
+.l-cc__all { flex: none; font-size: var(--fs-micro); opacity: .85; white-space: nowrap; }
+.l-cc__all b { font-family: var(--font-num); font-size: 16px; }
+.l-cc__plot { display: grid; flex: 1 1 auto; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px; min-height: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .35); }
+.l-cc__col { display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 4px; min-height: 0; }
+.l-cc__col b { font-family: var(--font-num); font-size: 18px; line-height: 1; font-variant-numeric: tabular-nums; }
+.l-cc__bar { display: block; flex: none; height: calc(var(--h) * (100% - 26px)); min-height: 3px; border-radius: 8px 8px 0 0;
+  background: rgba(255, 255, 255, calc(.4 + var(--h) * .5)); }
+.l-cc__keys { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 12px; margin-top: -4px; }
+.l-cc__key { display: flex; flex-direction: column; min-width: 0; }
+.l-cc__key span { font-size: var(--fs-label); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.l-cc__key small { font-size: var(--fs-micro); opacity: .82; white-space: nowrap; }
+/* 2x1 (V5, owner 25 Sep 2026: Pending took the 2x2): the columns shorten,
+   the figure sits smaller and the key's two lines tighten under each column */
+.card[data-size='medium']:has(.l-cc) { padding: 14px 18px; }
+.card[data-size='medium'] .l-cc { gap: 4px; }
+.card[data-size='medium'] .l-cc__plot, .card[data-size='medium'] .l-cc__keys { gap: 10px; }
+.card[data-size='medium'] .l-cc__col b { font-size: 14px; }
+.card[data-size='medium'] .l-cc__bar { height: calc(var(--h) * (100% - 20px)); border-radius: 6px 6px 0 0; }
+.card[data-size='medium'] .l-cc__keys { margin-top: -2px; }
+.card[data-size='medium'] .l-cc__key span { font-size: 12px; line-height: 1.1; }
+.card[data-size='medium'] .l-cc__key small { line-height: 1.1; }
+.l-sch__foot { margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, .22); font-size: var(--fs-label); opacity: .92; }
+.l-sch__foot b { font-variant-numeric: tabular-nums; }
+.l-wf { --wf-0: rgba(255, 255, 255, .95); --wf-1: rgba(255, 255, 255, .62); --wf-2: rgba(255, 255, 255, .38); --wf-3: rgba(255, 255, 255, .16); }
+.l-wf__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
+.l-wf__top .c-head { margin: 0; min-width: 0; }
+.l-wf__all { flex: none; font-size: var(--fs-micro); opacity: .85; }
+.l-wf__all b { font-family: var(--font-num); font-size: 16px; }
+.l-wf__body { display: flex; flex: 1 1 auto; align-items: center; gap: 20px; min-height: 0; }
+.l-wf__grid { display: grid; flex: none; grid-template-columns: repeat(10, 1fr); gap: 3px; width: min(168px, 48%); aspect-ratio: 1; }
+.l-wf__grid i { border-radius: 3px; }
+.l-wf__legend { display: flex; flex: 1 1 auto; flex-direction: column; gap: 10px; min-width: 0; }
+.l-wf__key { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.l-wf__name { display: flex; align-items: center; gap: 6px; font-size: var(--fs-micro); opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.l-wf__name i { flex: none; width: 9px; height: 9px; border-radius: 2px; }
+.l-wf__fig { display: flex; align-items: baseline; gap: 6px; padding-left: 15px; }
+.l-wf__fig b { font-family: var(--font-num); font-size: 17px; font-variant-numeric: tabular-nums; }
+.l-wf__fig small { font-size: var(--fs-micro); opacity: .8; }
+
+/* SITE TABS (V5) · a light pill track above the banner, the selected site a
+   white pill; it scrolls sideways rather than wrapping on a phone */
+.site-tabs { display: flex; gap: 4px; margin: 24px 0 0; padding: 4px; width: fit-content; max-width: 100%;
+  border-radius: var(--r-pill); background: rgba(0, 171, 171, .1); overflow-x: auto; scrollbar-width: none; }
+.site-tabs::-webkit-scrollbar { display: none; }
+.site-tabs[hidden] { display: none; }
+.site-tabs__tab { flex: none; border: 0; padding: 8px 16px; border-radius: var(--r-pill); background: none; color: var(--ink-2);
+  font: inherit; font-size: var(--fs-label); font-weight: 600; white-space: nowrap; cursor: pointer; }
+.site-tabs__tab:hover { color: var(--ink); }
+.site-tabs__tab[aria-selected='true'] { background: var(--c-white); color: var(--viz-900); box-shadow: 0 1px 3px rgba(31, 65, 91, .12); }
+.site-tabs__tab:focus-visible { outline: 2px solid var(--viz-700); outline-offset: 1px; }
+.l-seg { display: inline-flex; flex: none; padding: 3px; border-radius: var(--r-pill); background: rgba(255, 255, 255, .18); }
+.l-seg__opt { border: 0; padding: 4px 12px; border-radius: var(--r-pill); background: none; color: rgba(255, 255, 255, .9); font: inherit; font-size: var(--fs-label); font-weight: 600; cursor: pointer; }
+.l-seg__opt[aria-pressed='true'] { background: var(--c-white); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+.l-seg__opt:focus-visible { outline: 2px solid var(--c-white); outline-offset: 1px; }
+.l-sch__body { display: flex; flex: 1 1 auto; flex-direction: column; gap: 12px; min-height: 0; }
+.l-sch__viz { display: flex; flex: 1 1 auto; align-items: center; gap: 24px; }
+.l-sch__donut { position: relative; flex: none; width: 132px; height: 132px; }
+.l-sch__donut svg { width: 100%; height: 100%; transform: rotate(0deg); }
+.l-sch__mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+.l-sch__mid b { font-family: var(--font-num); font-size: 26px; font-weight: 700; }
+.l-sch__mid small { font-size: var(--fs-micro); opacity: .82; }
+.l-sch__legend { display: flex; flex: 1 1 auto; flex-direction: column; gap: 14px; min-width: 0; }
+.l-sch__key { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.l-sch__name { display: flex; align-items: center; gap: 6px; font-size: var(--fs-label); opacity: .92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.l-sch__name i { flex: none; width: 10px; height: 10px; border-radius: 3px; }
+.l-sch__fig { display: flex; align-items: baseline; gap: 6px; padding-left: 16px; }
+.l-sch__fig b { font-family: var(--font-num); font-size: 20px; font-variant-numeric: tabular-nums; }
+.l-sch__fig small { font-size: var(--fs-micro); opacity: .8; }
 /* ONE ROW LEAVES 124px, AND A FEATURED ENTITY WANTS MORE THAN THAT.
    Name, subtitle, two facts and a footed line come to 168. So at 2×1 the
    card keeps its subject and its figures and gives up the two supporting
@@ -14406,7 +14537,7 @@ body.is-editing .qa-chat { display: none; }
        what an unknown value or a stale link should answer with. Kept as an
        explicit list rather than a range check so that adding a version is a
        visible edit in both of the two places `?v=` is read. */
-    if (q === '2' || q === '3' || q === '4') v = q;
+    if (q === '2' || q === '3' || q === '4' || q === '5') v = q;
   } catch (e) { /* no URLSearchParams, no version: V1 is the default anyway */ }
   /* V2 IS V4'S PAGE, REDESIGNED (owner, 24 Sep 2026: "instead of updating v4
      can we do in v2" — "replace V2's home"). It wears V4's whole stylesheet,
@@ -14599,6 +14730,11 @@ body.is-editing .qa-chat { display: none; }
     <div class="hero-stage" id="heroStage" aria-roledescription="carousel" aria-label="Announcements">
       <div class="hero-stage__deck"></div>
     </div>
+
+    <!-- ══ site tabs (V5) ════════════════════════════════════════════════
+         Which site the page counts, above Recent Observations (owner, 25 Sep
+         2026). Filled by app.js; hidden on every other version. -->
+    <div class="site-tabs" id="siteTabs" role="tablist" aria-label="Site" hidden></div>
 
     <!-- ══ recent observations ═════════════════════════════════════════
          The band is node 196:7243, the "Current Design" of 4 Sep 2026: it sits
@@ -15441,7 +15577,20 @@ function moveItem(cards, from, to) {
 });
 
 __def('js/data/cardVariants.js', function (__x, __req) {
-const { isV4 } = __req('js/lib/pageVersion.js')
+const { isV4, isV5 } = __req('js/lib/pageVersion.js')
+const { BY_CLASS } = __req('js/data/collection.js')
+/* THE SITE TABS (V5) re-scope the data cards. `scale` is reportScope's mock
+   share of an all-sites figure; lazy, so the catalogue loads without it. */
+const siteScale = () => __req('js/state/reportScope.js').scale
+function scaleData(d) {
+  const sc = siteScale()
+  const rows = (rs) => rs.map((r) => ({ ...r, n: sc(r.n) }))
+  return {
+    ...d,
+    ...(d.views ? { views: d.views.map((w) => ({ ...w, base: sc(w.base), rows: rows(w.rows) })) } : {}),
+    ...(d.parts ? { parts: d.parts.map((p) => ({ ...p, n: sc(p.n), ...(p.species != null ? { species: sc(p.species), animals: sc(p.animals) } : {}) })) } : {}),
+  }
+}
 /**
  * CARD VARIATIONS
  * ───────────────────────────────────────────────────────────────────────────
@@ -17353,6 +17502,119 @@ const VARIANTS = [
   },
 
   /* ── SPECIES MANAGEMENT ──────────────────────────────────────────────── */
+  /* COLLECTION BY CLASS · V5's home (owner, 25 Sep 2026: "a single card that
+     shows, class-wise, how many species and animals" — then "only one [graph]
+     for animal, but show species count and animal count"). One bar per class
+     on one scale, sized by animals; the species count rides in the row's name.
+     Read from BY_CLASS, the table V4's reports use; its totals are not the
+     Species Management tile's, and the owner has accepted that while both
+     are placeholder figures. */
+  {
+    id: 'species.byclass', moduleId: 'species', name: 'Collection by Class',
+    layout: 'classcols', purpose: 'UNDERSTAND',
+    supportedSizes: ['medium', 'large'], defaultSize: 'medium', priority: 'secondary',
+    scopedData() {
+      const sc = siteScale()
+      const rows = BY_CLASS.map((r) => ({ ...r, species: sc(r.species), animals: sc(r.animals) }))
+        .sort((a, b) => b.animals - a.animals)
+      const top = rows[0].animals || 1
+      const n = (x) => x.toLocaleString('en-IN')
+      const species = rows.reduce((t, r) => t + r.species, 0)
+      const animals = rows.reduce((t, r) => t + r.animals, 0)
+      return {
+        title: 'Collection', total: n(animals), unit: `animals \u00b7 ${n(species)} species`,
+        summary: rows.map((r) => `${r.label}: ${n(r.animals)} animals, ${n(r.species)} species`).join('; '),
+        cols: rows.map((r) => ({ label: r.label, animals: n(r.animals), species: n(r.species), h: r.animals / top })),
+      }
+    },
+  },
+  /* WHICH SCHEDULE and CITES APPENDIX · V5's home (owner, 25 Sep 2026, from
+     two reference screenshots — their content, not their colours). Neither
+     splits by entity or class any more (owner: "not required"). The Species
+     figures are the screenshots'; the ANIMALS FIGURES, and the animals base,
+     ARE PLACEHOLDERS made up so the switch can be reviewed. */
+  {
+    id: 'species.schedule', scopedData() { return scaleData(this.data) }, moduleId: 'species', name: 'Which schedule',
+    layout: 'schedule', purpose: 'UNDERSTAND', passive: true,
+    /* each V5 data card on a different tile gradient from the theme, so the
+       four do not read as one green block (owner, 25 Sep 2026) */
+    gradient: '--g-pharmacy',
+    supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
+    data: {
+      title: 'Which schedule',
+      summary: 'Species: Schedule I 126, Schedule II 73, of 2,453',
+      /* `base` is everything counted, scheduled or not, for the footer line */
+      views: [
+        { label: 'Species', unit: 'scheduled', base: 2453, rows: [
+          { label: 'Schedule I',  n: 126 },
+          { label: 'Schedule II', n: 73 },
+        ] },
+        /* PLACEHOLDER — invented, see above */
+        { label: 'Animals', unit: 'scheduled', base: 97421, rows: [
+          { label: 'Schedule I',  n: 1284 },
+          { label: 'Schedule II', n: 642 },
+        ] },
+      ],
+    },
+  },
+  /* ENCLOSURES BY TYPE · V5 (owner, 25 Sep 2026). The project's sixteen
+     housing kinds folded into seven families, each with its species and
+     animals; a 2x1 table, so the three smallest fold into "Other". All
+     counts are placeholders. */
+  {
+    id: 'housing.types', scopedData() { return scaleData(this.data) }, moduleId: 'housing', name: 'Enclosures by type',
+    layout: 'enctable', purpose: 'UNDERSTAND', gradient: '--g-lab',
+    supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
+    data: {
+      title: 'Enclosures by type', unit: 'enclosures',
+      summary: 'Cages 62, Aviaries 41, Paddocks and open ranges 38, Buildings 31, Moated and island 22, Vivaria and aquaria 12, Hospital units 8',
+      parts: [
+        { label: 'Cages',             n: 62, species: 18, animals: 540 },
+        { label: 'Aviaries',          n: 41, species: 26, animals: 780 },
+        { label: 'Paddocks & ranges', n: 38, species: 14, animals: 910 },
+        { label: 'Buildings',         n: 31, species: 21, animals: 460 },
+        { label: 'Moated & island',   n: 22, species: 9,  animals: 310 },
+        { label: 'Vivaria & aquaria', n: 12, species: 15, animals: 640 },
+        { label: 'Hospital units',    n: 8,  species: 4,  animals: 257 },
+      ],
+    },
+  },
+  /* PENDING · V5 (owner, 25 Sep 2026). The seven jobs waiting on the
+     collection, one count each, on coral because every row is an action.
+     The whole card opens Medical; the counts are placeholders. */
+  {
+    id: 'medical.pending', scopedData() { return scaleData(this.data) }, moduleId: 'medical', name: 'Pending',
+    layout: 'pendlist', purpose: 'ACT', gradient: '--g-note',
+    supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
+    data: {
+      title: 'Pending', unit: 'open',
+      summary: 'Vaccinations 48, necropsy reports 6, medicine administrations 39, surgeries 4, sexing 31, microchipping 57, transfers 9',
+      parts: [
+        { label: 'Vaccinations',     n: 48 },
+        { label: 'Necropsy reports', n: 6 },
+        { label: 'Medicine admin',   n: 39 },
+        { label: 'Surgeries',        n: 4 },
+        { label: 'Sexing',           n: 31 },
+        { label: 'Microchipping',    n: 57 },
+        { label: 'Transfers',        n: 9 },
+      ],
+    },
+  },
+  {
+    id: 'species.appendix', scopedData() { return scaleData(this.data) }, moduleId: 'species', name: 'CITES appendix',
+    layout: 'waffle', purpose: 'UNDERSTAND', gradient: '--g-approvals-wash',
+    supportedSizes: ['large'], defaultSize: 'large', priority: 'secondary',
+    data: {
+      title: 'CITES appendix', unit: 'species',
+      summary: 'Appendix I 251, Appendix II 858, Appendix III 82, not in CITES 1,262',
+      parts: [
+        { label: 'Appendix I',   n: 251 },
+        { label: 'Appendix II',  n: 858 },
+        { label: 'Appendix III', n: 82 },
+        { label: 'Not in CITES', n: 1262 },
+      ],
+    },
+  },
   {
     id: 'species.classes', moduleId: 'species', name: 'By Class',
     layout: 'taxa', purpose: 'UNDERSTAND',
@@ -17748,11 +18010,14 @@ const VARIANTS = [
      the ten-day species listing on them (owner, 18 Sep 2026: "natality and
      mortality as a separate card with the listing itself on the homepage").
      `door` is only the fallback layout: on V4 ModuleTiles.js draws them. */
-  ...(isV4() ? [
+  /* …and on V5, which reuses these two as they are (owner, 25 Sep 2026) */
+  ...(isV4() || isV5() ? [
     { id: 'mortality.list', moduleId: 'mortality', name: 'Ten-day listing', layout: 'door', purpose: 'UNDERSTAND',
       supportedSizes: ['large', 'tall', 'full'], defaultSize: 'full', priority: 'secondary', data: {} },
     { id: 'natality.list', moduleId: 'natality', name: 'Ten-day listing', layout: 'door', purpose: 'UNDERSTAND',
       supportedSizes: ['large', 'tall', 'full'], defaultSize: 'full', priority: 'secondary', data: {} },
+  ] : []),
+  ...(isV4() ? [
     /* the Circle of Life's other two counts as tiles (owner, 18 Sep 2026) */
     { id: 'mortality.neonatal', moduleId: 'mortality', name: 'Neonatal deaths', layout: 'door', purpose: 'UNDERSTAND',
       supportedSizes: ['small', 'medium'], defaultSize: 'small', priority: 'secondary', data: {} },
@@ -17909,7 +18174,7 @@ __def('js/lib/pageVersion.js', function (__x, __req) {
 const PAGE_VERSION = (() => {
   try {
     const q = new URLSearchParams(location.search).get('v')
-    return q === '2' || q === '3' || q === '4' ? q : '1'
+    return q === '2' || q === '3' || q === '4' || q === '5' ? q : '1'
   } catch {
     return '1'
   }
@@ -17926,6 +18191,13 @@ const isV3 = () => PAGE_VERSION === '3'
    redesign on top, so every V4 feature answers true on V2 as well. What only
    V2 has asks `isV2()`; the version menu asks PAGE_VERSION directly. */
 const isV4 = () => PAGE_VERSION === '4' || PAGE_VERSION === '2'
+/* V5 IS V4 DOWN TO RECENT OBSERVATIONS, THEN V1's ALL MODULES (owner, 25 Sep
+   2026). `hasV4Top()` is everything V4 adds above that cut — the clock, the
+   ranked search, My species, the Did You Know deck — and is true on both.
+   What V4 adds below it (the reports, the drawn tiles, V4's layout) still
+   asks `isV4()` alone, so V5's grid is V1's grid under its own key. */
+const isV5 = () => PAGE_VERSION === '5'
+const hasV4Top = () => isV4() || isV5()
 
 /**
  * SWITCH THE PAGE — A NAVIGATION, AND IT CANNOT BE ANYTHING ELSE.
@@ -17956,7 +18228,7 @@ function setPageVersion(v) {
   try {
     const url = new URL(location.href)
     const want = String(v)
-    if (want === '2' || want === '3' || want === '4') url.searchParams.set('v', want)
+    if (want === '2' || want === '3' || want === '4' || want === '5') url.searchParams.set('v', want)
     else url.searchParams.delete('v')
     if (url.href === location.href) return false
     location.assign(url.href)
@@ -17971,6 +18243,8 @@ function setPageVersion(v) {
   __x.isV2 = isV2;
   __x.isV3 = isV3;
   __x.isV4 = isV4;
+  __x.isV5 = isV5;
+  __x.hasV4Top = hasV4Top;
   __x.setPageVersion = setPageVersion;
 });
 
@@ -17995,7 +18269,7 @@ __def('js/state/layoutStore.js', function (__x, __req) {
 const { createStore } = __req('js/state/store.js');
 const { getVariant } = __req('js/data/cardVariants.js');
 const { normalise } = __req('js/lib/pack.js');
-const { isV2, isV3, isV4 } = __req('js/lib/pageVersion.js');
+const { isV2, isV3, isV4, isV5 } = __req('js/lib/pageVersion.js');
 
 /**
  * ONE KEY PER PAGE VERSION, and not one key with a version field in it.
@@ -18008,7 +18282,7 @@ const { isV2, isV3, isV4 } = __req('js/lib/pageVersion.js');
  */
 /* V2 first: it answers isV4() too, but keeps a layout of its own, under a new
    key so a grid saved on the old V2 page does not come back in this one */
-const KEY = isV2() ? 'antz.home.layout.v2r' : isV4() ? 'antz.home.layout.v4' : 'antz.home.layout'
+const KEY = isV2() ? 'antz.home.layout.v2r' : isV5() ? 'antz.home.layout.v5' : isV4() ? 'antz.home.layout.v4' : 'antz.home.layout'
 
 /**
  * VERSION 4 — every card is a composition now rather than a stack of blocks,
@@ -18393,6 +18667,32 @@ const V3_LAYOUT = [
    tiles sat in this grid for a day (18 Sep 2026) and were moved by the owner
    to the head of the Circle of Life band, where the lists they summarise
    are; `RETIRED_V4` is how a layout saved that day loses them. */
+/* V5's GRID IS V1's, plus Pending and Collection by Class beside Species Management */
+/* the three data cards follow straight after, on a fresh row, so the data
+   sits together near the top and the plain module doors come after it
+   (owner, 25 Sep 2026: "this has to come somewhere on top") */
+/* Pending is 2x2 beside Medical and Species, which leaves a strip three
+   columns wide under those two: Collection and Housing (2 + 1) fill it exactly,
+   before the data row starts. Hospital, pulled up from further down, waits
+   until after the two lists, where it sits beside Enclosures. */
+const V5_PULLED = ['hospital.photo', 'housing.default']
+const pulled = (id) => DEFAULT_LAYOUT.find((d) => d.variantId === id)
+const V5_LAYOUT = DEFAULT_LAYOUT.filter((e) => !V5_PULLED.includes(e.variantId)).flatMap((e) => (e.variantId === 'species.stats'
+  ? [e, { variantId: 'medical.pending', size: 'large' },
+     { variantId: 'species.byclass', size: 'medium' },
+     pulled('housing.default'),
+     { variantId: 'species.schedule', size: 'large' },
+     { variantId: 'species.appendix', size: 'large' },
+     /* V4's two ten-day lists, side by side, before Enclosures: a 2x1 ahead
+        of them staggers the pair, and a fresh row leaves a hole */
+     { variantId: 'mortality.list', size: 'large' },
+     { variantId: 'natality.list', size: 'large' },
+     pulled('hospital.photo'),
+     { variantId: 'housing.types', size: 'medium' }] : [e]))
+/* a saved V5 grid from an older seed is an older ORDER; it falls back */
+const V5_SEED = 10
+const REQUIRED_V5 = V5_LAYOUT.filter((e) => ['species.byclass', 'medical.pending', 'species.schedule', 'species.appendix', 'housing.types', 'mortality.list', 'natality.list'].includes(e.variantId))
+
 const V4_LAYOUT = [
   ...DEFAULT_LAYOUT.filter((e) => e.variantId !== 'mortality.default' && e.variantId !== 'security.default')
     /* owner, 18 Sep 2026: "a 2 blocks wide card, number of sites and enclosure count" */
@@ -18535,7 +18835,7 @@ function seed() {
   /* EACH PAGE SEEDS ITS OWN SET. V3's is node 506:10213's, row by row — see
      V3_LAYOUT above for how the frame's geometry was read into grid cells. */
   /* V2 first: isV4() is true on V2 since 24 Sep, and V2 has a seed of its own */
-  const layout = isV2() ? V2_LAYOUT : isV4() ? V4_LAYOUT : isV3() ? V3_LAYOUT : DEFAULT_LAYOUT
+  const layout = isV2() ? V2_LAYOUT : isV5() ? V5_LAYOUT : isV4() ? V4_LAYOUT : isV3() ? V3_LAYOUT : DEFAULT_LAYOUT
   return layout.map((d) => ({ ...d, uid: newUid() }))
 }
 
@@ -18556,9 +18856,14 @@ function load() {
       if (raw && isV2() && parsed.seed !== V2_SEED) raw = null
       /* V4's retirements and required cards are V4's page's, not V2's */
       if (raw && isV4() && !isV2() && parsed.seed !== V4_SEED) raw = null
+      if (raw && isV5() && parsed.seed !== V5_SEED) raw = null
       if (raw && isV4() && !isV2()) {
         raw = raw.filter((c) => !RETIRED_V4.has(c.variantId))
         for (const e of REQUIRED_V4) if (!raw.some((c) => c.variantId === e.variantId)) raw.push({ ...e })
+      }
+      /* a V5 grid saved before Collection by Class existed gains it */
+      if (raw && isV5()) {
+        for (const e of REQUIRED_V5) if (!raw.some((c) => c.variantId === e.variantId)) raw.push({ ...e })
       }
     }
   } catch {
@@ -18576,7 +18881,7 @@ function load() {
 
 function save(cards) {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ version: VERSION, seed: isV2() ? V2_SEED : isV4() ? V4_SEED : undefined, savedAt: Date.now(), cards }))
+    localStorage.setItem(KEY, JSON.stringify({ version: VERSION, seed: isV2() ? V2_SEED : isV4() ? V4_SEED : isV5() ? V5_SEED : undefined, savedAt: Date.now(), cards }))
     return true
   } catch {
     return false   // the layout still works this session; it just will not persist
@@ -27808,7 +28113,7 @@ __def('js/components/ModuleCard.js', function (__x, __req) {
  */
 
 const { getModule } = __req('js/data/modules.js');
-const { isV4, isV2 } = __req('js/lib/pageVersion.js');
+const { isV4, isV2, isV5 } = __req('js/lib/pageVersion.js');
 const { summarise, daily } = __req('js/data/lifecycle.js');
 const { icon } = __req('js/icons.js');
 
@@ -27825,7 +28130,8 @@ const ASSET_IMG = 'assets/img/'
 function renderCard(variant, opts = {}) {
   const { size = variant.defaultSize, w = 1, h = 1, uid = '', static: isStatic = false } = opts
   const mod = getModule(variant.moduleId)
-  const data = variant.data || {}
+  /* a card whose figures follow the site tabs computes them per paint */
+  const data = (variant.scopedData ? variant.scopedData() : variant.data) || {}
 
   /**
    * A card with a destination is a link, one without is a button, a preview is
@@ -27846,7 +28152,9 @@ function renderCard(variant, opts = {}) {
   /* V4: a module tile carries its report — the drawing and figures from
      ModuleTiles.js — and opens the report page, so it is a button, not the
      module's link. Lazy, so the catalogue never depends on the reports. */
-  const rt = isV4() && !isV2() && !isStatic ? __req('js/components/ModuleTiles.js').tileFor(variant) : null
+  /* V5 borrows only the two ten-day lists; every other V5 tile is V1's */
+  const V5_TILES = ['mortality.list', 'natality.list']
+  const rt = ((isV4() && !isV2()) || (isV5() && V5_TILES.includes(variant.id))) && !isStatic ? __req('js/components/ModuleTiles.js').tileFor(variant) : null
   /* A VARIANT MAY CARRY ITS OWN DESTINATION. Until now only a MODULE had an
      `href` — reasonably, since a card is a way into a module. The Command
      Centre banner is the exception the catalogue already allows for
@@ -27993,7 +28301,58 @@ function renderCard(variant, opts = {}) {
  * these are the same call with different selectors, which is the point of
  * having the mechanism in js/lib/carousel.js rather than in either of them.
  */
+const fmtN = (n) => n.toLocaleString('en-IN')
+
+function scheduleBody(view) {
+  const totals = view.rows.map((r) => r.n)
+  const all = totals.reduce((t, x) => t + x, 0) || 1
+  const tones = ['rgba(255, 255, 255, .95)', 'rgba(255, 255, 255, .38)']
+  let at = 0
+  /* r = 15.9155 makes the circumference 100, so a dash length is a percent */
+  const arcs = totals.map((n, i) => {
+    const pct = (n / all) * 100
+    const a = `<circle r="15.9155" cx="21" cy="21" fill="none" stroke="${tones[i]}" stroke-width="3.6" stroke-dasharray="${pct} ${100 - pct}" stroke-dashoffset="${25 - at}"/>`
+    at += pct
+    return a
+  }).join('')
+  return `<span class="l-sch__viz">` +
+      `<span class="l-sch__donut"><svg viewBox="0 0 42 42" aria-hidden="true">${arcs}</svg>` +
+        `<span class="l-sch__mid"><b>${fmtN(all)}</b><small>${esc(view.unit)}</small></span></span>` +
+      `<span class="l-sch__legend">` + view.rows.map((r, i) =>
+        `<span class="l-sch__key"><span class="l-sch__name"><i style="background:${tones[i]}"></i>${esc(r.label)}</span>` +
+        `<span class="l-sch__fig"><b>${fmtN(totals[i])}</b><small>${((totals[i] / all) * 100).toFixed(1)}%</small></span></span>`).join('') +
+      `</span>` +
+    `</span>` +
+    `<span class="l-sch__foot"><b>${fmtN(all)}</b> of ${fmtN(view.base)} ${esc(view.label.toLowerCase())} are scheduled` +
+      ` (${view.base ? Math.round((all / view.base) * 100) : 0}%)</span>`
+}
+
+/* A 10x10 WAFFLE: a hundred squares shared out by largest remainder, so the
+   squares always add to 100 and every group above zero shows at least one */
+function waffleSquares(parts) {
+  const all = parts.reduce((t, p) => t + p.n, 0) || 1
+  const raw = parts.map((p) => (p.n / all) * 100)
+  const got = raw.map((x, i) => (parts[i].n > 0 ? Math.max(1, Math.floor(x)) : 0))
+  let left = 100 - got.reduce((t, x) => t + x, 0)
+  const order = raw.map((x, i) => [x - Math.floor(x), i]).sort((a, b) => b[0] - a[0])
+  for (let k = 0; left > 0; k = (k + 1) % order.length) { const i = order[k][1]; if (parts[i].n > 0) { got[i]++; left-- } }
+  for (let i = got.length - 1; left < 0; i = (i + got.length - 1) % got.length) if (got[i] > 1) { got[i]--; left++ }
+  return got
+}
+
 const BEHAVIOUR = {
+  schedule: (el, variant, data) => {
+    const body = el.querySelector('.l-sch__body')
+    for (const b of el.querySelectorAll('.l-seg__opt')) {
+      /* the grid drags on pointerdown and opens on click; neither is this */
+      b.addEventListener('pointerdown', (e) => e.stopPropagation())
+      b.addEventListener('click', (e) => {
+        e.stopPropagation()
+        for (const o of el.querySelectorAll('.l-seg__opt')) o.setAttribute('aria-pressed', String(o === b))
+        body.innerHTML = scheduleBody(data.views[Number(b.dataset.i)])  // `data` is this paint's scoped copy
+      })
+    }
+  },
   focus: (el) => createCarousel({
     root: el,
     pages: el.querySelector('.l-focus__pages'),
@@ -29157,6 +29516,81 @@ const LAYOUTS = {
   /* METERS · rows that each carry their own track, for quantities where the
      remainder is the story and a bare figure would not say whether it is
      comfortable or nearly out. */
+  /* WHICH SCHEDULE · a donut of the two schedules, then the same split by
+     entity. The Species/Animals switch redraws `.l-sch__body` (BEHAVIOUR). */
+  schedule: (mod, variant, data) =>
+    `<span class="l-sch">` +
+      `<span class="l-sch__top">${head(mod, variant, data)}` +
+        `<span class="l-seg" role="group" aria-label="Count">` +
+          data.views.map((w, i) => `<button type="button" class="l-seg__opt" data-i="${i}" aria-pressed="${i === 0}">${esc(w.label)}</button>`).join('') +
+        `</span>` +
+      `</span>` +
+      `<span class="l-sch__body">${scheduleBody(data.views[0])}</span>` +
+    `</span>`,
+
+  /* ENCLOSURES BY TYPE · a table, largest type first: enclosures, species
+     and animals. Past four rows the rest fold into one "Other" row, which
+     is all a 2x1 tile holds legibly. */
+  enctable: (mod, variant, data) => {
+    const parts = [...data.parts].sort((a, b) => b.n - a.n)
+    const sum = (ps, k) => ps.reduce((t, p) => t + p[k], 0)
+    const rest = parts.slice(4)
+    const rows = rest.length > 1
+      ? [...parts.slice(0, 4), { label: 'Other', n: sum(rest, 'n'), species: sum(rest, 'species'), animals: sum(rest, 'animals'), of: rest.map((p) => p.label).join(', ') }]
+      : parts
+    const cell = (x) => `<span>${fmtN(x)}</span>`
+    return `<span class="l-et">` +
+      `<span class="l-et__top">${head(mod, variant, data)}<span class="l-et__all"><b>${fmtN(sum(parts, 'n'))}</b> ${esc(data.unit)}</span></span>` +
+      `<span class="l-et__grid" role="table">` +
+        `<span class="l-et__row l-et__row--head" role="row"><span>Type</span><span>Encl.</span><span>Species</span><span>Animals</span></span>` +
+        rows.map((r) => `<span class="l-et__row" role="row"${r.of ? ` title="${esc(r.of)}"` : ''}><span class="l-et__label">${esc(r.label)}</span>${cell(r.n)}${cell(r.species)}${cell(r.animals)}</span>`).join('') +
+      `</span></span>`
+  },
+
+  /* PENDING · a sticky note: seven jobs down ruled lines, in the order
+     given so a row is always in the same place (owner, 25 Sep 2026), an
+     empty tick box before each and the count at the end. A job with nothing
+     waiting is struck through, as if ticked off. */
+  pendlist: (mod, variant, data) => {
+    const all = data.parts.reduce((t, p) => t + p.n, 0)
+    return `<span class="l-pd">` +
+      `<i class="l-pd__tape" aria-hidden="true"></i>` +
+      `<span class="l-pd__top">${head(mod, variant, data)}<span class="l-pd__all"><b>${fmtN(all)}</b> ${esc(data.unit)}</span></span>` +
+      `<span class="l-pd__grid">` + data.parts.map((p) =>
+        `<span class="l-pd__row${p.n ? '' : ' l-pd__row--none'}"><i class="l-pd__box" aria-hidden="true"></i>` +
+        `<span class="l-pd__label">${esc(p.label)}</span><b>${fmtN(p.n)}</b></span>`).join('') +
+      `</span></span>`
+  },
+
+  /* COLLECTION · a column per class, height by animals, species beneath */
+  classcols: (mod, variant, data) =>
+    `<span class="l-cc" style="--n:${data.cols.length}">` +
+      `<span class="l-cc__top">${head(mod, variant, data)}<span class="l-cc__all"><b>${esc(data.total)}</b> ${esc(data.unit)}</span></span>` +
+      `<span class="l-cc__plot" aria-hidden="true">` + data.cols.map((c) =>
+        `<span class="l-cc__col"><b>${esc(c.animals)}</b><i class="l-cc__bar" style="--h:${c.h.toFixed(3)}"></i></span>`).join('') +
+      `</span>` +
+      `<span class="l-cc__keys">` + data.cols.map((c) =>
+        `<span class="l-cc__key"><span>${esc(c.label)}</span><small>${esc(c.species)} species</small></span>`).join('') +
+      `</span>` +
+    `</span>`,
+
+  /* CITES APPENDIX · a waffle of a hundred squares, one tint per appendix
+     from most protected (solid) to not listed (faintest), keyed on the right */
+  waffle: (mod, variant, data) => {
+    const all = data.parts.reduce((t, p) => t + p.n, 0)
+    const sq = waffleSquares(data.parts)
+    const tone = (i) => `var(--wf-${i})`
+    return `<span class="l-wf">` +
+      `<span class="l-wf__top">${head(mod, variant, data)}<span class="l-wf__all"><b>${fmtN(all)}</b> ${esc(data.unit)}</span></span>` +
+      `<span class="l-wf__body">` +
+        `<span class="l-wf__grid" aria-hidden="true">` + sq.flatMap((k, i) => Array.from({ length: k }, () => `<i style="background:${tone(i)}"></i>`)).join('') + `</span>` +
+        `<span class="l-wf__legend">` + data.parts.map((p, i) =>
+          `<span class="l-wf__key"><span class="l-wf__name"><i style="background:${tone(i)}"></i>${esc(p.label)}</span>` +
+          `<span class="l-wf__fig"><b>${fmtN(p.n)}</b><small>${all ? Math.round((p.n / all) * 100) : 0}%</small></span></span>`).join('') +
+        `</span>` +
+      `</span></span>`
+  },
+
   meters: (mod, variant, data) =>
     `<span class="l-meters">${head(mod, variant, data)}` +
       (data.total ? `<span class="l-meters__hero">` +
@@ -34602,7 +35036,7 @@ __def('js/components/GlobalSearch.js', function (__x, __req) {
 const { icon } = __req('js/icons.js');
 const { TYPES, TAGS, search } = __req('js/data/searchIndex.js');
 const { prefersReducedMotion } = __req('js/lib/motion.js');
-const { isV4 } = __req('js/lib/pageVersion.js');
+const { hasV4Top } = __req('js/lib/pageVersion.js');
 
 const RECENT_KEY = 'antz.search.recent'
 const RECENT_MAX = 8
@@ -35106,7 +35540,7 @@ function createGlobalSearch({ trigger, input, getScope, onNavigate }) {
       return
     }
 
-    const groups = search(q, { type: token ? token.key : null, scope, tags: picked, cap: CAP, rank: isV4() })
+    const groups = search(q, { type: token ? token.key : null, scope, tags: picked, cap: CAP, rank: hasV4Top() })
     flat = []
     for (const g of groups) for (const r of g.rows) flat.push(r)
     cursor = flat.length ? 0 : -1
@@ -35299,7 +35733,7 @@ function createGlobalSearch({ trigger, input, getScope, onNavigate }) {
   /* ⌘K / Ctrl+K opens the search from anywhere on V4, as it does on every
      page of the compliance web; pressed again while it is open, it closes.
      Not bound on the older versions, whose keyboard is the artboard's. */
-  if (isV4()) {
+  if (hasV4Top()) {
     window.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() !== 'k' || !(e.metaKey || e.ctrlKey) || e.altKey) return
       e.preventDefault()
@@ -37177,7 +37611,7 @@ __def('js/components/Favourites.js', function (__x, __req) {
  * blocked, so every touch is guarded and the seed is what a blocked
  * browser sees every time.
  */
-const { isV4 } = __req('js/lib/pageVersion.js')
+const { hasV4Top, isV5 } = __req('js/lib/pageVersion.js')
 const { SPECIES, CLASSES } = __req('js/data/lifecycle.js')
 const { PROTECTED } = __req('js/data/collection.js')
 const { esc } = __req('js/components/LifePanel.js')
@@ -37280,7 +37714,13 @@ const curve = (name, fallback) => {
 }
 
 function mount({ root, onOpen } = {}) {
-  if (!root || !isV4()) return null
+  if (!root || !hasV4Top()) return null
+  if (isV5()) {
+    root.querySelector('.fav__title').textContent = 'My favourites'
+    /* V5 carries it below the announcements, above the site tabs (owner,
+       25 Sep 2026); V4 keeps it under the search where the markup puts it */
+    document.getElementById('heroStage')?.after(root)
+  }
   const rail = root.querySelector('.fav__rail')
   const edit = root.querySelector('.fav__edit')
   const all = catalogue()
@@ -40679,7 +41119,7 @@ mountIconSprite()
    would mean two more `?v=` branches in the HTML for no gain: V1 needs them,
    V2's CSS drops them before they paint, and an empty `.hero-stage` in the DOM
    of a page that never displays it costs nothing. */
-const { PAGE_VERSION, isV2, isV3, setPageVersion, isV4 } = __req('js/lib/pageVersion.js')
+const { PAGE_VERSION, isV2, isV3, setPageVersion, isV4, isV5, hasV4Top } = __req('js/lib/pageVersion.js')
 /* `=== '1'`, NOT `!== '2'`. The deck and the rail are V1's alone, and the
    negative form meant "anything that is not V2" — which was the same thing
    right up until V3 existed, and would then have mounted V1's two bands into
@@ -40687,7 +41127,7 @@ const { PAGE_VERSION, isV2, isV3, setPageVersion, isV4 } = __req('js/lib/pageVer
 /* AND V4, which is V1's page — the one place V4 has to say so, because the
    positive form above is exactly right and would otherwise leave V4 with an
    empty stage and an empty rail where V1 draws both. */
-if (PAGE_VERSION === '1' || isV4()) {
+if (PAGE_VERSION === '1' || hasV4Top()) {
   const { createHeroBanners } = __req('js/components/HeroBanners.js')
   const { HOME_BANNERS, HOME_BANNERS_V4, HOME_BANNERS_V2 } = __req('js/data/homeBanners.js')
   /* V4's deck carries the Did You Know cards; V1's is the deck as it was */
@@ -40695,7 +41135,7 @@ if (PAGE_VERSION === '1' || isV4()) {
   if (isV2()) __req('js/components/AnnouncementDeck.js').createAnnouncementDeck({ root: document.getElementById('heroStage'), items: HOME_BANNERS_V2 })
   /* the climate background — live on V2, dev switcher under ?climate (25 Sep 2026) */
   if (isV2()) __req('js/components/ClimateBackground.js').mountClimate()
-  else createHeroBanners({ root: document.getElementById('heroStage'), items: isV4() ? HOME_BANNERS_V4 : HOME_BANNERS })
+  else createHeroBanners({ root: document.getElementById('heroStage'), items: hasV4Top() ? HOME_BANNERS_V4 : HOME_BANNERS })
 
   /* the rail between the announcements and the modules, node 196:7243 */
   const { createRecentObservations } = __req('js/components/RecentObservations.js')
@@ -40759,6 +41199,35 @@ if (PAGE_VERSION === '1' || isV4()) {
   /* V2's additions over V4's composition: the notes filter and hold menu,
      arrival motion (HomeV2.js) */
   if (isV2()) __req('js/components/HomeV2.js').mount()
+  /* V5's site tabs: the same scope as V4's site select (one key), drawn as
+     tabs above the modules; a change repaints the grid for the new site */
+  if (isV5()) {
+    const scope = __req('js/state/reportScope.js')
+    const bar = document.getElementById('siteTabs')
+    const draw = () => {
+      bar.innerHTML = scope.options().map((o) =>
+        `<button type="button" role="tab" class="site-tabs__tab" data-site="${o.id}" aria-selected="${o.id === scope.get()}"` +
+        ` tabindex="${o.id === scope.get() ? 0 : -1}">${o.label}</button>`).join('')
+    }
+    draw()
+    bar.hidden = false
+    bar.addEventListener('click', (e) => {
+      const t = e.target.closest('.site-tabs__tab')
+      if (t) scope.set(t.dataset.site)
+    })
+    /* arrow keys move along the tabs, as a tablist should */
+    bar.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+      const tabs = [...bar.querySelectorAll('.site-tabs__tab')]
+      const i = tabs.indexOf(document.activeElement)
+      if (i < 0) return
+      e.preventDefault()
+      const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]
+      scope.set(next.dataset.site)
+      bar.querySelector(`[data-site="${next.dataset.site}"]`).focus()
+    })
+    scope.subscribe(() => { draw(); grid.destroy(); paint({ animate: false }) })
+  }
 }
 
 /* ── quick actions ──────────────────────────────────────────────────────
@@ -41091,6 +41560,8 @@ const profileMenu = createProfileMenu({
           note: 'The black page — node 506:10213' },
         { id: 'ver:4', label: 'Version 4', checked: PAGE_VERSION === '4',
           note: 'Live clock, no planting, today\u2019s births and deaths' },
+        { id: 'ver:5', label: 'Version 5', checked: isV5(),
+          note: 'Version 4 to the observations, then Version 1\u2019s modules' },
 
         null,
         { id: 'reset', icon: 'refresh', label: 'Reset Home Page',
@@ -41932,7 +42403,7 @@ const searchHint = createSearchHint({
        "Blackbuck", "Lion House 2" — so the field says what it can find and
        what to type, which a category alone does not (the compliance web's
        search-hints.ts, whose examples are lifted from its own sheet) */
-    if (!isV4()) return cats
+    if (!hasV4Top()) return cats
     const ex = __req('js/data/searchIndex.js').examples(6)
     return cats.flatMap((c, i) => (ex[i] ? [c, ex[i]] : [c]))
   },
@@ -43573,7 +44044,7 @@ __def('js/components/Clock.js', function (__x, __req) {
  * from it every hour the tab stays open.
  */
 
-const { isV4 } = __req('js/lib/pageVersion.js');
+const { hasV4Top } = __req('js/lib/pageVersion.js');
 
 const fmtTime = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
 const fmtDate = new Intl.DateTimeFormat(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
@@ -43594,7 +44065,7 @@ const iso = d => {
 };
 
 function mount() {
-  if (!isV4()) return
+  if (!hasV4Top()) return
   const time = document.getElementById('clockTime');
   const date = document.getElementById('clockDate');
   const word = document.getElementById('greetWord');

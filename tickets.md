@@ -16,3 +16,11 @@
 - [ ] v4-mortality-icon — redraw the Mortality glyph for V4 to match Natality's
 - [ ] push — never push unless the owner says so
 - [x] v4-focus-tiles — Preventive Care report + tile, Lab split from Operations, Fetal Death and Follow Up small tiles
+- [x] v5-v4-top-v1-modules — Version 5: V4 page down to Recent Observations, then V1 All Modules (own layout key)
+- [x] v5-collection-by-class — V5 home: one card, animals per class as bars, species count per class, totals on the title line
+- [x] v5-schedule-appendix — V5 home: Which schedule (donut + by entity, Species/Animals switch; animal figures are placeholders) and Appendix, by class; teal only
+- [x] v5-enclosure-types — V5 home: Enclosures by type treemap, seven families from the housing kinds (placeholder counts)
+- [x] v5-site-tabs — V5 home: All sites + four site tabs above the banner; re-scope the four data cards (mock site share)
+- [x] v5-life-lists — V5 home: V4's Mortality and Natality ten-day lists after Schedule/CITES (commit 922b317)
+- [x] v5-pending-list — V5 home: one Pending card, 7 rows (vaccinations, necropsy, medicine, surgeries, sexing, microchip, transfers) (commit 27794dd)
+- [x] v5-pending-note — V5 home: Pending 2x2 sticky note, Collection 2x1 (commit a2c8238)
