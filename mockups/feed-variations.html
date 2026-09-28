@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feed Variations</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=DM+Sans:opsz,wght@9..40,400..700&display=swap" rel="stylesheet">
+<!--
+  ANNOUNCEMENTS & NOTES ON AN iPAD — three ways (28 Sep 2026)
+  The build behind V2's "View all" (a grid of cards, the detail over it) was
+  sent back: "No Not Good. Can u make 3 Variations". Each variation here
+  changes a different thing: WHERE the post is read (a pane beside the list,
+  a sheet over a board, the list itself) and HOW the list is ordered (newest
+  first, by priority, by day). Each one says what a tap does. V2's own
+  parts are kept: the chip, the gradient title, the priority colours and
+  badges, the frosted AAID plate, the like/comment/save row.
+-->
+<style>
+:root {
+  --ink: #1F415B; --ink-2: #44544A; --mute: #7A8684; --line: rgba(0, 0, 0, .06);
+  --mint: rgba(175, 239, 235, .5); --page: #EEF2F2; --card: #fff;
+  --green: #37BD69; --blue: #00AFD6; --red: #E93353; --action: #00845F;
+  --p-critical: #F21037; --p-high: #F06D52; --p-moderate: #FFB71D; --p-low: #0FC1E8;
+  --b-critical: #FFE3E8; --b-high: #FFE6E0; --b-moderate: #FFF3D6; --b-low: #DDF7FD;
+  --g-ann: linear-gradient(-38.56deg, #00AFD6 .6%, #37BD69 103.4%);
+  --g-imp: linear-gradient(133.1deg, #E93353 1.5%, #FA6140 96.9%);
+  --spring: cubic-bezier(.32, .72, 0, 1);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+
+/* ── the mockup's own chrome ── */
+.mk { position: sticky; top: 0; z-index: 50; padding: 16px 24px 12px; background: rgba(238, 242, 242, .92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.mk__row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.mk h1 { margin: 0 auto 0 0; font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+.seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: rgba(31, 65, 91, .08); }
+.seg button { height: 34px; padding: 0 14px; border: 0; border-radius: 9px; background: none; font-size: 13px; font-weight: 550; cursor: pointer; white-space: nowrap; }
+.seg button[aria-pressed='true'] { background: #fff; box-shadow: 0 1px 3px rgba(31, 65, 91, .15); font-weight: 650; }
+.seg button b { margin-right: 6px; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 11px; }
+.brief { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.brief div { padding: 10px 12px; border-radius: 10px; background: #fff; font-size: 12.5px; line-height: 18px; color: var(--ink-2); }
+.brief b { display: block; margin-bottom: 2px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); }
+@media (max-width: 900px) { .brief { grid-template-columns: 1fr 1fr; } }
+.stage { display: flex; justify-content: center; padding: 24px 16px 64px; }
+.ipad { position: relative; flex: none; border-radius: 34px; background: #111; padding: 14px; box-shadow: 0 30px 80px -24px rgba(16, 45, 52, .45); transform-origin: 50% 0; }
+.screen { position: relative; overflow: hidden; border-radius: 22px; background: #F7F9F9; }
+.caption { text-align: center; font-size: 12px; color: var(--mute); margin-top: -40px; padding-bottom: 32px; }
+
+/* ── the app's bar, shared ── */
+.app { position: absolute; inset: 0; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(175, 239, 235, .42) 0, rgba(175, 239, 235, 0) 240px), #F7F9F9; }
+.sb { flex: none; height: 24px; padding: 0 22px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600; }
+.bar { flex: none; display: flex; align-items: center; gap: 12px; padding: 8px 24px 12px; }
+.back { display: grid; place-items: center; width: 40px; height: 40px; border: .5px solid var(--line); border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(76, 78, 100, .08); cursor: pointer; }
+.back svg { width: 20px; height: 20px; }
+.bar h2 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.01em; }
+.bar small { display: block; font-size: 12px; font-weight: 500; color: var(--mute); }
+.bar .sp { flex: 1; }
+.search { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border: .5px solid var(--line); border-radius: 12px; background: #fff; font-size: 14px; color: var(--mute); }
+.search img { width: 18px; height: 18px; opacity: .7; }
+.tabs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 11px; background: rgba(31, 65, 91, .07); }
+.tabs span { height: 32px; padding: 0 12px; display: inline-flex; align-items: center; gap: 5px; border-radius: 8px; font-size: 13px; font-weight: 550; cursor: pointer; white-space: nowrap; }
+.tabs span.on { background: #fff; box-shadow: 0 1px 3px rgba(31, 65, 91, .14); font-weight: 650; }
+.tabs b { font-weight: 650; color: var(--mute); }
+.tabs span.on b { color: #F06D52; }
+
+/* ── the parts every variation shares ── */
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 2px 10px 2px 2px; border-radius: 100px; background: rgba(55, 189, 105, .1); font-size: 10.5px; font-weight: 650; letter-spacing: .02em; color: var(--ink-2); white-space: nowrap; }
+.chip img { width: 24px; height: 24px; }
+.chip.important { background: rgba(233, 51, 83, .1); }
+.chip.fact { background: rgba(0, 175, 214, .1); }
+.hl { margin: 0; font-weight: 600; letter-spacing: -.005em; color: transparent; background: var(--g-ann); -webkit-background-clip: text; background-clip: text; }
+.hl.important { background-image: var(--g-imp); }
+.hl.cancelled { background-image: linear-gradient(#8A9593, #8A9593); }
+.flag { height: 20px; padding: 0 8px; border-radius: 5px; background: #E5484D; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .06em; line-height: 20px; }
+.by { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--mute); white-space: nowrap; min-width: 0; }
+.by i { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 0, 0, .05); font-size: 9px; font-weight: 700; font-style: normal; color: #1F515B; }
+.by b { font-weight: 600; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; }
+.by .dot::before { content: '•'; margin-right: 6px; }
+.pri { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; font-weight: 700; letter-spacing: -.3px; }
+.pri img { width: 18px; height: 18px; }
+.pri.critical { background: var(--b-critical); color: var(--p-critical); }
+.pri.high { background: var(--b-high); color: var(--p-high); }
+.pri.moderate { background: var(--b-moderate); color: #C98A00; }
+.pri.low { background: var(--b-low); color: #0797B8; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px; color: var(--mute); }
+.tags span::before { content: '•'; margin-right: 5px; }
+.ent { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ent img { flex: none; width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.ent b { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.ent span { font-size: 11px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.files { display: flex; flex-wrap: wrap; gap: 6px; }
+.file { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px 0 3px; border-radius: 100px; background: var(--f-bg); font-size: 11.5px; font-weight: 500; }
+.file i { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #fff; color: var(--f-ink); font-style: normal; }
+.file svg { width: 12px; height: 12px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.tile { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 10px; background: var(--f-bg); }
+.tile i { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; background: #fff; color: var(--f-ink); font-style: normal; }
+.tile svg { width: 20px; height: 20px; }
+.tile b { display: block; font-size: 12.5px; font-weight: 600; }
+.tile small { font-size: 11px; color: var(--mute); }
+.acts { display: flex; align-items: center; gap: 16px; font-size: 12.5px; color: rgba(68, 84, 74, .85); }
+.acts span { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.acts img { width: 18px; height: 18px; }
+.acts .save { margin-left: auto; }
+.notif { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.notif > b { width: 100%; font-size: 12.5px; font-weight: 600; }
+.notif span { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 9px 0 3px; border-radius: 100px; background: rgba(31, 65, 91, .05); font-size: 11.5px; color: var(--ink-2); }
+.notif span i { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #fff; font-size: 8px; font-weight: 700; font-style: normal; }
+.thread { display: flex; flex-direction: column; gap: 10px; }
+.thread > b { font-size: 14px; font-weight: 600; }
+.thread > b em { font-style: normal; font-weight: 500; color: var(--mute); margin-left: 4px; }
+.com { display: flex; gap: 10px; }
+.com i { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(0, 175, 214, .1); color: #0B6F86; font-size: 10px; font-weight: 700; font-style: normal; }
+.com p { margin: 0; font-size: 13px; line-height: 19px; color: var(--ink-2); }
+.com p:first-child { font-size: 12px; color: var(--mute); }
+.com p:first-child b { color: var(--ink); font-weight: 600; margin-right: 6px; }
+.say { display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 4px 0 14px; border: .5px solid rgba(0, 0, 0, .08); border-radius: 100px; background: #F4F7F7; font-size: 14px; color: var(--mute); }
+.say span { flex: 1; }
+.say button { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 50%; background: linear-gradient(135deg, #37BD69, #00AFD6); color: #fff; }
+.say svg { width: 16px; height: 16px; }
+.slab { background: linear-gradient(160deg, var(--s1), var(--s2)); }
+.slab.critical { --s1: #FF6A84; --s2: #F21037; } .slab.high { --s1: #F8A28E; --s2: #F06D52; }
+.slab.moderate { --s1: #FFD470; --s2: #F2A600; } .slab.low { --s1: #6FDDF3; --s2: #0AA9CF; }
+.slab.announcement { --s1: #8FE0B0; --s2: #1FAE8C; } .slab.important { --s1: #FF8FA0; --s2: #E93353; } .slab.fact { --s1: #7ED9EE; --s2: #0096C7; }
+.plate { display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border-radius: 10px; background: rgba(255, 255, 255, .3); backdrop-filter: blur(12px); color: #fff; }
+.plate img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.plate b { display: block; font-size: 14px; font-weight: 600; } .plate small { font-size: 12px; opacity: .92; }
+.plate em { margin-left: auto; font-style: normal; font-weight: 600; }
+.nocontent { padding: 40px; text-align: center; color: var(--mute); font-size: 14px; }
+
+/* ═════ VARIATION 1 · SPLIT VIEW ═════ */
+.v1 { flex: 1; min-height: 0; display: flex; gap: 0; padding: 0 0 0 16px; }
+.v1__list { flex: none; width: var(--listw, 400px); display: flex; flex-direction: column; min-height: 0; padding-right: 12px; }
+.v1__tools { display: flex; flex-direction: column; gap: 8px; padding: 0 0 10px 8px; }
+.v1__rows { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 0 0 24px 8px; scrollbar-width: thin; }
+.v1__grp { margin: 10px 4px 2px; font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.row { position: relative; display: flex; gap: 12px; padding: 12px 12px 12px 16px; border-radius: 14px; background: #fff; border: .5px solid var(--line); cursor: pointer; transition: background-color 200ms ease, box-shadow 200ms ease; }
+.row::before { content: ''; position: absolute; left: 6px; top: 14px; bottom: 14px; width: 3px; border-radius: 2px; background: var(--rc, var(--green)); }
+.row.on { background: #E9F8F6; border-color: rgba(0, 175, 214, .35); box-shadow: 0 0 0 3px rgba(0, 175, 214, .08); }
+.row__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.row__top { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 650; letter-spacing: .04em; color: var(--mute); text-transform: uppercase; }
+.row__top .when { margin-left: auto; font-weight: 500; letter-spacing: 0; text-transform: none; }
+.row h4 { margin: 0; font-size: 14.5px; font-weight: 600; line-height: 19px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.row p { margin: 0; font-size: 12.5px; line-height: 17px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.row__meta { display: flex; align-items: center; gap: 10px; font-size: 11.5px; color: var(--mute); }
+.row__meta svg { width: 12px; height: 12px; vertical-align: -1px; }
+.row__pic { flex: none; width: 64px; height: 64px; border-radius: 10px; object-fit: cover; align-self: center; }
+.row.cancelled h4 { color: var(--mute); }
+.v1__pane { flex: 1; min-width: 0; display: flex; flex-direction: column; margin: 0 16px 16px 0; border-radius: 20px; background: #fff; border: .5px solid var(--line); box-shadow: 0 2px 16px rgba(76, 78, 100, .06); overflow: hidden; }
+.v1__scroll { flex: 1; min-height: 0; overflow-y: auto; }
+.v1__media { position: relative; height: 260px; }
+.v1__media > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.v1__media .plate { position: absolute; left: 16px; right: 16px; bottom: 16px; }
+.v1__media .n { position: absolute; left: 16px; top: 16px; height: 24px; padding: 0 9px; border-radius: 100px; background: rgba(0, 0, 0, .5); color: #fff; font-size: 11.5px; font-weight: 600; line-height: 24px; }
+.v1__media .pri { position: absolute; right: 16px; top: 16px; width: 36px; height: 36px; box-shadow: 0 1px 3px rgba(0, 0, 0, .15); }
+.v1__body { display: flex; flex-direction: column; gap: 14px; padding: 20px 28px 20px; }
+.v1__body .hl { font-size: 24px; line-height: 30px; }
+.v1__body .ttl { margin: 0; font-size: 24px; line-height: 30px; font-weight: 600; }
+.v1__body .txt { margin: 0; font-size: 15px; line-height: 24px; color: var(--ink-2); }
+.v1__body hr { width: 100%; margin: 0; border: 0; border-top: .5px solid var(--line); }
+.v1__foot { flex: none; padding: 10px 20px 14px; border-top: .5px solid var(--line); background: #fff; }
+.v1__nav { display: flex; gap: 6px; margin-left: auto; }
+.v1__nav span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: rgba(31, 65, 91, .06); cursor: pointer; }
+.v1__nav svg { width: 16px; height: 16px; }
+.pane-in { animation: pane-in 360ms var(--spring); }
+@keyframes pane-in { from { opacity: 0; transform: translateX(14px); } }
+
+/* ═════ VARIATION 2 · BOARD ═════ */
+.v2 { flex: 1; min-height: 0; overflow: auto; padding: 0 24px 24px; }
+.v2__tools { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.v2__tools .search { flex: 1; }
+.v2h { display: flex; align-items: baseline; gap: 8px; margin: 18px 0 10px; font-size: 13px; font-weight: 650; }
+.v2h small { font-weight: 500; color: var(--mute); }
+.v2__pinned { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.pin { display: flex; gap: 14px; padding: 14px; border-radius: 16px; background: linear-gradient(135deg, #FFF1F3, #FFF6F0); border: .5px solid rgba(233, 51, 83, .18); cursor: pointer; }
+.pin__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.pin .hl { font-size: 16px; line-height: 21px; }
+.pin p { margin: 0; font-size: 12.5px; line-height: 18px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pin__ack { align-self: flex-start; height: 30px; padding: 0 12px; border: 0; border-radius: 100px; background: var(--red); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; }
+.pin__ack.done { background: rgba(55, 189, 105, .14); color: var(--action); }
+.pin.cancelled { background: #F4F6F6; border-color: var(--line); }
+.v2__grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 12px; }
+.tcard { display: flex; flex-direction: column; border-radius: 14px; background: #fff; border: .5px solid var(--line); overflow: hidden; cursor: pointer; transition: transform 200ms var(--spring), box-shadow 200ms ease; }
+.tcard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -8px rgba(16, 45, 52, .2); }
+.tcard__pic { height: 128px; position: relative; }
+.tcard__pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tcard__pic .n { position: absolute; right: 8px; top: 8px; height: 22px; padding: 0 8px; border-radius: 100px; background: rgba(0, 0, 0, .5); color: #fff; font-size: 11px; font-weight: 600; line-height: 22px; }
+.tcard__in { display: flex; flex-direction: column; gap: 7px; padding: 12px; flex: 1; }
+.tcard .hl { font-size: 14.5px; line-height: 19px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tcard p { margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tcard .acts { margin-top: auto; padding-top: 6px; }
+.v2__facts { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; }
+.fact { flex: none; width: 280px; display: flex; gap: 12px; padding: 12px; border-radius: 14px; background: linear-gradient(135deg, #E6F8FC, #EAF8F0); cursor: pointer; }
+.fact img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; }
+.fact b { display: block; font-size: 13px; line-height: 17px; }
+.fact small { font-size: 11px; color: var(--mute); font-style: italic; }
+/* the notes board: a lane per priority */
+.lanes { display: grid; grid-template-columns: repeat(4, minmax(var(--lanew, 0), 1fr)); gap: 12px; align-items: start; }
+.lanes.scroll { grid-template-columns: repeat(4, 290px); }
+.lane { display: flex; flex-direction: column; gap: 10px; padding: 10px; border-radius: 16px; background: rgba(31, 65, 91, .035); }
+.lane__h { display: flex; align-items: center; gap: 8px; padding: 2px 4px 4px; font-size: 13px; font-weight: 650; }
+.lane__h::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--lc); }
+.lane__h em { margin-left: auto; font-style: normal; font-weight: 600; color: var(--mute); }
+.ncard { display: flex; flex-direction: column; border-radius: 12px; background: #fff; border: .5px solid var(--line); overflow: hidden; cursor: pointer; transition: transform 200ms var(--spring), box-shadow 200ms ease; }
+.ncard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -8px rgba(16, 45, 52, .2); }
+.ncard__pic { height: 96px; position: relative; }
+.ncard__pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ncard__in { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px 12px; }
+.ncard h4 { margin: 0; font-size: 14px; font-weight: 600; }
+.ncard p { margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* the sheet */
+.veil { position: absolute; inset: 0; z-index: 10; background: rgba(16, 45, 52, .28); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity 260ms ease; }
+.veil.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; top: 12px; right: 12px; bottom: 12px; z-index: 11; width: var(--sheetw, 500px); display: flex; flex-direction: column; border-radius: 22px; background: #fff; box-shadow: -20px 0 60px -20px rgba(16, 45, 52, .45); overflow: hidden; transform: translateX(calc(100% + 24px)); transition: transform 420ms var(--spring); }
+.sheet.on { transform: none; }
+.sheet .x { position: absolute; top: 12px; right: 12px; z-index: 3; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, .9); box-shadow: 0 2px 8px rgba(0, 0, 0, .15); cursor: pointer; }
+.sheet .x svg { width: 16px; height: 16px; }
+.sheet .v1__media .pri { right: 60px; }
+
+/* ═════ VARIATION 3 · TIMELINE ═════ */
+.v3 { flex: 1; min-height: 0; display: flex; gap: 20px; padding: 0 24px; }
+.v3__main { flex: 1; min-width: 0; overflow-y: auto; padding-bottom: 32px; }
+.v3__side { flex: none; width: 290px; overflow-y: auto; padding-bottom: 24px; display: flex; flex-direction: column; gap: 12px; }
+.v3__side.top { display: none; }
+.box { padding: 14px; border-radius: 16px; background: #fff; border: .5px solid var(--line); }
+.box > b { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 650; }
+.need { display: flex; flex-direction: column; gap: 8px; }
+.need__i { display: flex; gap: 10px; align-items: flex-start; padding: 10px; border-radius: 12px; background: #FFF3F5; cursor: pointer; }
+.need__i.note { background: #FFF6F1; }
+.need__i p { margin: 0; flex: 1; font-size: 12.5px; line-height: 17px; font-weight: 550; }
+.need__i small { display: block; font-weight: 400; color: var(--mute); margin-top: 2px; }
+.flist { display: flex; flex-direction: column; gap: 2px; }
+.flist span { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border-radius: 10px; font-size: 13px; cursor: pointer; }
+.flist span::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--fc, var(--ink)); }
+.flist span b { margin-left: auto; font-weight: 600; color: var(--mute); }
+.flist span.on { background: var(--ink); color: #fff; } .flist span.on b { color: rgba(255, 255, 255, .7); } .flist span.on::before { background: #fff; }
+.day { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 10px; padding: 10px 0 8px; background: linear-gradient(#F7F9F9 70%, rgba(247, 249, 249, 0)); font-size: 12px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.day::after { content: ''; flex: 1; height: .5px; background: var(--line); }
+.tl { position: relative; display: flex; flex-direction: column; gap: 10px; padding-left: 64px; margin-bottom: 8px; }
+.tl::before { content: ''; position: absolute; left: 48px; top: 6px; bottom: 6px; width: 2px; border-radius: 1px; background: rgba(31, 65, 91, .08); }
+.item { position: relative; border-radius: 16px; background: #fff; border: .5px solid var(--line); cursor: pointer; transition: box-shadow 240ms ease; }
+.item:hover { box-shadow: 0 6px 18px -8px rgba(16, 45, 52, .2); }
+.item__t { position: absolute; left: -64px; top: 14px; width: 40px; text-align: right; font-size: 11px; font-weight: 600; color: var(--mute); }
+.item__dot { position: absolute; left: -21px; top: 16px; width: 12px; height: 12px; border-radius: 50%; background: var(--dc, var(--green)); box-shadow: 0 0 0 3px #F7F9F9; }
+.item__row { display: flex; gap: 14px; padding: 14px; }
+.item__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.item__top { display: flex; align-items: center; gap: 8px; }
+.item .hl, .item .ttl { margin: 0; font-size: 16px; line-height: 21px; font-weight: 600; }
+.item__txt > p { margin: 0; font-size: 13px; line-height: 19px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item__pic { flex: none; width: 132px; height: 96px; border-radius: 12px; object-fit: cover; }
+.item__more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 420ms var(--spring); }
+.item__more > div { min-height: 0; overflow: hidden; }
+.item__more .in { display: flex; flex-direction: column; gap: 14px; padding: 0 14px 14px; }
+.item.open { cursor: default; box-shadow: 0 10px 30px -12px rgba(16, 45, 52, .25); }
+.item.open .item__more { grid-template-rows: 1fr; }
+.item.open .item__txt > p { -webkit-line-clamp: unset; display: block; }
+.item.open .item__pic { display: none; }
+.item .bigpic { width: 100%; height: 240px; border-radius: 12px; object-fit: cover; display: block; }
+.item .foot { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-top: .5px solid var(--line); }
+.item .foot .acts { flex: 1; }
+.sum { display: none; gap: 8px; overflow-x: auto; margin-bottom: 8px; }
+.sum span { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 100px; background: #fff; border: .5px solid var(--line); font-size: 13px; cursor: pointer; }
+.sum span.on { background: var(--ink); color: #fff; border-color: transparent; }
+.sum span b { font-weight: 600; opacity: .7; }
+.sum span.alert { background: #FFF3F5; border-color: rgba(233, 51, 83, .25); color: #C21D3C; }
+.portrait .v3__side { display: none; }
+.portrait .sum { display: flex; }
+</style>
+</head>
+<body>
+
+<header class="mk">
+  <div class="mk__row">
+    <h1>Announcements &amp; Notes on an iPad: three ways</h1>
+    <div class="seg" id="segV" role="group" aria-label="Variation">
+      <button data-v="1" aria-pressed="true"><b>1</b>Split view</button>
+      <button data-v="2" aria-pressed="false"><b>2</b>Board</button>
+      <button data-v="3" aria-pressed="false"><b>3</b>Timeline</button>
+    </div>
+    <div class="seg" id="segK" role="group" aria-label="Page">
+      <button data-k="ann" aria-pressed="true">Announcements</button>
+      <button data-k="notes" aria-pressed="false">Notes</button>
+    </div>
+    <div class="seg" id="segO" role="group" aria-label="Orientation">
+      <button data-o="land" aria-pressed="true">Landscape</button>
+      <button data-o="port" aria-pressed="false">Portrait</button>
+    </div>
+  </div>
+  <div class="brief" id="brief"></div>
+</header>
+
+<div class="stage"><div class="ipad" id="ipad"><div class="screen" id="screen"><div class="app" id="app"></div></div></div></div>
+
+<script>
+const A = '../assets/'
+const ME = 'Sourav Tambe'
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+const ini = (n) => String(n).replace(/^Dr\.?\s+/, '').split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase()
+
+/* ── the content: V2's seed, with what the app has and the home does not ── */
+const ANN = [
+  { id: 'a1', k: 'announcement', title: 'Monsoon hours: night houses close at 17:30 from Monday', by: ME, when: 'Yesterday', time: '09:40', day: 'Yesterday',
+    body: 'With the heavy rain forecast for the next two weeks, every section brings its animals in by 17:30 and the last keeper walk moves to 17:00. The drainage team will walk the moats each morning before the gates open; report standing water to the duty office straight away.',
+    img: 'img/species/sambar.jpg', imgs: 3, files: [['pdf', 'Monsoon rota', 'PDF · 3 pages'], ['video', 'Drainage walk-through', 'Video · 1:12']],
+    notified: ['All staff'], comments: [['Anita Deshmukh', 'Today 08:10', 'Primates are in by 17:15 all week.']], likes: 12 },
+  { id: 'a2', k: 'important', cancelled: true, title: 'Evacuation drill for the Carnivore Section on 29 September', by: ME, when: '3d ago', time: '16:20', day: 'This week',
+    body: 'The drill has been called off because of the monsoon warning. Keepers do not need to report early on the 29th. A new date will be announced once the rain has passed.',
+    notified: ['Carnivore Section', 'Security'], comments: [], likes: 3 },
+  { id: 'a3', k: 'announcement', title: 'Volunteer orientation moves to the Education Centre', by: ME, when: '21 Sep', time: '11:05', day: 'Earlier in September',
+    body: 'Saturday’s orientation for the new volunteers is now in the Education Centre, not the main hall. Please meet them at the north gate at 09:00 and walk them over.',
+    files: [['audio', 'Directions to the Education Centre', 'Audio · 0:28']], notified: ['Volunteers', 'Visitor Services'], comments: [], likes: 7 },
+  { id: 'a4', k: 'important', title: 'Please follow all safety protocols carefully to ensure smooth and secure daily operations', by: 'Vantara admin', when: '26 Aug', time: '10:00', day: 'August',
+    body: 'This is an important reminder regarding the strict adherence to all established guidelines, protocols, and regulations across every section and enclosure. Report any hazard to your section head at once, wear your issued PPE in every holding area, and never enter a night house alone.',
+    files: [['pdf', 'Safety protocol v4', 'PDF · 12 pages'], ['doc', 'PPE checklist', 'DOCX · 1 page']], notified: ['All staff'],
+    comments: [['Suresh Yadav', '26 Aug 16:05', 'Hoofstock has signed the checklist for every holding area.']], likes: 41, ack: false },
+  { id: 'a5', k: 'announcement', title: 'Zara and Kian, our leopard cubs, go on exhibit from Monday', by: 'Dr. Meera Nair', when: '24 Aug', time: '08:30', day: 'August',
+    body: 'After twelve weeks in the den the two Persian leopard cubs have passed their final health check and will be out in the main habitat from Monday morning. Please keep the service path behind the exhibit closed between 09:00 and 11:00 while they get used to the space.',
+    img: 'img/hero-leopard.jpg', imgs: 2, files: [['pdf', 'Exhibit opening plan', 'PDF · 2 pages']], notified: ['Carnivore Section', 'Visitor Services', 'Security'],
+    comments: [['Kunal Singh', '24 Aug 10:12', 'The keeper talk at the viewing deck starts at 11:30 on Monday.'], ['Anita Deshmukh', '25 Aug 08:40', 'Maintenance have checked the stand-off barrier on the east side.']], likes: 24 },
+  { id: 'a6', k: 'announcement', title: 'Quarterly health checks begin 7 September', by: 'Hospital team', when: '22 Aug', time: '12:00', day: 'August',
+    body: 'The veterinary hospital starts the quarterly round on 7 September, section by section, beginning with Hoofstock. Section heads will receive the schedule by Friday. Please have weights, body-condition scores and any open medical notes updated in ANTZ before your date.',
+    img: 'img/hospital.jpg', imgs: 1, files: [['sheet', 'Quarterly schedule', 'XLSX · 4 sections']], notified: ['Section heads', 'Hospital team'],
+    comments: [['Dr. Meera Nair', '22 Aug 12:30', 'Hoofstock on the 7th, Primates on the 9th.'], ['Ramesh Patil', '23 Aug 09:02', 'Big Bull is still on box rest; can we move him?'], ['Dr. Meera Nair', '23 Aug 09:40', 'Yes, moved to 21 September.']], likes: 18 },
+  { id: 'a7', k: 'announcement', title: 'Fresh browse deliveries move to a morning schedule', by: 'Diet Kitchen', when: '12 Aug', time: '07:15', day: 'August',
+    body: 'From next week the browse and produce delivery arrives at the Diet Kitchen at 06:30 instead of 14:00, so every section collects its rations before the first feed. Diet change requests still need a nutritionist’s sign-off in ANTZ by 16:00 the day before.',
+    img: 'img/diet-kitchen.jpg', imgs: 1, files: [['audio', 'Voice note from the kitchen', 'Audio · 0:42']], notified: ['Diet Kitchen', 'Section heads'], comments: [], likes: 9 },
+  { id: 'f1', k: 'fact', title: 'A lion’s roar carries for eight kilometres', species: 'Asiatic lion', latin: 'Panthera leo leo', img: 'img/species.jpg', day: 'Did you know',
+    body: 'The vocal folds of a big cat are square-edged and fatty, so they turn far less breath into far more sound than ours can.', likes: 56, comments: [] },
+  { id: 'f2', k: 'fact', title: 'Orangutans share nearly 97% of our DNA', species: 'Sumatran orangutan', latin: 'Pongo abelii', img: 'img/species/sumatran-orangutan.jpg', day: 'Did you know',
+    body: 'Only the two chimpanzees are closer to us, and it shows in the hands: thumb and all, an orangutan’s grip works the way yours does.', likes: 33, comments: [] },
+  { id: 'f3', k: 'fact', title: 'An elephant hears through its feet', species: 'Asian elephant', latin: 'Elephas maximus', day: 'Did you know',
+    body: 'A herd’s low rumbles travel through the ground as well as the air, and are read back through bone.', likes: 29, comments: [] },
+]
+const NOTES = [
+  { id: 'n1', p: 'high', title: 'Hoof Overgrowth', tags: ['Hoof Care', 'Mobility'], by: ME, when: '2d ago', time: '17:10', day: 'This week',
+    ent: ['AAID : 190411', 'Sambar', 'img/species/sambar.jpg'], more: 1, img: 'img/species/sambar.jpg',
+    body: 'Both front hooves are long on the outer wall and she is rolling onto the heels when she walks. Booked a trim with the hospital for Wednesday; keep her on the soft paddock until then.',
+    notified: ['Hospital team', 'Hoofstock'], comments: [['Dr. Meera Nair', '26 Sep 17:30', 'Wednesday 10:00 works. Fast her from the night before.']], likes: 4 },
+  { id: 'n2', p: 'low', title: 'Visitor Path Signage', tags: ['Signage', 'Visitor Safety'], by: ME, when: '4d ago', time: '11:20', day: 'This week',
+    ent: ['SITE', 'Bannerghatta Safari', 'img/hero-banner-v2.jpg'], more: 0,
+    body: 'Two of the “Do not feed the animals” boards on the safari loop have faded past reading. Asked Visitor Services for replacements before the Dasara weekend.',
+    notified: ['Visitor Services'], comments: [], likes: 2 },
+  { id: 'n3', p: 'critical', title: 'Deep Flank Wound', tags: ['Open Wound', 'Bleeding'], by: 'Ramesh Patil', when: '3 Sep', time: '07:45', day: 'Earlier in September',
+    ent: ['AAID : 87546/24', 'Big Bull', 'img/obs-animal.png'], more: 2, img: 'img/v2-note-tiger.jpg', notifiedMe: true,
+    body: 'Found a 6cm laceration on the left flank during the morning check, still bleeding lightly. Separated him into the night house and called the duty vet. Needs cleaning, a suture and a tetanus cover before he goes back out with the herd.',
+    notified: ['Dr. Meera Nair', 'Hospital team', 'Hoofstock', 'Sourav Tambe'], comments: [['Dr. Meera Nair', '3 Sep 09:15', 'On my way. Keep him in the night house.'], ['Ramesh Patil', '3 Sep 11:48', 'Sutured, six stitches. Tetanus cover given.']], likes: 12 },
+  { id: 'n4', p: 'high', title: 'Metal Work', tags: ['Rust and Corrosion', 'Structural Changes'], by: 'Anita Deshmukh', when: '2 Sep', time: '14:10', day: 'Earlier in September',
+    ent: ['ENC : HB-04', 'Hoofstock Barn', 'img/hospital.jpg'], more: 0, notifiedMe: true,
+    body: 'The lower rail on the north gate has rusted through where it meets the post, and the whole panel now flexes when the animals lean on it. Raised with maintenance; the paddock stays closed until the panel is replaced.',
+    notified: ['Maintenance', 'Hoofstock', 'Sourav Tambe'], comments: [['Kunal Singh', '2 Sep 15:20', 'The replacement panel arrives on Thursday.']], likes: 31 },
+  { id: 'n5', p: 'moderate', title: 'Feed Refusal', tags: ['Appetite', 'Diet Change'], by: 'Dr. Meera Nair', when: '1 Sep', time: '18:00', day: 'Earlier in September',
+    ent: ['AAID : 44120/25', 'Zara', 'img/hero-leopard.jpg'], more: 1, img: 'img/hero-leopard.jpg',
+    body: 'Third morning running that she has left the meat and taken only the browse. Weight is steady and she is bright and active otherwise, so this is not urgent yet.',
+    notified: ['Nutrition', 'Carnivore Section'], comments: [['Suresh Yadav', '1 Sep 18:02', 'She took half of the chicken this evening.']], likes: 8 },
+  { id: 'n6', p: 'low', title: 'Coat Condition', tags: ['Grooming', 'Routine Check'], by: 'Suresh Yadav', when: '30 Aug', time: '10:30', day: 'August',
+    ent: ['AAID : 21873/23', 'Kanha', 'img/species.jpg'], more: 3,
+    body: 'Slight thinning across the shoulders on four of the herd, most likely the seasonal moult rather than anything to treat. Worth a photograph each week.',
+    notified: ['Hoofstock'], comments: [], likes: 5 },
+  { id: 'n7', p: 'high', title: 'Water Line Leak', tags: ['Utilities', 'Enclosure'], by: 'Anita Deshmukh', when: '29 Aug', time: '09:05', day: 'August',
+    ent: ['ENC : PR-02', 'Primate House', 'img/diet-kitchen.jpg'], more: 0, img: 'img/diet-kitchen.jpg',
+    body: 'The supply to the drinker in the outdoor run has been dripping since Tuesday and has turned the ground under it to mud. Isolated the line at the stopcock and moved them to the tub until it is fixed.',
+    notified: ['Maintenance', 'Primates'], comments: [], likes: 17 },
+  { id: 'n8', p: 'moderate', title: 'Intermittent Lameness', tags: ['Gait', 'Left Hind'], by: 'Dr. Meera Nair', when: '28 Aug', time: '16:40', day: 'August',
+    ent: ['AAID : 66301/24', 'Moti', 'img/obs-animal.png'], more: 0,
+    body: 'Favouring the left hind for the first few strides after standing, then walking it off within a minute. Booked for a proper gait assessment on Thursday.',
+    notified: ['Dr. Meera Nair'], comments: [], likes: 9 },
+]
+const PRI = { critical: ['Critical', '<img src="' + A + 'icon/obs-flame.svg" alt="">'], high: ['High', '!!!'], moderate: ['Moderate', '!!'], low: ['Low', '!'] }
+const CHIP = { announcement: ['ANNOUNCEMENT', 'an-announce'], important: ['IMPORTANT', 'an-important'], fact: ['DID YOU KNOW', 'an-announce'] }
+const TONE = { announcement: '#37BD69', important: '#E93353', fact: '#00AFD6', critical: '#F21037', high: '#F06D52', moderate: '#FFB71D', low: '#0FC1E8' }
+const FILE = {
+  pdf: ['#FDECEC', '#E5484D', '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/>'],
+  doc: ['#E7F0FF', '#2F6FE0', '<path d="M7 3h7l5 5v13H7z"/><path d="M9.5 12h5M9.5 15h5"/>'],
+  sheet: ['#E4F6EC', '#1F9D55', '<path d="M5 5h14v14H5zM5 10h14M5 14.5h14M10 5v14"/>'],
+  audio: ['#FFF6D6', '#D49B00', '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/>'],
+  video: ['#E6F6FB', '#0E9CC0', '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/>'],
+}
+const svg = (p, sw = 2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`
+const CLIP = svg('<path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/>')
+
+/* ── the shared parts ── */
+const chip = (k) => `<span class="chip ${k}"><img src="${A}icon/${CHIP[k][1]}.svg" alt="">${CHIP[k][0]}</span>`
+const pri = (p) => `<span class="pri ${p}" title="${PRI[p][0]} priority">${PRI[p][1]}</span>`
+const by = (it) => it.k === 'fact' ? `<span class="by"><b>${esc(it.species)}</b><span class="dot"><i style="all:unset;font-style:italic">${esc(it.latin)}</i></span></span>`
+  : `<span class="by"><i>${ini(it.by)}</i><b>${esc(it.by)}</b><span class="dot">${esc(it.when)}</span></span>`
+const files = (list) => list?.length ? `<div class="files">${list.map(([k, n]) => `<span class="file" style="--f-bg:${FILE[k][0]};--f-ink:${FILE[k][1]}"><i>${svg(FILE[k][2], 1.8)}</i>${esc(n)}</span>`).join('')}</div>` : ''
+const tiles = (list) => list?.length ? `<div class="tiles">${list.map(([k, n, m]) => `<div class="tile" style="--f-bg:${FILE[k][0]};--f-ink:${FILE[k][1]}"><i>${svg(FILE[k][2], 1.8)}</i><div><b>${esc(n)}</b><small>${esc(m)}</small></div></div>`).join('')}</div>` : ''
+const notif = (list) => list?.length ? `<div class="notif"><b>Notified to</b>${list.slice(0, 4).map((n) => `<span><i>${ini(n)}</i>${esc(n)}</span>`).join('')}${list.length > 4 ? `<span>+${list.length - 4}</span>` : ''}</div>` : ''
+const acts = (it) => `<div class="acts"><span><img src="${A}icon/v2-comment.svg" alt="">${it.comments.length}</span><span><img src="${A}icon/v2-like.svg" alt="">${it.likes}</span><span class="save"><img src="${A}icon/obs-bookmark.svg" alt=""></span></div>`
+const thread = (it) => `<div class="thread"><b>Comments<em>${it.comments.length}</em></b>${it.comments.length ? it.comments.map(([w, t, x]) => `<div class="com"><i>${ini(w)}</i><div><p><b>${esc(w)}</b>${esc(t)}</p><p>${esc(x)}</p></div></div>`).join('') : '<p style="margin:0;font-size:13px;color:var(--mute)">No comments yet.</p>'}<div class="say"><span>Add a comment…</span><button>${svg('<path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z"/>', 0).replace('fill="none"', 'fill="currentColor"')}</button></div></div>`
+const title = (it, cls = '') => it.p ? `<h3 class="ttl ${cls}">${esc(it.title)}</h3>` : `<h3 class="hl ${it.cancelled ? 'cancelled' : it.k} ${cls}">${esc(it.title)}</h3>`
+const tone = (it) => TONE[it.p || it.k]
+
+/* the whole post, used by the split pane and the sheet */
+function detail(it, kind) {
+  const media = it.img
+    ? `<div class="v1__media"><img src="${A}${it.img}" alt="" style="${it.cancelled ? 'filter:grayscale(1) opacity(.7)' : ''}">${it.imgs > 1 ? `<span class="n">1 / ${it.imgs}</span>` : ''}${it.p ? pri(it.p) : ''}${it.ent ? plate(it) : ''}</div>`
+    : it.p ? `<div class="v1__media slab ${it.p}">${pri(it.p)}${plate(it)}</div>` : ''
+  return media + `<div class="v1__body">` +
+    `<div style="display:flex;align-items:center;gap:8px">${it.p ? `<span class="tags">${it.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</span>` : chip(it.k)}${it.cancelled ? '<span class="flag" style="margin-left:auto">CANCELLED</span>' : ''}</div>` +
+    title(it) + by(it) + `<hr><p class="txt">${esc(it.body)}</p>` +
+    (it.files?.length ? `<b style="font-size:13px">Attachments</b>${tiles(it.files)}` : '') +
+    notif(it.notified) + `<hr>${acts(it)}<hr>${thread(it)}</div>`
+}
+const plate = (it) => `<div class="plate"><img src="${A}${it.ent[2]}" alt=""><div><b>${esc(it.ent[0])}</b><small>${esc(it.ent[1])}</small></div>${it.more ? `<em>+${it.more}</em>` : ''}</div>`
+
+/* ── state ── */
+const S = { v: '1', k: 'ann', o: 'land', sel: { ann: 'a1', notes: 'n3' }, tab: 'all', lane: null, open: null, filter: 'all', acked: new Set() }
+const list = () => (S.k === 'ann' ? ANN : NOTES)
+const bar = (extra = '') => `<div class="sb"><span>9:41 AM Mon 28 Sep</span><span>100%</span></div>` +
+  `<div class="bar"><span class="back">${svg('<path d="m15 18-6-6 6-6"/>', 2.2)}</span><div><h2>${S.k === 'ann' ? 'Announcements' : 'Observation Notes'}</h2><small>${list().length} ${S.k === 'ann' ? 'announcements' : 'notes'}</small></div><span class="sp"></span>${extra}</div>`
+const tabs = (opts) => `<div class="tabs">${opts.map(([k, l, n]) => `<span data-tab="${k}" class="${S.tab === k ? 'on' : ''}">${l} <b>${n}</b></span>`).join('')}</div>`
+const mine = () => list().filter((i) => i.by === ME).length
+const TABS = () => S.k === 'ann' ? [['all', 'All', ANN.length], ['mine', 'Created by me', mine()], ['saved', 'Saved', 0]] : [['all', 'All notes', NOTES.length], ['mine', 'My notes', mine()], ['saved', 'Saved', 0]]
+const shown = () => list().filter((i) => S.tab === 'all' || (S.tab === 'mine' && i.by === ME))
+
+/* ═════ 1 · SPLIT VIEW ═════ */
+function v1() {
+  const port = S.o === 'port'
+  const sel = shown().find((i) => i.id === S.sel[S.k]) || shown()[0]
+  let grp = ''
+  const rows = shown().map((it) => {
+    const g = it.day !== grp ? `<div class="v1__grp">${esc(it.day)}</div>` : ''; grp = it.day
+    const top = it.p ? `${pri(it.p).replace('class="pri', 'style="width:20px;height:20px;font-size:10px" class="pri')}<span>${PRI[it.p][0]}</span>` : `<span style="color:${tone(it)}">${CHIP[it.k][0]}</span>${it.cancelled ? '<span class="flag" style="height:16px;line-height:16px;font-size:9px">CANCELLED</span>' : ''}`
+    return g + `<div class="row ${it.id === sel?.id ? 'on' : ''} ${it.cancelled ? 'cancelled' : ''}" data-id="${it.id}" style="--rc:${tone(it)}"><div class="row__txt">` +
+      `<div class="row__top">${top}<span class="when">${esc(it.when || '')}</span></div><h4>${esc(it.title)}</h4>` +
+      (it.ent ? `<div class="ent"><img src="${A}${it.ent[2]}" alt=""><b>${esc(it.ent[0])}</b><span>${esc(it.ent[1])}</span></div>` : `<p>${esc(it.body)}</p>`) +
+      `<div class="row__meta">${it.by ? `<span>${esc(it.by)}</span>` : `<span><i>${esc(it.latin)}</i></span>`}${it.files?.length ? `<span>${CLIP} ${it.files.length}</span>` : ''}<span>${svg('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>')} ${it.comments.length}</span></div>` +
+      `</div>${it.img ? `<img class="row__pic" src="${A}${it.img}" alt="">` : ''}</div>`
+  }).join('')
+  const idx = shown().indexOf(sel)
+  return bar() + `<div class="v1" style="--listw:${port ? 330 : 400}px"><div class="v1__list"><div class="v1__tools">${tabs(TABS())}<div class="search"><img src="${A}icon/v2-search.svg" alt="">Search</div></div><div class="v1__rows">${rows}</div></div>` +
+    `<div class="v1__pane"><div class="v1__scroll pane-in" id="pane">${sel ? detail(sel) : '<div class="nocontent">Nothing here</div>'}</div>` +
+    `<div class="v1__foot"><div class="acts"><span style="font-weight:600;color:var(--ink)">${idx + 1} of ${shown().length}</span><span class="v1__nav" style="margin-left:auto"><span data-step="-1">${svg('<path d="m18 15-6-6-6 6"/>')}</span><span data-step="1">${svg('<path d="m6 9 6 6 6-6"/>')}</span></span></div></div></div></div>`
+}
+
+/* ═════ 2 · BOARD ═════ */
+function v2() {
+  const port = S.o === 'port'
+  let body
+  if (S.k === 'ann') {
+    const pinned = shown().filter((i) => i.k === 'important')
+    const rest = shown().filter((i) => i.k === 'announcement')
+    const facts = shown().filter((i) => i.k === 'fact')
+    body = (pinned.length ? `<div class="v2h">Important <small>${pinned.filter((p) => !p.cancelled && !S.acked.has(p.id)).length} need your acknowledgement</small></div><div class="v2__pinned" style="${port ? 'grid-template-columns:1fr' : ''}">` +
+      pinned.map((it) => `<div class="pin ${it.cancelled ? 'cancelled' : ''}" data-id="${it.id}"><div class="pin__txt"><div style="display:flex;align-items:center;gap:8px">${chip('important')}${it.cancelled ? '<span class="flag">CANCELLED</span>' : ''}<span style="margin-left:auto;font-size:11.5px;color:var(--mute)">${esc(it.when)}</span></div>${title(it)}<p>${esc(it.body)}</p>${files(it.files)}` +
+        (it.cancelled ? '' : `<button class="pin__ack ${S.acked.has(it.id) ? 'done' : ''}" data-ack="${it.id}">${S.acked.has(it.id) ? '✓ Acknowledged' : 'Acknowledge'}</button>`) + `</div></div>`).join('') + `</div>` : '') +
+      (rest.length ? `<div class="v2h">Latest <small>${rest.length}</small></div><div class="v2__grid" style="--cols:${port ? 2 : 3}">` +
+      rest.map((it) => `<div class="tcard" data-id="${it.id}">${it.img ? `<div class="tcard__pic"><img src="${A}${it.img}" alt="">${it.imgs > 1 ? `<span class="n">+${it.imgs - 1}</span>` : ''}</div>` : `<div class="tcard__pic slab announcement" style="height:56px"></div>`}` +
+        `<div class="tcard__in">${title(it)}${by(it)}<p>${esc(it.body)}</p>${files(it.files)}${acts(it)}</div></div>`).join('') + `</div>` : '') +
+      (facts.length ? `<div class="v2h">Did you know <small>${facts.length}</small></div><div class="v2__facts">` +
+      facts.map((it) => `<div class="fact" data-id="${it.id}">${it.img ? `<img src="${A}${it.img}" alt="">` : `<span class="slab fact" style="flex:none;width:56px;height:56px;border-radius:12px"></span>`}<div><b>${esc(it.title)}</b><small>${esc(it.species)}</small></div></div>`).join('') + `</div>` : '')
+  } else {
+    const lanes = ['critical', 'high', 'moderate', 'low']
+    body = `<div class="lanes ${port ? 'scroll' : ''}">` + lanes.map((p) => {
+      const cards = shown().filter((i) => i.p === p)
+      return `<div class="lane"><div class="lane__h" style="--lc:${TONE[p]}">${PRI[p][0]}<em>${cards.length}</em></div>` +
+        (cards.length ? cards.map((it) => `<div class="ncard" data-id="${it.id}">${it.img ? `<div class="ncard__pic"><img src="${A}${it.img}" alt=""></div>` : ''}` +
+          `<div class="ncard__in"><h4>${esc(it.title)}</h4><div class="ent"><img src="${A}${it.ent[2]}" alt=""><b>${esc(it.ent[0])}</b><span>${esc(it.ent[1])}</span></div><p>${esc(it.body)}</p>` +
+          `<div style="display:flex;align-items:center;gap:8px;justify-content:space-between">${by(it)}</div>${acts(it)}</div></div>`).join('') : '<div class="nocontent" style="padding:20px">None open</div>') + `</div>`
+    }).join('') + `</div>`
+  }
+  const it = S.open && list().find((i) => i.id === S.open)
+  return bar(`<div class="search" style="width:${port ? 220 : 300}px"><img src="${A}icon/v2-search.svg" alt="">Search</div>`) +
+    `<div class="v2"><div class="v2__tools">${tabs(TABS())}</div>${body}</div>` +
+    `<div class="veil ${it ? 'on' : ''}" data-close></div><div class="sheet ${it ? 'on' : ''}" style="--sheetw:${port ? 560 : 520}px"><span class="x" data-close>${svg('<path d="M6 6l12 12M18 6 6 18"/>', 2.2)}</span><div class="v1__scroll">${it ? detail(it) : ''}</div></div>`
+}
+
+/* ═════ 3 · TIMELINE ═════ */
+function v3() {
+  const port = S.o === 'port'
+  const items = list().filter((i) => S.filter === 'all' || (S.filter === 'mine' ? i.by === ME : S.filter === 'files' ? i.files?.length : S.filter === 'me' ? i.notifiedMe : (i.p || i.k) === S.filter))
+  const need = S.k === 'ann' ? ANN.filter((i) => i.k === 'important' && !i.cancelled && !S.acked.has(i.id)) : NOTES.filter((i) => i.notifiedMe)
+  const F = S.k === 'ann'
+    ? [['all', 'Everything', ANN.length, 'var(--ink)'], ['important', 'Important', ANN.filter((i) => i.k === 'important').length, TONE.important], ['announcement', 'Announcements', ANN.filter((i) => i.k === 'announcement').length, TONE.announcement], ['fact', 'Did you know', 3, TONE.fact], ['mine', 'Created by me', mine(), '#7A8684'], ['files', 'With attachments', ANN.filter((i) => i.files?.length).length, '#D49B00']]
+    : [['all', 'Everything', NOTES.length, 'var(--ink)'], ['me', 'Notified to me', NOTES.filter((i) => i.notifiedMe).length, '#E93353'], ['critical', 'Critical', 1, TONE.critical], ['high', 'High', 3, TONE.high], ['moderate', 'Moderate', 2, TONE.moderate], ['low', 'Low', 2, TONE.low], ['mine', 'My notes', mine(), '#7A8684']]
+  let day = ''
+  const rows = items.map((it) => {
+    const h = it.day !== day ? `${day ? '</div>' : ''}<div class="day">${esc(it.day)}</div><div class="tl">` : ''; day = it.day
+    const open = S.open === it.id
+    const top = it.p ? `${pri(it.p)}<span class="tags">${it.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</span>` : chip(it.k)
+    return h + `<div class="item ${open ? 'open' : ''}" data-id="${it.id}"><span class="item__t">${esc(it.time || '')}</span><span class="item__dot" style="--dc:${tone(it)}"></span>` +
+      `<div class="item__row"><div class="item__txt"><div class="item__top">${top}${it.cancelled ? '<span class="flag" style="margin-left:auto">CANCELLED</span>' : ''}</div>${title(it)}${it.ent ? `<div class="ent"><img src="${A}${it.ent[2]}" alt=""><b>${esc(it.ent[0])}</b><span>${esc(it.ent[1])}${it.more ? ` +${it.more}` : ''}</span></div>` : ''}<p>${esc(it.body)}</p>${open ? '' : files(it.files)}</div>` +
+      (it.img ? `<img class="item__pic" src="${A}${it.img}" alt="" style="${it.cancelled ? 'filter:grayscale(1) opacity(.7)' : ''}">` : '') + `</div>` +
+      `<div class="item__more"><div><div class="in">${it.img ? `<img class="bigpic" src="${A}${it.img}" alt="">` : ''}${it.files?.length ? tiles(it.files) : ''}${notif(it.notified)}${thread(it)}</div></div></div>` +
+      `<div class="foot">${by(it)}${acts(it)}</div></div>`
+  }).join('') + (day ? '</div>' : '')
+  const side = `<div class="box"><b>${S.k === 'ann' ? 'Needs you' : 'Notified to you'}</b><div class="need">${need.length ? need.map((it) =>
+      `<div class="need__i ${it.p ? 'note' : ''}" data-id="${it.id}">${it.p ? pri(it.p) : '<span class="pri critical" style="background:#FFE3E8"><img src="' + A + 'icon/an-important.svg" alt="" style="width:26px;height:26px"></span>'}<p>${esc(it.title)}<small>${esc(it.by)} · ${esc(it.when)}</small></p></div>`).join('') : '<p style="margin:0;font-size:12.5px;color:var(--mute)">All caught up.</p>'}</div></div>` +
+    `<div class="box"><b>Show</b><div class="flist">${F.map(([k, l, n, c]) => `<span data-filter="${k}" class="${S.filter === k ? 'on' : ''}" style="--fc:${c}">${l}<b>${n}</b></span>`).join('')}</div></div>`
+  const sum = `<div class="sum">${need.length && S.k === 'ann' ? `<span class="alert" data-filter="${S.k === 'ann' ? 'important' : 'me'}">${need.length} ${S.k === 'ann' ? 'need you' : 'notified to you'}</span>` : ''}${F.map(([k, l, n]) => `<span data-filter="${k}" class="${S.filter === k ? 'on' : ''}">${l} <b>${n}</b></span>`).join('')}</div>`
+  return bar(`<div class="search" style="width:${port ? 220 : 300}px"><img src="${A}icon/v2-search.svg" alt="">Search</div>`) +
+    `<div class="v3"><div class="v3__main">${sum}${rows || '<div class="nocontent">Nothing here</div>'}</div><div class="v3__side">${side}</div></div>`
+}
+
+/* ── the brief: premise, tap, in place, cost ── */
+const BRIEF = {
+  1: [['The idea', 'Mail on an iPad. The list stays on the left; the post you are reading fills the pane beside it. Nothing covers the list.'],
+      ['Tap a row', 'The pane swaps to that post: photos, full text, attachments, who was notified, comments. The row stays highlighted; ↑ ↓ step through.'],
+      ['In place', 'Comment, like and save in the pane. Tabs (All / Created by me / Saved) and search filter the list only.'],
+      ['Costs', 'Least new UI and the fastest way to read ten posts in a row. It looks like email rather than a feed; on a phone it becomes list → detail.']],
+  2: [['The idea', 'Organised by what matters. Announcements: Important pinned at the top with Acknowledge, then Latest as tiles, Did you know as a strip. Notes: one lane per priority.'],
+      ['Tap a card', 'A sheet slides in from the right over the board with the whole post. Tap outside or × to close; the board stays where it was.'],
+      ['In place', 'Acknowledge an Important post right on the board. Lane counts show the open notes by priority at a glance.'],
+      ['Costs', 'Best overview; Important can’t be missed. Portrait scrolls the four lanes sideways. Priority lanes need a “resolved” state to stay short.']],
+  3: [['The idea', 'A day-by-day timeline. Posts hang off a time line grouped Yesterday / This week / Earlier. The side panel says what needs you and filters the rest.'],
+      ['Tap a post', 'It opens where it is. The photo grows, and attachments, notified, comments and the comment field unfold under it. Tap again to fold.'],
+      ['In place', 'Everything: read, comment, filter (Important, With attachments, Notified to me). Portrait moves the panel to a chip row on top.'],
+      ['Costs', 'Reads like a story of the day; no second surface to learn. Long threads make the timeline long, and it is slower for skimming many posts.']],
+}
+
+/* ── render and wire ── */
+const app = document.getElementById('app'), ipad = document.getElementById('ipad'), screen = document.getElementById('screen')
+function fit() {
+  const [w, h] = S.o === 'land' ? [1180, 820] : [820, 1180]
+  screen.style.width = w + 'px'; screen.style.height = h + 'px'
+  const avail = Math.min(innerWidth - 32, 1400) / (w + 28)
+  const k = Math.min(1, avail)
+  ipad.style.transform = `scale(${k})`
+  ipad.parentElement.style.height = (h + 28) * k + 88 + 'px'
+}
+function render(keepScroll) {
+  const sc = [...app.querySelectorAll('.v1__rows, .v2, .v3__main')].map((e) => e.scrollTop)
+  app.innerHTML = S.v === '1' ? v1() : S.v === '2' ? v2() : v3()
+  app.classList.toggle('portrait', S.o === 'port')
+  if (keepScroll) [...app.querySelectorAll('.v1__rows, .v2, .v3__main')].forEach((e, i) => { e.scrollTop = sc[i] || 0 })
+  document.getElementById('brief').innerHTML = BRIEF[S.v].map(([h, t]) => `<div><b>${h}</b>${t}</div>`).join('')
+  for (const [id, key] of [['segV', 'v'], ['segK', 'k'], ['segO', 'o']]) document.querySelectorAll(`#${id} button`).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset[key] === S[key])))
+  fit()
+}
+document.querySelector('.mk').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  if (b.dataset.v) { S.v = b.dataset.v; S.open = null; S.filter = 'all' }
+  if (b.dataset.k) { S.k = b.dataset.k; S.open = null; S.filter = 'all'; S.tab = 'all' }
+  if (b.dataset.o) S.o = b.dataset.o
+  render()
+})
+app.addEventListener('click', (e) => {
+  const t = e.target
+  const tab = t.closest('[data-tab]'); if (tab) { S.tab = tab.dataset.tab; return render() }
+  const f = t.closest('[data-filter]'); if (f) { S.filter = f.dataset.filter; S.open = null; return render() }
+  const ack = t.closest('[data-ack]'); if (ack) { e.stopPropagation(); S.acked.add(ack.dataset.ack); return render(true) }
+  const step = t.closest('[data-step]'); if (step) { const l = shown(), i = l.findIndex((x) => x.id === S.sel[S.k]); const n = l[Math.max(0, Math.min(l.length - 1, i + +step.dataset.step))]; if (n) S.sel[S.k] = n.id; return render(true) }
+  if (t.closest('[data-close]')) { S.open = null; return render(true) }
+  if (S.v === '1') { const r = t.closest('.row'); if (r) { S.sel[S.k] = r.dataset.id; render(true) } return }
+  if (S.v === '2') { const c = t.closest('.pin, .tcard, .fact, .ncard'); if (c) { S.open = c.dataset.id; render(true) } return }
+  if (S.v === '3') {
+    const n = t.closest('.need__i'); if (n) { S.filter = 'all'; S.open = n.dataset.id; render(); app.querySelector(`.item[data-id="${n.dataset.id}"]`)?.scrollIntoView({ block: 'start', behavior: 'smooth' }); return }
+    const it = t.closest('.item'); if (!it) return
+    if (it.classList.contains('open') && !t.closest('.item__row')) return
+    S.open = S.open === it.dataset.id ? null : it.dataset.id; render(true)
+  }
+})
+addEventListener('resize', fit)
+const q = new URLSearchParams(location.search)
+if (q.get('v')) S.v = q.get('v'); if (q.get('k')) S.k = q.get('k'); if (q.get('o')) S.o = q.get('o'); if (q.get('open')) S.open = q.get('open')
+render()
+</script>
+</body>
+</html>
