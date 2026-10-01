@@ -1,0 +1,649 @@
+<title>Quick Actions, Five Premises</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: a review page. Each concept is a stage (the blurred home) holding a
+   live 696px panel, with its contract beside it: what it drops, what a tap does,
+   where drafts go, what it costs. Data = HOME_QUICK_ACTIONS / QA_RESUME (29 Sep). */
+:root {
+  /* page chrome, themed */
+  --page: #EEF3F2; --page-ink: #1F415B; --page-mute: #5E6D6B; --card: #FFFFFF; --card-line: rgba(31,65,91,.10);
+  /* the app panel — always the app's light surface */
+  --ink: #1F415B; --ink-2: #44544A; --mute: #6F7C7A; --line: rgba(31,65,91,.09); --line-2: rgba(31,65,91,.16);
+  --primary: #37BD69; --primary-ink: #1E7A44; --action: #006D35; --petrol: #1F515B;
+  --field: #F3F6F5; --sheet: #FFFFFF; --soft: #F6F9F8; --hover: #EEF5F2;
+  --t-clinical: #E6F2F1; --i-clinical: #1F515B;
+  --t-animal: #E9F5EE;   --i-animal: #006D35;
+  --t-ops: #EFF1F0;      --i-ops: #44544A;
+  --t-estate: #E1F6EA;   --i-estate: #006D35;
+  --draft-bg: #FFF1D6; --draft: #8A5A00; --unsent-bg: #FDE8E4; --unsent: #B2361F; --await-bg: #E8EEF6; --await: #36557A;
+  --ease: cubic-bezier(.32,.72,0,1);
+  --ui: Inter, system-ui, -apple-system, sans-serif; --num: 'DM Sans', Inter, system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page: #0F1A1D; --page-ink: #E4EDEC; --page-mute: #9DB0AD; --card: #16252A; --card-line: rgba(255,255,255,.08); color-scheme: dark; } }
+:root[data-theme="dark"] { --page: #0F1A1D; --page-ink: #E4EDEC; --page-mute: #9DB0AD; --card: #16252A; --card-line: rgba(255,255,255,.08); color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--page-ink); font-family: var(--ui); -webkit-font-smoothing: antialiased; padding: 0 16px; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+svg { display: block; flex: none; }
+
+.wrap { max-width: 1480px; margin: 0 auto; padding-block: 40px 80px; }
+.intro h1 { margin: 0 0 10px; font: 600 30px/1.15 var(--num); letter-spacing: -.02em; text-wrap: balance; }
+.intro p { margin: 0 0 12px; max-width: 760px; font-size: 15px; line-height: 1.55; color: var(--page-mute); }
+.intro p b { color: var(--page-ink); font-weight: 600; }
+.why { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px,100%),1fr)); gap: 10px; margin: 20px 0 0; padding: 0; list-style: none; }
+.why li { padding: 14px 16px; border-radius: 14px; background: var(--card); border: 1px solid var(--card-line); font-size: 13.5px; line-height: 1.5; color: var(--page-mute); }
+.why li b { display: block; color: var(--page-ink); font-size: 13.5px; margin-bottom: 3px; }
+
+.concept { display: grid; grid-template-columns: minmax(0, 740px) minmax(0, 1fr); gap: 36px; align-items: start; margin-top: 64px; }
+@media (max-width: 1100px) { .concept { grid-template-columns: minmax(0,1fr); gap: 18px; } }
+.contract { display: flex; flex-direction: column; gap: 14px; min-width: 0; position: sticky; top: 24px; }
+@media (max-width: 1100px) { .contract { position: static; order: -1; } }
+.tag { display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--page-mute); }
+.tag b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--primary-ink); color: #fff; font-size: 12px; letter-spacing: 0; }
+.contract h2 { margin: 0; font: 600 23px/1.2 var(--num); letter-spacing: -.015em; text-wrap: balance; }
+.rec { display: inline-block; margin-left: 6px; padding: 3px 9px; border-radius: 99px; background: var(--primary); color: #fff; font: 700 11px/1.3 var(--ui); letter-spacing: .03em; vertical-align: 4px; }
+.drops { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--card-line); font-size: 14px; line-height: 1.5; }
+.drops span { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--page-mute); margin-bottom: 2px; }
+.rules { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 13.5px; line-height: 1.5; }
+.rules li { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 10px; }
+.rules li > span:first-child { font-weight: 600; color: var(--page-mute); }
+.rules .bad > span:last-child { color: var(--page-ink); }
+
+/* stage: the home, blurred */
+.stage { position: relative; padding: 26px 22px; border-radius: 26px; overflow: hidden; background: radial-gradient(120% 90% at 15% 0%, #A7C0BA, #5E7A76 72%); min-width: 0; }
+.stage::before { content: ""; position: absolute; inset: 0; background:
+  radial-gradient(40% 30% at 80% 20%, rgba(255,255,255,.28), transparent 70%),
+  radial-gradient(30% 40% at 10% 90%, rgba(55,189,105,.25), transparent 70%); }
+.panel { position: relative; max-width: 696px; margin: 0 auto; border-radius: 28px; overflow: hidden; background: var(--sheet); color: var(--ink); box-shadow: 0 26px 60px -18px rgba(10,38,44,.55); display: flex; flex-direction: column; }
+.toast { position: absolute; left: 50%; bottom: 14px; transform: translate(-50%, 12px); opacity: 0; transition: .28s var(--ease); pointer-events: none; z-index: 5;
+  max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 12px; background: #16323A; color: #fff; font-size: 13px; line-height: 1.4; box-shadow: 0 10px 30px -8px rgba(0,0,0,.4); }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+.toast b { color: #8BE0AE; font-weight: 600; }
+
+/* shared panel parts */
+.p-top { padding: 20px 22px 0; display: flex; flex-direction: column; gap: 14px; }
+.field { display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; border-radius: 14px; background: var(--field); }
+.field:focus-within { box-shadow: inset 0 0 0 2px var(--action); background: #fff; }
+.field input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font-size: 16px; }
+.field input::placeholder { color: #8A9694; }
+.field .ic { color: var(--mute); }
+.scanbtn { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; color: var(--petrol); }
+.scanbtn:hover { background: #fff; }
+.foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 22px 18px; border-top: 1px solid var(--line); margin-top: auto; }
+.foot button { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: var(--petrol); padding: 8px 6px; border-radius: 10px; }
+.foot button:hover { background: var(--soft); }
+.kick { font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--mute); }
+.pill { flex: none; padding: 3px 8px; border-radius: 99px; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.pill.draft { background: var(--draft-bg); color: var(--draft); }
+.pill.unsent { background: var(--unsent-bg); color: var(--unsent); }
+.pill.awaiting { background: var(--await-bg); color: var(--await); }
+.ago { font-family: var(--num); font-size: 12.5px; color: var(--mute); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.disc { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; }
+.tone-clinical { background: var(--t-clinical); color: var(--i-clinical); }
+.tone-animal { background: var(--t-animal); color: var(--i-animal); }
+.tone-ops { background: var(--t-ops); color: var(--i-ops); }
+.tone-estate { background: var(--t-estate); color: var(--i-estate); }
+.chev { color: #A3AEAC; }
+.empty { padding: 22px; text-align: center; color: var(--mute); font-size: 14px; }
+
+/* ── 1 · Pinned tiles ─────────────────────────────── */
+.c1 .tiles { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; padding: 16px 22px 4px; }
+@media (max-width: 560px) { .c1 .tiles { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+.tile { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; min-height: 118px; padding: 14px; border-radius: 18px; text-align: left; transition: transform .18s var(--ease); }
+.tile:active { transform: scale(.97); }
+.tile .nm { font-size: 15px; font-weight: 600; line-height: 1.25; margin-top: auto; }
+.tile .ic-l { width: 28px; height: 28px; }
+.tile .dr { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px 4px 7px; border-radius: 99px; background: #fff; color: var(--draft); font-size: 11.5px; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.tile .dr i { width: 7px; height: 7px; border-radius: 50%; background: #E5A21A; }
+.tile .dr.un { color: var(--unsent); } .tile .dr.un i { background: #D9533B; }
+.c1 .all { margin: 12px 22px 0; border-radius: 16px; background: var(--soft); }
+.c1 .all > button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 14px 16px; font-size: 15px; font-weight: 500; }
+.c1 .all > button span { flex: 1; text-align: left; }
+.c1 .all > button .ct { flex: none; color: var(--mute); font-size: 13px; }
+.c1 .all .chev { transition: transform .25s var(--ease); }
+.c1 .all.open .chev { transform: rotate(90deg); }
+.c1 .rest { display: none; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 2px 12px; padding: 0 10px 10px; max-height: 260px; overflow: auto; }
+.c1 .all.open .rest { display: grid; }
+.row { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 8px; border-radius: 12px; text-align: left; font-size: 14.5px; width: 100%; }
+.row:hover { background: var(--hover); }
+.row .disc { width: 32px; height: 32px; border-radius: 9px; }
+.row .lb { flex: 1; min-width: 0; }
+.pinbtn { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #9AA6A4; }
+.pinbtn:hover { color: var(--action); background: #fff; }
+.pop { position: absolute; z-index: 4; width: 300px; max-width: calc(100% - 24px); padding: 8px; border-radius: 16px; background: #fff; box-shadow: 0 18px 44px -10px rgba(10,38,44,.35), 0 0 0 1px var(--line); }
+.pop h4 { margin: 4px 8px 6px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.pop .row { font-size: 14px; }
+.pop .row small { display: block; color: var(--mute); font-size: 12.5px; }
+.pop .new { color: var(--action); font-weight: 600; border-top: 1px solid var(--line); border-radius: 0 0 10px 10px; margin-top: 4px; }
+
+/* ── 2 · Two jobs, two tabs ───────────────────────── */
+.seg { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 13px; background: var(--field); }
+.seg button { height: 38px; border-radius: 10px; font-size: 14.5px; font-weight: 600; color: var(--mute); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.seg button[aria-selected="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.seg .n { min-width: 22px; height: 20px; padding: 0 6px; border-radius: 99px; background: #E5A21A; color: #fff; font-size: 11.5px; display: grid; place-items: center; }
+.c2 .body { padding: 14px 14px 8px; height: 470px; overflow: auto; }
+.c2 .cols { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px 18px; }
+@media (max-width: 560px) { .c2 .cols { grid-template-columns: minmax(0,1fr); } }
+.c2 .grp h4 { margin: 8px 8px 2px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.c2 .row .sub, .c3 .row .sub, .c5 .row .sub { display: block; font-size: 12.5px; color: var(--mute); margin-top: 1px; }
+.job { display: flex; align-items: center; gap: 12px; padding: 12px 10px; border-bottom: 1px solid var(--line); }
+.job:last-child { border-bottom: 0; }
+.job .lb { flex: 1; min-width: 0; }
+.job .lb b { display: block; font-size: 15px; font-weight: 600; }
+.job .lb span { font-size: 13px; color: var(--mute); }
+.job .meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.job .go { flex: none; height: 34px; padding: 0 14px; border-radius: 10px; font-size: 13.5px; font-weight: 600; background: var(--action); color: #fff; }
+.job .go.ghost { background: var(--field); color: var(--petrol); }
+.job .go.retry { background: var(--unsent); }
+.job-h { margin: 12px 10px 2px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.job-h:first-child { margin-top: 2px; }
+
+/* ── 3 · Subject first ─────────────────────────────── */
+.c3 .q { font: 600 20px/1.2 var(--num); letter-spacing: -.01em; margin: 0; }
+.subjects { display: flex; gap: 8px; overflow-x: auto; padding: 2px 22px 4px; margin: 0 -22px; scrollbar-width: none; }
+.subj { flex: none; display: flex; align-items: center; gap: 10px; padding: 8px 14px 8px 8px; border-radius: 16px; background: var(--soft); box-shadow: inset 0 0 0 1px var(--line); text-align: left; }
+.subj .av { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font: 700 12px var(--num); color: #fff; }
+.subj b { display: block; font-size: 14px; font-weight: 600; }
+.subj small { font-size: 12px; color: var(--mute); }
+.subj[aria-pressed="true"] { background: #E4F4EA; box-shadow: inset 0 0 0 2px var(--action); }
+.c3 .verbs { padding: 12px 14px 8px; height: 360px; overflow: auto; }
+.c3 .cols { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 2px 14px; }
+@media (max-width: 560px) { .c3 .cols { grid-template-columns: minmax(0,1fr); } }
+.resume-bar { display: flex; align-items: center; gap: 12px; margin: 0 8px 10px; padding: 12px 14px; border-radius: 14px; background: var(--draft-bg); }
+.resume-bar .lb { flex: 1; font-size: 14px; }
+.resume-bar .lb b { display: block; }
+.resume-bar button { height: 34px; padding: 0 14px; border-radius: 10px; background: var(--draft); color: #fff; font-size: 13.5px; font-weight: 600; }
+.c3 .other { margin: 10px 8px 0; padding-top: 10px; border-top: 1px solid var(--line); }
+.chiprow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip { height: 34px; padding: 0 12px; border-radius: 10px; background: var(--field); font-size: 13.5px; font-weight: 500; display: inline-flex; align-items: center; gap: 7px; }
+.chip:hover { background: var(--hover); }
+.hint { padding: 4px 8px 10px; font-size: 13.5px; color: var(--mute); }
+
+/* ── 4 · Folders ────────────────────────────────────── */
+.c4 .viewport { position: relative; height: 470px; overflow: hidden; }
+.c4 .pane { position: absolute; inset: 0; padding: 14px 22px 8px; overflow: auto; transition: transform .38s var(--ease), opacity .3s; }
+.c4 .pane.detail { transform: translateX(100%); }
+.c4.in .pane.home { transform: translateX(-30%); opacity: 0; pointer-events: none; }
+.c4.in .pane.detail { transform: none; }
+.strip { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border-radius: 14px; background: var(--draft-bg); color: var(--draft); font-size: 14px; font-weight: 600; text-align: left; margin-bottom: 12px; }
+.strip span { flex: 1; }
+.folders { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+@media (max-width: 560px) { .folders { grid-template-columns: minmax(0,1fr); } }
+.folder { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 20px; text-align: left; min-height: 176px; }
+.folder .hd { display: flex; align-items: center; gap: 10px; }
+.folder .hd b { flex: 1; font-size: 16px; font-weight: 600; line-height: 1.25; }
+.folder .ct { font-size: 12.5px; opacity: .75; font-weight: 600; }
+.folder .top2 { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+.folder .top2 span { display: flex; align-items: center; gap: 8px; padding: 9px 11px; border-radius: 11px; background: rgba(255,255,255,.75); font-size: 13.5px; font-weight: 500; color: var(--ink); }
+.folder .top2 span:hover { background: #fff; }
+.back { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 500; color: var(--petrol); padding: 6px 4px; margin-bottom: 8px; }
+.c4 .detail h3 { margin: 0 0 10px; font: 600 22px/1.2 var(--num); }
+.bigrow { display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px; border-radius: 14px; text-align: left; }
+.bigrow:hover { background: var(--hover); }
+.bigrow .lb { flex: 1; min-width: 0; }
+.bigrow b { display: block; font-size: 16px; font-weight: 600; }
+.bigrow small { font-size: 13px; color: var(--mute); }
+
+/* ── 5 · The panel is the first step ───────────────── */
+.c5 .split { display: grid; grid-template-columns: 250px minmax(0,1fr); height: 520px; border-top: 1px solid var(--line); }
+@media (max-width: 620px) { .c5 .split { grid-template-columns: minmax(0,1fr); height: auto; } .c5 .list { max-height: 240px; border-right: 0 !important; border-bottom: 1px solid var(--line); } }
+.c5 .list { overflow: auto; padding: 8px; border-right: 1px solid var(--line); background: var(--soft); }
+.c5 .list h4 { margin: 10px 8px 4px; font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.c5 .list .row { min-height: 40px; font-size: 14px; padding: 4px 8px; }
+.c5 .list .row .disc { width: 28px; height: 28px; border-radius: 8px; }
+.c5 .list .row[aria-current="true"] { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.08), inset 0 0 0 1.5px var(--action); font-weight: 600; }
+.c5 .step { overflow: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.c5 .step h3 { margin: 0; font: 600 21px/1.2 var(--num); }
+.crumbs { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12.5px; color: var(--mute); }
+.crumbs span { padding: 3px 9px; border-radius: 99px; background: var(--field); }
+.crumbs span.on { background: #E4F4EA; color: var(--primary-ink); font-weight: 600; }
+.opt { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line-2); text-align: left; }
+.opt[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--action); background: #F1FAF4; }
+.opt .av { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font: 700 11.5px var(--num); color: #fff; }
+.opt .lb { flex: 1; min-width: 0; font-size: 14.5px; }
+.opt .lb small { display: block; color: var(--mute); font-size: 12.5px; }
+.opts { display: flex; flex-direction: column; gap: 8px; }
+.next { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.next p { flex: 1; margin: 0; font-size: 13px; color: var(--mute); line-height: 1.4; }
+.cta { height: 44px; padding: 0 18px; border-radius: 12px; background: var(--action); color: #fff; font-size: 15px; font-weight: 600; }
+.cta[disabled] { background: #B9C6C2; cursor: not-allowed; }
+
+/* verdict */
+.verdict { margin-top: 80px; padding: 26px; border-radius: 22px; background: var(--card); border: 1px solid var(--card-line); }
+.verdict h2 { margin: 0 0 14px; font: 600 22px/1.2 var(--num); }
+.tbl { overflow-x: auto; }
+.verdict table { width: 100%; min-width: 720px; border-collapse: collapse; font-size: 13.5px; line-height: 1.45; }
+.verdict th, .verdict td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--card-line); vertical-align: top; }
+.verdict th { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--page-mute); }
+.verdict td:first-child { font-weight: 600; white-space: nowrap; }
+.verdict p { margin: 16px 0 0; max-width: 780px; font-size: 14.5px; line-height: 1.55; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <h1>Quick Actions, five premises</h1>
+    <p>The current panel tries to do two jobs in one scroll: <b>finish what I started</b> and <b>start something new</b>. It shows sixteen chips of equal weight in four colour groups, and the list is cut off, so it reads as a menu to study rather than a tool. Each idea below removes one of those assumptions. Every panel is live: tap anything and a note says what the app would do next.</p>
+    <ul class="why">
+      <li><b>What the review saw</b>Search, five drafts, four headings, sixteen chips and a footer, all at once. Nothing stands out, and the bottom row is faded half off screen.</li>
+      <li><b>What stays in every idea</b>The same sixteen actions and five unfinished items from the app, V4's palette, the 696 panel, Search everything and Edit Modules at the foot.</li>
+      <li><b>How to compare them</b>Each card lists the assumption it drops, what a tap does, where drafts go, and the cost or weak point.</li>
+    </ul>
+  </header>
+
+  <!-- 1 -->
+  <section class="concept" id="c1">
+    <div class="stage"><div class="panel c1" data-c="1"></div></div>
+    <aside class="contract">
+      <span class="tag"><b>1</b> Pinned tiles</span>
+      <h2>Your six actions as big tiles, with drafts on the tile<span class="rec">Recommended</span></h2>
+      <p class="drops"><span>Drops the idea that</span>all sixteen must be visible, and that drafts need their own list.</p>
+      <ul class="rules">
+        <li><span>Opens on</span><span>Six tiles the user picked, in Control Centre style. The other ten fold into one “All actions” row.</span></li>
+        <li><span>Tap a tile</span><span>Starts a new record of that type.</span></li>
+        <li><span>Tap the badge</span><span>“2 drafts” opens a small list of that action’s drafts, with “Start new” last.</span></li>
+        <li><span>Pin</span><span>The pin on any row in All actions swaps it onto the grid. Edit Modules does the same for many at once.</span></li>
+        <li><span>Awaiting</span><span>Items waiting on another person leave this panel and go to the Pending Actions card on Home, where they already belong.</span></li>
+        <li class="bad"><span>Weak point</span><span>A new user sees defaults, not their own six. Ship role-based defaults (vet, keeper, admin).</span></li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 2 -->
+  <section class="concept" id="c2">
+    <div class="stage"><div class="panel c2" data-c="2"></div></div>
+    <aside class="contract">
+      <span class="tag"><b>2</b> Two tabs</span>
+      <h2>Two jobs, two tabs: Start new or Pick up</h2>
+      <p class="drops"><span>Drops the idea that</span>one scrolling panel should hold both jobs.</p>
+      <ul class="rules">
+        <li><span>Opens on</span><span>Pick up if anything is unfinished, otherwise Start new. The count on the tab shows what is waiting.</span></li>
+        <li><span>Start new</span><span>A plain two-column list, no chips. Each row says what it will ask for (“asks: enclosure”).</span></li>
+        <li><span>Pick up</span><span>Grouped by what you can do: Resume a draft, Retry an unsent one, or View one that is waiting on someone else.</span></li>
+        <li><span>Search</span><span>Searches both tabs and moves you to the tab with the match.</span></li>
+        <li class="bad"><span>Weak point</span><span>A tab hides half of the panel. If people start new far more often than they resume, the default tab gets in the way.</span></li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 3 -->
+  <section class="concept" id="c3">
+    <div class="stage"><div class="panel c3" data-c="3"></div></div>
+    <aside class="contract">
+      <span class="tag"><b>3</b> Animal first</span>
+      <h2>Start with the animal, then the action</h2>
+      <p class="drops"><span>Drops the idea that</span>you pick the action first and the place later. Ten of the sixteen are about one animal or enclosure.</p>
+      <ul class="rules">
+        <li><span>Opens on</span><span>“Who is this about?” with the animals you worked on recently, plus scan and search.</span></li>
+        <li><span>Pick one</span><span>Only the eight animal actions stay, already set to that animal. If a draft exists for it, a Resume bar sits on top.</span></li>
+        <li><span>Tap action</span><span>Opens the form with the site, section, enclosure and animal already filled in. It skips the three-level picker.</span></li>
+        <li><span>No animal</span><span>Request, Note, Announcement, User and the site actions sit in a small row at the bottom.</span></li>
+        <li class="bad"><span>Weak point</span><span>It needs a real animal index and recents. For admin users, who rarely pick an animal, it adds a step.</span></li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 4 -->
+  <section class="concept" id="c4">
+    <div class="stage"><div class="panel c4" data-c="4"></div></div>
+    <aside class="contract">
+      <span class="tag"><b>4</b> Folders</span>
+      <h2>Four folders, each showing its two most-used actions</h2>
+      <p class="drops"><span>Drops the idea that</span>everything has to be on one level. You see four things, not twenty-five.</p>
+      <ul class="rules">
+        <li><span>Opens on</span><span>Four large category cards. Each one shows its two most-used actions as direct buttons.</span></li>
+        <li><span>Tap a button</span><span>Starts that action right away. The common cases take one tap.</span></li>
+        <li><span>Tap a card</span><span>The panel slides to that category’s full list, with a line of help under each action, and a Back button.</span></li>
+        <li><span>Drafts</span><span>A single strip at the top, “5 unfinished”, which slides to the list. It stays one line tall.</span></li>
+        <li class="bad"><span>Weak point</span><span>An action outside the top two takes two taps. Search makes up for it, but only for people who type.</span></li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 5 -->
+  <section class="concept" id="c5">
+    <div class="stage"><div class="panel c5" data-c="5"></div></div>
+    <aside class="contract">
+      <span class="tag"><b>5</b> Step one inside</span>
+      <h2>The panel becomes step one of the form</h2>
+      <p class="drops"><span>Drops the idea that</span>Quick Actions is just a launcher. Today the “quick” tap still leads to the slow part, which is picking the place.</p>
+      <ul class="rules">
+        <li><span>Opens on</span><span>A compact list on the left. The right side shows your unfinished work.</span></li>
+        <li><span>Tap action</span><span>The right side turns into its first question: “Which animal?” or “Which site?”, with recent answers to pick from.</span></li>
+        <li><span>Continue</span><span>Opens the full form with that answer filled in, and a footer says what the form will ask next.</span></li>
+        <li><span>No-place</span><span>Announcement, Add User, New Site and Master Settings skip the question and open straight away.</span></li>
+        <li class="bad"><span>Weak point</span><span>The most work to build, since each form’s first step has to be defined. On a phone the two sides stack.</span></li>
+      </ul>
+    </aside>
+  </section>
+
+  <section class="verdict">
+    <h2>Side by side</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Idea</th><th>Taps to a common action</th><th>Taps to a rare action</th><th>Where drafts live</th><th>Build cost</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Pinned tiles</td><td>1</td><td>2 (All actions, then row)</td><td>A badge on the action’s own tile</td><td>Low: a pin store and role defaults</td></tr>
+        <tr><td>2 · Two tabs</td><td>1 (on Start new)</td><td>1</td><td>Their own tab</td><td>Low: splits the current panel</td></tr>
+        <tr><td>3 · Animal first</td><td>2 (animal, then action), and no place picker afterwards</td><td>2</td><td>A Resume bar for the chosen animal</td><td>Medium: needs an animal index and recents</td></tr>
+        <tr><td>4 · Folders</td><td>1 (top two per folder)</td><td>2</td><td>A one-line strip</td><td>Low: needs usage counts</td></tr>
+        <tr><td>5 · Step one inside</td><td>2, but the place is already answered</td><td>2</td><td>The right side when idle</td><td>High: a first step for each form</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Recommendation: 1, with 3’s idea kept for later.</b> Idea 1 gives the manager the calm first view the current panel lacks: six tiles instead of sixteen chips plus a list. It also stops the separate draft list competing with the actions. Once the app has an animal index, Animal first (3) is where most of the time savings are, because it removes the three-level place picker from every medical and animal action.</p>
+  </section>
+</div>
+
+<script>
+/* ── data: mirrors HOME_QUICK_ACTIONS / QA_RESUME in index.html ── */
+const GROUPS = [
+  { id: 'clinical', name: 'Medical & Clinical Care', short: 'Medical' },
+  { id: 'animal',   name: 'Animal Management',       short: 'Animals' },
+  { id: 'ops',      name: 'Operations & Admin',      short: 'Operations' },
+  { id: 'estate',   name: 'Site & System',           short: 'Site & System' },
+];
+const A = [
+  { id: 'medical',  g: 'clinical', label: 'New Medical Record', ic: 'plus',  scope: 'animal',  help: 'Diagnosis, treatment, notes', uses: 41 },
+  { id: 'dispense', g: 'clinical', label: 'Dispense Medicine',  ic: 'pill',  scope: 'animal',  help: 'Drug, dose, route, schedule', uses: 33 },
+  { id: 'hosp',     g: 'clinical', label: 'Hospitalise',        ic: 'bed',   scope: 'animal',  help: 'Move to the hospital ward', uses: 6 },
+  { id: 'fetal',    g: 'clinical', label: 'Add Fetal Death',    ic: 'fetal', scope: 'animal',  help: 'Record a fetal loss', uses: 2 },
+  { id: 'transfer', g: 'animal',   label: 'Transfer Animal',    ic: 'swap',  scope: 'animal',  help: 'Between enclosures or sites', uses: 18 },
+  { id: 'accession',g: 'animal',   label: 'Add Accession',      ic: 'paw',   scope: 'animal',  help: 'A new animal joins the collection', uses: 9 },
+  { id: 'eggs',     g: 'animal',   label: 'Add Eggs',           ic: 'egg',   scope: 'animal',  help: 'Clutch size, nest, date', uses: 5 },
+  { id: 'missing',  g: 'animal',   label: 'Report Missing / Escaped', ic: 'alert', scope: 'animal', help: 'Alerts security and the curator', uses: 1 },
+  { id: 'request',  g: 'ops',      label: 'New Request',        ic: 'doc',   scope: 'site',    help: 'Purchase, repair, supplies', uses: 22 },
+  { id: 'note',     g: 'ops',      label: 'New Note',           ic: 'note',  scope: 'site',    help: 'An observation for the site feed', uses: 27 },
+  { id: 'announce', g: 'ops',      label: 'New Announcement',   ic: 'mega',  scope: 'none',    help: 'Goes to everyone', uses: 4 },
+  { id: 'user',     g: 'ops',      label: 'Add User',           ic: 'user',  scope: 'none',    help: 'Invite a staff member', uses: 3 },
+  { id: 'site',     g: 'estate',   label: 'New Site',           ic: 'pin',   scope: 'none',    help: 'A new zoo or rescue centre', uses: 1 },
+  { id: 'section',  g: 'estate',   label: 'New Section',        ic: 'grid',  scope: 'site',    help: 'A zone inside a site', uses: 2 },
+  { id: 'enclosure',g: 'estate',   label: 'New Enclosure',      ic: 'fence', scope: 'section', help: 'Inside a section', uses: 3 },
+  { id: 'master',   g: 'estate',   label: 'Master Settings',    ic: 'gear',  scope: 'none',    help: 'Species lists, units, roles', uses: 2 },
+];
+const byId = Object.fromEntries(A.map(a => [a.id, a]));
+const RESUME = [
+  { id: 'r1', kind: 'draft',    action: 'medical',  where: 'CAR-03 · Indian Leopard', note: '3 of 5 fields', ago: '14 min', subj: 'car3' },
+  { id: 'r6', kind: 'draft',    action: 'medical',  where: 'BER-01 · Sloth Bear',     note: 'vitals only',   ago: '2 hr',   subj: 'ber1' },
+  { id: 'r2', kind: 'draft',    action: 'dispense', where: 'BER-01 · Sloth Bear',     note: 'dose not entered', ago: '18 hr', subj: 'ber1' },
+  { id: 'r3', kind: 'unsent',   action: 'missing',  where: 'HRB-02 · Blackbuck',      note: 'saved offline', ago: '40 min', subj: 'hrb2' },
+  { id: 'r4', kind: 'awaiting', action: 'transfer', where: 'CAR-01 → Rescue Holding', note: 'with the Curator', ago: '2 days' },
+  { id: 'r5', kind: 'awaiting', action: 'request',  where: 'Bannerghatta Safari',     note: 'with Finance', ago: '4 days' },
+];
+const SUBJECTS = [
+  { id: 'car3', code: 'CAR-03', name: 'Indian Leopard', where: 'Carnivore · Encl. 3', c: '#B7792B' },
+  { id: 'ber1', code: 'BER-01', name: 'Sloth Bear',     where: 'Bear Zone · Encl. 1', c: '#5B4A3A' },
+  { id: 'hrb2', code: 'HRB-02', name: 'Blackbuck',      where: 'Herbivore · Encl. 2', c: '#8C6A3F' },
+  { id: 'prm4', code: 'PRM-04', name: 'Bonnet Macaque', where: 'Primate · Encl. 4',  c: '#6D7F5A' },
+  { id: 'rep1', code: 'REP-01', name: 'Mugger Crocodile', where: 'Reptile · Pond 1', c: '#4E6B5C' },
+];
+const SITES = [
+  { code: 'BNP', name: 'Bannerghatta Safari', where: '4 sections', c: '#1F515B' },
+  { code: 'RSC', name: 'Rescue Centre', where: '2 sections', c: '#006D35' },
+  { code: 'MYS', name: 'Mysuru Zoo', where: '6 sections', c: '#44544A' },
+];
+const KIND = { draft: { l: 'Draft', v: 'Resume' }, unsent: { l: 'Not sent', v: 'Retry' }, awaiting: { l: 'Awaiting', v: 'View' } };
+const ASKS = { animal: 'asks: animal', site: 'asks: site', section: 'asks: section', none: 'opens straight away' };
+const NEXT = {
+  medical: 'Next in the form: complaint, diagnosis, treatment, attachments.',
+  dispense: 'Next in the form: drug, dose, route, how long.',
+  hosp: 'Next in the form: ward, reason, expected stay.',
+  fetal: 'Next in the form: date found, stage, remains sent to lab.',
+  transfer: 'Next in the form: destination, reason, date. Goes to the Curator for approval.',
+  accession: 'Next in the form: species, sex, source, ID tag.',
+  eggs: 'Next in the form: clutch size, nest, date laid.',
+  missing: 'Next in the form: last seen, time. Security is alerted when you send.',
+  request: 'Next in the form: type, items, amount. Goes to Finance.',
+  note: 'Next in the form: the note, photos, who can see it.',
+  section: 'Next in the form: name, type, keeper in charge.',
+  enclosure: 'Next in the form: name, size, capacity.',
+};
+
+/* ── icons (24 grid, stroke) ── */
+const P = {
+  plus: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/>',
+  pill: '<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.6 8.6l4.8 6.8" />',
+  bed: '<path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/>',
+  fetal: '<path d="M14 4a5 5 0 0 1 0 10c-2 0-3 1.5-3 3.5S12.5 20 14 20"/><circle cx="12.5" cy="8.5" r="2"/>',
+  swap: '<path d="M7 7h12l-3-3M17 17H5l3 3"/>',
+  paw: '<circle cx="7" cy="9" r="1.8"/><circle cx="17" cy="9" r="1.8"/><circle cx="10" cy="5.5" r="1.8"/><circle cx="14" cy="5.5" r="1.8"/><path d="M12 11.5c-3 0-5.5 3.5-5.5 5.5 0 1.6 1.4 2.5 3 2.2 1-.2 1.7-.5 2.5-.5s1.5.3 2.5.5c1.6.3 3-.6 3-2.2 0-2-2.5-5.5-5.5-5.5z"/>',
+  egg: '<path d="M12 3.5c3.3 0 6 5.2 6 9.5a6 6 0 0 1-12 0c0-4.3 2.7-9.5 6-9.5z"/>',
+  alert: '<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17v.01"/>',
+  doc: '<path d="M7 3.5h7l4 4V20.5H7z"/><path d="M14 3.5v4h4M10 12h5M10 15.5h5"/>',
+  note: '<path d="M5 4.5h14v11l-4 4H5z"/><path d="M15 19.5v-4h4M8.5 9h7M8.5 12.5h4"/>',
+  mega: '<path d="M4 10v4h3l7 4V6L7 10z"/><path d="M17.5 9.5a3.5 3.5 0 0 1 0 5"/>',
+  user: '<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/>',
+  pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+  grid: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  fence: '<path d="M5 20V7l2-2.5L9 7v13M15 20V7l2-2.5L19 7v13M3 10h18M3 16h18"/>',
+  gear: '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>',
+  scan: '<path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M7 12h10"/>',
+  edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+  chev: '<path d="M9 6l6 6-6 6"/>',
+  back: '<path d="M15 6l-6 6 6 6"/>',
+  pinit: '<path d="M9 4h6l-1 5 3 3H7l3-3z"/><path d="M12 12v8"/>',
+  clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+};
+const ic = (k, s = 20, cls = '') => `<svg class="${cls}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[k]}</svg>`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const disc = a => `<span class="disc tone-${a.g}">${ic(a.ic, 18)}</span>`;
+const match = (a, q) => !q || a.label.toLowerCase().includes(q) || a.help.toLowerCase().includes(q);
+
+/* what a tap would do, said once per panel */
+function toast(panel, html) {
+  let t = panel.querySelector('.toast');
+  if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); panel.append(t); }
+  t.innerHTML = html; t.classList.add('on');
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600);
+}
+const opens = a => {
+  const s = { animal: 'asks which animal first', site: 'asks which site first', section: 'asks site and section first', none: 'opens the form straight away' }[a.scope];
+  return `Opens <b>${esc(a.label)}</b> · ${s}`;
+};
+const resumeMsg = r => `${KIND[r.kind].v} <b>${esc(byId[r.action].label)}</b> · ${esc(r.where)}`;
+const field = (id, ph) => `<label class="field">${ic('search', 18, 'ic')}<input id="${id}" type="search" placeholder="${ph}" autocomplete="off"><button class="scanbtn" type="button" data-scan aria-label="Scan a tag">${ic('scan', 20)}</button></label>`;
+const foot = () => `<div class="foot"><button type="button" data-foot="search">${ic('search', 19)}Search everything</button><button type="button" data-foot="edit">${ic('edit', 19)}Edit Modules</button></div>`;
+function wireCommon(panel) {
+  panel.addEventListener('click', e => {
+    const f = e.target.closest('[data-foot]'); if (f) toast(panel, f.dataset.foot === 'search' ? 'Opens <b>Global Search</b> with what you typed' : 'Closes the panel and puts Home into <b>Edit Modules</b>');
+    if (e.target.closest('[data-scan]')) { e.preventDefault(); toast(panel, 'Opens the camera · scan an animal’s tag or an enclosure QR'); }
+  });
+}
+
+/* ── 1 · Pinned tiles ── */
+(function () {
+  const panel = document.querySelector('.c1');
+  let pins = ['medical', 'dispense', 'transfer', 'note', 'request', 'missing'];
+  let open = false, q = '';
+  const draftsFor = id => RESUME.filter(r => r.action === id && r.kind !== 'awaiting');
+  function render() {
+    const tiles = pins.map(id => {
+      const a = byId[id], d = draftsFor(id);
+      const un = d.some(r => r.kind === 'unsent');
+      const badge = d.length ? `<span class="dr ${un ? 'un' : ''}" data-drafts="${id}" role="button" tabindex="0"><i></i>${un ? 'Not sent' : d.length + (d.length > 1 ? ' drafts' : ' draft')}</span>` : '';
+      return `<button type="button" class="tile tone-${a.g}" data-act="${id}">${ic(a.ic, 28, 'ic-l')}<span class="nm">${esc(a.label)}</span>${badge}</button>`;
+    }).join('');
+    const rest = A.filter(a => !pins.includes(a.id) && match(a, q));
+    const shown = q ? A.filter(a => match(a, q)) : null;
+    panel.innerHTML = `
+      <div class="p-top">${field('c1q', 'Search actions')}</div>
+      ${shown ? `<div style="padding:12px 14px 4px;max-height:420px;overflow:auto">${shown.length ? shown.map(a => `<button type="button" class="row" data-act="${a.id}">${disc(a)}<span class="lb">${esc(a.label)}</span></button>`).join('') : `<div class="empty">No action called “${esc(q)}”. Search everything below.</div>`}</div>`
+      : `<div class="tiles">${tiles}</div>
+      <div class="all ${open ? 'open' : ''}">
+        <button type="button" data-all aria-expanded="${open}">${ic('grid', 19)}<span>All actions</span><span class="ct">${rest.length} more</span>${ic('chev', 18, 'chev')}</button>
+        <div class="rest">${rest.map(a => `<div class="row" style="padding:2px 4px 2px 8px"><button type="button" class="row" style="padding:4px 0;min-height:44px" data-act="${a.id}">${disc(a)}<span class="lb">${esc(a.label)}</span></button><button type="button" class="pinbtn" data-pin="${a.id}" aria-label="Pin ${esc(a.label)}">${ic('pinit', 17)}</button></div>`).join('')}</div>
+      </div>`}
+      <div style="height:14px"></div>
+      ${foot()}`;
+    const inp = panel.querySelector('#c1q'); inp.value = q;
+  }
+  panel.addEventListener('input', e => { if (e.target.id === 'c1q') { q = e.target.value.trim().toLowerCase(); render(); const i = panel.querySelector('#c1q'); i.focus(); i.setSelectionRange(99, 99); } });
+  panel.addEventListener('click', e => {
+    const pop = panel.querySelector('.pop');
+    const dr = e.target.closest('[data-drafts]');
+    if (dr) {
+      e.stopPropagation(); if (pop) pop.remove();
+      const id = dr.dataset.drafts, a = byId[id];
+      const p = document.createElement('div'); p.className = 'pop';
+      p.innerHTML = `<h4>${esc(a.label)}</h4>${draftsFor(id).map(r => `<button type="button" class="row" data-res="${r.id}"><span class="lb">${esc(r.where)}<small>${esc(r.note)} · ${r.ago} ago</small></span><span class="pill ${r.kind}">${KIND[r.kind].l}</span></button>`).join('')}<button type="button" class="row new" data-act="${id}">${ic('plus', 18)}Start a new one</button>`;
+      const pr = panel.getBoundingClientRect(), br = dr.getBoundingClientRect();
+      p.style.top = (br.bottom - pr.top + 6) + 'px';
+      p.style.left = Math.max(12, Math.min(br.right - pr.left - 300, pr.width - 312)) + 'px';
+      panel.append(p); return;
+    }
+    if (pop && !e.target.closest('.pop')) pop.remove();
+    const r = e.target.closest('[data-res]'); if (r) { toast(panel, resumeMsg(RESUME.find(x => x.id === r.dataset.res))); panel.querySelector('.pop')?.remove(); return; }
+    const pin = e.target.closest('[data-pin]');
+    if (pin) { const id = pin.dataset.pin; const out = pins.pop(); pins.unshift(id); render(); toast(panel, `Pinned <b>${esc(byId[id].label)}</b> · ${esc(byId[out].label)} moved to All actions`); return; }
+    if (e.target.closest('[data-all]')) { open = !open; render(); return; }
+    const act = e.target.closest('[data-act]'); if (act) { toast(panel, opens(byId[act.dataset.act])); panel.querySelector('.pop')?.remove(); }
+  });
+  wireCommon(panel); render();
+})();
+
+/* ── 2 · Two tabs ── */
+(function () {
+  const panel = document.querySelector('.c2');
+  const pending = RESUME.length;
+  let tab = pending ? 'pick' : 'new', q = '';
+  function render() {
+    const acts = A.filter(a => match(a, q));
+    const jobs = RESUME.filter(r => !q || byId[r.action].label.toLowerCase().includes(q) || r.where.toLowerCase().includes(q));
+    const newBody = acts.length ? `<div class="cols">${GROUPS.map(g => {
+      const list = acts.filter(a => a.g === g.id); if (!list.length) return '';
+      return `<div class="grp"><h4>${g.name}</h4>${list.map(a => `<button type="button" class="row" data-act="${a.id}">${disc(a)}<span class="lb">${esc(a.label)}<span class="sub">${ASKS[a.scope]}</span></span></button>`).join('')}</div>`;
+    }).join('')}</div>` : `<div class="empty">No action matches “${esc(q)}”.</div>`;
+    const pickBody = jobs.length ? ['draft', 'unsent', 'awaiting'].map(k => {
+      const list = jobs.filter(r => r.kind === k); if (!list.length) return '';
+      const h = { draft: 'You can finish these', unsent: 'Stuck on this device', awaiting: 'Waiting on someone else' }[k];
+      return `<div class="job-h">${h}</div>${list.map(r => { const a = byId[r.action]; return `<div class="job">${disc(a)}<span class="lb"><b>${esc(a.label)}</b><span>${esc(r.where)} · ${esc(r.note)}</span></span><span class="meta"><span class="pill ${r.kind}">${KIND[r.kind].l}</span><span class="ago">${r.ago} ago</span></span><button type="button" class="go ${k === 'awaiting' ? 'ghost' : k === 'unsent' ? 'retry' : ''}" data-res="${r.id}">${KIND[k].v}</button></div>`; }).join('')}`;
+    }).join('') : `<div class="empty">Nothing unfinished matches “${esc(q)}”.</div>`;
+    panel.innerHTML = `
+      <div class="p-top">${field('c2q', 'Search actions and drafts')}
+        <div class="seg" role="tablist"><button type="button" role="tab" data-tab="new" aria-selected="${tab === 'new'}">Start new</button><button type="button" role="tab" data-tab="pick" aria-selected="${tab === 'pick'}">Pick up <span class="n">${pending}</span></button></div>
+      </div>
+      <div class="body">${tab === 'new' ? newBody : pickBody}</div>
+      ${foot()}`;
+    panel.querySelector('#c2q').value = q;
+  }
+  panel.addEventListener('input', e => {
+    if (e.target.id !== 'c2q') return;
+    q = e.target.value.trim().toLowerCase();
+    if (q) { const inNew = A.some(a => match(a, q)); const inPick = RESUME.some(r => byId[r.action].label.toLowerCase().includes(q) || r.where.toLowerCase().includes(q)); if (tab === 'new' && !inNew && inPick) tab = 'pick'; if (tab === 'pick' && !inPick && inNew) tab = 'new'; }
+    render(); const i = panel.querySelector('#c2q'); i.focus(); i.setSelectionRange(99, 99);
+  });
+  panel.addEventListener('click', e => {
+    const t = e.target.closest('[data-tab]'); if (t) { tab = t.dataset.tab; render(); return; }
+    const r = e.target.closest('[data-res]'); if (r) { toast(panel, resumeMsg(RESUME.find(x => x.id === r.dataset.res))); return; }
+    const a = e.target.closest('[data-act]'); if (a) toast(panel, opens(byId[a.dataset.act]));
+  });
+  wireCommon(panel); render();
+})();
+
+/* ── 3 · Animal first ── */
+(function () {
+  const panel = document.querySelector('.c3');
+  let sel = null;
+  function render() {
+    const s = SUBJECTS.find(x => x.id === sel);
+    const draft = s && RESUME.find(r => r.subj === s.id);
+    const animalActs = A.filter(a => a.scope === 'animal');
+    const verbs = s ? `
+      ${draft ? `<div class="resume-bar"><span class="lb"><b>${esc(byId[draft.action].label)} for ${esc(s.name)}</b>${KIND[draft.kind].l} · ${esc(draft.note)} · ${draft.ago} ago</span><button type="button" data-res="${draft.id}">${KIND[draft.kind].v}</button></div>` : ''}
+      <div class="cols">${animalActs.map(a => `<button type="button" class="row" data-act="${a.id}">${disc(a)}<span class="lb">${esc(a.label)}<span class="sub">for ${esc(s.code)}</span></span></button>`).join('')}</div>`
+      : `<div class="hint">Pick an animal above and its actions appear here, already set to it. Or choose an action without an animal:</div>
+      <div class="cols">${animalActs.map(a => `<button type="button" class="row" data-act="${a.id}">${disc(a)}<span class="lb">${esc(a.label)}<span class="sub">asks: animal</span></span></button>`).join('')}</div>`;
+    panel.innerHTML = `
+      <div class="p-top">
+        <p class="q">${s ? `What happened with ${esc(s.name)}?` : 'Who is this about?'}</p>
+        ${field('c3q', 'Search an animal, tag or enclosure')}
+        <div class="subjects">${SUBJECTS.map(x => `<button type="button" class="subj" data-subj="${x.id}" aria-pressed="${sel === x.id}"><span class="av" style="background:${x.c}">${x.code.split('-')[0]}</span><span><b>${esc(x.name)}</b><small>${x.code} · ${esc(x.where)}</small></span></button>`).join('')}</div>
+      </div>
+      <div class="verbs">${verbs}
+        <div class="other"><span class="kick">Not about an animal</span><div class="chiprow">${A.filter(a => a.scope !== 'animal').map(a => `<button type="button" class="chip" data-act="${a.id}">${ic(a.ic, 16)}${esc(a.label)}</button>`).join('')}</div></div>
+      </div>
+      ${foot()}`;
+  }
+  panel.addEventListener('click', e => {
+    const sb = e.target.closest('[data-subj]'); if (sb) { sel = sel === sb.dataset.subj ? null : sb.dataset.subj; render(); return; }
+    const r = e.target.closest('[data-res]'); if (r) { toast(panel, resumeMsg(RESUME.find(x => x.id === r.dataset.res))); return; }
+    const a = e.target.closest('[data-act]');
+    if (a) { const act = byId[a.dataset.act], s = SUBJECTS.find(x => x.id === sel); toast(panel, act.scope === 'animal' && s ? `Opens <b>${esc(act.label)}</b> · site, section, enclosure and ${esc(s.code)} already filled` : opens(act)); }
+  });
+  panel.addEventListener('input', e => { if (e.target.id === 'c3q' && e.target.value.length > 2) toast(panel, 'Would search the animal index · matches replace the recent list'); });
+  wireCommon(panel); render();
+})();
+
+/* ── 4 · Folders ── */
+(function () {
+  const panel = document.querySelector('.c4');
+  let view = null;
+  function render() {
+    const home = `
+      <button type="button" class="strip" data-view="resume">${ic('clock', 19)}<span>5 unfinished · 3 drafts, 1 not sent</span>${ic('chev', 18)}</button>
+      <div class="folders">${GROUPS.map(g => {
+        const list = A.filter(a => a.g === g.id), top = [...list].sort((x, y) => y.uses - x.uses).slice(0, 2);
+        return `<div class="folder tone-${g.id}" role="button" tabindex="0" data-view="${g.id}"><div class="hd"><b>${g.name}</b><span class="ct">${list.length}</span>${ic('chev', 18)}</div><div class="top2">${top.map(a => `<span role="button" tabindex="0" data-act="${a.id}">${ic(a.ic, 17)}${esc(a.label)}</span>`).join('')}</div></div>`;
+      }).join('')}</div>`;
+    let detail = '';
+    if (view === 'resume') detail = `<button type="button" class="back" data-back>${ic('back', 18)}Quick Actions</button><h3>Unfinished</h3>${RESUME.map(r => { const a = byId[r.action]; return `<button type="button" class="bigrow" data-res="${r.id}">${disc(a)}<span class="lb"><b>${esc(a.label)}</b><small>${esc(r.where)} · ${r.ago} ago</small></span><span class="pill ${r.kind}">${KIND[r.kind].l}</span></button>`; }).join('')}`;
+    else if (view) { const g = GROUPS.find(x => x.id === view); detail = `<button type="button" class="back" data-back>${ic('back', 18)}Quick Actions</button><h3>${g.name}</h3>${A.filter(a => a.g === view).map(a => `<button type="button" class="bigrow" data-act="${a.id}">${disc(a)}<span class="lb"><b>${esc(a.label)}</b><small>${esc(a.help)}</small></span>${ic('chev', 18, 'chev')}</button>`).join('')}`; }
+    panel.innerHTML = `<div class="p-top">${field('c4q', 'Search actions')}</div><div class="viewport"><div class="pane home">${home}</div><div class="pane detail">${detail}</div></div>${foot()}`;
+    panel.classList.toggle('in', !!view);
+  }
+  panel.addEventListener('click', e => {
+    const a = e.target.closest('[data-act]'); if (a) { e.stopPropagation(); toast(panel, opens(byId[a.dataset.act])); return; }
+    const r = e.target.closest('[data-res]'); if (r) { toast(panel, resumeMsg(RESUME.find(x => x.id === r.dataset.res))); return; }
+    if (e.target.closest('[data-back]')) { panel.classList.remove('in'); setTimeout(() => { view = null; render(); }, 380); return; }
+    const v = e.target.closest('[data-view]'); if (v) { view = v.dataset.view; render(); requestAnimationFrame(() => panel.classList.add('in')); }
+  });
+  panel.addEventListener('input', e => {
+    if (e.target.id !== 'c4q') return;
+    const q = e.target.value.trim().toLowerCase(), hit = q && A.find(a => match(a, q));
+    if (hit && view !== hit.g) { view = hit.g; render(); panel.classList.add('in'); const i = panel.querySelector('#c4q'); i.value = e.target.value; i.focus(); }
+  });
+  wireCommon(panel); render();
+})();
+
+/* ── 5 · Step one inside ── */
+(function () {
+  const panel = document.querySelector('.c5');
+  let cur = null, pick = null;
+  function right() {
+    if (!cur) {
+      return `<h3>Pick up where you left off</h3>${RESUME.filter(r => r.kind !== 'awaiting').map(r => { const a = byId[r.action]; return `<button type="button" class="opt" data-res="${r.id}">${disc(a)}<span class="lb">${esc(a.label)}<small>${esc(r.where)} · ${esc(r.note)}</small></span><span class="pill ${r.kind}">${KIND[r.kind].l}</span></button>`; }).join('')}
+      <div class="next"><p>Or choose an action on the left. Its first question appears here, so you don’t have to open the full form to answer it.</p></div>`;
+    }
+    const a = byId[cur];
+    if (a.scope === 'none') return `<div class="crumbs"><span class="on">${esc(a.label)}</span></div><h3>${esc(a.label)}</h3><p style="margin:0;color:var(--mute);font-size:14px;line-height:1.5">${esc(a.help)}. There’s nothing to choose first, so this goes straight to the form.</p><div class="next"><p>Opens the full form.</p><button type="button" class="cta" data-go>Open form</button></div>`;
+    const isAnimal = a.scope === 'animal', list = isAnimal ? SUBJECTS : SITES;
+    const q = isAnimal ? 'Which animal?' : a.scope === 'section' ? 'Which site and section?' : 'Which site?';
+    return `<div class="crumbs"><span class="on">1 · ${isAnimal ? 'Animal' : 'Place'}</span><span>2 · Details</span><span>3 · Review</span></div>
+      <h3>${esc(a.label)} · ${q}</h3>
+      <div class="opts">${list.map((x, i) => `<button type="button" class="opt" data-pick="${i}" aria-pressed="${pick === i}"><span class="av" style="background:${x.c}">${x.code.split('-')[0]}</span><span class="lb">${esc(x.name)}<small>${x.code} · ${esc(x.where)}</small></span></button>`).join('')}</div>
+      <div class="next"><p>${NEXT[a.id] || 'Next: the rest of the form.'}</p><button type="button" class="cta" data-go ${pick === null ? 'disabled' : ''}>Continue</button></div>`;
+  }
+  function render() {
+    panel.innerHTML = `<div class="p-top" style="padding-bottom:14px">${field('c5q', 'Search actions')}</div>
+      <div class="split"><div class="list">${GROUPS.map(g => `<h4>${g.short}</h4>${A.filter(a => a.g === g.id).map(a => `<button type="button" class="row" data-act="${a.id}" aria-current="${cur === a.id}">${disc(a)}<span class="lb">${esc(a.label)}</span></button>`).join('')}`).join('')}</div><div class="step">${right()}</div></div>${foot()}`;
+  }
+  panel.addEventListener('click', e => {
+    const a = e.target.closest('[data-act]'); if (a) { cur = a.dataset.act; pick = null; render(); return; }
+    const p = e.target.closest('[data-pick]'); if (p) { pick = +p.dataset.pick; render(); return; }
+    const r = e.target.closest('[data-res]'); if (r) { toast(panel, resumeMsg(RESUME.find(x => x.id === r.dataset.res))); return; }
+    if (e.target.closest('[data-go]')) {
+      const act = byId[cur], x = act.scope === 'animal' ? SUBJECTS[pick] : SITES[pick];
+      toast(panel, act.scope === 'none' ? `Opens <b>${esc(act.label)}</b>` : `Opens <b>${esc(act.label)}</b> at step 2 · ${esc(x.name)} already chosen`);
+    }
+  });
+  panel.addEventListener('input', e => {
+    if (e.target.id !== 'c5q') return;
+    const q = e.target.value.trim().toLowerCase();
+    panel.querySelectorAll('.list .row').forEach(b => { b.hidden = !match(byId[b.dataset.act], q); });
+  });
+  wireCommon(panel); render();
+})();
+</script>

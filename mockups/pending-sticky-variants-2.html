@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pending Sticky Notes II</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* SIX MORE, WITH DIFFERENT PREMISES (owner, 29 Sep 2026: "can you try some
+     other version too — think a different approach"). The first set
+     (pending-sticky-variants.html) kept ONE list on ONE note and changed the
+     question it answers first. These change what the note IS: a pad you tear
+     through, a board of notes, a walking route, a message from the last
+     shift, a grid of urgency against effort, and the animals themselves.
+     Same paper, same tape, same seven jobs, same 120 open. Everything beyond
+     the open totals (places, people, effort, the animals named) is SAMPLE. */
+  :root {
+    --bg: #F3F5F4; --panel: #FFFFFF; --ink-ui: #1F415B; --ink-ui-2: #5A6B78; --line: #E1E6EA;
+    --paper: linear-gradient(172deg, rgb(255, 247, 196) 0%, rgb(255, 240, 166) 70%, rgb(252, 232, 146) 100%);
+    --ink: rgb(62, 52, 20); --ink-2: rgba(62, 52, 20, .62); --rule: rgba(80, 130, 170, .28); --margin: rgba(214, 120, 90, .45);
+    --tape: rgba(150, 214, 208, .7); --hi: rgba(255, 196, 0, .55); --red: rgb(196, 70, 44); --green: rgb(46, 110, 60);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #12181D; --panel: #1B232A; --ink-ui: #E7EEF3; --ink-ui-2: #9AAAB7; --line: #2A353E; }
+  }
+  :root[data-theme="dark"] { --bg: #12181D; --panel: #1B232A; --ink-ui: #E7EEF3; --ink-ui-2: #9AAAB7; --line: #2A353E; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink-ui); font-family: Inter, system-ui, sans-serif; }
+  header { max-width: 1240px; margin: 0 auto; padding: 32px 16px 4px; }
+  h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -.3px; }
+  header p { margin: 0; max-width: 840px; color: var(--ink-ui-2); font-size: 15px; line-height: 1.5; }
+  header a { color: inherit; }
+  main { max-width: 1240px; margin: 0 auto; padding: 20px 16px 56px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr)); gap: 20px; }
+  figure { margin: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+  figure.is-ref { border-style: dashed; }
+  .stage { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 24px; padding: 28px 16px 24px; background: #EEF4F1; }
+  .slot { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .slot > small { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #6F7F7A; }
+  figcaption { padding: 14px 16px 16px; font-size: 13.5px; line-height: 1.5; color: var(--ink-ui-2); }
+  figcaption h2 { margin: 0 0 4px; font-size: 16px; font-weight: 700; color: var(--ink-ui); }
+  figcaption > p { margin: 0 0 10px; color: var(--ink-ui); }
+  dl { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 6px 10px; margin: 0; }
+  dt { font-weight: 600; color: var(--ink-ui); }
+  dd { margin: 0; }
+
+  /* ── the paper, shared ── */
+  .note { position: relative; width: 340px; max-width: calc(100vw - 64px); padding: 18px 18px 16px; border-radius: 4px; background: var(--paper); color: var(--ink);
+    box-shadow: 0 1px 1px rgba(90, 70, 0, .08), 0 10px 18px -8px rgba(90, 70, 0, .35); rotate: -1deg; font-size: 14px; }
+  .note.l { height: 304px; }
+  .note.m { height: 144px; padding: 14px 16px 12px; }
+  .note::after { content: ''; position: absolute; right: 0; bottom: 0; width: 22px; height: 22px; pointer-events: none;
+    background: linear-gradient(315deg, #EEF4F1 0 50%, rgb(242, 222, 128) 50% 100%); border-top-left-radius: 6px; filter: drop-shadow(-1px -1px 2px rgba(90, 70, 0, .22)); }
+  .note.bare { background: none; box-shadow: none; padding: 0; rotate: 0deg; }
+  .note.bare::after { display: none; }
+  .tape { position: absolute; top: -9px; left: 50%; z-index: 5; width: 88px; height: 18px; translate: -50% 0; rotate: 2deg; background: var(--tape); box-shadow: 0 1px 2px rgba(40, 70, 60, .18); }
+  .head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .head b { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; }
+  .head b svg { width: 18px; height: 18px; flex: none; translate: 0 2px; }
+  .head span { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+  .head span strong { font-family: 'DM Sans', sans-serif; font-size: 16px; color: var(--ink); }
+  .num { font-family: 'DM Sans', sans-serif; font-weight: 700; font-variant-numeric: tabular-nums; }
+  button { font: inherit; color: inherit; }
+  .hit { margin: 0; padding: 0; border: 0; background: none; text-align: left; cursor: pointer; }
+  .note button:focus-visible, .note [tabindex]:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; border-radius: 3px; }
+  @media (hover: hover) { .hit:hover { background: rgba(62, 52, 20, .05); } }
+  .pill { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--ink); color: rgb(255, 244, 180); font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .pill.ghost { background: rgba(62, 52, 20, .08); color: var(--ink); }
+  .toast { position: fixed; left: 50%; bottom: 24px; z-index: 9; translate: -50% 12px; padding: 10px 16px; border-radius: 10px; background: rgba(31, 65, 91, .94); color: #fff; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .18s, translate .18s; }
+  .toast.on { opacity: 1; translate: -50% 0; }
+
+  /* 0 · current */
+  .v0 .rows { display: grid; grid-auto-rows: 1fr; height: calc(100% - 40px); margin-top: 10px; border-top: 2px solid var(--margin); }
+  .v0 .row { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: 10px; border-bottom: 1px solid var(--rule); }
+  .v0 .box { width: 12px; height: 12px; border: 1.5px solid rgba(62, 52, 20, .55); border-radius: 3px; }
+  .m.v0 .rows { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr); grid-auto-flow: column; height: calc(100% - 30px); margin-top: 6px; column-gap: 16px; }
+  .m.v0 .row { grid-template-columns: minmax(0, 1fr) auto; font-size: 12px; }
+  .m.v0 .row > span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* 7 · the tear-off pad: one job at a time */
+  .v7 .pad { position: relative; height: 100%; }
+  .v7 .sheet { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 18px 18px 14px; border-radius: 4px; background: var(--paper); box-shadow: 0 1px 1px rgba(90, 70, 0, .08); }
+  .v7 .under { position: absolute; left: 0; right: 0; height: 100%; border-radius: 4px; background: linear-gradient(172deg, #FBEFB2, #F2DC7E); }
+  .v7 .under.u1 { top: 4px; rotate: .8deg; box-shadow: 0 10px 18px -8px rgba(90, 70, 0, .35); }
+  .v7 .under.u2 { top: 8px; rotate: -.6deg; background: linear-gradient(172deg, #F6E7A2, #EBD06C); }
+  .v7 .sheet.tear { animation: tear .5s cubic-bezier(.5, 0, .75, 0) forwards; transform-origin: 20% 0; }
+  @keyframes tear { 30% { rotate: -4deg; translate: 4px 2px; } 100% { rotate: -18deg; translate: -60px 260px; opacity: 0; } }
+  .v7 .job { margin-top: 14px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+  .v7 .what { margin: 4px 0 0; font-size: 20px; font-weight: 700; line-height: 1.2; }
+  .v7 .where { margin: 6px 0 0; font-size: 13px; color: var(--ink-2); }
+  .v7 .age { display: inline-block; margin-top: 10px; padding: 3px 8px; border-radius: 4px; background: rgba(196, 70, 44, .12); color: var(--red); font-size: 12px; font-weight: 700; }
+  .v7 .acts { display: flex; gap: 8px; margin-top: auto; align-items: center; }
+  .v7 .acts .left { margin-left: auto; font-size: 12px; color: var(--ink-2); }
+  .m.v7 .sheet { padding: 14px 16px 12px; }
+  .m.v7 .line { margin-top: 10px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+  .m.v7 .line b { display: block; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .m.v7 .line small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* 8 · the corkboard: a note per job, sized by what is open */
+  .v8.note { background: #C9A57A radial-gradient(rgba(0, 0, 0, .06) 1px, transparent 1.5px) 0 0 / 7px 7px; rotate: 0deg; border-radius: 8px; box-shadow: inset 0 0 0 5px #9C7A52, 0 8px 16px -8px rgba(60, 40, 10, .5); padding: 14px; }
+  .v8.note::after { display: none; }
+  .v8 .board { display: flex; flex-wrap: wrap; align-content: flex-start; align-items: flex-start; justify-content: center; gap: 8px; height: 100%; }
+  .v8 .mini { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 8px 8px 7px; border: 0; border-radius: 2px; text-align: left; cursor: pointer; box-shadow: 0 4px 8px -4px rgba(60, 40, 10, .55); }
+  .v8 .mini::before { content: ''; position: absolute; top: -4px; left: 50%; width: 10px; height: 10px; translate: -50% 0; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #F58B7A, #B8321F); box-shadow: 0 1px 2px rgba(0, 0, 0, .4); }
+  .v8 .mini b { font-family: 'DM Sans', sans-serif; font-weight: 700; line-height: 1; }
+  .v8 .mini span { font-size: 11px; font-weight: 600; line-height: 1.15; }
+  .v8 .mini[data-c='0'] { background: #FFF1A8; } .v8 .mini[data-c='1'] { background: #FFD9A0; } .v8 .mini[data-c='2'] { background: #C9F0C4; } .v8 .mini[data-c='3'] { background: #BFE3F7; }
+  .v8 .mini.old::after { content: 'OVERDUE'; position: absolute; right: 5px; bottom: 6px; font-size: 8px; font-weight: 800; letter-spacing: .06em; color: var(--red); }
+  .m.v8 .board { flex-wrap: nowrap; justify-content: flex-start; gap: 10px; }
+
+  /* 9 · the keeper's round: grouped by where you walk */
+  .v9 .route { position: relative; margin-top: 8px; padding-left: 22px; }
+  .v9 .route::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 10px; border-left: 2px dashed rgba(62, 52, 20, .35); }
+  .v9 .stop { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 10px; width: 100%; padding: 4px 4px 4px 0; border-bottom: 1px solid var(--rule); }
+  .v9 .stop::before { content: attr(data-n); position: absolute; left: -22px; top: 7px; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); color: rgb(255, 244, 180); font-size: 9.5px; font-weight: 700; }
+  .v9 .stop.here::before { background: var(--red); box-shadow: 0 0 0 3px rgba(196, 70, 44, .22); }
+  .v9 .stop b { font-size: 13.5px; }
+  .v9 .stop small { grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .v9 .stop .num { font-size: 15px; }
+  .v9 .walk { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11.5px; color: var(--ink-2); }
+  .m.v9 .route { margin-top: 8px; padding-left: 0; display: flex; align-items: center; gap: 4px; }
+  .m.v9 .route::before { display: none; }
+  .m.v9 .hop { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border-radius: 6px; text-align: center; }
+  .m.v9 .hop i { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: rgb(255, 244, 180); font-style: normal; font-size: 11px; font-weight: 700; }
+  .m.v9 .hop.here i { background: var(--red); }
+  .m.v9 .hop span { max-width: 100%; font-size: 10.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .m.v9 .arrow { flex: none; color: var(--ink-2); font-size: 12px; }
+
+  /* 10 · the handover: a message from the last shift */
+  .v10 .from { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; color: var(--ink-2); }
+  .v10 .av { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #1F515B; color: #fff; font-size: 10px; font-weight: 700; flex: none; }
+  .v10 .av.me { background: var(--green); }
+  .v10 ul { margin: 8px 0 0; padding: 0; list-style: none; border-top: 2px solid var(--margin); }
+  .v10 li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 36px; padding: 4px 0; border-bottom: 1px solid var(--rule); font-size: 12.5px; line-height: 1.28; }
+  .v10 li b { font-weight: 700; }
+  .v10 .take { height: 26px; padding: 0 10px; border: 1.5px solid rgba(62, 52, 20, .35); border-radius: 999px; background: rgba(255, 255, 255, .4); font-size: 11.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .v10 .taken { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: var(--green); }
+  .v10 .ack { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11.5px; color: var(--ink-2); }
+  .v10 .ack.done .pill { background: var(--green); }
+  .m.v10 .msg { margin-top: 8px; font-size: 13px; line-height: 1.35; }
+  .m.v10 .msg b { font-weight: 700; }
+  .m.v10 .ack { margin-top: 8px; }
+
+  /* 11 · urgent × effort: where each job sits */
+  .v11 .grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: calc(100% - 44px); margin: 10px 0 0 14px; border-left: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
+  .v11 .q { position: relative; border-right: 1px dashed rgba(62, 52, 20, .25); border-bottom: 1px dashed rgba(62, 52, 20, .25); }
+  .v11 .q > em { position: absolute; top: 4px; left: 6px; font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+  .v11 .q.now { background: rgba(196, 70, 44, .09); }
+  .v11 .q.now > em { color: var(--red); }
+  .v11 .ax { position: absolute; font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); }
+  .v11 .ax.y { left: -16px; top: 50%; translate: -50% -50%; rotate: -90deg; white-space: nowrap; }
+  .v11 .ax.x { right: 0; bottom: -17px; }
+  .v11 .dot { position: absolute; display: grid; place-items: center; translate: -50% -50%; border: 0; border-radius: 50%; background: var(--ink); color: rgb(255, 244, 180); cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 11px; box-shadow: 0 2px 4px rgba(62, 52, 20, .3); }
+  .v11 .dot.hot { background: var(--red); color: #fff; }
+  .v11 .dot + .lab { position: absolute; translate: -50% 0; font-size: 10px; font-weight: 600; white-space: nowrap; pointer-events: none; }
+  .m.v11 .now { margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: rgba(196, 70, 44, .09); }
+  .m.v11 .now em { font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--red); }
+  .m.v11 .now div { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; font-size: 12.5px; }
+
+  /* 12 · animals first: who is waiting on you */
+  .v12 .faces { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+  .v12 .face { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 0; border: 0; background: none; cursor: pointer; }
+  .v12 .face img { width: 62px; height: 62px; border-radius: 50%; object-fit: cover; border: 2.5px solid #fff; box-shadow: 0 3px 6px -2px rgba(62, 52, 20, .45); }
+  .v12 .face.urgent img { border-color: var(--red); }
+  .v12 .face span { max-width: 100%; font-size: 10.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .v12 .face i { position: absolute; top: -2px; right: 6px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--ink); color: rgb(255, 244, 180); font-style: normal; font-size: 10.5px; font-weight: 700; line-height: 20px; text-align: center; }
+  .v12 .face.urgent i { background: var(--red); color: #fff; }
+  .v12 .face small { display: flex; gap: 2px; }
+  .v12 .face small b { width: 14px; height: 14px; border-radius: 3px; background: rgba(62, 52, 20, .12); font-size: 8.5px; line-height: 14px; text-align: center; }
+  .v12 .rest { margin-top: 10px; font-size: 12px; color: var(--ink-2); }
+  .m.v12 .strip { display: flex; align-items: center; margin-top: 10px; }
+  .m.v12 .strip img { width: 44px; height: 44px; margin-left: -10px; border-radius: 50%; object-fit: cover; border: 2px solid #FFF3B8; box-shadow: 0 2px 4px rgba(62, 52, 20, .35); }
+  .m.v12 .strip img:first-child { margin-left: 0; border-color: var(--red); }
+  .m.v12 .strip span { margin-left: 10px; font-size: 12.5px; line-height: 1.3; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pending, on yellow paper: six different approaches</h1>
+  <p>The <a href="pending-sticky-variants.html">first set</a> kept one list on one note and changed the question it answers first. This set changes what the note <i>is</i>: a pad you tear through one job at a time, a board of notes, the route you walk, a message from the last shift, a grid of urgency against effort, and the animals themselves. Each note shows the 2×2 and 2×1 sizes and says what a tap does. Taps work here, and in 7, 10 and 11 they act on the note itself. The first card is the current note, for comparison. <b>Sample data:</b> the open totals (the same seven jobs, 120 open) come from the database. The places, people, effort, ages and the animals named are made up.</p>
+</header>
+<main id="figs"></main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const JOBS = [
+  { k: 'Vaccinations', short: 'Vacc', n: 30, over: 12, mins: 5, c: 0 },
+  { k: 'Necropsy reports', short: 'Necr', n: 4, over: 3, mins: 90, c: 1 },
+  { k: 'Medicine admin', short: 'Med', n: 24, over: 4, mins: 4, c: 0 },
+  { k: 'Surgeries', short: 'Surg', n: 2, over: 0, mins: 120, c: 1 },
+  { k: 'Sexing', short: 'Sex', n: 19, over: 9, mins: 15, c: 2 },
+  { k: 'Microchipping', short: 'Chip', n: 35, over: 20, mins: 4, c: 2 },
+  { k: 'Transfers', short: 'Move', n: 6, over: 1, mins: 60, c: 3 },
+]
+const TOTAL = JOBS.reduce((t, j) => t + j.n, 0)
+const byN = [...JOBS].sort((a, b) => b.n - a.n)
+const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 2.9 4.5 6.7 4.5c2.1 0 3.5 1.1 4.3 2.4.8-1.3 2.2-2.4 4.3-2.4 3.8 0 5.8 4 4.3 7.3C19.5 16.4 12 21 12 21Z"/><path d="M3 12h4l2-3 3 6 2-3h7" fill="none" stroke="#FFF3B8" stroke-width="1.6" stroke-linejoin="round"/></svg>'
+const head = (right) => `<div class="head"><b>${HEART}Pending</b><span>${right ?? `<strong>${TOTAL}</strong> open`}</span></div>`
+const go = (what) => `data-go="${what}"`
+/* 11 · where a job sits: effort spread from the lightest job to the heaviest,
+   urgency the overdue share; "Do now" is the top-left quarter, on both sizes */
+const E = JOBS.map((j) => Math.log10(j.mins * j.n)), E0 = Math.min(...E), E1 = Math.max(...E)
+const PLACE = (j) => ({ x: (.1 + .8 * (Math.log10(j.mins * j.n) - E0) / (E1 - E0)) * 100, y: (1 - (.1 + .8 * Math.min(1, j.over / j.n / .75))) * 100 })
+const doNow = (j) => { const p = PLACE(j); return p.x < 50 && p.y < 50 }
+const IMG = (n) => `../assets/img/species/${n}.jpg`
+
+/* 7 · the queue the pad tears through: the oldest item of each job first */
+const QUEUE = [
+  { job: 'Microchipping', what: 'Chip the three juveniles', where: 'Slate Pangolin · Fern Shaw Warren · Hollowpine', age: 'Waiting 9 days' },
+  { job: 'Necropsy reports', what: 'Sign off the report for AID 57741', where: 'Ochre erroralis · Crimson Frosted', age: 'Waiting 6 days' },
+  { job: 'Vaccinations', what: 'Booster for the chital herd', where: '8 animals · Meadow Spring paddock', age: 'Overdue 4 days' },
+  { job: 'Sexing', what: 'Sex the Aaru Macaw clutch', where: '4 chicks · East aviary · Clearspring', age: 'Waiting 3 days' },
+  { job: 'Medicine admin', what: 'Evening dose: meloxicam', where: 'Sambar AID 57679 · Lake Dell', age: 'Due today' },
+]
+
+/* 9 · the round, stop by stop */
+const STOPS = [
+  { p: 'Hospital', jobs: [['Necropsy reports', 4], ['Surgeries', 2], ['Medicine admin', 8]] },
+  { p: 'Aviary block', jobs: [['Vaccinations', 10], ['Sexing', 12], ['Microchipping', 0]] },
+  { p: 'Reptile house', jobs: [['Microchipping', 18], ['Sexing', 4], ['Medicine admin', 3]] },
+  { p: 'Hoofstock paddocks', jobs: [['Vaccinations', 16], ['Medicine admin', 9], ['Transfers', 4]] },
+  { p: 'Primate house', jobs: [['Microchipping', 17], ['Vaccinations', 4], ['Sexing', 3], ['Medicine admin', 4], ['Transfers', 2]] },
+].map((s) => ({ ...s, n: s.jobs.reduce((t, [, n]) => t + n, 0), jobs: s.jobs.filter(([, n]) => n) }))
+
+/* 10 · the night shift's handover */
+const HAND = [
+  { html: '<b>12 vaccinations</b> overdue. Start with the aviary; the chital booster is due tomorrow.', job: 'Vaccinations' },
+  { html: '<b>3 necropsy reports</b> since Monday still need a vet to sign off.', job: 'Necropsy reports' },
+  { html: '<b>Microchipping</b>: 20 overdue. The reader is in the reptile house office.', job: 'Microchipping' },
+  { html: 'Sambar at Lake Dell: <b>evening meloxicam</b>, then check her gait.', job: 'Medicine admin' },
+]
+
+/* 12 · the animals waiting, most jobs first */
+const ANIMALS = [
+  { n: 'Slate Pangolin', img: 'indian-leopard', jobs: ['Chip', 'Sex', 'Vacc'], urgent: true },
+  { n: 'Chital herd', img: 'chital', jobs: ['Vacc', 'Med'], urgent: true },
+  { n: 'Aaru Macaw', img: 'rose-ringed-parakeet', jobs: ['Sex', 'Chip'] },
+  { n: 'Sambar 57679', img: 'sambar', jobs: ['Med', 'Vacc'] },
+  { n: 'Rock Python', img: 'indian-rock-python', jobs: ['Chip'] },
+  { n: 'Bonnet Macaque', img: 'bonnet-macaque', jobs: ['Vacc'] },
+  { n: 'Sarus Crane', img: 'sarus-crane', jobs: ['Med'] },
+  { n: 'Gaur', img: 'gaur', jobs: ['Move'] },
+]
+
+const V = [
+  { id: 0, ref: true, name: 'Current note (for comparison)',
+    premise: 'Seven jobs down ruled lines, always in the same order.',
+    tap: 'A row opens that job’s list.', m: 'Two columns of short lines.',
+    l: () => head() + `<div class="rows">${JOBS.map((j) => `<button class="hit row" ${go(j.k)}><i class="box"></i><span>${j.k}</span><span class="num">${j.n}</span></button>`).join('')}</div>`,
+    s: () => head() + `<div class="rows">${JOBS.map((j) => `<button class="hit row" ${go(j.k)}><span>${j.k}</span><span class="num">${j.n}</span></button>`).join('')}</div>` },
+
+  { id: 7, bare: true, name: '7 · The tear-off pad: one job at a time',
+    premise: 'The note stops being a summary and becomes a queue. The top sheet is one concrete thing to do now, with the animal, the place and how long it has waited. The sheets underneath are the rest of the pad, so you can see how much is left. Done tears the sheet off and the next one is waiting.',
+    tap: '“Done” tears the sheet away and the next job appears (try it). “Skip” sends it to the back of the pad. Tapping the sheet opens that job’s record.', m: 'One line, the next job, with a Done button. Pending becomes a to-do you can clear from the Home page.',
+    trade: 'You see one job, not the whole spread. The totals move to a small “119 left” count.',
+    l: () => `<div class="pad"><i class="under u2"></i><i class="under u1"></i><div class="sheet"></div></div>`,
+    s: () => `<div class="pad"><i class="under u1"></i><div class="sheet"></div></div>` },
+
+  { id: 8, name: '8 · The corkboard: a note for each job',
+    premise: 'The single note splits into seven, pinned to a small cork board. Each note’s size is how much is open, so Microchipping is the biggest and Surgeries the smallest; you read the spread by size before any number. The colour groups them (yellow medical care, orange vet reports, green records, blue moves), and a job with overdue work says so in red.',
+    tap: 'A note opens that job’s list.', m: 'The four biggest notes in a row, largest first, with “+3” at the end.',
+    trade: 'It loses the ruled-paper look of the other versions: it’s a board holding notes, not a note.',
+    l: () => `<div class="board">${byN.map((j) => { const s = Math.round(58 + Math.sqrt(j.n / byN[0].n) * 62); return `<button class="mini${j.over > 5 ? ' old' : ''}" data-c="${j.c}" ${go(j.k)} style="width:${s}px;height:${Math.round(s * .82)}px;rotate:${((j.n * 37) % 7) - 3}deg"><span>${j.k}</span><b style="font-size:${Math.round(14 + s / 7)}px">${j.n}</b></button>` }).join('')}</div>`,
+    s: () => `<div class="board">${byN.slice(0, 4).map((j, i) => `<button class="mini${j.over > 5 ? ' old' : ''}" data-c="${j.c}" ${go(j.k)} style="width:${[82, 72, 66, 60][i]}px;height:${[96, 88, 84, 80][i]}px;rotate:${[-3, 2, -1, 3][i]}deg"><span>${j.k}</span><b style="font-size:${[26, 22, 20, 18][i]}px">${j.n}</b></button>`).join('')}<button class="mini" data-c="3" ${go('Pending · all jobs')} style="width:48px;height:80px;rotate:-2deg"><span>more</span><b style="font-size:18px">+3</b></button></div>` },
+
+  { id: 9, name: '9 · The keeper’s round: grouped by where you walk',
+    premise: 'The note is organised by place, not by job. It follows the order you would walk: Hospital, Aviary block, Reptile house, Hoofstock paddocks, Primate house. Each stop says what is waiting there, so you do all of it in one visit instead of crossing the site once per job type.',
+    tap: 'A stop opens a list of everything pending at that place, all job types together. The red dot is the stop with the most overdue.', m: 'The route as five numbered stops in a line, the busiest in red.',
+    trade: 'The places and the split between them are sample data. The database records each job’s site, not the section.',
+    l: () => head() + `<div class="route">${STOPS.map((s, i) => `<button class="hit stop${i === 2 ? ' here' : ''}" data-n="${i + 1}" ${go(s.p + ' · all jobs')}><b>${s.p}</b><span class="num">${s.n}</span><small>${s.jobs.map(([k, n]) => `${k} ${n}`).join(' · ')}</small></button>`).join('')}</div><div class="walk"><span>5 stops · about 2 h 10 min</span><span>Start at the Hospital</span></div>`,
+    s: () => head() + `<div class="route">${STOPS.map((s, i) => `${i ? '<span class="arrow">›</span>' : ''}<button class="hit hop${i === 2 ? ' here' : ''}" ${go(s.p + ' · all jobs')}><i>${s.n}</i><span>${s.p.split(' ')[0]}</span></button>`).join('')}</div>` },
+
+  { id: 10, name: '10 · The handover: a message from the last shift',
+    premise: 'A sticky note is how one person leaves work for the next. So this one is written as a handover from the night shift, a few plain sentences on what matters today, with a reason, instead of a table of totals. It’s about ownership: each line has “Take it”, and once taken it shows who has it, so two people don’t do the same job.',
+    tap: '“Take it” puts your name on that line (try it). “Acknowledge” tells the night shift the handover was read. Tapping a sentence opens that job’s list.', m: 'The first sentence, “+3 more”, and Acknowledge.',
+    trade: 'The sentences have to be written by someone, or generated from the data. Sample text here.',
+    l: () => head('<strong>Handover</strong> 07:00') + `<div class="from"><span class="av">RP</span>From Ramesh Patil · night vet</div><ul>${HAND.map((h, i) => `<li data-i="${i}"><button class="hit" ${go(h.job)}>${h.html}</button><button class="take">Take it</button></li>`).join('')}</ul><div class="ack"><span>0 of 4 taken</span><button class="pill">Acknowledge</button></div>`,
+    s: () => head('<strong>Handover</strong> 07:00') + `<button class="hit msg" ${go(HAND[0].job)}>${HAND[0].html}</button><div class="ack"><span>+3 more from Ramesh Patil</span><button class="pill">Acknowledge</button></div>` },
+
+  { id: 11, name: '11 · Urgent × effort: what to do first',
+    premise: 'Each job is placed on a small grid: up the side, how much of it is overdue; along the bottom, how long it takes (minutes per animal times how many). The dot’s size is how many are open. The top-left corner, urgent and quick, is shaded red and labelled Do now. It answers “what can I clear before lunch?”, which the other versions don’t.',
+    tap: 'A dot shows its job and figures (try it). A second tap opens its list. A corner opens those jobs together.', m: 'Only the Do now corner, as a short list.',
+    trade: 'Effort is an estimate (sample minutes per job). It needs a sensible default for each job type.',
+    l: () => {
+      const place = PLACE
+      return head() + `<div class="grid"><div class="q now"><em>Do now</em></div><div class="q"><em>Plan it</em></div><div class="q"><em>Quick wins</em></div><div class="q"><em>Later</em></div>` +
+        `<span class="ax y">Overdue →</span><span class="ax x">Effort →</span>` +
+        JOBS.map((j) => { const p = place(j), d = Math.round(20 + Math.sqrt(j.n) * 3.2); return `<button class="dot${doNow(j) ? ' hot' : ''}" data-k="${j.k}" style="left:${p.x}%;top:${p.y}%;width:${d}px;height:${d}px">${j.n}</button><span class="lab" style="left:${p.x}%;top:calc(${p.y}% + ${d / 2 + 2}px)">${j.short}</span>` }).join('') + `</div>` },
+    s: () => head() + `<button class="hit now" ${go('Pending · do now')}><em>Do now · urgent and quick</em><div>${JOBS.filter(doNow).map((j) => `<span>${j.k} <b class="num">${j.n}</b></span>`).join('')}</div></button>` },
+
+  { id: 12, name: '12 · Animals first: who is waiting on you',
+    premise: 'Keepers think in animals, not job types. So the note shows the animals that have something pending, as faces: the badge is how many jobs each one needs, and the small tags say which. A red ring means something is overdue. The same 120 jobs, seen as the 64 animals they belong to.',
+    tap: 'A face opens that animal’s record with all its pending jobs together, so you do them in one handling. “+56 more” opens the full list.', m: 'An overlapping row of the most urgent faces, and one line: “Slate Pangolin and 63 others”.',
+    trade: 'The number of animals per job is sample data. The photos are the project’s kind photos, not each animal’s own.',
+    l: () => head('<strong>64</strong> animals') + `<div class="faces">${ANIMALS.map((a) => `<button class="face${a.urgent ? ' urgent' : ''}" ${go(a.n + ' · all pending')}><img src="${IMG(a.img)}" alt=""><i>${a.jobs.length}</i><span>${a.n}</span><small>${a.jobs.map((j) => `<b>${j[0]}</b>`).join('')}</small></button>`).join('')}</div><div class="rest">+56 more animals · 120 jobs between them</div>`,
+    s: () => head('<strong>64</strong> animals') + `<button class="hit strip" ${go('Pending · by animal')}>${ANIMALS.slice(0, 5).map((a) => `<img src="${IMG(a.img)}" alt="">`).join('')}<span><b>Slate Pangolin</b> and 63 others<br>need something today</span></button>` },
+]
+
+const figs = document.getElementById('figs')
+figs.innerHTML = V.map((v) => `<figure class="${v.ref ? 'is-ref' : ''}"><div class="stage">` +
+  `<div class="slot"><small>2×2</small><div class="note l v${v.id}${v.bare ? ' bare' : ''}">${v.id === 8 ? '' : '<i class="tape" aria-hidden="true"></i>'}${v.l()}</div></div>` +
+  `<div class="slot"><small>2×1</small><div class="note m v${v.id}${v.bare ? ' bare' : ''}">${v.id === 8 ? '' : '<i class="tape" aria-hidden="true"></i>'}${v.s()}</div></div>` +
+  `</div><figcaption><h2>${v.name}</h2><p>${v.premise}</p><dl><dt>Tap</dt><dd>${v.tap}</dd><dt>2×1</dt><dd>${v.m}</dd>${v.trade ? `<dt>Trade-off</dt><dd>${v.trade}</dd>` : ''}</dl></figcaption></figure>`).join('')
+
+const toast = document.getElementById('toast'); let tt
+const say = (t) => { toast.textContent = t; toast.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove('on'), 1700) }
+document.addEventListener('click', (e) => { const g = e.target.closest('[data-go]'); if (g) say(`Opens ${g.dataset.go}`) })
+
+/* 7 · the pad: Done tears, Skip sends to the back */
+document.querySelectorAll('.v7').forEach((note) => {
+  const big = note.classList.contains('l'), q = [...QUEUE]
+  let left = TOTAL
+  const sheet = () => note.querySelector('.sheet')
+  const draw = () => {
+    const j = q[0]
+    sheet().innerHTML = big
+      ? head(`<strong data-left>${left}</strong> left`) + `<button class="hit" ${go(j.job + ' · ' + j.what)} style="display:block;width:100%"><div class="job">${j.job}</div><p class="what">${j.what}</p><p class="where">${j.where}</p><span class="age">${j.age}</span></button>` +
+        `<div class="acts"><button class="pill" data-done>Done ✓</button><button class="pill ghost" data-skip>Skip</button><span class="left">sheet 1 of ${left}</span></div>`
+      : head(`<strong>${left}</strong> left`) + `<div class="line"><button class="hit" ${go(j.job + ' · ' + j.what)}><b>${j.what}</b><small>${j.job} · ${j.age}</small></button><button class="pill" data-done>Done ✓</button></div>`
+  }
+  draw()
+  note.addEventListener('click', (e) => {
+    if (e.target.closest('[data-done]')) {
+      const s = sheet(); if (s.classList.contains('tear')) return
+      s.classList.add('tear')
+      setTimeout(() => { q.push(q.shift()); left--; s.classList.remove('tear'); draw() }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 480)
+      say('Marked done · next sheet')
+    } else if (e.target.closest('[data-skip]')) { q.push(q.shift()); draw(); say('Moved to the back of the pad') }
+  })
+})
+
+/* 10 · take a line, acknowledge the handover */
+document.querySelectorAll('.v10.l').forEach((note) => {
+  note.addEventListener('click', (e) => {
+    const t = e.target.closest('.take')
+    if (t) { t.outerHTML = '<span class="taken"><span class="av me">NV</span>You</span>'; const n = note.querySelectorAll('.taken').length; note.querySelector('.ack span').textContent = `${n} of 4 taken`; say('Your name is on it') }
+    const a = e.target.closest('.pill')
+    if (a) { a.textContent = 'Read ✓'; a.closest('.ack').classList.add('done'); say('Ramesh sees you read the handover') }
+  })
+})
+document.querySelectorAll('.v10.m .pill').forEach((a) => a.addEventListener('click', () => { a.textContent = 'Read ✓'; a.closest('.ack').classList.add('done'); say('Ramesh sees you read the handover') }))
+
+/* 11 · a dot says what it is, a second tap opens it */
+document.querySelectorAll('.v11.l').forEach((note) => {
+  let last = null
+  note.addEventListener('click', (e) => {
+    const d = e.target.closest('.dot'); if (!d) return
+    const j = JOBS.find((x) => x.k === d.dataset.k)
+    if (last === d) { say(`Opens ${j.k}`); last = null; return }
+    last = d; say(`${j.k}: ${j.n} open, ${j.over} overdue, about ${Math.round(j.mins * j.n / 60 * 10) / 10} h of work`)
+  })
+})
+</script>
+</body>
+</html>

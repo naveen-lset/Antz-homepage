@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pending Card Versions</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* FOUR VERSIONS OF V2's PENDING CARD (29 Sep 2026: "Create 4 mockups for
+     this — not like this. It has to match the current design"). The sticky
+     note was the one card on V2 that shares nothing with its neighbours.
+     Each version here is built only from parts V2 already draws — a module
+     gradient, the Animals card's pill, tab track and white list, the stat
+     card's DM Sans figure, the Insights band's plate — and is shown IN THE
+     LIVE PAGE: every tile is index.html?v=2 with only the Pending card
+     swapped, reading that card's own numbers from the database. */
+  :root { --bg: #F4F6F7; --card: #FFFFFF; --ink: #1F415B; --ink-2: #5A6B78; --line: #E1E6EA; --pick: #006D35; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #12181D; --card: #1B232A; --ink: #E7EEF3; --ink-2: #9AAAB7; --line: #2A353E; --pick: #5CC98E; }
+  }
+  :root[data-theme="dark"] { --bg: #12181D; --card: #1B232A; --ink: #E7EEF3; --ink-2: #9AAAB7; --line: #2A353E; --pick: #5CC98E; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+  header { max-width: 1320px; margin: 0 auto; padding: 32px 16px 8px; }
+  h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -.3px; }
+  header p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.5; max-width: 860px; }
+  main { max-width: 1320px; margin: 0 auto; padding: 20px 16px 48px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  @media (max-width: 900px) { main { grid-template-columns: minmax(0, 1fr); } }
+  figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .bar b { font-size: 15px; font-weight: 600; }
+  .seg { display: inline-flex; padding: 3px; border-radius: 9px; background: var(--line); }
+  .seg button { border: 0; padding: 6px 12px; border-radius: 7px; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+  .seg button:focus-visible { outline: 2px solid var(--pick); outline-offset: 1px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 744 / 640; overflow: hidden; background: #fff; }
+  .frame iframe { position: absolute; left: 0; top: 0; width: 744px; height: 640px; border: 0; transform-origin: 0 0; }
+  figcaption { padding: 14px 16px 16px; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
+  figcaption p { margin: 0 0 8px; }
+  figcaption p:first-child { color: var(--ink); font-size: 14px; }
+  dl { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 6px 10px; margin: 0; }
+  dt { font-weight: 600; color: var(--ink); }
+  dd { margin: 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pending card: four versions</h1>
+  <p>Each tile is the live V2 home at tablet width, with only the Pending card swapped out. The numbers are the database's. Try them: the filter, the tabs and every row work, and a tap shows where it would go. Use <b>2×2 / 2×1</b> to see how each one fits a smaller slot. Pick one, or parts of two.</p>
+</header>
+<main id="figs"></main>
+
+<script>
+/* ── the four versions: a caption and a builder each ── */
+const VERSIONS = [
+  { id: 'a', name: 'A · The Animals card’s twin',
+    premise: 'Pending uses the same parts as the Animals card beside it: the medical green, a “Last 30 days ▾” pill, a Medical / Records tab track, and a white list of jobs.',
+    tap: 'A row opens that job’s page (Vaccinations, Sexing and so on), already filtered to the window you picked.',
+    filter: 'The pill picks when the job was raised (any time, 7 days, 30 days). The tabs pick the area, and each tab shows its own count.',
+    small: 'At 2×1 the tab track goes and the list shows its top two jobs. The pill still filters.' },
+  { id: 'b', name: 'B · One figure, then where it is',
+    premise: 'A door first: the total open jobs as one big figure, like the Animals stat card, with a white stacked bar showing which jobs make it up. The three biggest jobs sit under it as glass chips.',
+    tap: 'The figure opens a Pending overview page. A chip opens its own job’s page.',
+    filter: 'The same pill; the figure, the bar and the chips all recount together. The area choice sits in the pill’s menu.',
+    small: 'At 2×1 the chips drop: the figure and the bar only. The card becomes a plain door, like Medical beside it.' },
+  { id: 'c', name: 'C · Six small doors',
+    premise: 'Each job is its own small door on the green ground, with its glyph, count and name. Medical jobs and register jobs get two different glass tints, so the split shows without a legend.',
+    tap: 'Any tile opens its job’s page. A job with nothing waiting is dimmed but still opens its page.',
+    filter: 'The pill for time. The tab track dims the area you are not looking at, so tiles don’t move.',
+    small: 'At 2×1 the tiles become a single row of the three biggest, with the count and a short name.' },
+  { id: 'd', name: 'D · How old the pile is',
+    premise: 'A white plate in the Insights band’s style, with a mint wash and a top hairline, so it reads as part of that family. Every job gets a bar showing how much is new this week, from this month, or older.',
+    tap: 'A row opens its job’s page, sorted oldest first.',
+    filter: 'A tab track for the area. The age bar replaces the time filter: you see all three ages at once instead of choosing one.',
+    small: 'At 2×1 the jobs fold into two columns, each with just its bar and count.' },
+]
+
+/* ── the jobs, and what each count means ── */
+const JOBS = {
+  vaccination: { glyph: 'm-administer.svg', sub: 'doses overdue', short: 'Vaccines' },
+  deworming:   { glyph: 'ki-deworm.svg', sub: 'treatments overdue', short: 'Deworm' },
+  admin:       { glyph: 'm-pharmacy.svg', sub: 'courses due today', short: 'Medicine' },
+  necropsy:    { glyph: 'm-mortality.svg', sub: 'reports not filed', short: 'Necropsy' },
+  sexing:      { glyph: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="14" r="5"/><path d="M13.5 10.5 20 4M15 4h5v5M10 19v3M8 21h4"/></svg>'), sub: 'animals unsexed', short: 'Sexing' },
+  microchip:   { glyph: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/><rect x="10" y="10" width="4" height="4" rx=".5" fill="#000" stroke="none"/></svg>'), sub: 'mammals & reptiles', short: 'Chips' },
+}
+/* single quotes: this lands inside a double-quoted style="" attribute */
+const glyphUrl = (g) => g.startsWith('data:') ? `url('${g}')` : `url('assets/icon/${g}')`
+const fmt = (n) => n.toLocaleString('en-IN')
+const RAISED = [['all', 'Any time'], ['7', 'Last 7 days'], ['30', 'Last 30 days']]
+
+/* ── what every version shares, injected into the page once ── */
+const SHARED_CSS = `
+#moduleGrid .card.pm { rotate: 0deg !important; border-radius: 12px !important; box-shadow: none !important; overflow: hidden !important; padding: 12px !important; }
+#moduleGrid .card.pm::after { content: none !important; }
+#moduleGrid .card.pm:has(.pm-menu:not([hidden])) { overflow: visible !important; z-index: 20; }
+.pm-root { position: relative; z-index: 2; display: flex; flex: 1 1 0; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; color: #fff; font-family: Inter, sans-serif; }
+.pm-head { display: flex; align-items: center; gap: 8px; flex: none; }
+.pm-icon { width: 20px; height: 20px; flex: none; background: #fff; -webkit-mask: url("assets/icon/m-medical.svg") center/contain no-repeat; mask: url("assets/icon/m-medical.svg") center/contain no-repeat; }
+.pm-title { flex: 1 1 0; min-width: 0; font-size: 14px; font-weight: 500; letter-spacing: .1px; }
+.pm-pill { position: relative; display: inline-flex; align-items: center; gap: 4px; padding: 6px 8px; border: 0; border-radius: 8px; background: rgba(255,255,255,.25); color: #fff; font: inherit; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.pm-pill::after { content: ''; position: absolute; inset: -8px -4px; }
+.pm-pill img { width: 14px; height: 14px; display: block; }
+.pm-pill:focus-visible, .pm-way:focus-visible, .pm-hit:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.pm-menu { position: absolute; top: 44px; right: 12px; z-index: 9; display: flex; flex-direction: column; min-width: 180px; padding: 6px; border-radius: 12px; background: #fff; box-shadow: 0 2px 6px rgba(31,65,91,.08), 0 14px 32px -8px rgba(31,65,91,.25); }
+.pm-menu[hidden] { display: none; }
+.pm-menu small { padding: 6px 10px 2px; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #7A8684; }
+.pm-menu button { display: flex; align-items: center; justify-content: space-between; height: 38px; padding: 0 10px; border: 0; border-radius: 8px; background: none; font: inherit; font-size: 13px; font-weight: 500; color: #44544A; cursor: pointer; text-align: left; }
+.pm-menu button[aria-checked="true"] { color: #006D35; background: rgba(0,109,53,.08); }
+.pm-menu button[aria-checked="true"]::after { content: '✓'; }
+.pm-switch { display: flex; gap: 4px; flex: none; height: 39px; padding: 2px; border-radius: 8px; background: rgba(255,255,255,.25); }
+.pm-way { flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 6px 8px; border: 0; border-radius: 8px; background: none; color: #fff; font: inherit; font-size: 12px; font-weight: 400; white-space: nowrap; cursor: pointer; }
+.pm-way[aria-pressed="true"] { border-radius: 6px; background: #fff; color: #44544A; }
+.pm-hit { border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; padding: 0; }
+.pm-glyph { flex: none; background: currentColor; -webkit-mask: var(--g) center/contain no-repeat; mask: var(--g) center/contain no-repeat; }
+.pm-num { font-family: 'DM Sans', Inter, sans-serif; font-variant-numeric: tabular-nums; font-weight: 600; }
+.card[data-h='1'] .pm-root { gap: 8px; }
+`
+
+/* ── A · the Animals card's twin ── */
+const A = {
+  css: `
+.pmA .pm-list { position: relative; flex: 1 1 0; display: flex; flex-direction: column; min-height: 0; padding: 4px 8px; border-radius: 10px; background: #fff; overflow-y: auto; scrollbar-width: none; }
+.pmA .pm-row { flex: none; display: flex; align-items: center; gap: 10px; width: 100%; min-height: 46px; padding: 6px 0; border-bottom: .5px solid rgba(0,0,0,.1); color: #44544A; }
+.pmA .pm-row:last-child { border-bottom: 0; }
+.pmA .pm-row[hidden] { display: none; }
+.pmA .pm-sq { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(51,138,93,.12); color: #338A5D; }
+.pmA .pm-row[data-area="records"] .pm-sq { background: rgba(66,138,193,.12); color: #2C6E9E; }
+.pmA .pm-sq .pm-glyph { width: 20px; height: 20px; }
+.pmA .pm-txt { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.pmA .pm-txt b { font-size: 12px; font-weight: 600; }
+.pmA .pm-txt i { font-size: 11px; font-style: normal; color: #7A8684; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pmA .pm-n { font-size: 16px; }
+.pmA .pm-chev { width: 7px; height: 7px; margin: 0 4px 0 2px; border-right: 1.6px solid #9AA5A2; border-top: 1.6px solid #9AA5A2; rotate: 45deg; }
+.pmA .pm-row.is-zero { opacity: .5; }
+@media (hover: hover) { .pmA .pm-row:hover { background: rgba(0,0,0,.03); } }
+.card[data-h='1'] .pmA .pm-switch { display: none; }
+.card[data-h='1'] .pmA .pm-row { min-height: 38px; padding: 3px 0; }
+.card[data-h='1'] .pmA .pm-sq { width: 28px; height: 28px; }
+`,
+  html: (s) => `<div class="pm-root pmA">
+    <div class="pm-head"><span class="pm-icon"></span><span class="pm-title">Pending</span>${pill(s)}</div>
+    ${tabs(s, true)}
+    <div class="pm-list">${s.rows.map((r) => `<button type="button" class="pm-hit pm-row${r.v ? '' : ' is-zero'}" data-key="${r.key}" data-area="${r.area}" ${s.area !== 'all' && r.area !== s.area ? 'hidden' : ''}>
+      <span class="pm-sq"><span class="pm-glyph" style="--g:${glyphUrl(JOBS[r.key].glyph)}"></span></span>
+      <span class="pm-txt"><b>${r.label}</b><i>${r.v ? `${fmt(r.v)} ${JOBS[r.key].sub}` : 'Nothing waiting'}</i></span>
+      <span class="pm-num pm-n">${fmt(r.v)}</span><span class="pm-chev"></span></button>`).join('')}</div>
+    ${menu(s)}</div>`,
+}
+
+/* ── B · one figure, then where it is ── */
+const B = {
+  css: `
+.pmB .pm-fig { display: flex; flex-direction: column; gap: 2px; width: fit-content; }
+.pmB .pm-fig .pm-num { font-size: 44px; line-height: 1; font-weight: 600; text-shadow: 0 4px 12px rgba(0,0,0,.08); }
+.pmB .pm-fig small { font-size: 12px; font-weight: 500; opacity: .9; }
+.pmB .pm-stack { display: flex; gap: 2px; height: 10px; border-radius: 5px; overflow: hidden; flex: none; }
+.pmB .pm-stack i { display: block; min-width: 3px; background: #fff; }
+.pmB .pm-key { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11px; opacity: .92; }
+.pmB .pm-key span { display: inline-flex; align-items: center; gap: 5px; }
+.pmB .pm-key i { width: 8px; height: 8px; border-radius: 2px; background: #fff; }
+.pmB .pm-chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: auto; }
+.pmB .pm-chip { display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: 10px; background: rgba(255,255,255,.2); border: .5px solid rgba(255,255,255,.35); }
+.pmB .pm-chip .pm-glyph { width: 18px; height: 18px; }
+.pmB .pm-chip b { font-size: 16px; }
+.pmB .pm-chip span { font-size: 11px; opacity: .92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (hover: hover) { .pmB .pm-chip:hover { background: rgba(255,255,255,.3); } }
+.card[data-h='1'] .pmB .pm-chips, .card[data-h='1'] .pmB .pm-key { display: none; }
+.card[data-h='1'] .pmB .pm-fig .pm-num { font-size: 32px; }
+.card[data-h='1'] .pmB .pm-fig { margin-top: auto; }
+`,
+  html: (s) => {
+    const shown = s.rows.filter((r) => s.area === 'all' || r.area === s.area)
+    const total = shown.reduce((t, r) => t + r.v, 0) || 1
+    const tones = ['1', '.78', '.58', '.42', '.3', '.2']
+    const top = [...shown].sort((a, b) => b.v - a.v).slice(0, 3)
+    return `<div class="pm-root pmB">
+      <div class="pm-head"><span class="pm-icon"></span><span class="pm-title">Pending</span>${pill(s)}</div>
+      <button type="button" class="pm-hit pm-fig" data-key="all"><span class="pm-num">${fmt(shown.reduce((t, r) => t + r.v, 0))}</span><small>open jobs${s.area === 'all' ? '' : ` · ${s.area === 'medical' ? 'Medical' : 'Records'}`} — tap for all</small></button>
+      <div class="pm-stack" aria-hidden="true">${shown.map((r, i) => `<i style="flex:${r.v / total};opacity:${tones[i]}"></i>`).join('')}</div>
+      <div class="pm-key">${shown.map((r, i) => `<span><i style="opacity:${tones[i]}"></i>${JOBS[r.key].short}</span>`).join('')}</div>
+      <div class="pm-chips">${top.map((r) => `<button type="button" class="pm-hit pm-chip" data-key="${r.key}"><span class="pm-glyph" style="--g:${glyphUrl(JOBS[r.key].glyph)}"></span><b class="pm-num">${fmt(r.v)}</b><span>${r.label}</span></button>`).join('')}</div>
+      ${menu(s, true)}</div>`
+  },
+}
+
+/* ── C · six small doors ── */
+const C = {
+  css: `
+.pmC .pm-tiles { flex: 1 1 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; min-height: 0; }
+.pmC .pm-tile { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; padding: 10px; border-radius: 10px; background: rgba(255,255,255,.22); border: .5px solid rgba(255,255,255,.35); transition: opacity 160ms ease; }
+.pmC .pm-tile[data-area="records"] { background: rgba(31,65,91,.28); border-color: rgba(255,255,255,.2); }
+.pmC .pm-tile .pm-glyph { width: 20px; height: 20px; }
+.pmC .pm-tile b { font-size: 20px; line-height: 1.1; }
+.pmC .pm-tile span:last-child { font-size: 11px; opacity: .92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pmC .pm-tile.is-zero b, .pmC .pm-tile.is-zero .pm-glyph { opacity: .5; }
+.pmC .pm-tile.is-out { opacity: .28; }
+@media (hover: hover) { .pmC .pm-tile:hover { background: rgba(255,255,255,.32); } }
+.card[data-h='1'] .pmC .pm-switch { display: none; }
+.card[data-h='1'] .pmC .pm-tiles { grid-template-rows: minmax(0, 1fr); }
+.card[data-h='1'] .pmC .pm-tile:nth-child(n+4) { display: none; }
+.card[data-h='1'] .pmC .pm-tile { padding: 8px; flex-direction: row; align-items: center; gap: 6px; flex-wrap: wrap; align-content: center; }
+.card[data-h='1'] .pmC .pm-tile b { font-size: 16px; }
+.card[data-h='1'] .pmC .pm-tile span:last-child { flex: 0 0 100%; }
+`,
+  html: (s) => {
+    const rows = s.small ? [...s.rows].sort((a, b) => b.v - a.v) : s.rows
+    return `<div class="pm-root pmC">
+    <div class="pm-head"><span class="pm-icon"></span><span class="pm-title">Pending · ${fmt(s.rows.filter((r) => s.area === 'all' || r.area === s.area).reduce((t, r) => t + r.v, 0))}</span>${pill(s)}</div>
+    ${tabs(s)}
+    <div class="pm-tiles">${rows.map((r) => `<button type="button" class="pm-hit pm-tile${r.v ? '' : ' is-zero'}${s.area !== 'all' && r.area !== s.area ? ' is-out' : ''}" data-key="${r.key}" data-area="${r.area}">
+      <span class="pm-glyph" style="--g:${glyphUrl(JOBS[r.key].glyph)}"></span><b class="pm-num">${fmt(r.v)}</b><span>${s.small ? JOBS[r.key].short : r.label}</span></button>`).join('')}</div>
+    ${menu(s)}</div>`
+  },
+}
+
+/* ── D · how old the pile is (the Insights band's plate) ── */
+const D = {
+  ground: 'plate',
+  css: `
+#moduleGrid .card.pm.pm--plate { background: radial-gradient(420px 190px at 50% -70px, rgba(103,168,134,.42) 6%, rgba(179,212,195,.4) 50%, rgba(255,255,255,.5) 94%) padding-box, linear-gradient(#fff,#fff) padding-box,
+  linear-gradient(180deg, #67A886 0%, #67A886 12%, transparent 50%) border-box !important; border: .5px solid transparent !important; }
+#moduleGrid .card.pm.pm--plate::before { content: none !important; }
+.pmD { color: #44544A; }
+.pmD .pm-icon { background: #006D35; }
+.pmD .pm-title { color: #006D35; }
+.pmD .pm-title small { margin-left: 4px; font-weight: 500; color: #7A8684; }
+.pmD .pm-switch { background: rgba(0,109,53,.08); height: 34px; }
+.pmD .pm-way { color: #44544A; }
+.pmD .pm-way[aria-pressed="true"] { background: #fff; color: #006D35; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.pmD .pm-legend { display: flex; gap: 12px; font-size: 10px; color: #7A8684; flex: none; }
+.pmD .pm-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.pmD .pm-legend i, .pmD .pm-age i { display: block; border-radius: 2px; }
+.pmD .pm-legend i { width: 8px; height: 8px; }
+.pmD .t1 { background: #6ADCE2; } .pmD .t2 { background: #E4B819; } .pmD .t3 { background: #FA6140; }
+.pmD .pm-list { flex: 1 1 0; display: flex; flex-direction: column; min-height: 0; overflow-y: auto; scrollbar-width: none; }
+.pmD .pm-row { flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; gap: 4px 10px; width: 100%; padding: 7px 0; box-shadow: inset 0 -.5px 0 rgba(0,0,0,.08); }
+.pmD .pm-row[hidden] { display: none; }
+.pmD .pm-row b { font-size: 13px; font-weight: 500; }
+.pmD .pm-row .pm-num { grid-row: span 2; align-self: center; font-size: 16px; }
+.pmD .pm-age { display: flex; gap: 2px; height: 6px; border-radius: 3px; overflow: hidden; background: rgba(0,0,0,.05); }
+.pmD .pm-row.is-zero { opacity: .45; }
+@media (hover: hover) { .pmD .pm-row:hover { background: rgba(0,109,53,.04); } }
+.card[data-h='1'] .pmD .pm-switch, .card[data-h='1'] .pmD .pm-legend { display: none; }
+.card[data-h='1'] .pmD .pm-list { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: min-content; column-gap: 14px; }
+.card[data-h='1'] .pmD .pm-row { padding: 3px 0; gap: 2px 6px; }
+.card[data-h='1'] .pmD .pm-row b { font-size: 11px; }
+.card[data-h='1'] .pmD .pm-row .pm-num { font-size: 13px; }
+`,
+  html: (s) => `<div class="pm-root pmD">
+    <div class="pm-head"><span class="pm-icon"></span><span class="pm-title">Pending<small>${fmt(s.rows.filter((r) => s.area === 'all' || r.area === s.area).reduce((t, r) => t + r.n, 0))} open</small></span></div>
+    ${tabs(s)}
+    <div class="pm-legend"><span><i class="t1"></i>This week</span><span><i class="t2"></i>This month</span><span><i class="t3"></i>Older</span></div>
+    <div class="pm-list">${[...s.rows].sort((a, b) => (b.n ? (b.n - b.r30) / b.n : -1) - (a.n ? (a.n - a.r30) / a.n : -1)).map((r) => {
+      const w = r.r7, m = r.r30 - r.r7, o = r.n - r.r30, t = r.n || 1
+      return `<button type="button" class="pm-hit pm-row${r.n ? '' : ' is-zero'}" data-key="${r.key}" ${s.area !== 'all' && r.area !== s.area ? 'hidden' : ''}>
+        <b>${r.label}</b><span class="pm-num">${fmt(r.n)}</span>
+        <span class="pm-age" title="${fmt(w)} this week · ${fmt(m)} this month · ${fmt(o)} older">${r.n ? `<i class="t1" style="flex:${w / t}"></i><i class="t2" style="flex:${m / t}"></i><i class="t3" style="flex:${o / t}"></i>` : ''}</span></button>`
+    }).join('')}</div></div>`,
+}
+
+const BUILD = { a: A, b: B, c: C, d: D }
+
+/* ── the shared controls ── */
+function pill(s) {
+  const t = RAISED.find(([v]) => v === s.raised)[1]
+  return `<button type="button" class="pm-pill" data-act="menu" aria-haspopup="menu" aria-expanded="${!s.menu ? 'false' : 'true'}">${t}<img src="assets/icon/v2-caret.svg" alt=""></button>`
+}
+function tabs(s, counts) {
+  const n = (a) => s.rows.filter((r) => a === 'all' || r.area === a).reduce((t, r) => t + r.v, 0)
+  return `<div class="pm-switch" role="tablist">${[['all', 'All'], ['medical', 'Medical'], ['records', 'Records']].map(([v, t]) =>
+    `<button type="button" class="pm-way" role="tab" data-act="area" data-v="${v}" aria-pressed="${s.area === v}">${t}${counts ? ` - ${fmt(n(v))}` : ''}</button>`).join('')}</div>`
+}
+function menu(s, withArea) {
+  return `<div class="pm-menu" role="menu" ${s.menu ? '' : 'hidden'}><small>Raised</small>` +
+    RAISED.map(([v, t]) => `<button type="button" role="menuitemradio" data-act="raised" data-v="${v}" aria-checked="${s.raised === v}">${t}</button>`).join('') +
+    (withArea ? `<small>Area</small>` + [['all', 'All jobs'], ['medical', 'Medical'], ['records', 'Records']].map(([v, t]) =>
+      `<button type="button" role="menuitemradio" data-act="area" data-v="${v}" aria-checked="${s.area === v}">${t}</button>`).join('') : '') + `</div>`
+}
+
+/* ── mount: one live V2 page per version ── */
+const figs = document.getElementById('figs')
+for (const v of VERSIONS) {
+  const f = document.createElement('figure')
+  f.innerHTML = `<div class="bar"><b>${v.name}</b><span class="seg" role="group" aria-label="Card size">
+      <button type="button" data-h="2" aria-pressed="true">2×2</button><button type="button" data-h="1" aria-pressed="false">2×1</button></span></div>
+    <div class="frame"><iframe src="../index.html?v=2" title="${v.name}" loading="eager"></iframe></div>
+    <figcaption><p>${v.premise}</p><dl><dt>Tap</dt><dd>${v.tap}</dd><dt>Filter</dt><dd>${v.filter}</dd><dt>At 2×1</dt><dd>${v.small}</dd></dl></figcaption>`
+  figs.append(f)
+  const frame = f.querySelector('.frame'), ifr = f.querySelector('iframe')
+  const fit = () => { ifr.style.transform = `scale(${frame.clientWidth / 744})` }
+  new ResizeObserver(fit).observe(frame); fit()
+  ifr.addEventListener('load', () => mountIn(ifr, v, f))
+}
+
+function mountIn(ifr, v, fig) {
+  const win = ifr.contentWindow, doc = ifr.contentDocument
+  let tries = 0
+  const go = () => {
+    const card = doc.querySelector('#moduleGrid [data-variant="pending.v2"]')
+    if (!card || !card.querySelector('.l-pd__row')) { if (tries++ < 200) return setTimeout(go, 50); return }
+    /* the card's own numbers: every raised window, as the database has them */
+    const rows = [...card.querySelectorAll('.l-pd__row')].map((r) => ({
+      key: r.dataset.key, area: r.dataset.area, label: r.querySelector('.l-pd__label').textContent,
+      n: +r.dataset.n, r7: +(r.dataset.r7 || 0), r30: +(r.dataset.r30 || 0) }))
+    if (!doc.getElementById('pm-css')) {
+      const st = doc.createElement('style'); st.id = 'pm-css'
+      st.textContent = SHARED_CSS + Object.values(BUILD).map((b) => b.css).join('\n'); doc.head.append(st)
+    }
+    /* a clean copy of the card, so the note's own listeners go with it */
+    const el = card.cloneNode(false); card.replaceWith(el)
+    el.className = 'card pm' + (BUILD[v.id].ground === 'plate' ? ' pm--plate' : '')
+    el.dataset.h = '2'
+    /* Medical's own ground, as the Medical door two cells away paints it */
+    el.style.background = BUILD[v.id].ground === 'plate' ? '' : 'var(--g-medical)'
+    const s = { raised: 'all', area: 'all', menu: false, small: false, rows }
+    const paint = () => {
+      s.rows.forEach((r) => { r.v = s.raised === 'all' ? r.n : r[`r${s.raised}`] })
+      el.innerHTML = BUILD[v.id].html(s)
+    }
+    const toast = (msg) => {
+      let t = doc.querySelector('.pd-toast')
+      if (!t) { t = doc.createElement('div'); t.className = 'pd-toast'; t.setAttribute('role', 'status'); doc.body.append(t) }
+      t.textContent = msg; t.classList.add('is-on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('is-on'), 2000)
+    }
+    el.addEventListener('pointerdown', (e) => e.stopPropagation())
+    el.addEventListener('click', (e) => {
+      e.stopPropagation()
+      const b = e.target.closest('button'); if (!b) return
+      const act = b.dataset.act
+      if (act === 'menu') { s.menu = !s.menu; return paint() }
+      if (act === 'raised') { s.raised = b.dataset.v; s.menu = false; return paint() }
+      if (act === 'area') { s.area = b.dataset.v; s.menu = false; return paint() }
+      const key = b.dataset.key; if (!key) return
+      const r = rows.find((x) => x.key === key)
+      const when = RAISED.find(([x]) => x === s.raised)[1].toLowerCase()
+      toast(key === 'all' ? 'Opens the Pending overview page' : `Opens ${r.label}${s.raised === 'all' ? '' : ` · raised ${when}`}${v.id === 'd' ? ' · oldest first' : ''}`)
+    })
+    doc.addEventListener('pointerdown', (e) => { if (s.menu && !el.contains(e.target)) { s.menu = false; paint() } })
+    paint()
+    /* 2×2 / 2×1: the slot the grid gave it, and the card's own height mark */
+    fig.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => {
+      fig.querySelectorAll('.seg button').forEach((o) => o.setAttribute('aria-pressed', String(o === b)))
+      const one = b.dataset.h === '1'
+      el.style.gridRowEnd = one ? 'span 1' : 'span 2'   /* the mock IS the grid item */
+      el.dataset.h = one ? '1' : '2'; s.small = one; paint(); place()
+    }))
+    const place = () => { const y = el.getBoundingClientRect().top + win.scrollY; win.scrollTo({ top: y - 170, behavior: 'instant' }) }
+    setTimeout(place, 300); setTimeout(place, 1200)
+  }
+  go()
+}
+</script>
+</body>
+</html>

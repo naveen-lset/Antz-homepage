@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Species Picker</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Four ways to make the My Species sheet less congested and its selection
+   plainer (owner, 25 Sep 2026). Each sheet is live: tap, filter, remove,
+   Done. Same 22 species, same five on the home, same four sites as the app. */
+:root {
+  --ink: #1F415B; --ink-2: #44544A; --mute: #6F7C7A; --line: rgba(31, 65, 91, .10); --line-2: rgba(31, 65, 91, .18);
+  --primary: #37BD69; --primary-050: #EAF8EF; --green: #1E7A44; --green-ink: #006D35; --green-050: #E8F4EC; --green-100: #D2EAD9;
+  --page: #EEF3F2; --card: #fff; --field: #F4F7F6; --new: #E4F1E8;
+  --ease: cubic-bezier(.32, .72, 0, 1); --spring: cubic-bezier(.34, 1.56, .64, 1);
+  --num: 'DM Sans', Inter, system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page: #0F1A1D; --ink-page: #E6EEEE; } }
+:root[data-theme="dark"] { --page: #0F1A1D; --ink-page: #E6EEEE; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink-page, var(--ink)); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+
+header.top { max-width: 1480px; margin: 0 auto; padding: 40px 24px 8px; }
+header.top h1 { margin: 0 0 8px; font-size: 28px; font-weight: 600; letter-spacing: -.02em; }
+header.top > p { margin: 0 0 18px; max-width: 780px; font-size: 15px; line-height: 1.55; opacity: .8; }
+.today { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.today li { padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--card) 70%, transparent); font-size: 13.5px; line-height: 1.45; color: var(--ink); }
+.today li b { display: block; margin-bottom: 2px; font-size: 13px; }
+
+.grid { max-width: 1480px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(640px, 100%), 1fr)); gap: 48px 32px; }
+.concept { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.concept__tag { display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+.concept--v5 { grid-column: 1 / -1; }
+.concept__tag b { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--green); color: #fff; font-size: 12px; letter-spacing: 0; }
+.concept h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+.concept > p { margin: 0; font-size: 14.5px; line-height: 1.5; opacity: .82; max-width: 640px; }
+.rec { display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 100px; background: #37BD69; color: #fff; font-size: 11px; font-weight: 700; vertical-align: 3px; }
+.states { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; font-size: 13.5px; line-height: 1.45; max-width: 640px; }
+.states li { display: grid; grid-template-columns: 92px 1fr; gap: 8px; }
+.states li span:first-child { font-weight: 600; opacity: .6; }
+
+/* ── the sheet, on a dimmed home ── */
+.stage { position: relative; padding: 28px 20px 0; border-radius: 24px; background: linear-gradient(180deg, #8FA7A4, #5E7775); overflow: hidden; }
+.sheet { position: relative; width: 100%; max-width: 680px; height: 860px; margin: 0 auto; display: flex; flex-direction: column; background: #fff; color: var(--ink); border-radius: 28px 28px 0 0; overflow: hidden; container-type: inline-size; box-shadow: 0 -10px 40px rgba(0, 0, 0, .18); }
+.grab { flex: none; width: 40px; height: 5px; border-radius: 3px; background: #D5DCDB; margin: 10px auto 0; }
+.head { flex: none; display: flex; align-items: flex-start; gap: 12px; padding: 14px 24px 12px; }
+.head__t { flex: 1; min-width: 0; }
+.head h3 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.01em; }
+.head p { margin: 3px 0 0; font-size: 14px; color: var(--mute); }
+.head p b { color: var(--green-ink); font-weight: 600; }
+.x { flex: none; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--field); display: grid; place-items: center; }
+.x svg { width: 18px; height: 18px; }
+.body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 24px 16px; scrollbar-width: thin; }
+.foot { flex: none; display: flex; align-items: center; gap: 12px; padding: 12px 24px 22px; border-top: 1px solid var(--line); background: #fff; }
+.done { flex: none; min-width: 140px; height: 50px; border: 0; border-radius: 14px; background: var(--green); color: #fff; font-size: 16px; font-weight: 600; }
+.done:active { transform: scale(.98); }
+.foot__sum { flex: 1; min-width: 0; font-size: 14px; color: var(--mute); }
+.foot__sum b { color: var(--ink); font-weight: 600; }
+.link { border: 0; background: none; padding: 6px 4px; color: var(--green-ink); font-size: 14px; font-weight: 600; }
+.link[disabled] { color: var(--mute); opacity: .5; cursor: default; }
+svg { display: block; }
+
+/* shared controls */
+.search { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 6px 0 14px; border-radius: 14px; background: var(--field); box-shadow: inset 0 0 0 1px var(--line); }
+.search:focus-within { box-shadow: inset 0 0 0 2px var(--green-ink); }
+.search > svg { width: 18px; height: 18px; color: var(--mute); flex: none; }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font-size: 16px; }
+.site-sel { flex: none; position: relative; }
+.site-sel select { appearance: none; height: 36px; padding: 0 30px 0 12px; border: 0; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px var(--line-2); font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; }
+.site-sel svg { position: absolute; right: 9px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); pointer-events: none; }
+.seg { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: 0 -2px; }
+.seg::-webkit-scrollbar { display: none; }
+.seg button { flex: none; height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--line-2); font-size: 14px; font-weight: 500; white-space: nowrap; }
+.seg button span { font-family: var(--num); font-size: 12.5px; font-weight: 600; opacity: .55; margin-left: 4px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: #fff; box-shadow: none; }
+.seg button[aria-pressed="true"] span { opacity: .75; }
+.seg .sep { flex: none; width: 1px; align-self: center; height: 20px; background: var(--line-2); margin: 0 2px; }
+.seg button.new[aria-pressed="true"] { background: var(--green); }
+.new-b { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--new); color: var(--green-ink); font-size: 11px; font-weight: 700; vertical-align: 2px; letter-spacing: .01em; }
+.none { padding: 40px 8px; text-align: center; color: var(--mute); font-size: 14px; }
+.toast { position: absolute; left: 50%; bottom: 96px; transform: translate(-50%, 16px); opacity: 0; pointer-events: none; display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 16px; border-radius: 14px; background: #1C2B2A; color: #fff; font-size: 14px; white-space: nowrap; transition: opacity 180ms var(--ease), transform 320ms var(--ease); box-shadow: 0 10px 30px rgba(0, 0, 0, .25); z-index: 5; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast button { border: 0; border-radius: 9px; background: rgba(255, 255, 255, .14); color: #9BE3B4; padding: 6px 12px; font-weight: 600; font-size: 14px; }
+@keyframes pop { 0% { transform: scale(.8); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+@keyframes flash { from { background: var(--green-100); } to { background: transparent; } }
+@keyframes arrive { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
+
+/* ── A · tray ── */
+.a-tray { flex: none; margin: 0 24px 14px; padding: 12px; border-radius: 16px; background: var(--green-050); }
+.a-tray__h { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 10px; font-size: 13px; font-weight: 600; color: var(--green-ink); }
+.a-tray__h small { font-weight: 500; color: var(--mute); font-size: 12.5px; }
+.a-tray__row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; min-height: 44px; }
+.a-tray__row::-webkit-scrollbar { display: none; }
+.a-pill { flex: none; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 4px 0 4px; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .08), 0 0 0 1px rgba(30, 122, 68, .18); font-size: 14px; font-weight: 600; cursor: grab; user-select: none; }
+.a-pill.is-new { animation: arrive 360ms var(--spring); }
+.a-pill.drag { opacity: .4; }
+.a-pill img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.a-pill i { font-style: normal; font-family: var(--num); font-size: 12px; color: var(--mute); margin-right: -2px; }
+.a-pill button { width: 30px; height: 30px; border: 0; border-radius: 50%; background: var(--field); display: grid; place-items: center; }
+.a-pill button svg { width: 14px; height: 14px; }
+.a-tray__empty { display: flex; align-items: center; height: 44px; padding: 0 4px; font-size: 14px; color: var(--mute); }
+.a-ctrl { flex: none; display: flex; flex-direction: column; gap: 10px; padding: 0 24px 12px; border-bottom: 1px solid var(--line); }
+.a-list { list-style: none; margin: 0; padding: 12px 0 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+@container (max-width: 660px) { .a-list { grid-template-columns: 1fr; } }
+.a-row { width: 100%; display: flex; align-items: center; gap: 12px; padding: 8px 10px 8px 8px; border: 0; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); text-align: left; transition: background-color 160ms var(--ease), box-shadow 160ms var(--ease); }
+.a-row:hover { background: #FAFCFB; }
+.a-row[aria-pressed="true"] { background: var(--green-050); box-shadow: inset 0 0 0 1.5px var(--green); }
+.a-row img { flex: none; width: 52px; height: 52px; border-radius: 12px; object-fit: cover; }
+.a-row .t { flex: 1; min-width: 0; }
+.a-row .t b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 15.5px; font-weight: 600; line-height: 1.25; }
+.a-row .t small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; font-size: 13px; color: var(--mute); line-height: 1.35; }
+.a-row .t small em { font-style: normal; font-family: var(--num); font-weight: 600; color: var(--ink-2); }
+.a-state { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 32px; padding: 0 12px 0 9px; border-radius: 999px; font-size: 13px; font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--line-2); color: var(--ink); }
+.a-state svg { width: 15px; height: 15px; }
+.a-row[aria-pressed="true"] .a-state { background: var(--green); color: #fff; box-shadow: none; }
+.a-state.pop { animation: pop 420ms var(--spring); }
+
+/* ── B · photo grid ── */
+.b-ctrl { flex: none; display: flex; flex-direction: column; gap: 10px; padding: 0 24px 10px; }
+.b-sec { margin-top: 6px; }
+.b-sec h4 { position: sticky; top: 0; z-index: 2; margin: 0; padding: 12px 0 10px; background: linear-gradient(#fff 80%, rgba(255, 255, 255, 0)); display: flex; align-items: baseline; gap: 8px; font-size: 15px; font-weight: 600; }
+.b-sec h4 span { font-family: var(--num); font-size: 13px; color: var(--mute); font-weight: 600; }
+.b-sec h4 small { margin-left: auto; font-size: 12.5px; color: var(--green-ink); font-weight: 600; }
+.b-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
+.b-tile { position: relative; aspect-ratio: 1 / 1.08; border: 0; padding: 0; border-radius: 16px; overflow: hidden; background: #000; text-align: left; transition: transform 200ms var(--ease); }
+.b-tile:active { transform: scale(.97); }
+.b-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 200ms; }
+.b-tile::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.72)); }
+.b-tile .t { position: absolute; left: 10px; right: 10px; bottom: 9px; z-index: 1; color: #fff; }
+.b-tile .t b { display: block; font-size: 14px; font-weight: 600; line-height: 1.2; }
+.b-tile .t small { font-size: 12px; opacity: .85; font-family: var(--num); }
+.b-mark { position: absolute; top: 8px; right: 8px; z-index: 1; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.85); color: #fff; font-family: var(--num); font-size: 14px; font-weight: 700; }
+.b-mark svg { width: 16px; height: 16px; }
+.b-tile .nb { position: absolute; top: 10px; left: 10px; z-index: 1; padding: 2px 8px; border-radius: 999px; background: #fff; color: var(--green-ink); font-size: 11px; font-weight: 700; }
+.b-tile[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--green); }
+.b-tile[aria-pressed="true"] .b-mark { background: var(--green); box-shadow: 0 0 0 2px #fff; animation: pop 420ms var(--spring); }
+.b-grid { padding: 6px; margin: -6px; }
+.b-bar { flex: none; display: flex; align-items: center; gap: 12px; }
+.b-faces { display: flex; }
+.b-faces img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px #fff; margin-left: -8px; }
+.b-faces img:first-child { margin-left: 0; }
+
+/* ── V5 · A's filter bar over B's grid; the pick is the primary green ── */
+.v5 .b-tile[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--primary); }
+.v5 .b-tile[aria-pressed="true"] .b-mark { background: var(--primary); }
+.v5 .b-sec h4 small { color: var(--primary); }
+.v5 .seg button.new[aria-pressed="true"] { background: var(--primary); }
+.v5 .head p b { color: var(--primary); }
+.v5 .done { background: var(--primary); }
+.v5 .b-ctrl { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.v5 .body { padding-top: 4px; }
+.v5 .search:focus-within { box-shadow: inset 0 0 0 2px var(--primary); }
+.stage--wide .sheet { max-width: 760px; }
+
+/* ── C · split by state ── */
+.c-sec h4 { margin: 18px 0 8px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--mute); }
+.c-sec h4 span { display: grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--green); color: #fff; font-family: var(--num); font-size: 12px; letter-spacing: 0; }
+.c-sec h4 small { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 12.5px; }
+.c-home { list-style: none; margin: 0; padding: 4px; border-radius: 16px; background: var(--green-050); }
+.c-home li { display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 4px; border-radius: 12px; background: transparent; }
+.c-home li + li { box-shadow: 0 -1px 0 rgba(30, 122, 68, .12); }
+.c-home li.flash { animation: flash 1.4s var(--ease); }
+.c-home li.drag { opacity: .4; }
+.c-grip { flex: none; width: 28px; height: 36px; display: grid; place-items: center; color: var(--mute); cursor: grab; }
+.c-grip svg { width: 16px; height: 16px; }
+.c-ord { flex: none; width: 18px; font-family: var(--num); font-size: 13px; font-weight: 700; color: var(--green-ink); text-align: center; }
+.c-home img, .c-add img { flex: none; width: 44px; height: 44px; border-radius: 11px; object-fit: cover; }
+.c-t { flex: 1; min-width: 0; }
+.c-t b { display: block; font-size: 15px; font-weight: 600; }
+.c-t small { display: block; font-size: 13px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c-rm { flex: none; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--line-2); font-size: 13px; font-weight: 600; color: #A33A2B; }
+.c-empty { padding: 18px; text-align: center; font-size: 14px; color: var(--mute); }
+.c-filt { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+.c-add { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; }
+@container (max-width: 660px) { .c-add { grid-template-columns: 1fr; } }
+.c-add li { min-width: 0; display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.c-plus { flex: none; display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px 0 8px; border: 0; border-radius: 999px; background: var(--green-050); color: var(--green-ink); font-size: 13px; font-weight: 600; }
+.c-plus svg { width: 15px; height: 15px; }
+.c-add li.out { animation: arrive 260ms var(--ease) reverse forwards; }
+
+/* ── D · dense checklist ── */
+.d-ctrl { flex: none; display: flex; flex-direction: column; gap: 10px; padding: 0 24px 10px; border-bottom: 1px solid var(--line); position: relative; }
+.d-top { display: flex; gap: 8px; }
+.d-top .search { flex: 1; }
+.d-fbtn { flex: none; display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px; border: 0; border-radius: 14px; background: var(--field); box-shadow: inset 0 0 0 1px var(--line); font-size: 15px; font-weight: 600; }
+.d-fbtn svg { width: 18px; height: 18px; }
+.d-fbtn[aria-expanded="true"] { box-shadow: inset 0 0 0 2px var(--ink); }
+.d-fbtn i { font-style: normal; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: var(--green); color: #fff; font-family: var(--num); font-size: 12px; }
+.d-tokens { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 32px; }
+.d-tok { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 6px 0 12px; border: 0; border-radius: 999px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 500; }
+.d-tok svg { width: 13px; height: 13px; opacity: .8; }
+.d-sw { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; font-size: 13.5px; font-weight: 500; padding: 4px 0; }
+.d-sw u { position: relative; width: 38px; height: 22px; border-radius: 999px; background: #D5DCDB; transition: background 160ms; text-decoration: none; }
+.d-sw u::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform 220ms var(--spring); }
+.d-sw[aria-pressed="true"] u { background: var(--green); }
+.d-sw[aria-pressed="true"] u::after { transform: translateX(16px); }
+.d-panel { position: absolute; left: 24px; right: 24px; top: 58px; z-index: 6; padding: 16px; border-radius: 18px; background: #fff; box-shadow: 0 16px 40px rgba(0, 0, 0, .18), 0 0 0 1px var(--line); display: none; }
+.d-panel.on { display: block; }
+.d-panel h5 { margin: 0 0 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.d-panel h5 + div { margin-bottom: 16px; }
+.d-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.d-opt { display: flex; align-items: center; gap: 10px; height: 42px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--field); font-size: 14px; font-weight: 500; text-align: left; }
+.d-opt > span:last-child { margin-left: auto; font-family: var(--num); font-size: 12.5px; color: var(--mute); font-weight: 600; }
+.d-opt[aria-pressed="true"] { background: var(--green-050); box-shadow: inset 0 0 0 1.5px var(--green); }
+.d-box { flex: none; width: 20px; height: 20px; border-radius: 6px; box-shadow: inset 0 0 0 1.5px var(--line-2); background: #fff; display: grid; place-items: center; color: #fff; }
+.d-box svg { width: 13px; height: 13px; opacity: 0; }
+[aria-pressed="true"] > .d-box, [aria-checked="true"] > .d-box { background: var(--green); box-shadow: none; }
+[aria-pressed="true"] > .d-box svg, [aria-checked="true"] > .d-box svg { opacity: 1; }
+.d-panel .foot2 { display: flex; justify-content: space-between; align-items: center; }
+.d-panel .foot2 .done { min-width: 0; padding: 0 20px; height: 44px; font-size: 15px; }
+.d-wrap { display: flex; }
+.d-list { flex: 1; min-width: 0; }
+.d-letter { position: sticky; top: 0; z-index: 1; margin: 0; padding: 10px 0 4px; background: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; color: var(--mute); }
+.d-row { width: 100%; display: flex; align-items: center; gap: 12px; height: 54px; padding: 0 8px 0 4px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; }
+.d-row[aria-checked="true"] { background: linear-gradient(90deg, var(--green-050), rgba(232,244,236,0)); }
+.d-row .d-box { width: 24px; height: 24px; border-radius: 7px; }
+.d-row .d-box svg { width: 15px; height: 15px; }
+.d-row img { flex: none; width: 36px; height: 36px; border-radius: 9px; object-fit: cover; }
+.d-row b { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.d-row .k { flex: none; width: 64px; font-size: 13px; color: var(--mute); }
+.d-row .n { flex: none; width: 60px; text-align: right; font-family: var(--num); font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.d-row .s { flex: none; width: 150px; font-size: 13px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@container (max-width: 560px) { .d-row .s, .d-row .k { display: none; } }
+.d-colh { display: flex; gap: 12px; padding: 10px 44px 2px 4px; font-size: 11.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--mute); }
+.d-colh span:first-child { flex: 1; padding-left: 84px; }
+.d-colh .k { width: 64px; } .d-colh .n { width: 60px; text-align: right; } .d-colh .s { width: 150px; }
+@container (max-width: 560px) { .d-colh .s, .d-colh .k { display: none; } }
+.d-az { flex: none; position: sticky; top: 0; align-self: flex-start; display: flex; flex-direction: column; padding: 8px 0 0 10px; }
+.d-az button { border: 0; background: none; padding: 1px 4px; font-family: var(--num); font-size: 11.5px; font-weight: 700; color: var(--green-ink); }
+.d-az button[disabled] { color: #C3CCCB; cursor: default; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>My Species: a clearer way to pick</h1>
+  <p>Five live sheets on the app's own data: 22 species across four sites, with five already on the home. Tap, filter, remove and press Done in each one. Every concept fixes the same five problems in the current sheet, and each takes a different route.</p>
+  <ul class="today">
+    <li><b>Thirteen chips on two rows</b>Site, status and class all take the same pill shape, so the filters are the loudest thing in the sheet.</li>
+    <li><b>Selected looks like unselected</b>The only difference is a 40 px tick at the far edge. The row itself doesn't change.</li>
+    <li><b>Your picks are hidden</b>To see what's on your home you have to turn on the "Selected" filter, which hides everything else.</li>
+    <li><b>Meta is cut off</b>"Mammal · 9 animals · Bannergh…" repeats the class filter and still loses the site.</li>
+    <li><b>No order, no undo</b>The home rail has an order, but you can't set it here, and a mistaken tap can't be undone.</li>
+  </ul>
+</header>
+
+<main class="grid">
+
+  <section class="concept concept--v5">
+    <span class="concept__tag"><b>5</b> V5 · A's filters + B's photos</span>
+    <h2>Pick by picture, filter in one row <span class="rec">Build this</span></h2>
+    <p>A's filter bar sits on B's photo grid. Search and the site dropdown share one field, and class plus New share one row whose counts follow the site. Under All, the grid is split into class sections. Choose a class and only that section shows. A picked tile gets a ring and its home-rail number in the primary green, #37BD69.</p>
+    <ul class="states">
+      <li><span>Tap a tile</span><span>A primary ring appears, the + becomes its place on the home (1–n), and a face joins the foot.</span></li>
+      <li><span>Tap again</span><span>The tile is removed, later tiles renumber, and a toast offers Undo for 4 s.</span></li>
+      <li><span>Site</span><span>The dropdown filters the grid and recounts every class chip. Zoo Core reads All 10 · Mammals 3 · Birds 4.</span></li>
+      <li><span>Class / New</span><span>A class shows one section; tap it again for All. New combines with either.</span></li>
+      <li><span>Done</span><span>Closes the sheet. The foot keeps “5 on your home” and the faces in view.</span></li>
+    </ul>
+    <div class="stage stage--wide"><div class="sheet v5" id="E"></div></div>
+  </section>
+
+  <section class="concept">
+    <span class="concept__tag"><b>A</b> Selection tray</span>
+    <h2>Your picks sit on top; everything else is one filter row</h2>
+    <p>A mint tray above the list shows what is on your home now, in rail order. Site moves into the search field as one dropdown, and class plus New fit on a single row. A picked row turns green and its button says “Added”, not just a tick.</p>
+    <ul class="states">
+      <li><span>Tap a row</span><span>It turns green, the button changes to “Added”, and a pill appears at the end of the tray.</span></li>
+      <li><span>Remove</span><span>Tap × on a pill or tap the row again. A toast shows “Removed · Undo” for 4 s.</span></li>
+      <li><span>Reorder</span><span>Drag a pill in the tray. The number is its place on the home rail.</span></li>
+      <li><span>Filter</span><span>The site dropdown also recounts the class row. Filters never hide the tray.</span></li>
+      <li><span>Done</span><span>Closes the sheet. Changes save as you go, as they do today.</span></li>
+    </ul>
+    <div class="stage"><div class="sheet" id="A"></div></div>
+  </section>
+
+  <section class="concept">
+    <span class="concept__tag"><b>B</b> Pick by picture</span>
+    <h2>A photo grid grouped by class, numbered as you pick</h2>
+    <p>Keepers know these animals by sight, so the photo is the target. Class chips become sticky section heads such as “Mammals 13 · 3 picked”. A picked tile gets a green ring and its home-rail number, and the foot keeps the faces of your picks in view.</p>
+    <ul class="states">
+      <li><span>Tap a tile</span><span>A green ring appears, the badge changes from + to its order number (1–n), and a face joins the foot.</span></li>
+      <li><span>Tap again</span><span>The tile is removed, the tiles after it renumber, and Undo appears.</span></li>
+      <li><span>Filter</span><span>Site segments and search sit above the grid. Empty class sections disappear.</span></li>
+      <li><span>Done</span><span>The foot reads “5 on your home” with their faces, and Done sits beside it.</span></li>
+    </ul>
+    <div class="stage"><div class="sheet" id="B"></div></div>
+  </section>
+
+  <section class="concept">
+    <span class="concept__tag"><b>C</b> Split by state</span>
+    <h2>“On your home” and “Add more” are two separate lists</h2>
+    <p>The state is where a row sits, not an icon on it. The top list is your home rail, which you can reorder and remove from. The bottom list holds only species you haven't picked, and the filters apply there alone. A species is never in both lists.</p>
+    <ul class="states">
+      <li><span>+ Add</span><span>The row leaves “Add more” and lands at the end of “On your home”, where it flashes green. A toast reads “Added at #6”.</span></li>
+      <li><span>Remove</span><span>The row goes back to “Add more” in A–Z order, and Undo appears.</span></li>
+      <li><span>Reorder</span><span>Drag the ⋮⋮ grip. The numbers are the rail order.</span></li>
+      <li><span>Filter</span><span>Search, site and class apply only to “Add more”. Your picks stay in view.</span></li>
+    </ul>
+    <div class="stage"><div class="sheet" id="C"></div></div>
+  </section>
+
+  <section class="concept">
+    <span class="concept__tag"><b>D</b> Dense checklist</span>
+    <h2>One-line rows with a checkbox; filters fold into one button</h2>
+    <p>This one is for curators handling dozens of species. Each row fits on one line, with its facts in columns so nothing gets cut off. An A–Z index sits at the edge. All filters live behind a single Filters button, and the active ones show as tokens you can remove.</p>
+    <ul class="states">
+      <li><span>Tap a row</span><span>The checkbox fills and the row gets a green wash. The foot recounts.</span></li>
+      <li><span>Filters</span><span>Opens a panel with sites (multi-select), class and “Newly added”. The button reads “Show 12 species”.</span></li>
+      <li><span>Only mine</span><span>A switch, not a filter chip, so it's clear it's a view of your picks.</span></li>
+      <li><span>Bulk</span><span>“Select all shown” adds everything the filters leave visible. “Clear” empties the home, with Undo.</span></li>
+    </ul>
+    <div class="stage"><div class="sheet" id="D"></div></div>
+  </section>
+
+</main>
+
+<script>
+/* ── the app's data (js/components/Favourites.js HOLDINGS + PROTECTED) ── */
+const SITES = [
+  { id: 'bg-safari', label: 'Bannerghatta Safari', short: 'Bannerghatta' },
+  { id: 'bg-zoo', label: 'Zoo Core', short: 'Zoo Core' },
+  { id: 'hg-field', label: 'Hesaraghatta', short: 'Hesaraghatta' },
+  { id: 'ms-rescue', label: 'Mysuru Rescue', short: 'Mysuru Rescue' },
+]
+const CLASSES = [
+  { key: 'mammal', label: 'Mammals', one: 'Mammal' }, { key: 'aves', label: 'Birds', one: 'Bird' },
+  { key: 'reptile', label: 'Reptiles', one: 'Reptile' }, { key: 'other', label: 'Others', one: 'Other' },
+]
+const RAW = [
+  ['Asiatic lion', 'mammal', 9, ['bg-safari']], ['Barasingha', 'mammal', 18, ['bg-safari']],
+  ['Bengal tiger', 'mammal', 6, ['bg-safari']], ['Black kite', 'aves', 9, ['bg-zoo', 'ms-rescue']],
+  ['Blackbuck', 'mammal', 64, ['bg-safari', 'hg-field']], ['Bonnet macaque', 'mammal', 27, ['bg-zoo', 'ms-rescue']],
+  ['Chital', 'mammal', 96, ['bg-safari']], ['Cinereous vulture', 'aves', 4, ['bg-zoo']],
+  ['Gaur', 'mammal', 12, ['bg-safari']], ['Giant forest scorpion', 'other', 15, ['bg-zoo'], 19],
+  ['Hill myna', 'aves', 14, ['bg-zoo'], 12], ['Indian leopard', 'mammal', 7, ['bg-safari', 'ms-rescue']],
+  ['Indian peafowl', 'aves', 52, ['bg-safari', 'hg-field']], ['Indian rock python', 'reptile', 8, ['bg-zoo', 'ms-rescue']],
+  ['Indian star tortoise', 'reptile', 31, ['bg-zoo', 'ms-rescue']], ['Nilgai', 'mammal', 23, ['bg-safari', 'hg-field']],
+  ['Rhesus macaque', 'mammal', 19, ['bg-zoo'], 27], ['Rose-ringed parakeet', 'aves', 22, ['bg-zoo', 'ms-rescue']],
+  ['Sambar', 'mammal', 41, ['bg-safari']], ['Sarus crane', 'aves', 6, ['bg-safari', 'hg-field']],
+  ['Sloth bear', 'mammal', 11, ['bg-safari', 'ms-rescue']], ['Sumatran orangutan', 'mammal', 3, ['bg-zoo'], 6],
+]
+const ALL = RAW.map(([name, klass, animals, sites, added]) => ({ name, klass, animals, sites, added: added ?? null, isNew: added != null }))
+const BY = new Map(ALL.map((s) => [s.name, s]))
+const SEED = ['Asiatic lion', 'Bengal tiger', 'Bonnet macaque', 'Gaur', 'Sloth bear']
+const slug = (n) => n.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+const img = (n) => `../assets/img/species/${slug(n)}.jpg`
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const siteLabel = (id) => SITES.find((s) => s.id === id).label
+const siteShort = (id) => SITES.find((s) => s.id === id).short
+const sitesText = (sp) => sp.sites.map(siteShort).join(', ')
+const one = (k) => CLASSES.find((c) => c.key === k).one
+const plural = (n, a, b) => `${n} ${n === 1 ? a : b}`
+
+const I = {
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  grip: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>',
+  filter: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M7 12h10M10 17h4"/></svg>',
+}
+
+/* one picker's state: the picks in rail order, plus undo and a toast */
+function makeState(root) {
+  const st = { list: [...SEED], root, last: null, timer: 0 }
+  st.has = (n) => st.list.includes(n)
+  st.toggle = (n) => {
+    const i = st.list.indexOf(n)
+    if (i >= 0) { st.list.splice(i, 1); st.last = { n, i }; toast(st, `Removed ${n}`, true) }
+    else { st.list.push(n); toast(st, `${n} added at #${st.list.length}`) }
+  }
+  st.undo = () => { if (!st.last) return; st.list.splice(st.last.i, 0, st.last.n); st.last = null }
+  return st
+}
+function toast(st, text, undo) {
+  let t = st.root.querySelector('.toast')
+  if (!t) { t = document.createElement('div'); t.className = 'toast'; st.root.appendChild(t) }
+  t.innerHTML = `<span>${esc(text)}</span>` + (undo ? '<button type="button" data-undo>Undo</button>' : '')
+  t.classList.add('on'); clearTimeout(st.timer)
+  st.timer = setTimeout(() => t.classList.remove('on'), 4000)
+}
+function hideToast(st) { const t = st.root.querySelector('.toast'); if (t) t.classList.remove('on') }
+const head = (sub) => `<div class="grab"></div><div class="head"><div class="head__t"><h3>My Species</h3><p class="sub">${sub}</p></div><button class="x" type="button" aria-label="Close" data-close>${I.x}</button></div>`
+const siteSelect = (v) => `<span class="site-sel"><select aria-label="Site" data-site><option value="all"${v === 'all' ? ' selected' : ''}>All sites</option>${SITES.map((s) => `<option value="${s.id}"${v === s.id ? ' selected' : ''}>${esc(s.label)}</option>`).join('')}</select>${I.chev}</span>`
+const searchField = (ph, extra = '') => `<label class="search">${I.search}<input type="search" placeholder="${ph}" aria-label="${ph}" autocomplete="off" data-q>${extra}</label>`
+const match = (sp, f) => (f.site === 'all' || sp.sites.includes(f.site)) && (!f.klass || sp.klass === f.klass) && (!f.isNew || sp.isNew) && (!f.q || sp.name.toLowerCase().includes(f.q.toLowerCase()))
+const closeFlash = (root) => { root.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(24px)', opacity: .6 }, { transform: 'translateY(0)', opacity: 1 }], { duration: 480, easing: 'cubic-bezier(.32,.72,0,1)' }) }
+/* drag to reorder inside one container (desktop HTML5 drag; long-press on touch in the build) */
+function sortable(box, sel, st, redraw) {
+  let drag = null
+  box.addEventListener('dragstart', (e) => { drag = e.target.closest(sel); if (!drag) return; drag.classList.add('drag'); e.dataTransfer.effectAllowed = 'move' })
+  box.addEventListener('dragover', (e) => {
+    const el = e.target.closest(sel); if (!drag || !el || el === drag) return
+    e.preventDefault()
+    const r = el.getBoundingClientRect(), after = box.matches('.a-tray__row') ? e.clientX > r.left + r.width / 2 : e.clientY > r.top + r.height / 2
+    el[after ? 'after' : 'before'](drag)
+  })
+  box.addEventListener('dragend', () => {
+    if (!drag) return
+    st.list = [...box.querySelectorAll(sel)].map((el) => el.dataset.name); drag = null; redraw()
+  })
+}
+
+/* ── A · selection tray ── */
+;(function () {
+  const root = document.getElementById('A'), st = makeState(root)
+  const f = { q: '', site: 'all', klass: null, isNew: false }
+  root.innerHTML = head('') +
+    `<div class="a-tray"><div class="a-tray__h"><span>On your home</span><small>drag to reorder</small></div><div class="a-tray__row"></div></div>` +
+    `<div class="a-ctrl">${searchField('Search species', siteSelect('all'))}<div class="seg" role="group" aria-label="Filter"></div></div>` +
+    `<div class="body"><ul class="a-list"></ul></div>` +
+    `<div class="foot"><span class="foot__sum"></span><button type="button" class="done" data-close>Done</button></div>`
+  const tray = root.querySelector('.a-tray__row'), seg = root.querySelector('.seg'), list = root.querySelector('.a-list')
+  const drawTray = (fresh) => {
+    tray.innerHTML = st.list.length ? st.list.map((n, i) => `<span class="a-pill${n === fresh ? ' is-new' : ''}" draggable="true" data-name="${esc(n)}"><img src="${img(n)}" alt=""><i>${i + 1}</i>${esc(n)}<button type="button" aria-label="Remove ${esc(n)}" data-rm="${esc(n)}">${I.x}</button></span>`).join('')
+      : `<span class="a-tray__empty">Nothing on your home yet. Tap a species below.</span>`
+    if (fresh) tray.querySelector('.is-new')?.scrollIntoView({ block: 'nearest', inline: 'end', behavior: 'smooth' })
+  }
+  const draw = ({ fresh, pop } = {}) => {
+    const base = ALL.filter((s) => match(s, { ...f, klass: null, isNew: false }))
+    const shown = ALL.filter((s) => match(s, f))
+    root.querySelector('.sub').innerHTML = `<b>${st.list.length} on your home</b> · tap to add or remove`
+    seg.innerHTML = `<button type="button" aria-pressed="${!f.klass}" data-k="">All<span>${base.length}</span></button>` +
+      CLASSES.map((c) => `<button type="button" aria-pressed="${f.klass === c.key}" data-k="${c.key}">${c.label}<span>${base.filter((s) => s.klass === c.key).length}</span></button>`).join('') +
+      `<span class="sep"></span><button type="button" class="new" aria-pressed="${f.isNew}" data-new>New<span>${base.filter((s) => s.isNew).length}</span></button>`
+    list.innerHTML = shown.length ? shown.map((s) => {
+      const on = st.has(s.name)
+      return `<li><button type="button" class="a-row" aria-pressed="${on}" data-name="${esc(s.name)}"><img src="${img(s.name)}" alt="" loading="lazy">` +
+        `<span class="t"><b>${esc(s.name)}${s.isNew ? '<span class="new-b">New</span>' : ''}</b><small><em>${s.animals}</em> animals · ${esc(sitesText(s))}</small></span>` +
+        `<span class="a-state${pop === s.name ? ' pop' : ''}">${on ? I.check + 'Added' : I.plus + 'Add'}</span></button></li>`
+    }).join('') : `<li class="none" style="grid-column:1/-1">No species match${f.q ? ` “${esc(f.q)}”` : ''} here</li>`
+    root.querySelector('.foot__sum').innerHTML = `<b>${st.list.length}</b> ${st.list.length === 1 ? 'species' : 'species'} on your home`
+    drawTray(fresh)
+  }
+  root.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { f.q = e.target.value.trim(); draw() } })
+  root.addEventListener('change', (e) => { if (e.target.matches('[data-site]')) { f.site = e.target.value; draw() } })
+  root.addEventListener('click', (e) => {
+    const t = e.target
+    if (t.closest('[data-undo]')) { st.undo(); hideToast(st); return draw() }
+    if (t.closest('[data-close]')) { hideToast(st); return closeFlash(root) }
+    const rm = t.closest('[data-rm]'); if (rm) { st.toggle(rm.dataset.rm); return draw() }
+    const k = t.closest('[data-k]'); if (k) { f.klass = k.dataset.k || null; return draw() }
+    if (t.closest('[data-new]')) { f.isNew = !f.isNew; return draw() }
+    const row = t.closest('.a-row'); if (row) { const n = row.dataset.name, adding = !st.has(n); st.toggle(n); draw({ fresh: adding ? n : null, pop: n }) }
+  })
+  sortable(tray, '.a-pill', st, () => drawTray())
+  draw()
+})()
+
+/* ── B · pick by picture ── */
+;(function () {
+  const root = document.getElementById('B'), st = makeState(root)
+  const f = { q: '', site: 'all' }
+  root.innerHTML = head('Tap a photo to put it on your home') +
+    `<div class="b-ctrl">${searchField('Search species')}<div class="seg b-sites" role="group" aria-label="Site"></div></div>` +
+    `<div class="body"></div>` +
+    `<div class="foot b-bar"><span class="b-faces"></span><span class="foot__sum"></span><button type="button" class="done" data-close>Done</button></div>`
+  const body = root.querySelector('.body')
+  const draw = () => {
+    const shown = ALL.filter((s) => match(s, f))
+    root.querySelector('.b-sites').innerHTML = [{ id: 'all', label: 'All sites' }, ...SITES].map((s) =>
+      `<button type="button" aria-pressed="${f.site === s.id}" data-site="${s.id}">${esc(s.label)}<span>${ALL.filter((x) => s.id === 'all' || x.sites.includes(s.id)).length}</span></button>`).join('')
+    body.innerHTML = CLASSES.map((c) => {
+      const items = shown.filter((s) => s.klass === c.key); if (!items.length) return ''
+      const picked = items.filter((s) => st.has(s.name)).length
+      return `<div class="b-sec"><h4>${c.label} <span>${items.length}</span>${picked ? `<small>${picked} picked</small>` : ''}</h4><div class="b-grid">` +
+        items.map((s) => {
+          const i = st.list.indexOf(s.name)
+          return `<button type="button" class="b-tile" aria-pressed="${i >= 0}" data-name="${esc(s.name)}" aria-label="${esc(s.name)}"><img src="${img(s.name)}" alt="" loading="lazy">` +
+            (s.isNew ? '<span class="nb">New</span>' : '') +
+            `<span class="b-mark">${i >= 0 ? i + 1 : I.plus}</span><span class="t"><b>${esc(s.name)}</b><small>${plural(s.animals, 'animal', 'animals')}</small></span></button>`
+        }).join('') + `</div></div>`
+    }).join('') || `<p class="none">No species match${f.q ? ` “${esc(f.q)}”` : ''} here</p>`
+    root.querySelector('.b-faces').innerHTML = st.list.slice(0, 5).map((n) => `<img src="${img(n)}" alt="">`).join('')
+    root.querySelector('.foot__sum').innerHTML = st.list.length ? `<b>${st.list.length} on your home</b>${st.list.length > 5 ? ` · +${st.list.length - 5} more` : ''}` : 'Nothing picked yet'
+  }
+  root.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { f.q = e.target.value.trim(); draw() } })
+  root.addEventListener('click', (e) => {
+    const t = e.target
+    if (t.closest('[data-undo]')) { st.undo(); hideToast(st); return draw() }
+    if (t.closest('[data-close]')) { hideToast(st); return closeFlash(root) }
+    const s = t.closest('[data-site]'); if (s) { f.site = s.dataset.site; return draw() }
+    const tile = t.closest('.b-tile'); if (tile) { st.toggle(tile.dataset.name); draw() }
+  })
+  draw()
+})()
+
+/* ── V5 · A's filter bar, B's grid ── */
+;(function () {
+  const root = document.getElementById('E'), st = makeState(root)
+  const f = { q: '', site: 'all', klass: null, isNew: false }
+  root.innerHTML = head('') +
+    `<div class="b-ctrl">${searchField('Search species', siteSelect('all'))}<div class="seg" role="group" aria-label="Filter"></div></div>` +
+    `<div class="body"></div>` +
+    `<div class="foot b-bar"><span class="b-faces"></span><span class="foot__sum"></span><button type="button" class="done" data-close>Done</button></div>`
+  const body = root.querySelector('.body'), seg = root.querySelector('.seg')
+  const draw = () => {
+    const base = ALL.filter((s) => match(s, { ...f, klass: null, isNew: false }))
+    const shown = ALL.filter((s) => match(s, f))
+    root.querySelector('.sub').innerHTML = `<b>${st.list.length} on your home</b> · tap a photo to add or remove`
+    seg.innerHTML = `<button type="button" aria-pressed="${!f.klass}" data-k="">All<span>${base.length}</span></button>` +
+      CLASSES.map((c) => `<button type="button" aria-pressed="${f.klass === c.key}" data-k="${c.key}">${c.label}<span>${base.filter((s) => s.klass === c.key).length}</span></button>`).join('') +
+      `<span class="sep"></span><button type="button" class="new" aria-pressed="${f.isNew}" data-new>New<span>${base.filter((s) => s.isNew).length}</span></button>`
+    body.innerHTML = CLASSES.map((c) => {
+      const items = shown.filter((s) => s.klass === c.key); if (!items.length) return ''
+      const picked = items.filter((s) => st.has(s.name)).length
+      return `<div class="b-sec"><h4>${c.label} <span>${items.length}</span>${picked ? `<small>${picked} picked</small>` : ''}</h4><div class="b-grid">` +
+        items.map((s) => {
+          const i = st.list.indexOf(s.name)
+          return `<button type="button" class="b-tile" aria-pressed="${i >= 0}" data-name="${esc(s.name)}" aria-label="${esc(s.name)}"><img src="${img(s.name)}" alt="" loading="lazy">` +
+            (s.isNew ? '<span class="nb">New</span>' : '') +
+            `<span class="b-mark">${i >= 0 ? i + 1 : I.plus}</span><span class="t"><b>${esc(s.name)}</b><small>${plural(s.animals, 'animal', 'animals')}</small></span></button>`
+        }).join('') + `</div></div>`
+    }).join('') || `<p class="none">No species match${f.q ? ` “${esc(f.q)}”` : ''} here</p>`
+    root.querySelector('.b-faces').innerHTML = st.list.slice(0, 5).map((n) => `<img src="${img(n)}" alt="">`).join('')
+    root.querySelector('.foot__sum').innerHTML = st.list.length ? `<b>${st.list.length} on your home</b>${st.list.length > 5 ? ` · +${st.list.length - 5} more` : ''}` : 'Nothing picked yet'
+  }
+  root.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { f.q = e.target.value.trim(); draw() } })
+  root.addEventListener('change', (e) => { if (e.target.matches('[data-site]')) { f.site = e.target.value; draw() } })
+  root.addEventListener('click', (e) => {
+    const t = e.target
+    if (t.closest('[data-undo]')) { st.undo(); hideToast(st); return draw() }
+    if (t.closest('[data-close]')) { hideToast(st); return closeFlash(root) }
+    const k = t.closest('[data-k]'); if (k) { f.klass = k.dataset.k && f.klass !== k.dataset.k ? k.dataset.k : null; return draw() }
+    if (t.closest('[data-new]')) { f.isNew = !f.isNew; return draw() }
+    const tile = t.closest('.b-tile'); if (tile) { st.toggle(tile.dataset.name); draw() }
+  })
+  draw()
+})()
+
+/* ── C · split by state ── */
+;(function () {
+  const root = document.getElementById('C'), st = makeState(root)
+  const f = { q: '', site: 'all', klass: null }
+  root.innerHTML = head('Your home rail on top, everything else below') +
+    `<div class="body"><div class="c-sec"><h4>On your home <span class="c-n"></span><small>drag ⋮⋮ to reorder</small></h4><ul class="c-home"></ul></div>` +
+    `<div class="c-sec"><h4>Add more <small class="c-left"></small></h4><div class="c-filt">${searchField('Search species', siteSelect('all'))}<div class="seg" role="group" aria-label="Class"></div></div><ul class="c-add"></ul></div></div>` +
+    `<div class="foot"><span class="foot__sum"></span><button type="button" class="done" data-close>Done</button></div>`
+  const home = root.querySelector('.c-home'), add = root.querySelector('.c-add')
+  const drawHome = (flash) => {
+    home.innerHTML = st.list.length ? st.list.map((n, i) => { const s = BY.get(n)
+      return `<li draggable="true" data-name="${esc(n)}"${n === flash ? ' class="flash"' : ''}><span class="c-grip" aria-hidden="true">${I.grip}</span><span class="c-ord">${i + 1}</span><img src="${img(n)}" alt="">` +
+        `<span class="c-t"><b>${esc(n)}</b><small>${plural(s.animals, 'animal', 'animals')} · ${esc(sitesText(s))}</small></span><button type="button" class="c-rm" data-rm="${esc(n)}">Remove</button></li>` }).join('')
+      : `<li class="c-empty">Nothing on your home yet. Add species from the list below.</li>`
+    root.querySelector('.c-n').textContent = st.list.length
+  }
+  const draw = (flash) => {
+    const rest = ALL.filter((s) => !st.has(s.name))
+    const base = rest.filter((s) => match(s, { ...f, klass: null }))
+    const shown = rest.filter((s) => match(s, f))
+    root.querySelector('.seg').innerHTML = `<button type="button" aria-pressed="${!f.klass}" data-k="">All<span>${base.length}</span></button>` +
+      CLASSES.map((c) => `<button type="button" aria-pressed="${f.klass === c.key}" data-k="${c.key}">${c.label}<span>${base.filter((s) => s.klass === c.key).length}</span></button>`).join('')
+    add.innerHTML = shown.length ? shown.map((s) => `<li data-name="${esc(s.name)}"><img src="${img(s.name)}" alt="" loading="lazy"><span class="c-t"><b>${esc(s.name)}${s.isNew ? '<span class="new-b">New</span>' : ''}</b><small>${one(s.klass)} · ${plural(s.animals, 'animal', 'animals')} · ${esc(sitesText(s))}</small></span><button type="button" class="c-plus" data-add="${esc(s.name)}">${I.plus}Add</button></li>`).join('')
+      : `<li class="none" style="grid-column:1/-1;border:0">${rest.length ? `No species match${f.q ? ` “${esc(f.q)}”` : ''} here` : 'Every species is on your home'}</li>`
+    root.querySelector('.c-left').textContent = `${rest.length} not on your home`
+    root.querySelector('.foot__sum').innerHTML = `<b>${st.list.length}</b> on your home · <b>${rest.length}</b> to add`
+    drawHome(flash)
+  }
+  root.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { f.q = e.target.value.trim(); draw() } })
+  root.addEventListener('change', (e) => { if (e.target.matches('[data-site]')) { f.site = e.target.value; draw() } })
+  root.addEventListener('click', (e) => {
+    const t = e.target
+    if (t.closest('[data-undo]')) { st.undo(); hideToast(st); return draw() }
+    if (t.closest('[data-close]')) { hideToast(st); return closeFlash(root) }
+    const k = t.closest('[data-k]'); if (k) { f.klass = k.dataset.k || null; return draw() }
+    const rm = t.closest('[data-rm]'); if (rm) { st.toggle(rm.dataset.rm); return draw() }
+    const a = t.closest('[data-add]'); if (a) {
+      const n = a.dataset.add, li = a.closest('li'); li.classList.add('out')
+      setTimeout(() => { st.toggle(n); draw(n); home.querySelector('.flash')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }, 200)
+    }
+  })
+  sortable(home, 'li[data-name]', st, () => drawHome())
+  draw()
+})()
+
+/* ── D · dense checklist ── */
+;(function () {
+  const root = document.getElementById('D'), st = makeState(root)
+  const f = { q: '', sites: new Set(), klass: new Set(), isNew: false, mine: false }
+  const draft = { sites: new Set(), klass: new Set(), isNew: false }
+  const ok = (s, g = f) => (!g.sites.size || s.sites.some((x) => g.sites.has(x))) && (!g.klass.size || g.klass.has(s.klass)) && (!g.isNew || s.isNew) && (!f.q || s.name.toLowerCase().includes(f.q.toLowerCase()))
+  root.innerHTML = head('Check the species you want on your home') +
+    `<div class="d-ctrl"><div class="d-top">${searchField('Search 22 species')}<button type="button" class="d-fbtn" aria-expanded="false" data-fopen>${I.filter}Filters</button></div>` +
+    `<div class="d-tokens"></div><div class="d-panel" role="dialog" aria-label="Filters"></div></div>` +
+    `<div class="body"><div class="d-colh"><span>Species</span><span class="k">Class</span><span class="n">Animals</span><span class="s">Sites</span></div><div class="d-wrap"><div class="d-list"></div><nav class="d-az" aria-label="Jump to letter"></nav></div></div>` +
+    `<div class="foot"><span class="foot__sum"></span><button type="button" class="link" data-all>Select all shown</button><button type="button" class="link" data-clear>Clear</button><button type="button" class="done" data-close>Done</button></div>`
+  const panel = root.querySelector('.d-panel'), fbtn = root.querySelector('.d-fbtn')
+  const nActive = () => f.sites.size + f.klass.size + (f.isNew ? 1 : 0)
+  const shownList = () => ALL.filter((s) => ok(s) && (!f.mine || st.has(s.name)))
+  const drawPanel = () => {
+    const n = ALL.filter((s) => ok(s, draft)).length
+    const opt = (kind, v, label, on, cnt) => `<button type="button" class="d-opt" aria-pressed="${on}" data-opt="${kind}" data-v="${v}"><span class="d-box">${I.check}</span>${esc(label)}<span>${cnt}</span></button>`
+    panel.innerHTML = `<h5>Sites</h5><div class="d-opts">${SITES.map((s) => opt('site', s.id, s.label, draft.sites.has(s.id), ALL.filter((x) => x.sites.includes(s.id)).length)).join('')}</div>` +
+      `<h5>Class</h5><div class="d-opts">${CLASSES.map((c) => opt('klass', c.key, c.label, draft.klass.has(c.key), ALL.filter((x) => x.klass === c.key).length)).join('')}</div>` +
+      `<h5>Status</h5><div class="d-opts">${opt('new', 1, 'Newly added', draft.isNew, ALL.filter((x) => x.isNew).length)}</div>` +
+      `<div class="foot2"><button type="button" class="link" data-reset>Reset</button><button type="button" class="done" data-apply>Show ${plural(n, 'species', 'species')}</button></div>`
+  }
+  const draw = () => {
+    const shown = shownList()
+    const tok = [...f.sites].map((id) => ['site', id, siteLabel(id)]).concat([...f.klass].map((k) => ['klass', k, CLASSES.find((c) => c.key === k).label]), f.isNew ? [['new', 1, 'Newly added']] : [])
+    root.querySelector('.d-tokens').innerHTML = tok.map(([k, v, l]) => `<button type="button" class="d-tok" data-tok="${k}" data-v="${v}">${esc(l)}${I.x}</button>`).join('') +
+      `<button type="button" class="d-sw" aria-pressed="${f.mine}" data-mine><u></u>Only mine (${st.list.length})</button>`
+    fbtn.innerHTML = `${I.filter}Filters${nActive() ? `<i>${nActive()}</i>` : ''}`
+    const letters = [...new Set(shown.map((s) => s.name[0]))]
+    root.querySelector('.d-list').innerHTML = shown.length ? letters.map((L) => `<p class="d-letter" id="d-${L}">${L}</p>` + shown.filter((s) => s.name[0] === L).map((s) =>
+      `<button type="button" class="d-row" role="checkbox" aria-checked="${st.has(s.name)}" data-name="${esc(s.name)}"><span class="d-box">${I.check}</span><img src="${img(s.name)}" alt="" loading="lazy"><b>${esc(s.name)}${s.isNew ? '<span class="new-b">New</span>' : ''}</b><span class="k">${one(s.klass)}</span><span class="n">${s.animals}</span><span class="s">${esc(sitesText(s))}</span></button>`).join('')).join('')
+      : `<p class="none">${f.mine ? 'Nothing on your home matches these filters' : 'No species match'}</p>`
+    root.querySelector('.d-az').innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((L) => `<button type="button" data-az="${L}"${letters.includes(L) ? '' : ' disabled'}>${L}</button>`).join('')
+    root.querySelector('.foot__sum').innerHTML = `<b>${st.list.length}</b> selected · ${shown.length} shown`
+    root.querySelector('[data-clear]').disabled = !st.list.length
+  }
+  root.addEventListener('input', (e) => { if (e.target.matches('[data-q]')) { f.q = e.target.value.trim(); draw() } })
+  root.addEventListener('click', (e) => {
+    const t = e.target
+    if (t.closest('[data-undo]')) {
+      if (st.bulk) { st.list = st.bulk; st.bulk = null } else st.undo()
+      hideToast(st); return draw()
+    }
+    if (t.closest('[data-fopen]')) {
+      const on = !panel.classList.contains('on')
+      if (on) { draft.sites = new Set(f.sites); draft.klass = new Set(f.klass); draft.isNew = f.isNew; drawPanel() }
+      panel.classList.toggle('on', on); fbtn.setAttribute('aria-expanded', on); return
+    }
+    const o = t.closest('[data-opt]'); if (o) {
+      const { opt, v } = o.dataset
+      if (opt === 'new') draft.isNew = !draft.isNew
+      else { const set = opt === 'site' ? draft.sites : draft.klass; set.has(v) ? set.delete(v) : set.add(v) }
+      return drawPanel()
+    }
+    if (t.closest('[data-reset]')) { draft.sites.clear(); draft.klass.clear(); draft.isNew = false; return drawPanel() }
+    if (t.closest('[data-apply]')) { f.sites = new Set(draft.sites); f.klass = new Set(draft.klass); f.isNew = draft.isNew; panel.classList.remove('on'); fbtn.setAttribute('aria-expanded', 'false'); return draw() }
+    if (panel.classList.contains('on') && !t.closest('.d-panel')) { panel.classList.remove('on'); fbtn.setAttribute('aria-expanded', 'false') }
+    const tk = t.closest('[data-tok]'); if (tk) { const { tok, v } = tk.dataset; if (tok === 'new') f.isNew = false; else (tok === 'site' ? f.sites : f.klass).delete(v); return draw() }
+    if (t.closest('[data-mine]')) { f.mine = !f.mine; return draw() }
+    if (t.closest('[data-close]')) { hideToast(st); return closeFlash(root) }
+    const az = t.closest('[data-az]'); if (az) { root.querySelector(`#d-${az.dataset.az}`)?.scrollIntoView({ block: 'start', behavior: 'smooth' }); return }
+    if (t.closest('[data-all]')) { const add = shownList().filter((s) => !st.has(s.name)); if (!add.length) return; st.bulk = [...st.list]; st.list.push(...add.map((s) => s.name)); toast(st, `Added ${plural(add.length, 'species', 'species')}`, true); return draw() }
+    if (t.closest('[data-clear]')) { st.bulk = [...st.list]; const n = st.list.length; st.list = []; toast(st, `Cleared ${plural(n, 'species', 'species')} from your home`, true); return draw() }
+    const r = t.closest('.d-row'); if (r) { st.bulk = null; st.toggle(r.dataset.name); draw() }
+  })
+  draw()
+})()
+</script>
+</body>
+</html>

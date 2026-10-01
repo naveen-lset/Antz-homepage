@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ticker Variations</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  /* THE CONTINUOUS TICKER, EXPLORED (1 Oct 2026). The owner picked B of
+     health-strip-tickers.html ("One continuous ticker — explore this option
+     more variations"). B is kept first as the reference; the six after it
+     each change ONE premise of it: where the ticker lives (in the pills), what
+     stays put (the section head), how many lanes, what an item is (a photo
+     card), its rhythm (step and hold), and what frames it (a fixed station
+     tag). One ticker engine drives them all — 40px a second, held by a hover
+     or a finger, stopped off screen and under reduced motion. Numbers: V5
+     database, last 7 days, all four sites. */
+  :root {
+    --bg: #F4F6F7; --card: #FFFFFF; --ink: #1F415B; --ink-2: #5A6B78; --line: #E1E6EA; --pick: #1F415B; --pick-ink: #fff;
+    --a-ink: #44544A; --a-grey: #7A8684; --teal: #00ABAB; --coral: #FA6140;
+    --g-births: linear-gradient(177.16deg, rgba(92, 214, 206, .2) 0%, rgba(36, 186, 178, .2) 100%);
+    --g-deaths: linear-gradient(177.1deg, rgba(251, 153, 132, .2) 0%, rgba(251, 128, 102, .2) 100%);
+    --g-audit: rgba(252, 244, 174, .6);
+    /* the same tints laid on white, for anything that must hide what slides under it */
+    --s-births: linear-gradient(177.16deg, #DEF7F5 0%, #D3F1F0 100%);
+    --s-deaths: linear-gradient(177.1deg, #FEEBE6 0%, #FEE6E0 100%);
+    --s-audit: #FEFBDE;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #12181D; --card: #1B232A; --ink: #E7EEF3; --ink-2: #9AAAB7; --line: #2A353E; --pick: #E7EEF3; --pick-ink: #12181D; }
+  }
+  :root[data-theme="dark"] { --bg: #12181D; --card: #1B232A; --ink: #E7EEF3; --ink-2: #9AAAB7; --line: #2A353E; --pick: #E7EEF3; --pick-ink: #12181D; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; }
+
+  .top { max-width: 1120px; margin: 0 auto; padding: 32px 16px 4px; }
+  h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -.3px; }
+  .top p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.55; max-width: 820px; }
+  .bar { position: sticky; top: 0; z-index: 5; max-width: 1120px; margin: 0 auto; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); }
+  .seg button { border: 0; background: none; color: var(--ink-2); padding: 7px 14px; border-radius: 7px; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--pick); color: var(--pick-ink); }
+  .bar .data { margin-left: auto; font-size: 13px; color: var(--ink-2); }
+  main { max-width: 1120px; margin: 0 auto; padding: 8px 16px 64px; display: grid; gap: 28px; }
+  .var { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; min-width: 0; }
+  .var--ref { border-style: dashed; }
+  .var__head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; margin-bottom: 4px; }
+  .var__k { font-size: 13px; font-weight: 700; letter-spacing: .6px; color: var(--ink-2); }
+  .var h2 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -.2px; }
+  .var__premise { margin: 4px 0 16px; color: var(--ink-2); font-size: 14.5px; line-height: 1.55; max-width: 820px; }
+  .stage { background: repeating-linear-gradient(45deg, transparent 0 10px, color-mix(in srgb, var(--line) 45%, transparent) 10px 11px); border-radius: 14px; padding: 20px 0; overflow: hidden; }
+  .ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 12px; }
+  .ctl button { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .ctl .now { font-size: 13px; color: var(--ink-2); }
+  .notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+  @media (max-width: 760px) { .notes { grid-template-columns: minmax(0, 1fr); } }
+  .notes div { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 10px; }
+  .notes b { display: block; color: var(--ink); font-weight: 600; margin-bottom: 2px; }
+
+  /* ── the app frame: the foot of My species, the strip, the top of Announcements ── */
+  .frame { width: var(--fw, 744px); max-width: calc(100% - 32px); margin: 0 auto; background: #fff; border-radius: 14px; overflow: hidden; container-type: inline-size; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06); color: var(--a-ink); }
+  .ctx-top { height: 64px; border-radius: 0 0 20px 20px; background: radial-gradient(120% 220% at 50% -80%, #EEECCF 40%, #C9EAD5 100%); padding: 0 24px; display: flex; gap: 8px; overflow: hidden; }
+  .ctx-top i { flex: none; width: 148px; height: 44px; border-radius: 0 0 12px 12px; background: center 70% / cover no-repeat; position: relative; }
+  .ctx-top i::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(transparent, rgba(0,0,0,.45)); }
+  .slot { padding: 20px 24px; }
+  .ctx-bot { margin: 0 16px; height: 46px; border-radius: 12px 12px 0 0; background: linear-gradient(180deg, rgba(175, 239, 235, .5), rgba(230, 230, 230, .4)); padding: 16px; font-size: 16px; font-weight: 500; }
+  .w { margin: 0 -8px; }   /* the strip's 712: 8 past the column a side */
+  @container (max-width: 600px) {
+    .ctx-top { padding: 0 16px; height: 52px; } .ctx-top i { width: 140px; height: 34px; }
+    .slot { padding: 12px 0; } .w { margin: 0 16px; }
+    .ctx-bot { height: 40px; padding: 12px; }
+  }
+
+  /* ── shared parts ── */
+  .av { flex: none; width: 22px; height: 22px; border-radius: 50%; background: center / cover no-repeat #ddd; box-shadow: 0 0 0 1.5px #fff; }
+  .mk { flex: none; display: grid; place-items: center; width: 18px; height: 18px; }
+  .mk--d img { transform: rotate(44.67deg); }
+  .chev { flex: none; display: block; }
+  .tx { white-space: nowrap; font-size: 14px; line-height: normal; color: var(--a-ink); }
+  .tx b { font-weight: 600; }
+  .o { color: var(--coral); font-weight: 600; }
+  .fade { -webkit-mask-image: linear-gradient(90deg, transparent, #000 20px, #000 calc(100% - 20px), transparent); mask-image: linear-gradient(90deg, transparent, #000 20px, #000 calc(100% - 20px), transparent); }
+  .lane { position: relative; overflow: hidden; border-radius: 8px; cursor: grab; touch-action: pan-y; }
+  .track { position: absolute; top: 0; bottom: 0; left: 0; display: flex; gap: 8px; width: max-content; will-change: transform; }
+  .run { flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 12px; border-radius: 8px; }
+  .run--b { background: var(--g-births); } .run--d { background: var(--g-deaths); } .run--a { background: var(--g-audit); }
+  .it { display: flex; align-items: center; gap: 8px; }
+  .it + .it::before, .lead + .it::before { content: ''; width: 3px; height: 3px; border-radius: 50%; background: rgba(68,84,74,.35); margin-right: 6px; }
+  .lead { display: flex; align-items: center; gap: 8px; }
+  @media (prefers-reduced-motion: reduce) { .lane { overflow-x: auto; } .track { position: static; transform: none !important; } }
+
+  /* B · reference */
+  .v-ref .lane { height: 42.6px; }
+
+  /* B1 · a ticker inside each pill */
+  .v-b1 .row { display: flex; gap: 8px; }
+  .v-b1 .pill { position: relative; flex: 1 0 0; min-width: 0; height: 42.6px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 8px; overflow: hidden; }
+  .v-b1 .pill--b { background: var(--g-births); flex-grow: 1.3; } .v-b1 .pill--d { background: var(--g-deaths); flex-grow: 1.3; } .v-b1 .pill--a { background: var(--g-audit); flex: none; }
+  .v-b1 .pill .lane { flex: 1; min-width: 0; height: 100%; border-radius: 0; }
+  .v-b1 .pill .track { gap: 18px; padding-left: 4px; align-items: center; }
+  @container (max-width: 600px) {
+    .v-b1 .row { margin: 0; padding: 0 16px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; scroll-padding-inline: 16px; }
+    .v-b1 .row::-webkit-scrollbar { display: none; }
+    .v-b1 .pill { flex: none; width: 250px; scroll-snap-align: start; } .v-b1 .pill--a { width: auto; }
+  }
+
+  /* B2 · the section head stays pinned while its run passes under it */
+  .v-b2 .lane { height: 42.6px; }
+  .v-b2 .run { position: relative; padding-left: 0; gap: 14px; }
+  .v-b2 .lead { position: relative; z-index: 2; height: 100%; padding: 0 12px; border-radius: 8px; will-change: transform; box-shadow: 6px 0 10px -6px rgba(0,0,0,.18); }
+  .v-b2 .run--b .lead { background: var(--s-births); } .v-b2 .run--d .lead { background: var(--s-deaths); } .v-b2 .run--a .lead { background: var(--s-audit); box-shadow: none; }
+
+  /* B3 · two lanes, opposite ways; the audit fixed at the end */
+  .v-b3 .box { display: flex; gap: 8px; height: 76px; }
+  .v-b3 .lanes { flex: 1; min-width: 0; display: grid; grid-template-rows: 1fr 1fr; gap: 6px; }
+  .v-b3 .lane { height: 100%; }
+  .v-b3 .lane--b { background: var(--g-births); } .v-b3 .lane--d { background: var(--g-deaths); }
+  .v-b3 .track { gap: 18px; padding: 0 12px; align-items: center; }
+  .v-b3 .lead { padding-right: 4px; }
+  .v-b3 .aud { flex: none; width: 120px; border-radius: 8px; background: var(--g-audit); display: grid; align-content: center; justify-items: start; gap: 2px; padding: 0 12px; }
+  .v-b3 .aud__t { display: flex; align-items: center; gap: 6px; }
+  .v-b3 .aud .n { font-family: 'DM Sans', Inter, sans-serif; font-size: 24px; font-weight: 700; color: var(--coral); line-height: 1; }
+  .v-b3 .aud .l { font-size: 12px; line-height: 1.2; color: var(--a-ink); }
+  @container (max-width: 600px) { .v-b3 .aud { width: 96px; padding: 0 10px; gap: 2px; } .v-b3 .aud .n { font-size: 20px; } .v-b3 .aud .l { font-size: 11px; line-height: 1.2; } }
+
+  /* B4 · photo cards in the lane */
+  .v-b4 .lane { height: 64px; }
+  .v-b4 .run { gap: 8px; padding: 0 8px; }
+  .v-b4 .lead { height: 48px; padding: 0 12px 0 6px; gap: 10px; }
+  .v-b4 .lead .ic { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,.75); display: grid; place-items: center; }
+  .v-b4 .lead .n { display: grid; line-height: 1.1; }
+  .v-b4 .lead .n b { font-family: 'DM Sans', Inter, sans-serif; font-size: 20px; font-weight: 700; color: var(--a-ink); }
+  .v-b4 .lead .n small { font-size: 12px; color: var(--a-grey); }
+  .v-b4 .it { height: 48px; gap: 10px; padding: 4px 12px 4px 4px; border-radius: 8px; background: rgba(255,255,255,.72); }
+  .v-b4 .it::before { display: none; }
+  .v-b4 .ph { width: 40px; height: 40px; border-radius: 6px; background: center / cover no-repeat #ddd; }
+  .v-b4 .it .t { display: grid; line-height: 1.2; }
+  .v-b4 .it .t span { font-size: 13px; font-weight: 600; color: var(--a-ink); white-space: nowrap; }
+  .v-b4 .it .t small { font-size: 12px; font-weight: 600; }
+  .v-b4 .run--b small.c { color: var(--teal); } .v-b4 .run--d small.c { color: var(--coral); }
+
+  /* B5 · step and hold: glides one item to the start, waits, glides again */
+  .v-b5 .lane { height: 42.6px; cursor: default; }
+  .v-b5 .track { transition: transform .62s var(--ease); }
+  .v-b5 .track.snap { transition: none; }
+  .v-b5 .it, .v-b5 .lead { transition: opacity .4s; }
+  .v-b5 .lane.is-stepping .it:not(.is-on), .v-b5 .lane.is-stepping .lead:not(.is-on) { opacity: .45; }
+  .v-b5 .dots { display: flex; justify-content: center; gap: 4px; margin-top: 8px; }
+  .v-b5 .dots i { width: 5px; height: 5px; border-radius: 50%; background: #D5DBD8; transition: width .3s, background .3s; }
+  .v-b5 .dots i.on { width: 14px; border-radius: 3px; background: var(--a-ink); }
+
+  /* B6 · a fixed station tag; the tape runs out from behind it */
+  .v-b6 .lane { height: 42.6px; background: #F6F8F7; }
+  .v-b6 .track { left: 0; }
+  .v-b6 .tag { position: absolute; z-index: 3; left: 0; top: 0; bottom: 0; display: flex; align-items: center; gap: 8px; padding: 0 14px 0 12px; border-radius: 8px; color: #fff; transition: background .45s; box-shadow: 8px 0 14px -6px rgba(0,0,0,.18); }
+  .v-b6 .tag[data-s="b"] { background: #1AAFA7; } .v-b6 .tag[data-s="d"] { background: #F2704F; } .v-b6 .tag[data-s="a"] { background: #E2B93B; }
+  .v-b6 .tag .live { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: live 1.6s ease-in-out infinite; }
+  @keyframes live { 50% { opacity: .35; } }
+  .v-b6 .tag .n { font-family: 'DM Sans', Inter, sans-serif; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 2.2ch; }
+  .v-b6 .tag .l { font-size: 13px; font-weight: 600; opacity: .95; white-space: nowrap; }
+  .v-b6 .tag img { filter: brightness(0) invert(1); }
+  .v-b6 .run { background: none; padding: 0 8px; }
+  .v-b6 .run .it::before { background: rgba(68,84,74,.3); }
+  .v-b6 .gap { flex: none; width: 1px; align-self: center; height: 18px; background: #D5DBD8; }
+  @media (prefers-reduced-motion: reduce) { .v-b6 .tag .live { animation: none; } }
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>The continuous ticker: six ways to take it further</h1>
+  <p>B, the one-lane ticker, is first for reference. Each of the six after it changes one thing about it: where the ticker lives, what stays fixed, how many lanes there are, what an item looks like, how it moves, or what frames it. All of them move at 40px a second, hold still under a hover or a finger, and stop when scrolled off screen.</p>
+</div>
+<div class="bar">
+  <div class="seg" role="group" aria-label="Width">
+    <button type="button" data-w="744" aria-pressed="true">Tablet 744</button>
+    <button type="button" data-w="393" aria-pressed="false">Phone 393</button>
+  </div>
+  <span class="data">V5 database · last 7 days · all sites · 76 births · 192 deaths</span>
+</div>
+<main id="main"></main>
+
+<script>
+const IMG = (p) => `../assets/img/species/${p}.jpg`
+const ICON = (n) => `../assets/icon/${n}`
+const BIRTHS = { total: 76, rows: [
+  { name: 'Crimson Vinesnake', n: 11, k: 'Reptile', photo: 'indian-rock-python' },
+  { name: 'Verdant Conure', n: 10, k: 'Bird', photo: 'rose-ringed-parakeet' },
+  { name: 'Russet Worm-lizard', n: 8, k: 'Reptile', photo: 'indian-rock-python' },
+  { name: 'Tideborn Numbat', n: 6, k: 'Mammal', photo: 'sloth-bear' },
+  { name: 'Azure Vole', n: 4, k: 'Mammal', photo: 'barasingha' },
+] }
+const DEATHS = { total: 192, rows: [
+  { name: 'Ochre erroralis', n: 44, k: 'Reptile', photo: 'indian-rock-python' },
+  { name: 'Pale Krait', n: 18, k: 'Reptile', photo: 'indian-rock-python' },
+  { name: 'Russet Boa', n: 7, k: 'Reptile', photo: 'indian-rock-python' },
+  { name: 'Crimson Vinesnake', n: 6, k: 'Reptile', photo: 'indian-rock-python' },
+  { name: 'Marbled Lorikeet', n: 5, k: 'Bird', photo: 'rose-ringed-parakeet' },
+] }
+const AUDIT = 68   /* the node's placeholder: the dump has no audit table */
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches
+const e = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+const mkB = `<span class="mk"><img src="${ICON('hs-natality.svg')}" alt="" width="14" height="18"></span>`
+const mkD = `<span class="mk mk--d"><img src="${ICON('hs-mortality.svg')}" alt="" width="18" height="8.38"></span>`
+const mkA = `<span class="mk"><img src="${ICON('hs-warning.svg')}" alt="" width="18" height="18"></span>`
+const chev = `<img class="chev" src="${ICON('hs-chevron.svg')}" alt="" width="5.33" height="9.33">`
+const av = (r) => `<span class="av" style="background-image:url(${IMG(r.photo)})"></span>`
+const item = (r) => `<span class="it">${av(r)}<span class="tx"><b>${r.n}</b> ${e(r.name)}</span></span>`
+const leadB = `<span class="lead">${mkB}<span class="tx"><b>${BIRTHS.total}+</b> New Births</span></span>`
+const leadD = `<span class="lead">${mkD}<span class="tx"><b>${DEATHS.total}+</b> Deaths</span></span>`
+const leadA = `<span class="lead">${mkA}<span class="tx"><span class="o">${AUDIT}%</span>&nbsp;&nbsp;Animal Audit Score</span></span>`
+const runsOnce = () => `<div class="run run--b">${leadB}${BIRTHS.rows.map(item).join('')}</div>` +
+  `<div class="run run--d">${leadD}${DEATHS.rows.map(item).join('')}</div><div class="run run--a">${leadA}</div>`
+
+/* THE TICKER ENGINE. The tape holds its content twice; x runs over one copy
+   and wraps. Speed is px/s (negative runs right). A hover or a finger holds
+   it, the Pause button holds it, and it rests while off screen. */
+const ALL = []
+function ticker(lane, track, { speed = 40, onFrame } = {}) {
+  let x = 0, last = 0, half = 0, held = false, paused = false, seen = true
+  const measure = () => { half = track.scrollWidth / 2 }
+  const frame = (t) => {
+    const dt = last ? Math.min(.05, (t - last) / 1000) : 0; last = t
+    if (!half) measure()
+    if (!calm && !held && !paused && seen && half) { x -= speed * dt; if (x <= -half) x += half; if (x > 0) x -= half }
+    if (!calm) track.style.transform = `translate3d(${x}px,0,0)`
+    onFrame?.(x, half)
+    requestAnimationFrame(frame)
+  }
+  lane.addEventListener('mouseenter', () => (held = true)); lane.addEventListener('mouseleave', () => (held = false))
+  lane.addEventListener('pointerdown', () => (held = true))
+  addEventListener('pointerup', (ev) => { if (ev.pointerType !== 'mouse' || !lane.matches(':hover')) held = false })
+  addEventListener('pointercancel', () => (held = false))
+  addEventListener('resize', measure)
+  new IntersectionObserver(([en]) => (seen = en.isIntersecting)).observe(lane)
+  requestAnimationFrame(frame)
+  const api = { pause(v) { paused = v }, restart() { x = 0; paused = false }, measure }
+  ALL.push(api); return api
+}
+
+const VARIANTS = [
+  {
+    key: 'B', ref: true, name: 'One continuous ticker (the one you picked)',
+    premise: 'One lane carrying three coloured runs: births, deaths and the audit, each led by its total. Kept here so the six after it can be compared against it.',
+    notes: [['On tap', 'Each item is its own target. A run’s lead opens the week’s page, and a species opens that species.'], ['Phone', 'The same lane on the narrower width, with edge fades.'], ['Cost', 'The total scrolls away with its run, so for most of the loop you can’t see “76 births” anywhere.']],
+    build(m) {
+      m.innerHTML = `<div class="w"><div class="lane fade"><div class="track">${runsOnce()}${runsOnce()}</div></div></div>`
+      return [ticker(m.querySelector('.lane'), m.querySelector('.track'))]
+    },
+  },
+  {
+    key: 'B1', name: 'A ticker inside each pill',
+    premise: 'The strip keeps its three pills, and Births and Deaths each run their own small ticker inside the pill. The icon and chevron stay fixed, and only the words in between scroll. The two run at slightly different speeds so they never move in step, and the Audit pill stays still.',
+    notes: [['On tap', 'Unchanged from now: tapping a pill opens its page. A species tap is possible but small, so the pill is the target.'], ['Phone', 'Pills 250 wide, and the row keeps its sideways swipe. Each ticker carries on while it’s scrolled out of view.'], ['Cost', 'The live strip’s shape and height, with no layout change at all. Each window shows only one or two names at a time.']],
+    build(m) {
+      const t = (lead, D) => `${lead}${D.rows.map(item).join('')}`
+      const pill = (cls, mk, lead, D) => `<div class="pill pill--${cls}">${mk}<div class="lane fade"><div class="track">${t(lead, D)}${t(lead, D)}</div></div>${chev}</div>`
+      const lb = `<span class="lead tx"><b>${BIRTHS.total}+</b> New Births</span>`, ld = `<span class="lead tx"><b>${DEATHS.total}+</b> Deaths</span>`
+      m.innerHTML = `<div class="w row">${pill('b', mkB, lb, BIRTHS)}${pill('d', mkD, ld, DEATHS)}` +
+        `<div class="pill pill--a">${mkA}<span class="tx"><span class="o">${AUDIT}%</span>&nbsp;&nbsp;Animal Audit Score</span>${chev}</div></div>`
+      const [a, b] = m.querySelectorAll('.pill--b, .pill--d')
+      return [ticker(a.querySelector('.lane'), a.querySelector('.track'), { speed: 34 }), ticker(b.querySelector('.lane'), b.querySelector('.track'), { speed: 28 })]
+    },
+  },
+  {
+    key: 'B2', name: 'The section head stays pinned',
+    premise: 'The same lane, but each run’s lead (“76+ New Births”) sticks to the left edge while its species pass under it, like a contacts list’s letter headers. When the deaths run arrives, its lead pushes the births lead out. Some section is always named.',
+    notes: [['On tap', 'The pinned head opens that section’s week page, and a species opens that species. The head is always in the same place, so it is an easy target.'], ['Phone', 'The head takes about 130px of the lane, leaving room for a name and a half to scroll past it.'], ['Cost', 'Fixes B’s weakness: the total never disappears. The motion is busier where the next head pushes the old one out.']],
+    build(m) {
+      m.innerHTML = `<div class="w"><div class="lane"><div class="track">${runsOnce()}${runsOnce()}</div></div></div>`
+      const lane = m.querySelector('.lane'), track = m.querySelector('.track')
+      const runs = [...track.querySelectorAll('.run')]
+      return [ticker(lane, track, { onFrame: (x) => {
+        for (const r of runs) {
+          const lead = r.querySelector('.lead'), left = r.offsetLeft + x
+          const push = Math.max(0, Math.min(-left, r.offsetWidth - lead.offsetWidth))
+          lead.style.transform = `translateX(${push}px)`
+        }
+      } })]
+    },
+  },
+  {
+    key: 'B3', name: 'Two lanes, opposite ways',
+    premise: 'Births and Deaths each get their own lane, stacked. Births runs left and deaths runs right, so the two never read as one list. The audit becomes a fixed tile at the end with the score in large type.',
+    notes: [['On tap', 'A lane’s lead or a species opens as in B. The audit tile is one plain target.'], ['Phone', 'The audit tile narrows to 96, its label on two lines, and the lanes take the rest.'], ['Cost', 'Both totals are visible far more often, but the strip is 76 tall, not 43. Two lanes going opposite ways is a lot of motion near the top of the page.']],
+    build(m) {
+      const lane = (cls, lead, D) => `<div class="lane fade lane--${cls}"><div class="track">${lead}${D.rows.map(item).join('')}${lead}${D.rows.map(item).join('')}</div></div>`
+      m.innerHTML = `<div class="w box"><div class="lanes">${lane('b', leadB, BIRTHS)}${lane('d', leadD, DEATHS)}</div>` +
+        `<div class="aud"><span class="aud__t">${mkA}<span class="n">${AUDIT}%</span></span><span class="l">Animal Audit Score</span></div></div>`
+      const [b, d] = m.querySelectorAll('.lane')
+      return [ticker(b, b.querySelector('.track'), { speed: 32 }), ticker(d, d.querySelector('.track'), { speed: -32 })]
+    },
+  },
+  {
+    key: 'B4', name: 'Photo cards in the lane',
+    premise: 'The animals lead, not the words. Every item is a small card with the species’ photo, its name and its count (“11 born”, “44 died”), and each run opens on a large-number tile. It is the death animal card idea, put in motion.',
+    notes: [['On tap', 'A card opens its species, on the Circle of Life (births) or Mortality tab (deaths). The number tile opens the week’s page.'], ['Phone', 'About two and a half cards show at once, which is enough to read as a reel.'], ['Cost', 'The strip goes from 43 to 64 tall. It is the most recognisable, but it repeats the photos; this week most deaths are reptiles, which all use the one python photo.']],
+    build(m) {
+      const lead = (D, cls, mk, word) => `<span class="lead"><span class="ic">${mk}</span><span class="n"><b>${D.total}+</b><small>${word}</small></span></span>`
+      const card = (r, verb) => `<span class="it"><span class="ph" style="background-image:url(${IMG(r.photo)})"></span><span class="t"><span>${e(r.name)}</span><small class="c">${r.n} ${verb}</small></span></span>`
+      const once = `<div class="run run--b">${lead(BIRTHS, 'b', mkB, 'New Births')}${BIRTHS.rows.map((r) => card(r, 'born')).join('')}</div>` +
+        `<div class="run run--d">${lead(DEATHS, 'd', mkD, 'Deaths')}${DEATHS.rows.map((r) => card(r, 'died')).join('')}</div>` +
+        `<div class="run run--a"><span class="lead"><span class="ic">${mkA}</span><span class="n"><b class="o">${AUDIT}%</b><small>Audit Score</small></span></span></div>`
+      m.innerHTML = `<div class="w"><div class="lane fade"><div class="track">${once}${once}</div></div></div>`
+      return [ticker(m.querySelector('.lane'), m.querySelector('.track'), { speed: 36 })]
+    },
+  },
+  {
+    key: 'B5', name: 'Step and hold',
+    premise: 'The same lane with a different rhythm. Instead of drifting, it glides one item to the left edge, holds there for 1.8s, then glides to the next. The item being held is full strength and the rest are dimmed, and dots underneath show progress through the loop. It is read like a stock ticker, one item at a time.',
+    notes: [['On tap', 'The item in focus is the obvious target, and a tap opens it. A hover or finger holds it longer.'], ['Phone', 'One item plus the edge of the next. The hold gives a phone reader time to read a name.'], ['Cost', 'Calmer and easier to read than a constant drift, and closer to a carousel. Getting through all twelve items takes about 30 seconds.']],
+    build(m) {
+      m.innerHTML = `<div class="w"><div class="lane fade is-stepping"><div class="track">${runsOnce()}${runsOnce()}</div></div><div class="dots"></div></div>`
+      const lane = m.querySelector('.lane'), track = m.querySelector('.track'), dots = m.querySelector('.dots')
+      const stops = [...track.querySelectorAll('.lead, .it')], n = stops.length / 2
+      dots.innerHTML = Array.from({ length: n }, () => '<i></i>').join('')
+      let i = 0, paused = false, held = false, t = 0
+      const show = (k, snap) => {
+        if (snap) track.classList.add('snap')
+        track.style.transform = `translate3d(${-(stops[k].offsetLeft - 12)}px,0,0)`   /* offsets are the track's: it is the positioned parent */
+        if (snap) { void track.offsetWidth; track.classList.remove('snap') }
+        stops.forEach((s, j) => s.classList.toggle('is-on', j === k || j === k + n || j === k - n))
+        ;[...dots.children].forEach((d, j) => d.classList.toggle('on', j === k % n))
+      }
+      const tick = () => {
+        clearTimeout(t)
+        if (!paused && !held) {
+          i++; show(i)
+          if (i === n) setTimeout(() => { i = 0; show(0, true) }, 650)   // the second copy's first stop is the first's: snap back unseen
+        }
+        t = setTimeout(tick, 1800 + 620)
+      }
+      lane.addEventListener('mouseenter', () => (held = true)); lane.addEventListener('mouseleave', () => (held = false))
+      lane.addEventListener('pointerdown', () => (held = true)); addEventListener('pointerup', () => (held = false))
+      requestAnimationFrame(() => { show(0, true); t = setTimeout(tick, 1800) })
+      addEventListener('resize', () => show(i, true))
+      const api = { pause(v) { paused = v }, restart() { clearTimeout(t); i = 0; show(0, true); paused = false; t = setTimeout(tick, 1800) }, measure() {} }
+      ALL.push(api); return [api]
+    },
+  },
+  {
+    key: 'B6', name: 'A fixed station tag',
+    premise: 'A solid tag sits on the left of the lane like a channel’s on-air badge, and the tape runs out from behind it. The tag shows which section is passing and counts up its total: teal “76 New Births”, then coral “192 Deaths”, then yellow “68% Audit”. The tape itself becomes neutral, so the colour lives only in the tag.',
+    notes: [['On tap', 'The tag opens the section it is showing, and a species opens that species.'], ['Phone', 'The tag takes about 150 of the lane’s 361, and the names run in the rest. The tag stays the same width all the way round.'], ['Cost', 'The clearest of the seven about what you are looking at, and the count-up gives a small moment of attention. It is also the least like the Figma pills.']],
+    build(m) {
+      const run = (D) => `<div class="run">${D.rows.map(item).join('')}</div><span class="gap"></span>`
+      const once = run(BIRTHS) + run(DEATHS) + `<div class="run run--audit"><span class="it">${mkA}<span class="tx"><span class="o">${AUDIT}%</span>&nbsp;&nbsp;Animal Audit Score</span></span></div><span class="gap"></span>`
+      m.innerHTML = `<div class="w"><div class="lane"><span class="tag" data-s="b"><span class="live"></span><img src="${ICON('hs-natality.svg')}" alt="" width="14" height="18"><span class="n">0</span><span class="l">New Births</span></span>` +
+        `<div class="track">${once}${once}</div></div></div>`
+      const lane = m.querySelector('.lane'), track = m.querySelector('.track'), tag = m.querySelector('.tag')
+      const num = tag.querySelector('.n'), lab = tag.querySelector('.l'), ic = tag.querySelector('img')
+      const runs = [...track.querySelectorAll('.run')]
+      const S = [['b', BIRTHS.total, 'New Births', 'hs-natality.svg', ''], ['d', DEATHS.total, 'Deaths', 'hs-mortality.svg', ''], ['a', AUDIT, 'Audit Score', 'hs-warning.svg', '%']]
+      let cur = -1, anim = 0
+      const count = (to, suf) => {
+        cancelAnimationFrame(anim); const t0 = performance.now(), d = calm ? 0 : 700
+        const step = (t) => { const p = d ? Math.min(1, (t - t0) / d) : 1; num.textContent = Math.round(to * (1 - Math.pow(1 - p, 3))) + suf; if (p < 1) anim = requestAnimationFrame(step) }
+        anim = requestAnimationFrame(step)
+      }
+      const set = (k) => {
+        if (k === cur) return; cur = k
+        const [s, n, l, i, suf] = S[k]; tag.dataset.s = s; lab.textContent = l; ic.src = ICON(i)
+        ic.style.transform = s === 'd' ? 'rotate(44.67deg)' : ''; ic.width = s === 'd' ? 18 : s === 'a' ? 18 : 14; ic.height = s === 'd' ? 8.38 : 18
+        count(n, suf)
+      }
+      /* the tape starts at the tag's edge (not padded: padding would break the wrap) */
+      return [ticker(lane, track, { onFrame: (x) => {
+        track.style.left = `${tag.offsetWidth}px`
+        let k = 0
+        runs.forEach((r, j) => { if (r.offsetLeft + x <= 8) k = j % 3 })
+        set(k)
+      } })]
+    },
+  },
+]
+
+const main = document.getElementById('main')
+for (const v of VARIANTS) {
+  const sec = document.createElement('section'); sec.className = `var${v.ref ? ' var--ref' : ''}`
+  sec.innerHTML = `<div class="var__head"><span class="var__k">${v.ref ? 'REFERENCE · ' : ''}${v.key}</span><h2>${e(v.name)}</h2></div><p class="var__premise">${e(v.premise)}</p>` +
+    `<div class="stage"><div class="frame"><div class="ctx-top">${['bengal-tiger', 'sarus-crane', 'indian-rock-python', 'sloth-bear'].map((p) => `<i style="background-image:url(${IMG(p)})"></i>`).join('')}</div>` +
+    `<div class="slot v-${v.ref ? 'ref' : v.key.toLowerCase()}"><div class="mount"></div></div><div class="ctx-bot">Announcements</div></div></div>` +
+    `<div class="ctl"><button type="button" data-a="pause">Pause</button><button type="button" data-a="restart">Restart</button><span class="now">${calm ? 'Reduced motion is on: the lane is still and swipes' : 'Hover or press to hold'}</span></div>` +
+    `<div class="notes">${v.notes.map(([h, t]) => `<div><b>${e(h)}</b>${e(t)}</div>`).join('')}</div>`
+  main.append(sec)
+  const tk = v.build(sec.querySelector('.mount'))
+  let paused = false
+  sec.querySelector('.ctl').addEventListener('click', (ev) => {
+    const a = ev.target.closest('button')?.dataset.a; if (!a) return
+    if (a === 'restart') { tk.forEach((t) => t.restart()); paused = false; sec.querySelector('[data-a=pause]').textContent = 'Pause'; return }
+    paused = !paused; tk.forEach((t) => t.pause(paused)); ev.target.textContent = paused ? 'Play' : 'Pause'
+  })
+}
+
+document.querySelector('.bar .seg').addEventListener('click', (ev) => {
+  const b = ev.target.closest('button[data-w]'); if (!b) return
+  document.querySelectorAll('.bar .seg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+  document.documentElement.style.setProperty('--fw', `${b.dataset.w}px`)
+  requestAnimationFrame(() => { ALL.forEach((t) => t.measure()); dispatchEvent(new Event('resize')) })
+})
+</script>
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Health Strip Tickers</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  /* FIVE TICKERS FOR V2's HEALTH STRIP (node 851:10787) — 1 Oct 2026.
+     Owner: "first the new born count, then the new born species with their
+     count moving, then Deaths with the death animal card — 5 variations".
+     Each variation is a different PREMISE for how the strip moves, not five
+     skins of one: A rolls inside each pill, B is one continuous ticker, C
+     opens a pill into a rail of cards, D never hides the total, E is a
+     full-photo story card. Every frame sits between the end of the My
+     species block and the top of the Announcements band, at the app's own
+     widths (744 tablet artboard, 393 phone). Numbers: the V5 database, last
+     7 days, all four sites (the same read the live strip makes). */
+  :root {
+    --bg: #F4F6F7; --card: #FFFFFF; --ink: #1F415B; --ink-2: #5A6B78; --line: #E1E6EA; --pick: #1F415B; --pick-ink: #fff;
+    /* the app's own — frames stay light, as the app does */
+    --a-ink: #44544A; --a-grey: #7A8684; --teal: #00ABAB; --coral: #FA6140;
+    --g-births: linear-gradient(177.16deg, rgba(92, 214, 206, .2) 0%, rgba(36, 186, 178, .2) 100%);
+    --g-deaths: linear-gradient(177.1deg, rgba(251, 153, 132, .2) 0%, rgba(251, 128, 102, .2) 100%);
+    --g-audit: rgba(252, 244, 174, .6);
+    --ease: cubic-bezier(.2, .8, .2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #12181D; --card: #1B232A; --ink: #E7EEF3; --ink-2: #9AAAB7; --line: #2A353E; --pick: #E7EEF3; --pick-ink: #12181D; }
+  }
+  :root[data-theme="dark"] { --bg: #12181D; --card: #1B232A; --ink: #E7EEF3; --ink-2: #9AAAB7; --line: #2A353E; --pick: #E7EEF3; --pick-ink: #12181D; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; }
+
+  /* ── page chrome ── */
+  .top { max-width: 1120px; margin: 0 auto; padding: 32px 16px 4px; }
+  h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -.3px; }
+  .top p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.55; max-width: 820px; }
+  .bar { position: sticky; top: 0; z-index: 5; max-width: 1120px; margin: 0 auto; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); }
+  .seg button { border: 0; background: none; color: var(--ink-2); padding: 7px 14px; border-radius: 7px; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--pick); color: var(--pick-ink); }
+  .bar .data { margin-left: auto; font-size: 13px; color: var(--ink-2); }
+  main { max-width: 1120px; margin: 0 auto; padding: 8px 16px 64px; display: grid; gap: 28px; }
+
+  .var { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; min-width: 0; }
+  .var__head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; margin-bottom: 4px; }
+  .var__k { font-size: 13px; font-weight: 700; letter-spacing: .6px; color: var(--ink-2); }
+  .var h2 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -.2px; }
+  .var__premise { margin: 4px 0 16px; color: var(--ink-2); font-size: 14.5px; line-height: 1.55; max-width: 820px; }
+  .stage { background: repeating-linear-gradient(45deg, transparent 0 10px, color-mix(in srgb, var(--line) 45%, transparent) 10px 11px); border-radius: 14px; padding: 20px 0; overflow: hidden; }
+  .ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 12px; }
+  .ctl button { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .ctl .now { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+  @media (max-width: 760px) { .notes { grid-template-columns: minmax(0, 1fr); } }
+  .notes div { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 10px; }
+  .notes b { display: block; color: var(--ink); font-weight: 600; margin-bottom: 2px; }
+
+  /* ── the app frame: the end of My species, the strip, the top of Announcements ── */
+  .frame { width: var(--fw, 744px); max-width: calc(100% - 32px); margin: 0 auto; background: #fff; border-radius: 14px; overflow: hidden; container-type: inline-size; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06); font-family: Inter, system-ui, sans-serif; color: var(--a-ink); }
+  .ctx-top { position: relative; height: 64px; border-radius: 0 0 20px 20px; background: radial-gradient(120% 220% at 50% -80%, #EEECCF 40%, #C9EAD5 100%); padding: 0 24px; display: flex; gap: 8px; overflow: hidden; }
+  .ctx-top i { flex: none; width: 148px; height: 44px; border-radius: 0 0 12px 12px; background: center 70% / cover no-repeat; position: relative; }
+  .ctx-top i::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(transparent, rgba(0,0,0,.45)); }
+  .slot { padding: 20px 24px; }  /* the panel column: 24 in, the strip 8 past it — 16 from the edge, as in the app */
+  .ctx-bot { margin: 0 16px; height: 46px; border-radius: 12px 12px 0 0; background: linear-gradient(180deg, rgba(175, 239, 235, .5), rgba(230, 230, 230, .4)); padding: 16px; font-size: 16px; font-weight: 500; }
+  @container (max-width: 600px) {
+    .ctx-top { padding: 0 16px; height: 52px; }
+    .ctx-top i { width: 140px; height: 34px; }
+    .slot { padding: 12px 0; }
+    .ctx-bot { height: 40px; padding: 12px; }
+  }
+
+  /* ── shared parts ── */
+  .av { flex: none; width: 22px; height: 22px; border-radius: 50%; background: center / cover no-repeat #ddd; box-shadow: 0 0 0 1.5px #fff; }
+  .mk { flex: none; display: grid; place-items: center; width: 18px; height: 18px; }
+  .mk--d img { transform: rotate(44.67deg); }
+  .chev { flex: none; margin-right: 5.33px; }
+  .tx { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; line-height: normal; }
+  .tx b { font-weight: 600; }
+  .tx .o { color: var(--coral); font-weight: 600; }
+  .tx small { color: var(--a-grey); font-size: 12px; }
+  .pill { position: relative; flex: 1 0 0; min-width: 0; height: 42.6px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; border: 0; border-radius: 8px; color: var(--a-ink); text-align: left; cursor: pointer; overflow: hidden; }
+  .pill--b { background: var(--g-births); }
+  .pill--d { background: var(--g-deaths); }
+  .pill--a { background: var(--g-audit); justify-content: flex-start; }
+  .pill--a .chev { margin-right: -2.67px; }
+  .row { position: relative; display: flex; gap: 8px; margin: 0 -8px; }
+  @container (max-width: 600px) {
+    .row { margin: 0; padding: 0 16px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; scroll-padding-inline: 16px; }
+    .row::-webkit-scrollbar { display: none; }
+    .row > .pill { flex: none; scroll-snap-align: start; }
+  }
+
+  /* ══ A · ROLLING PILLS ══ each pill is a 20px window; its lines roll up */
+  .va .win { flex: 1; min-width: 0; height: 20px; overflow: hidden; }
+  .va .trk { display: flex; flex-direction: column; transition: transform .52s var(--ease); }
+  .va .trk.snap { transition: none; }
+  .va .ln { height: 20px; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .va .ln .av { width: 20px; height: 20px; }
+  @container (max-width: 600px) { .va .pill--b, .va .pill--d { width: 236px; } }
+
+  /* ══ B · ONE TICKER ══ a single 42.6 lane; three coloured runs slide past */
+  .vb .lane { position: relative; height: 42.6px; margin: 0 -8px; border-radius: 8px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent); }
+  @container (max-width: 600px) { .vb .lane { margin: 0 16px; } }
+  .vb .tape { position: absolute; inset: 0 auto 0 0; display: flex; gap: 8px; width: max-content; animation: tape var(--dur, 40s) linear infinite; }
+  .vb .lane:hover .tape, .vb .lane.is-held .tape, .vb.is-paused .tape { animation-play-state: paused; }
+  @keyframes tape { to { transform: translateX(-50%); } }
+  .vb .run { flex: none; display: flex; align-items: center; gap: 14px; height: 42.6px; padding: 0 14px 0 12px; border-radius: 8px; }
+  .vb .run--b { background: var(--g-births); } .vb .run--d { background: var(--g-deaths); } .vb .run--a { background: var(--g-audit); }
+  .vb .it { display: flex; align-items: center; gap: 8px; }
+  .vb .it + .it::before { content: ''; width: 3px; height: 3px; border-radius: 50%; background: rgba(68,84,74,.35); margin-right: 6px; }
+  .vb .lead { display: flex; align-items: center; gap: 8px; padding-right: 6px; }
+
+  /* ══ C · SPOTLIGHT ══ the strip, then one pill opens into a rail of cards */
+  .vc .row { align-items: stretch; }
+  .vc .pill { height: auto; min-height: 42.6px; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 0; padding: 0; transition: flex-grow .5s var(--ease), flex-basis .5s var(--ease), height .5s var(--ease); }
+  .vc .row { height: 42.6px; transition: height .5s var(--ease); }
+  .vc.is-open .row { height: 140px; }
+  .vc .cap { height: 42.6px; flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; }
+  .vc .cap .l { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .vc .mini { display: none; }
+  .vc.is-open .pill:not(.is-on) { flex: 0 0 64px; }
+  .vc.is-open .pill:not(.is-on) .full, .vc.is-open .pill:not(.is-on) .chev { display: none; }
+  .vc.is-open .pill:not(.is-on) .mini { display: inline; }
+  .vc.is-open .pill:not(.is-on) .cap { justify-content: center; padding: 12px 6px; flex-direction: column; height: 100%; gap: 6px; }
+  .vc .pill.is-on { flex: 1 1 0; }
+  .vc .rail { flex: 1; min-height: 0; overflow: hidden; padding: 4px 12px 12px; margin-top: -4px; scroll-behavior: smooth; }
+  .vc .pill:not(.is-on) .rail { display: none; }
+  .vc .pill.is-on .rail { animation: rail-in .35s .2s both; }
+  @keyframes rail-in { from { opacity: 0; } }
+  .vc .rtrk { display: flex; gap: 8px; height: 100%; width: max-content; padding: 0 4px; }
+  .vc .rail { position: relative; }
+  .vc .card { position: relative; flex: none; width: 128px; height: 100%; border-radius: 8px; background: center / cover no-repeat #ccc; overflow: hidden; transition: transform .4s var(--ease), box-shadow .4s; }
+  .vc .card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 30%, rgba(0,0,0,.7)); }
+  .vc .card span { position: absolute; left: 8px; right: 8px; bottom: 7px; z-index: 1; color: #fff; font-size: 12px; font-weight: 600; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vc .card span small { display: block; font-weight: 400; opacity: .85; font-size: 11px; }
+  .vc .card em { position: absolute; top: 6px; left: 6px; z-index: 1; font-style: normal; font-size: 12px; font-weight: 700; color: #fff; padding: 2px 7px; border-radius: 999px; background: var(--teal); }
+  .vc .pill--d .card em { background: var(--coral); }
+  .vc .card.is-on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--teal); }
+  .vc .pill--d .card.is-on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--coral); }
+  .vc .card:not(.is-on) { transform: scale(.94); }
+  @container (max-width: 600px) {
+    .vc .row { overflow: hidden; }
+    .vc.is-open .pill:not(.is-on) { flex: 0 0 56px; }
+    .vc:not(.is-open) .row { overflow-x: auto; }
+    .vc .card { width: 112px; }
+  }
+
+  /* ══ D · THE TOTAL STAYS ══ two-line pills: the total on top, the turning species under it */
+  .vd .pill { height: 58px; padding: 10px 12px; }
+  .vd .l { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+  .vd .two { min-width: 0; flex: 1; display: grid; gap: 2px; }
+  .vd .sub { position: relative; height: 16px; overflow: hidden; font-size: 12px; color: var(--a-grey); }
+  .vd .sub span { position: absolute; inset: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: transform .45s var(--ease), opacity .45s; }
+  .vd .sub span.out { transform: translateY(-100%); opacity: 0; }
+  .vd .sub span.in { transform: translateY(100%); opacity: 0; transition: none; }
+  .vd .sub b { color: var(--a-ink); font-weight: 600; }
+  .vd .pile { flex: none; display: flex; align-items: center; }
+  .vd .pile .av { width: 22px; height: 22px; margin-left: -8px; transition: transform .4s var(--ease), box-shadow .4s; }
+  .vd .pile .av:first-child { margin-left: 0; }
+  .vd .pile .av.is-on { transform: scale(1.22); z-index: 2; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--teal); }
+  .vd .pill--d .pile .av.is-on { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--coral); }
+  .vd .meter { height: 4px; border-radius: 2px; background: rgba(250, 97, 64, .18); overflow: hidden; margin-top: 6px; }
+  .vd .meter i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--coral); transition: width 1.2s var(--ease); }
+  @container (min-width: 601px) { .vd .pill--a { flex: none; } .vd .pill--a .tx { overflow: visible; } }
+  @container (max-width: 600px) { .vd .pill--b, .vd .pill--d { width: 268px; } .vd .pill--a { width: 210px; } }
+
+  /* ══ E · STORY CARD ══ one card, a segment per beat, full photographs */
+  .ve .story { position: relative; height: 172px; margin: 0 -8px; border-radius: 12px; overflow: hidden; color: #fff; user-select: none; -webkit-user-select: none; touch-action: pan-y; cursor: pointer; }
+  @container (max-width: 600px) { .ve .story { margin: 0 16px; height: 160px; } }
+  .ve .sl { position: absolute; inset: 0; opacity: 0; transition: opacity .5s; display: flex; align-items: flex-end; padding: 16px; }
+  .ve .sl.is-on { opacity: 1; }
+  .ve .sl .ph { position: absolute; inset: 0; background: center / cover no-repeat; transform: scale(1.04); }
+  .ve .sl.is-on .ph { animation: kb 4s linear forwards; }
+  @keyframes kb { from { transform: scale(1.04); } to { transform: scale(1.12); } }
+  .ve .sl .ph::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.62), rgba(0,0,0,.1) 70%), linear-gradient(transparent 50%, rgba(0,0,0,.35)); }
+  .ve .sl .body { position: relative; display: grid; gap: 4px; max-width: 100%; }
+  .ve .chip { justify-self: start; display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: .6px; padding: 4px 9px; border-radius: 999px; background: rgba(255,255,255,.92); color: var(--teal); }
+  .ve .chip--d { color: var(--coral); }
+  .ve .big { font-family: 'DM Sans', Inter, sans-serif; font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: -.5px; }
+  .ve .big small { font-family: Inter, sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 0; margin-left: 6px; }
+  .ve .meta { font-size: 13px; opacity: .88; }
+  .ve .sl--tot { color: var(--a-ink); }
+  .ve .sl--tot.b { background: linear-gradient(135deg, #D7F4F1, #BEEAE6); }
+  .ve .sl--tot.d { background: linear-gradient(135deg, #FFE6DF, #FDD3C8); }
+  .ve .sl--tot.a { background: linear-gradient(135deg, #FDF7CF, #FBEFA6); }
+  .ve .sl--tot .faces { display: flex; margin-top: 6px; }
+  .ve .sl--tot .faces .av { width: 28px; height: 28px; margin-left: -8px; }
+  .ve .sl--tot .faces .av:first-child { margin-left: 0; }
+  .ve .sl--tot .big .o { color: var(--coral); }
+  .ve .sl--tot .ic { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 76px; height: 76px; border-radius: 50%; background: rgba(255,255,255,.7); display: grid; place-items: center; }
+  .ve .sl--tot .ic img { width: 34px; height: auto; }
+  .ve .segs { position: absolute; z-index: 3; top: 10px; left: 12px; right: 12px; display: flex; gap: 4px; }
+  .ve .segs i { flex: 1; height: 3px; border-radius: 2px; background: rgba(0,0,0,.14); overflow: hidden; }
+  .ve .story.on-photo .segs i { background: rgba(255,255,255,.35); }
+  .ve .segs i b { display: block; height: 100%; width: 0; background: var(--a-ink); }
+  .ve .story.on-photo .segs i b { background: #fff; }
+  .ve .segs i.done b { width: 100%; }
+  .ve .go { position: absolute; z-index: 3; right: 14px; bottom: 14px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+  .ve .story.on-photo .go { color: #fff; } .ve .story:not(.on-photo) .go { color: var(--a-ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .va .trk, .vc .pill, .vc .row, .vc .rtrk, .vc .card, .vd .sub span, .vd .pile .av, .ve .sl { transition: none !important; }
+    .vb .tape, .ve .sl.is-on .ph { animation: none !important; }
+    .vb .lane { overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Health strip: five tickers</h1>
+  <p>Each one plays the same sequence: the newborn count, then each newborn species with its count, then the deaths count, then each species that died. They differ in how that motion happens. Each frame shows the strip in place, between the foot of My species and the top of Announcements. Switch between the tablet and phone widths, pause any variation, and read what a tap does.</p>
+</div>
+<div class="bar">
+  <div class="seg" role="group" aria-label="Width">
+    <button type="button" data-w="744" aria-pressed="true">Tablet 744</button>
+    <button type="button" data-w="393" aria-pressed="false">Phone 393</button>
+  </div>
+  <div class="seg" role="group" aria-label="All">
+    <button type="button" id="restartAll" aria-pressed="false">Restart all</button>
+  </div>
+  <span class="data">V5 database · last 7 days · all sites · 76 births · 192 deaths</span>
+</div>
+<main id="main"></main>
+
+<script>
+const IMG = (p) => `../assets/img/species/${p}.jpg`
+const ICON = (n) => `../assets/icon/${n}`
+/* the V5 database's 7-day window, all four sites — the live strip's own read.
+   Each species wears the project photograph its kind maps to (v5db.js), so the
+   reptiles share the python: that is the data, not a mockup shortcut. */
+const BIRTHS = { total: 76, rows: [
+  { name: 'Crimson Vinesnake', n: 11, k: 'Reptile', iucn: 'Least Concern', photo: 'indian-rock-python' },
+  { name: 'Verdant Conure', n: 10, k: 'Bird', iucn: 'Least Concern', photo: 'rose-ringed-parakeet' },
+  { name: 'Russet Worm-lizard', n: 8, k: 'Reptile', iucn: 'Vulnerable', photo: 'indian-rock-python' },
+  { name: 'Tideborn Numbat', n: 6, k: 'Mammal', iucn: 'Endangered', photo: 'sloth-bear' },
+  { name: 'Azure Vole', n: 4, k: 'Mammal', iucn: 'Least Concern', photo: 'barasingha' },
+] }
+const DEATHS = { total: 192, rows: [
+  { name: 'Ochre erroralis', n: 44, k: 'Reptile', iucn: 'Vulnerable', photo: 'indian-rock-python' },
+  { name: 'Pale Krait', n: 18, k: 'Reptile', iucn: 'Not Evaluated', photo: 'indian-rock-python' },
+  { name: 'Russet Boa', n: 7, k: 'Reptile', iucn: 'Not Evaluated', photo: 'indian-rock-python' },
+  { name: 'Crimson Vinesnake', n: 6, k: 'Reptile', iucn: 'Least Concern', photo: 'indian-rock-python' },
+  { name: 'Marbled Lorikeet', n: 5, k: 'Bird', iucn: 'Least Concern', photo: 'rose-ringed-parakeet' },
+] }
+const AUDIT = 68   /* the node's placeholder: the dump has no audit table */
+
+/* THE BEATS every variation plays: the total, each species, then the same for deaths */
+const BEATS = [
+  { t: 'b', i: -1, ms: 2600 }, ...BIRTHS.rows.map((r, i) => ({ t: 'b', i, ms: 2000 })),
+  { t: 'd', i: -1, ms: 2600 }, ...DEATHS.rows.map((r, i) => ({ t: 'd', i, ms: 2000 })),
+]
+const beatName = (b) => b.t === 'a' ? `Audit score ${AUDIT}%` : b.i < 0 ? (b.t === 'b' ? `Total · ${BIRTHS.total} new births` : `Total · ${DEATHS.total} deaths`)
+  : `${b.t === 'b' ? 'Newborn' : 'Death'} · ${(b.t === 'b' ? BIRTHS : DEATHS).rows[b.i].name}`
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches
+const e = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+
+const mkB = `<span class="mk"><img src="${ICON('hs-natality.svg')}" alt="" width="14" height="18"></span>`
+const mkD = `<span class="mk mk--d"><img src="${ICON('hs-mortality.svg')}" alt="" width="18" height="8.38"></span>`
+const mkA = `<span class="mk"><img src="${ICON('hs-warning.svg')}" alt="" width="18" height="18"></span>`
+const chev = `<img class="chev" src="${ICON('hs-chevron.svg')}" alt="" width="5.33" height="9.33">`
+const av = (r) => `<span class="av" style="background-image:url(${IMG(r.photo)})"></span>`
+const auditPill = `<button type="button" class="pill pill--a">${mkA}<span class="tx"><span class="o">${AUDIT}%</span>&nbsp;&nbsp;Animal Audit Score</span>${chev}</button>`
+
+/* a beat clock: plays a list of beats, pausable, restartable, holds when off screen */
+function clock(beats, onBeat) {
+  let i = -1, t = 0, paused = false, seen = true, left = 0, until = 0
+  const next = () => { i = (i + 1) % beats.length; onBeat(beats[i], i); arm(beats[i].ms) }
+  const arm = (ms) => { clearTimeout(t); left = ms; until = performance.now() + ms; if (!paused && seen) t = setTimeout(next, ms) }
+  const hold = () => { clearTimeout(t); left = Math.max(0, until - performance.now()) }
+  const run = () => { if (!paused && seen) { until = performance.now() + left; t = setTimeout(next, left) } }
+  return {
+    start() { i = -1; clearTimeout(t); next() },
+    pause(v) { if (v === paused) return; paused = v; v ? hold() : run() },
+    get paused() { return paused },
+    seen(v) { if (v === seen) return; seen = v; v ? run() : hold() },
+    step(d) { clearTimeout(t); i = (i + d - 1 + beats.length * 2) % beats.length; next() },
+  }
+}
+
+const VARIANTS = [
+  {
+    key: 'A', name: 'Rolling pills',
+    premise: 'The strip stays the three pills it is now. Each pill is a one-line window whose line rolls up, like a departures board. The Births pill rolls through its species while the Deaths pill holds its total, then they swap. The Audit pill never moves, so the eye always has a still anchor.',
+    notes: [
+      ['On tap', 'On a total, tap opens the Natality or Mortality page for the week. On a species, it opens that species’ Circle of Life (births) or Mortality tab (deaths).'],
+      ['Phone', 'The row keeps its sideways swipe. The pill that is rolling slides into view, so the Deaths roll is never off screen.'],
+      ['Cost', 'The least change from what is live now, and no layout shift. A 20px line can show one name and a number, nothing more.'],
+    ],
+    build(root) {
+      const lines = (D, mk, word) => [`<span class="ln">${mk}<span class="tx"><b>${D.total}+</b> ${word}</span></span>`,
+        ...D.rows.map((r) => `<span class="ln">${av(r)}<span class="tx"><b>${r.n}</b> ${e(r.name)}</span></span>`),
+        `<span class="ln">${mk}<span class="tx"><b>${D.total}+</b> ${word}</span></span>`].join('')
+      root.innerHTML = `<div class="row">` +
+        `<button type="button" class="pill pill--b"><span class="win"><span class="trk">${lines(BIRTHS, mkB, 'New Births')}</span></span>${chev}</button>` +
+        `<button type="button" class="pill pill--d"><span class="win"><span class="trk">${lines(DEATHS, mkD, 'Deaths')}</span></span>${chev}</button>` +
+        auditPill + `</div>`
+      const [tb, td] = root.querySelectorAll('.trk'), row = root.querySelector('.row')
+      const roll = (trk, at, n) => {
+        const cur = Number(trk.dataset.at || 0)
+        if (at === 0 && cur > 0) {   // back to the total: roll on to the copy at the end, then snap to the top
+          trk.style.transform = `translateY(${-(n + 1) * 20}px)`
+          setTimeout(() => { trk.classList.add('snap'); trk.style.transform = 'translateY(0)'; void trk.offsetWidth; trk.classList.remove('snap') }, calm ? 0 : 560)
+        } else trk.style.transform = `translateY(${-at * 20}px)`
+        trk.dataset.at = at
+      }
+      return (b) => {
+        roll(tb, b.t === 'b' ? b.i + 1 : 0, BIRTHS.rows.length)
+        roll(td, b.t === 'd' ? b.i + 1 : 0, DEATHS.rows.length)
+        const pill = root.querySelector(b.t === 'b' ? '.pill--b' : '.pill--d')
+        if (row.scrollWidth > row.clientWidth) row.scrollTo({ left: pill.offsetLeft - 16, behavior: calm ? 'auto' : 'smooth' })
+      }
+    },
+  },
+  {
+    key: 'B', name: 'One continuous ticker',
+    premise: 'The three pills merge into one lane that scrolls without stopping, like a news ticker. A teal run carries the births total and each species, a coral run carries the deaths, and a yellow run carries the audit. There are no beats: it moves at 40px a second, and a finger or pointer on it holds it still.',
+    notes: [
+      ['On tap', 'Each item is its own target. A species opens that species, and a run’s lead (“76+ New Births”) opens the week’s page. Touching first stops the lane, so the tap lands where you aimed.'],
+      ['Phone', 'The same lane on the narrower width. The edge fades say there is more to come, so the strip doesn’t need to swipe.'],
+      ['Cost', 'Shows the most in the least height, but it never stops, which some readers find tiring. The OS reduce-motion setting turns it into a still row you swipe.'],
+    ],
+    build(root) {
+      const run = (D, cls, mk, word) => `<div class="run run--${cls}"><span class="lead">${mk}<span class="tx"><b>${D.total}+</b> ${word}</span></span>` +
+        D.rows.map((r) => `<span class="it">${av(r)}<span class="tx"><b>${r.n}</b> ${e(r.name)}</span></span>`).join('') + `</div>`
+      const once = run(BIRTHS, 'b', mkB, 'New Births') + run(DEATHS, 'd', mkD, 'Deaths') +
+        `<div class="run run--a"><span class="lead">${mkA}<span class="tx"><span class="o">${AUDIT}%</span>&nbsp;&nbsp;Animal Audit Score</span></span></div>`
+      root.innerHTML = `<div class="lane" tabindex="0" aria-label="This week: ${BIRTHS.total} births, ${DEATHS.total} deaths, audit ${AUDIT}%"><div class="tape">${once}${once}</div></div>`
+      const lane = root.querySelector('.lane'), tape = root.querySelector('.tape')
+      const speed = () => tape.style.setProperty('--dur', `${tape.scrollWidth / 2 / 40}s`)
+      requestAnimationFrame(speed); addEventListener('resize', speed)
+      lane.addEventListener('pointerdown', () => lane.classList.add('is-held'))
+      addEventListener('pointerup', () => lane.classList.remove('is-held'))
+      return null   // continuous: no beats
+    },
+  },
+  {
+    key: 'C', name: 'Spotlight: a pill opens into cards',
+    premise: 'The strip starts as it is now. When the births beat begins, the Births pill widens and grows into a rail of photo cards, one per newborn species, each with a count badge. The other two pills shrink to small icon-and-number chips. The rail steps from card to card, folds back to the strip, and then the Deaths pill opens with its animal cards.',
+    notes: [
+      ['On tap', 'A card opens its species. The open pill’s head (“76+ New Births ›”) opens the week’s page. A tap on a shrunk chip opens that pill straight away.'],
+      ['Phone', 'The open pill takes the width less two 56px chips, and two to three cards show at once.'],
+      ['Cost', 'The most photo-led, and the only one that shows the animals properly. But the strip grows from 43 to 140px, which pushes Announcements down. Better played once on arrival than looped forever.'],
+    ],
+    build(root) {
+      const cards = (D, word) => D.rows.map((r) => `<span class="card" style="background-image:url(${IMG(r.photo)})"><em>${r.n}</em><span>${e(r.name)}<small>${word} · ${r.k}</small></span></span>`).join('')
+      const pill = (cls, mk, D, word, cw) => `<div class="pill pill--${cls}" role="button" tabindex="0">` +
+        `<span class="cap"><span class="l">${mk}<span class="tx full"><b>${D.total}+</b> ${word}<span class="when"></span></span><span class="tx mini"><b>${D.total}</b></span></span>${chev}</span>` +
+        `<span class="rail"><span class="rtrk">${cards(D, cw)}</span></span></div>`
+      root.innerHTML = `<div class="vc-in"><div class="row">` + pill('b', mkB, BIRTHS, 'New Births', 'born') + pill('d', mkD, DEATHS, 'Deaths', 'died') +
+        `<div class="pill pill--a" role="button" tabindex="0"><span class="cap"><span class="l">${mkA}<span class="tx full"><span class="o">${AUDIT}%</span>&nbsp;&nbsp;Animal Audit Score</span><span class="tx mini"><span class="o">${AUDIT}%</span></span></span>${chev}</span></div></div></div>`
+      const host = root.closest('.va-host')
+      const pb = root.querySelector('.pill--b'), pd = root.querySelector('.pill--d')
+      return (b) => {
+        const open = b.i >= 0
+        host.classList.toggle('is-open', open)
+        pb.classList.toggle('is-on', open && b.t === 'b'); pd.classList.toggle('is-on', open && b.t === 'd')
+        const p = b.t === 'b' ? pb : pd
+        p.querySelector('.when').textContent = open ? ' this week' : ''
+        if (open) {
+          const cs = [...p.querySelectorAll('.card')]
+          cs.forEach((c, j) => c.classList.toggle('is-on', j === b.i))
+          const rail = p.querySelector('.rail'), card = cs[b.i]
+          const go = () => (rail.scrollLeft = card.offsetLeft - (rail.clientWidth - card.offsetWidth) / 2)
+          b.i === 0 ? (rail.style.scrollBehavior = 'auto', rail.scrollLeft = 0, setTimeout(() => { rail.style.scrollBehavior = ''; go() }, calm ? 0 : 560)) : go()
+        }
+      }
+    },
+  },
+  {
+    key: 'D', name: 'The total stays, the species turn beside it',
+    premise: 'The count never leaves the screen. Births and Deaths become two-line pills: the total on the first line, and under it one species and its count, turning every two seconds. A pile of species photos on the right shows who is in this week, with the one being named lifted and ringed. Both pills turn together, a second apart, and the Audit pill gets a bar for its score.',
+    notes: [
+      ['On tap', 'Tap opens the week’s Natality or Mortality page, with the species named on the second line at the top of the list.'],
+      ['Phone', 'Each pill is 268px wide and keeps the sideways swipe. The total and the photo pile fit in the first pill’s width.'],
+      ['Cost', 'The strip goes from 43 to 58px, a small fixed growth with no jumps. You never have to wait for the total to come back round.'],
+    ],
+    build(root) {
+      const pill = (cls, mk, D, word) => `<button type="button" class="pill pill--${cls}"><span class="l">${mk}<span class="two"><span class="tx"><b>${D.total}+</b> ${word}</span>` +
+        `<span class="sub"><span><b>${D.rows[0].n}</b> · ${e(D.rows[0].name)}</span></span></span></span>` +
+        `<span class="pile">${D.rows.slice(0, 3).map(av).join('')}</span>${chev}</button>`
+      root.innerHTML = `<div class="row">` + pill('b', mkB, BIRTHS, 'New Births') + pill('d', mkD, DEATHS, 'Deaths') +
+        `<button type="button" class="pill pill--a"><span class="l">${mkA}<span class="two"><span class="tx"><span class="o">${AUDIT}%</span>&nbsp;&nbsp;Animal Audit Score</span><span class="meter"><i></i></span></span></span>${chev}</button></div>`
+      setTimeout(() => (root.querySelector('.meter i').style.width = `${AUDIT}%`), 300)
+      const turn = (p, D, i) => {
+        const sub = p.querySelector('.sub'), old = sub.querySelector('span:last-child'), r = D.rows[i % 3]
+        const nu = document.createElement('span'); nu.className = 'in'; nu.innerHTML = `<b>${r.n}</b> · ${e(r.name)}`
+        sub.append(nu); void nu.offsetWidth; nu.className = ''; old.className = 'out'
+        setTimeout(() => old.remove(), calm ? 0 : 480)
+        p.querySelectorAll('.pile .av').forEach((a, j) => a.classList.toggle('is-on', j === i % 3))
+      }
+      const pb = root.querySelector('.pill--b'), pd = root.querySelector('.pill--d')
+      /* its own beats: both pills turn together, deaths a second behind */
+      let n = 0
+      return { beats: Array.from({ length: 6 }, (_, k) => ({ t: k % 2 ? 'd' : 'b', i: k >> 1, ms: 1000 })),
+        on: (b) => { turn(b.t === 'b' ? pb : pd, b.t === 'b' ? BIRTHS : DEATHS, b.i); n++ } }
+    },
+  },
+  {
+    key: 'E', name: 'Story card',
+    premise: 'The strip becomes a single 172px card that plays like a story: a progress segment per beat along the top, a full-bleed photograph for each species, and a coloured title card for each total. Left and right taps step back and forward, and holding pauses. The audit score is the last beat.',
+    notes: [
+      ['On tap', 'Tapping the left third goes back a beat and the right third goes forward. A tap in the middle, or “View”, opens what is showing (the week’s page or that species). Hold to pause.'],
+      ['Phone', 'Full width less 16px each side and 160px tall. Stories are a gesture phone readers already know.'],
+      ['Cost', 'The richest, but it replaces the strip outright: 172px against 43px, and it competes with the announcement card right under it, which also turns.'],
+    ],
+    build(root) {
+      const beats = [...BEATS, { t: 'a', i: -1, ms: 2600 }]
+      const tot = (D, cls, chip, word, icon) => `<div class="sl sl--tot ${cls}"><div class="body"><span class="chip ${cls === 'd' ? 'chip--d' : ''}">${chip}</span>` +
+        `<span class="big">${D.total}<small>${word}</small></span><span class="faces">${D.rows.map(av).join('')}</span></div><span class="ic"><img src="${ICON(icon)}" alt=""></span></div>`
+      const sp = (r, cls, chip, word) => `<div class="sl"><span class="ph" style="background-image:url(${IMG(r.photo)})"></span><div class="body"><span class="chip ${cls === 'd' ? 'chip--d' : ''}">${chip}</span>` +
+        `<span class="big">${r.n}<small>${word}</small></span><span class="meta">${e(r.name)} · ${r.k} · ${r.iucn}</span></div></div>`
+      root.innerHTML = `<div class="story" tabindex="0" aria-roledescription="story"><div class="segs">${beats.map(() => '<i><b></b></i>').join('')}</div>` +
+        tot(BIRTHS, 'b', 'NEW BORN · 7 DAYS', 'new births', 'hs-natality.svg') + BIRTHS.rows.map((r) => sp(r, 'b', 'NEW BORN', 'born this week')).join('') +
+        tot(DEATHS, 'd', 'DEATHS · 7 DAYS', 'deaths', 'hs-mortality.svg') + DEATHS.rows.map((r) => sp(r, 'd', 'DEATH', 'died this week')).join('') +
+        `<div class="sl sl--tot a"><div class="body"><span class="chip chip--d">AUDIT</span><span class="big"><span class="o">${AUDIT}%</span><small>Animal Audit Score</small></span><span class="meta" style="opacity:.7">Placeholder: no audit data yet</span></div><span class="ic"><img src="${ICON('hs-warning.svg')}" alt=""></span></div>` +
+        `<span class="go">View ${chev.replace('class="chev"', 'class="chev" style="filter:var(--gf,none)"')}</span></div>`
+      const story = root.querySelector('.story'), sls = [...root.querySelectorAll('.sl')], segs = [...root.querySelectorAll('.segs i')]
+      let anim = null
+      return { beats, on: (b, k) => {
+        sls.forEach((s, j) => s.classList.toggle('is-on', j === k))
+        story.classList.toggle('on-photo', !sls[k].classList.contains('sl--tot'))
+        story.style.setProperty('--gf', story.classList.contains('on-photo') ? 'brightness(0) invert(1)' : 'none')
+        segs.forEach((s, j) => { s.classList.toggle('done', j < k); s.firstChild.style.width = j < k ? '100%' : '0' })
+        anim?.cancel(); if (!calm) anim = segs[k].firstChild.animate([{ width: '0%' }, { width: '100%' }], { duration: b.ms, fill: 'forwards' })
+      }, wire(c) {
+        let held = 0, down = 0
+        story.addEventListener('pointerdown', () => { down = performance.now(); held = setTimeout(() => { c.pause(true); anim?.pause() }, 220) })
+        story.addEventListener('pointerup', (ev) => {
+          clearTimeout(held)
+          if (performance.now() - down > 220) { c.pause(false); anim?.play(); return }
+          const x = (ev.clientX - story.getBoundingClientRect().left) / story.clientWidth
+          if (x < 1 / 3) c.step(-1); else if (x > 2 / 3) c.step(1)
+        })
+      } }
+    },
+  },
+]
+
+const main = document.getElementById('main'), clocks = []
+for (const v of VARIANTS) {
+  const sec = document.createElement('section'); sec.className = 'var'
+  sec.innerHTML = `<div class="var__head"><span class="var__k">VARIATION ${v.key}</span><h2>${e(v.name)}</h2></div><p class="var__premise">${e(v.premise)}</p>` +
+    `<div class="stage"><div class="frame"><div class="ctx-top">${['bengal-tiger', 'sarus-crane', 'indian-rock-python', 'sloth-bear'].map((p) => `<i style="background-image:url(${IMG(p)})"></i>`).join('')}</div>` +
+    `<div class="slot va-host v${v.key.toLowerCase()}"><div class="mount"></div></div><div class="ctx-bot">Announcements</div></div></div>` +
+    `<div class="ctl"><button type="button" data-a="pause">Pause</button><button type="button" data-a="restart">Restart</button><span class="now" aria-live="off"></span></div>` +
+    `<div class="notes">${v.notes.map(([h, t]) => `<div><b>${e(h)}</b>${e(t)}</div>`).join('')}</div>`
+  main.append(sec)
+  const host = sec.querySelector('.va-host'), now = sec.querySelector('.now')
+  if (v.key === 'B') host.classList.add('vb')
+  const out = v.build(sec.querySelector('.mount'))
+  const own = out && typeof out === 'object'
+  const beats = own ? out.beats : BEATS, onBeat = own ? out.on : out
+  let c = null
+  if (onBeat) {
+    c = clock(beats, (b, k) => { onBeat(b, k); now.textContent = v.key === 'D' ? `Turning · births and deaths together` : `Beat ${k + 1} of ${beats.length} · ${beatName(b)}` })
+    out.wire?.(c)
+    clocks.push(c)
+    new IntersectionObserver(([en]) => c.seen(en.isIntersecting)).observe(host)
+  } else now.textContent = 'Continuous · 40px a second · touch or hover to hold'
+  sec.querySelector('.ctl').addEventListener('click', (ev) => {
+    const a = ev.target.closest('button')?.dataset.a; if (!a) return
+    if (a === 'restart') { c?.pause(false); c?.start(); sec.querySelector('[data-a=pause]').textContent = 'Pause'; host.classList.remove('is-paused'); return }
+    const p = c ? !c.paused : !host.classList.contains('is-paused')
+    c?.pause(p); host.classList.toggle('is-paused', p)
+    ev.target.textContent = p ? 'Play' : 'Pause'
+  })
+  v.start = () => c?.start()
+}
+VARIANTS.forEach((v) => v.start())
+document.getElementById('restartAll').addEventListener('click', () => VARIANTS.forEach((v) => v.start()))
+
+/* width switch: the app's own two widths */
+document.querySelector('.bar .seg').addEventListener('click', (ev) => {
+  const b = ev.target.closest('button[data-w]'); if (!b) return
+  document.querySelectorAll('.bar .seg button[data-w]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+  document.documentElement.style.setProperty('--fw', `${b.dataset.w}px`)
+  dispatchEvent(new Event('resize'))
+  VARIANTS.forEach((v) => v.start())
+})
+</script>
+</body>
+</html>

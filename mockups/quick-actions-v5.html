@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick Actions, Four Ways</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Four Quick Actions panels after the owner's reference (25 Sep 2026): the
+   same sixteen actions, four groups and five unfinished items as the app
+   (HOME_QUICK_ACTIONS, QA_GROUPS, QA_RESUME), on V4's palette. Every panel is
+   live: search, tap an action, resume a draft. */
+:root {
+  --ink: #1F415B; --ink-2: #44544A; --mute: #6F7C7A; --line: rgba(31, 65, 91, .09); --line-2: rgba(31, 65, 91, .16);
+  --primary: #37BD69; --primary-ink: #1E7A44; --action: #006D35; --petrol: #1F515B; --sig: #00AFD6;
+  --page: #EEF3F2; --field: #F4F7F6;
+  --t-clinical: #E8F4F2; --i-clinical: #1F515B;
+  --t-animal: #EFF5F2;   --i-animal: #006D35;
+  --t-ops: #F0F1F0;      --i-ops: #44544A;
+  --t-estate: #E1F9ED;   --i-estate: #006D35;
+  --draft-bg: #E4F4EA; --draft: #1E7A44; --unsent-bg: #FDE8E4; --unsent: #B2361F; --await-bg: #FFF1D6; --await: #9A6400;
+  --ease: cubic-bezier(.32, .72, 0, 1); --spring: cubic-bezier(.34, 1.3, .64, 1);
+  --num: 'DM Sans', Inter, system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page: #0F1A1D; --ink-page: #E6EEEE; } }
+:root[data-theme="dark"] { --page: #0F1A1D; --ink-page: #E6EEEE; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink-page, var(--ink)); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+img { display: block; }
+
+header.top { max-width: 1560px; margin: 0 auto; padding: 40px 24px 8px; }
+header.top h1 { margin: 0 0 8px; font-size: 28px; font-weight: 600; letter-spacing: -.02em; }
+header.top > p { margin: 0 0 16px; max-width: 800px; font-size: 15px; line-height: 1.55; opacity: .82; }
+.keep { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.keep li { padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, #fff 72%, transparent); color: var(--ink); font-size: 13.5px; line-height: 1.45; }
+.keep li b { display: block; margin-bottom: 2px; font-size: 13px; }
+.grid { max-width: 1560px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(740px, 100%), 1fr)); gap: 56px 32px; }
+.concept { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.concept__tag { display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+.concept__tag b { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--primary-ink); color: #fff; font-size: 12px; letter-spacing: 0; }
+.concept h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+.concept > p { margin: 0; font-size: 14.5px; line-height: 1.5; opacity: .82; max-width: 680px; }
+.rec { display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 100px; background: var(--primary); color: #fff; font-size: 11px; font-weight: 700; vertical-align: 3px; }
+.states { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; font-size: 13.5px; line-height: 1.45; max-width: 680px; }
+.states li { display: grid; grid-template-columns: 100px 1fr; gap: 8px; }
+.states li span:first-child { font-weight: 600; opacity: .6; }
+
+/* ── the stage: the home, blurred, under the panel ── */
+.stage { position: relative; padding: 28px 22px; border-radius: 24px; overflow: hidden; background: radial-gradient(120% 80% at 20% 0%, #9CB6B1, #587270 70%); }
+.panel {
+  position: relative; width: 100%; max-width: 696px; margin: 0 auto; border-radius: 28px; overflow: hidden;
+  background: linear-gradient(180deg, #fff, #F7FCFB); color: var(--ink); box-shadow: 0 24px 60px -18px rgba(10, 38, 44, .5);
+  container-type: inline-size;
+}
+.p-head { display: flex; align-items: center; gap: 12px; padding: 20px 20px 12px 24px; }
+.p-head h3 { flex: 1; margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.01em; }
+.p-head .glyph { width: 26px; height: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+.p-head .glyph i { border-radius: 4px; background: var(--ink); }
+.x { flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 0 0 1px var(--line); display: grid; place-items: center; }
+.x svg { width: 18px; height: 18px; }
+svg { display: block; }
+
+/* shared pieces */
+.search { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px 0 14px; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1px var(--line-2); }
+.search:focus-within { box-shadow: inset 0 0 0 2px var(--action); }
+.search > svg { flex: none; width: 17px; height: 17px; color: var(--mute); }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font-size: 15px; }
+.search input::-webkit-search-cancel-button { display: none; }
+.disc { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; }
+.disc img { width: 20px; height: 20px; }
+.pill { flex: none; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.pill.draft { background: var(--draft-bg); color: var(--draft); }
+.pill.unsent { background: var(--unsent-bg); color: var(--unsent); }
+.pill.awaiting { background: var(--await-bg); color: var(--await); }
+.ago { flex: none; font-family: var(--num); font-size: 12.5px; color: var(--mute); min-width: 54px; text-align: right; }
+.chev { flex: none; width: 16px; height: 16px; color: #9AA6A4; }
+.chip {
+  display: flex; align-items: center; gap: 9px; min-width: 0; min-height: 46px; padding: 7px 10px; font-size: 13.5px !important; border: 0; border-radius: 14px;
+  background: #fff; box-shadow: 0 1px 2px rgba(10, 38, 44, .06), 0 0 0 1px rgba(255,255,255,.6); text-align: left; font-size: 14px; font-weight: 500; color: var(--ink);
+  transition: transform 460ms var(--spring), box-shadow 200ms var(--ease);
+}
+.chip:hover { box-shadow: 0 3px 10px rgba(10, 38, 44, .1); }
+.chip:active { transform: scale(.96); transition-duration: 110ms; }
+.chip img { flex: none; width: 20px; height: 20px; }
+.chip span { min-width: 0; line-height: 1.22; }
+.chip mark { background: #FFF1B8; color: inherit; border-radius: 3px; }
+.foot { display: flex; gap: 8px; padding: 12px 20px 20px; border-top: 1px solid var(--line); }
+.foot button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border: 0; border-radius: 12px; background: var(--field); font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.foot svg { width: 17px; height: 17px; }
+.empty { padding: 28px 12px; text-align: center; color: var(--mute); font-size: 14px; }
+.empty button { margin-top: 10px; height: 38px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--primary-ink); color: #fff; font-weight: 600; font-size: 14px; }
+
+/* the resume row, shared by A, B and D */
+.rrow { width: 100%; display: flex; align-items: center; gap: 14px; padding: 10px 12px; border: 0; border-radius: 14px; background: none; text-align: left; transition: background-color 160ms; }
+.rrow:hover { background: rgba(31, 65, 91, .04); }
+.rrow + .rrow { box-shadow: 0 -1px 0 var(--line); }
+.rrow:hover + .rrow { box-shadow: none; }
+.rrow .t { flex: 1; min-width: 0; }
+.rrow .t b { display: block; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rrow .t small { display: block; margin-top: 2px; font-size: 13px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── the next step: where the action happens ── */
+.step { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; background: linear-gradient(180deg, #fff, #F7FCFB); transform: translateX(100%); transition: transform 420ms var(--ease); visibility: hidden; }
+.step.on { transform: none; visibility: visible; }
+.step__h { display: flex; align-items: center; gap: 12px; padding: 20px 20px 14px; border-bottom: 1px solid var(--line); }
+.step__h h4 { flex: 1; margin: 0; font-size: 19px; font-weight: 600; }
+.step__h .back { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--field); display: grid; place-items: center; }
+.step__h .back svg { width: 18px; height: 18px; }
+.step__b { flex: 1; overflow-y: auto; padding: 18px 24px; }
+.step__b h5 { margin: 0 0 10px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.step__b h5:not(:first-child) { margin-top: 22px; }
+.places { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.place { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 0; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px var(--line-2); text-align: left; transition: box-shadow 160ms, background-color 160ms; }
+.place b { font-size: 15px; font-weight: 600; }
+.place small { font-size: 12.5px; color: var(--mute); }
+.place[aria-pressed="true"] { background: #F1FAF4; box-shadow: inset 0 0 0 2px var(--primary); }
+.crumbs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.crumbs label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 600; color: var(--mute); }
+.crumbs select { height: 44px; padding: 0 10px; border: 0; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1px var(--line-2); font-size: 14px; font-weight: 500; color: var(--ink); }
+.step__f { display: flex; align-items: center; gap: 12px; padding: 14px 24px 22px; border-top: 1px solid var(--line); }
+.step__f p { flex: 1; margin: 0; font-size: 13.5px; color: var(--mute); }
+.step__f p b { color: var(--ink); }
+.go { height: 48px; min-width: 150px; padding: 0 22px; border: 0; border-radius: 14px; background: var(--primary-ink); color: #fff; font-size: 15.5px; font-weight: 600; }
+.go[disabled] { opacity: .4; cursor: default; }
+.toast { position: absolute; z-index: 8; left: 50%; bottom: 18px; transform: translate(-50%, 14px); opacity: 0; pointer-events: none; padding: 11px 16px; border-radius: 14px; background: #1C2B2A; color: #fff; font-size: 14px; white-space: nowrap; transition: opacity 180ms, transform 360ms var(--ease); box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+.toast b { color: #9BE3B4; font-weight: 600; }
+
+/* ── A · the reference, cleaned ── */
+.a-cont { margin: 4px 16px 0; padding: 12px 8px 6px; border-radius: 20px; background: #fff; box-shadow: 0 1px 3px rgba(10, 38, 44, .06), 0 0 0 1px var(--line); }
+.a-cont__h { display: flex; align-items: center; gap: 10px; padding: 2px 12px 8px; }
+.a-cont__h h4 { margin: 0; font-size: 17px; font-weight: 600; }
+.count { display: grid; place-items: center; min-width: 24px; height: 24px; padding: 0 7px; border-radius: 999px; background: var(--field); font-family: var(--num); font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.a-cont__h .more { margin-left: auto; border: 0; background: none; color: var(--action); font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; padding: 4px; }
+.a-cont__h .more svg { width: 15px; height: 15px; transition: transform 300ms var(--ease); }
+.a-cont__h .more[aria-expanded="true"] svg { transform: rotate(180deg); }
+.a-rows { overflow: hidden; transition: height 380ms var(--ease); }
+.a-new { display: flex; align-items: center; gap: 12px; padding: 18px 24px 12px; }
+.a-new h4 { flex: 1; margin: 0; font-size: 17px; font-weight: 600; }
+.a-new .search { width: 260px; height: 40px; }
+.a-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 16px; }
+@container (max-width: 600px) { .a-cats { grid-template-columns: 1fr; } .a-new { flex-wrap: wrap; } .a-new .search { width: 100%; } }
+.a-cat { padding: 14px; border-radius: 20px; background: var(--tone); }
+.a-cat__h { width: 100%; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 0; border: 0; background: none; text-align: left; }
+.a-cat__h .disc { width: 44px; height: 44px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.a-cat__h .t { flex: 1; min-width: 0; }
+.a-cat__h b { display: block; font-size: 15.5px; font-weight: 600; }
+.a-cat__h small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--mute); }
+.a-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* ── B · split ── */
+.b-body { display: grid; grid-template-columns: 230px 1fr; min-height: 560px; border-top: 1px solid var(--line); }
+@container (max-width: 600px) { .b-body { grid-template-columns: 1fr; } .b-side { border-right: 0 !important; border-bottom: 1px solid var(--line); } }
+.b-side { display: flex; flex-direction: column; gap: 4px; padding: 14px 12px; border-right: 1px solid var(--line); background: rgba(244, 247, 246, .6); }
+.b-side .search { height: 40px; margin-bottom: 8px; }
+.b-nav { width: 100%; display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 10px; border: 0; border-radius: 12px; background: none; text-align: left; font-size: 14.5px; font-weight: 500; transition: background-color 160ms; }
+.b-nav .disc { width: 30px; height: 30px; background: var(--tone, #fff); }
+.b-nav .disc img { width: 16px; height: 16px; }
+.b-nav span { flex: 1; min-width: 0; line-height: 1.2; }
+.b-nav i { font-style: normal; font-family: var(--num); font-size: 12.5px; font-weight: 700; color: var(--mute); }
+.b-nav i.hot { display: grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--primary); color: #fff; }
+.b-nav[aria-current="true"] { background: #fff; box-shadow: 0 1px 3px rgba(10,38,44,.08), 0 0 0 1px var(--line); font-weight: 600; }
+.b-side hr { width: 100%; border: 0; border-top: 1px solid var(--line); margin: 6px 0; }
+.b-main { padding: 18px 20px 20px; min-width: 0; }
+.b-main__h { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+.b-main__s { margin: 0 0 14px; font-size: 13.5px; color: var(--mute); }
+.b-kind { margin: 14px 0 4px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.b-verb { flex: none; height: 32px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; display: grid; place-items: center; }
+.b-verb.draft { background: var(--primary-ink); color: #fff; }
+.b-verb.unsent { background: var(--unsent-bg); color: var(--unsent); }
+.b-verb.awaiting { background: var(--field); color: var(--ink-2); }
+.b-act { width: 100%; display: flex; align-items: center; gap: 14px; padding: 12px; border: 0; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); text-align: left; transition: transform 460ms var(--spring), box-shadow 200ms; }
+.b-act + .b-act { margin-top: 8px; }
+.b-act:hover { box-shadow: inset 0 0 0 1px var(--line-2), 0 3px 10px rgba(10,38,44,.07); }
+.b-act:active { transform: scale(.985); transition-duration: 110ms; }
+.b-act .disc { background: var(--tone); }
+.b-act .t { flex: 1; min-width: 0; }
+.b-act .t b { display: block; font-size: 15px; font-weight: 600; }
+.b-act .t small { display: block; margin-top: 2px; font-size: 13px; color: var(--mute); }
+.b-act .t small em { font-style: normal; color: var(--ink-2); }
+.b-fade { animation: b-in 320ms var(--ease); }
+@keyframes b-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ── C · suggested ── */
+.c-sec { padding: 6px 24px 14px; }
+.c-sec h4 { display: flex; align-items: baseline; gap: 8px; margin: 8px 0 10px; font-size: 15px; font-weight: 600; }
+.c-sec h4 small { font-weight: 500; font-size: 13px; color: var(--mute); }
+.c-rail { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin: 0 -24px; padding: 2px 24px 4px; scroll-snap-type: x mandatory; }
+.c-rail::-webkit-scrollbar { display: none; }
+.c-card { flex: none; width: 214px; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 0; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--line-2); text-align: left; scroll-snap-align: start; transition: transform 460ms var(--spring); }
+.c-card:active { transform: scale(.97); transition-duration: 110ms; }
+.c-card .top { display: flex; align-items: center; justify-content: space-between; }
+.c-card b { font-size: 14.5px; font-weight: 600; line-height: 1.25; }
+.c-card small { font-size: 12.5px; color: var(--mute); line-height: 1.35; }
+.c-bar { height: 5px; border-radius: 3px; background: var(--field); overflow: hidden; }
+.c-bar i { display: block; height: 100%; border-radius: 3px; background: var(--primary); }
+.c-card .verb { align-self: flex-start; margin-top: 2px; font-size: 13px; font-weight: 700; color: var(--action); }
+.c-card.awaiting .verb { color: var(--mute); }
+.c-card.unsent .verb { color: var(--unsent); }
+.c-sugg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@container (max-width: 600px) { .c-sugg { grid-template-columns: 1fr; } .c-all { grid-template-columns: 1fr 1fr !important; } }
+.c-tile { display: flex; gap: 12px; padding: 14px; border: 0; border-radius: 18px; background: var(--tone); text-align: left; transition: transform 460ms var(--spring); }
+.c-tile:active { transform: scale(.97); transition-duration: 110ms; }
+.c-tile .disc { background: #fff; }
+.c-tile .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.c-tile b { font-size: 15px; font-weight: 600; }
+.c-tile .where { display: inline-flex; align-self: flex-start; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; background: #fff; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.c-tile .where svg { width: 12px; height: 12px; color: var(--primary-ink); }
+.c-tile small { font-size: 12.5px; color: var(--mute); }
+.c-all { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding-top: 2px; }
+.c-all h6 { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .03em; color: var(--mute); }
+.c-all h6 i { width: 8px; height: 8px; border-radius: 50%; background: var(--dot); }
+.c-all button { display: block; width: 100%; padding: 7px 0; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; font-size: 13.5px; font-weight: 500; color: var(--ink); }
+.c-all button:hover { color: var(--action); }
+.c-top { display: flex; align-items: center; gap: 10px; padding: 0 24px 8px; }
+.c-top .search { flex: 1; height: 42px; }
+.c-top .scan { flex: none; width: 42px; height: 42px; border: 0; border-radius: 12px; background: var(--field); display: grid; place-items: center; }
+.c-top .scan svg { width: 18px; height: 18px; }
+
+/* ── D · command ── */
+.d-field { margin: 0 20px; display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 12px 0 18px; border-radius: 18px; background: #fff; box-shadow: 0 0 0 2px var(--action), 0 8px 24px -10px rgba(0,109,53,.35); }
+.d-field > svg { width: 22px; height: 22px; color: var(--action); flex: none; }
+.d-field input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font-size: 19px; font-weight: 500; }
+.d-field input::-webkit-search-cancel-button { display: none; }
+.d-field .scan { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border: 0; border-radius: 10px; background: var(--field); font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
+.d-field .scan svg { width: 16px; height: 16px; }
+.d-recent[hidden] { display: none; }
+.d-recent { display: flex; gap: 8px; flex-wrap: wrap; padding: 14px 20px 4px; }
+.d-recent small { width: 100%; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.d-recent button { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 8px; border: 0; border-radius: 999px; background: var(--tone); font-size: 13.5px; font-weight: 500; }
+.d-recent img { width: 18px; height: 18px; }
+.d-list { padding: 6px 12px 12px; max-height: 520px; overflow-y: auto; }
+.d-group { margin: 12px 8px 4px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); display: flex; justify-content: space-between; }
+.d-item { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 10px; border: 0; border-radius: 12px; background: none; text-align: left; }
+.d-item .disc { width: 34px; height: 34px; background: var(--tone); }
+.d-item .disc img { width: 18px; height: 18px; }
+.d-item .t { flex: 1; min-width: 0; }
+.d-item .t b { display: block; font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.d-item .t b strong { font-weight: 700; }
+.d-item .t small { display: block; font-size: 12.5px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.d-item kbd { flex: none; visibility: hidden; padding: 3px 8px; border-radius: 6px; background: #fff; box-shadow: inset 0 0 0 1px var(--line-2); font-family: var(--num); font-size: 12px; color: var(--mute); }
+.d-item.is-hi { background: #EAF6EE; }
+.d-item.is-hi kbd { visibility: visible; }
+.d-keys { display: flex; gap: 16px; padding: 10px 20px 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--mute); }
+.d-keys kbd { padding: 2px 6px; margin-right: 4px; border-radius: 5px; background: var(--field); box-shadow: inset 0 -1px 0 var(--line-2); font-family: var(--num); font-size: 11.5px; color: var(--ink-2); }
+.d-keys span:last-child { margin-left: auto; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Quick Actions, four ways</h1>
+  <p>Four live panels built on your reference, all 696 px wide like the app's panel. They use the same sixteen actions, four groups and five unfinished items that <code>?v=2</code> ships. Tap any action to see the next step: where it happens, with recent places filled in. Tap an unfinished item to resume it.</p>
+  <ul class="keep">
+    <li><b>Kept from the reference</b>Continue sits above New, the four groups are tinted, and each action is a chip with its icon.</li>
+    <li><b>Changed in all four</b>The status says who is blocking: Draft means you, Not sent means the network, Awaiting means someone else. The tap label matches: Resume, Retry or View.</li>
+    <li><b>What "useful" means here</b>A create has to land somewhere, so every panel asks where right away and offers the places you last used, before the form opens.</li>
+  </ul>
+</header>
+
+<main class="grid">
+  <section class="concept">
+    <span class="concept__tag"><b>A</b> Reference, cleaned</span>
+    <h2>Continue on top, four tinted groups below <span class="rec">Closest to the ref</span></h2>
+    <p>This is your reference, tightened. Continue shows the top three and folds the rest behind “2 more”. Search sits in the New heading and narrows the chips as you type. Each group's heading opens its module.</p>
+    <ul class="states">
+      <li><span>Tap a chip</span><span>“Where?” slides in with your three recent places. Pick one and press Start. If the action needs no place, such as New Site, it opens straight away.</span></li>
+      <li><span>Tap a row</span><span>Resume, Retry or View, depending on who is blocking it.</span></li>
+      <li><span>Type</span><span>Chips narrow and matches are highlighted. With no match, “Search everything for ‘x’” appears.</span></li>
+    </ul>
+    <div class="stage"><div class="panel" id="A"></div></div>
+  </section>
+
+  <section class="concept">
+    <span class="concept__tag"><b>B</b> One thing at a time</span>
+    <h2>A sidebar of groups and a pane for the chosen one</h2>
+    <p>This works like iPad Settings. The sidebar holds search, Continue with a count, and the four groups. The pane shows only the chosen one, with space for each action to say where it goes and where you last used it.</p>
+    <ul class="states">
+      <li><span>Opens on</span><span>Continue whenever something is unfinished, otherwise the last group you used.</span></li>
+      <li><span>Continue</span><span>Rows are grouped Draft, then Not sent, then Awaiting, each with its own button.</span></li>
+      <li><span>Action row</span><span>It says whether it asks for an enclosure, a site or nothing, and shows your last use, such as “Last: CAR-03, 2 days ago”.</span></li>
+      <li><span>Search</span><span>Typing replaces the pane with matches from every group.</span></li>
+    </ul>
+    <div class="stage"><div class="panel" id="B"></div></div>
+  </section>
+
+  <section class="concept">
+    <span class="concept__tag"><b>C</b> Ready to go</span>
+    <h2>Unfinished work as cards, then four suggestions with the place already set</h2>
+    <p>This one guesses the next step. Continue becomes a row of cards with a progress bar. “Suggested now” offers four actions with the place already chosen and a reason for each. Every other action sits below as a plain four-column list.</p>
+    <ul class="states">
+      <li><span>Suggestion</span><span>One tap starts it. The place is already filled in, so there's no “Where?” step.</span></li>
+      <li><span>Change place</span><span>Tap the place pill on a suggestion to open “Where?” instead.</span></li>
+      <li><span>All actions</span><span>A text list works like an index: tap a name and it asks where.</span></li>
+    </ul>
+    <div class="stage"><div class="panel" id="C"></div></div>
+  </section>
+
+  <section class="concept">
+    <span class="concept__tag"><b>D</b> Type what you want</span>
+    <h2>A command field that understands the action and the animal</h2>
+    <p>The field is focused when the panel opens. Before you type, it shows your four recent actions, what you haven't finished and every action by group. Type “leo” and it offers “Dispense Medicine · Indian Leopard, CAR-03” with the place already filled in, next to matching drafts.</p>
+    <ul class="states">
+      <li><span>Keys</span><span>↑ ↓ to move, ↵ to start, esc to close. On touch, tap a row.</span></li>
+      <li><span>An animal</span><span>Matches on species or enclosure code turn into actions ready to go at that place.</span></li>
+      <li><span>No match</span><span>“Search everything for ‘x’” runs Global Search, as the app's field does today.</span></li>
+    </ul>
+    <div class="stage"><div class="panel" id="D"></div></div>
+  </section>
+</main>
+
+<script>
+/* ── the app's data: HOME_QUICK_ACTIONS, QA_GROUPS, QA_RESUME ── */
+const ACTIONS = [
+  { id: 'medical', group: 'clinical', label: 'New Medical Record', icon: 'qa-medical.svg', scope: 'enclosure' },
+  { id: 'dispense', group: 'clinical', label: 'Dispense Medicine', icon: 'qa-medical.svg', scope: 'enclosure' },
+  { id: 'hospitalize', group: 'clinical', label: 'Hospitalise', icon: 'qa-medical.svg', scope: 'enclosure' },
+  { id: 'fetal', group: 'clinical', label: 'Add Fetal Death', icon: 'qa-fetal.svg', scope: 'enclosure' },
+  { id: 'transfer', group: 'animal', label: 'Transfer Animal', icon: 'qa-paw.svg', scope: 'enclosure' },
+  { id: 'accession', group: 'animal', label: 'Add Accession', icon: 'qa-paw.svg', scope: 'enclosure' },
+  { id: 'eggs', group: 'animal', label: 'Add Eggs', icon: 'qa-egg.svg', scope: 'enclosure' },
+  { id: 'missing', group: 'animal', label: 'Report Missing / Escaped Animal', icon: 'qa-paw.svg', scope: 'enclosure' },
+  { id: 'request', group: 'ops', label: 'New Request', icon: 'qa-request.svg', scope: 'site' },
+  { id: 'note', group: 'ops', label: 'New Note', icon: 'qa-request.svg', scope: 'site' },
+  { id: 'announcement', group: 'ops', label: 'New Announcement', icon: 'qa-announce.svg', scope: 'none' },
+  { id: 'user', group: 'ops', label: 'Add User', icon: 'qa-user.svg', scope: 'none' },
+  { id: 'site', group: 'estate', label: 'New Site', icon: 'qa-site.svg', scope: 'none' },
+  { id: 'section', group: 'estate', label: 'New Section', icon: 'qa-section.svg', scope: 'site' },
+  { id: 'enclosure', group: 'estate', label: 'New Enclosure', icon: 'qa-section.svg', scope: 'section' },
+  { id: 'master', group: 'estate', label: 'Master Settings', icon: 'qa-master.svg', scope: 'none' },
+]
+const GROUPS = [
+  { id: 'clinical', name: 'Medical & Clinical Care', short: 'Medical', desc: 'Records, treatment and the hospital', icon: 'qa-medical.svg' },
+  { id: 'animal', name: 'Animal Management', short: 'Animals', desc: 'Moves, arrivals, eggs and escapes', icon: 'qa-paw.svg' },
+  { id: 'ops', name: 'Operations & Administration', short: 'Operations', desc: 'Requests, notes and people', icon: 'qa-request.svg' },
+  { id: 'estate', name: 'Site & System Management', short: 'Sites & System', desc: 'Sites, sections and settings', icon: 'qa-site.svg' },
+]
+const RESUME = [
+  { id: 'r1', kind: 'draft', action: 'medical', where: 'CAR-03 · Indian Leopard', note: '3 of 5 fields', mins: 14, done: .6 },
+  { id: 'r2', kind: 'draft', action: 'dispense', where: 'BER-01 · Sloth Bear', note: 'dose not entered', mins: 18 * 60, done: .8 },
+  { id: 'r3', kind: 'unsent', action: 'missing', where: 'HRB-02 · Blackbuck', note: 'saved offline', mins: 40, done: 1 },
+  { id: 'r4', kind: 'awaiting', action: 'transfer', where: 'CAR-01 → Rescue Holding', note: 'with the Curator', mins: 2 * 1440, done: 1 },
+  { id: 'r5', kind: 'awaiting', action: 'request', where: 'Bannerghatta Safari', note: 'with Finance', mins: 4 * 1440, done: 1 },
+]
+const KINDS = { draft: { label: 'Draft', verb: 'Resume' }, unsent: { label: 'Not sent', verb: 'Retry' }, awaiting: { label: 'Awaiting', verb: 'View' } }
+/* places: Site › Section › Enclosure (sites.js / sections.js ids) */
+const SITES = [
+  { id: 'bg-safari', name: 'Bannerghatta Safari', sections: [
+    { code: 'CAR', name: 'Carnivore Safari', encl: [['CAR-01', 'Asiatic Lion'], ['CAR-03', 'Indian Leopard']] },
+    { code: 'HRB', name: 'Herbivore Safari', encl: [['HRB-01', 'Chital'], ['HRB-02', 'Blackbuck'], ['HRB-04', 'Gaur']] },
+    { code: 'BER', name: 'Bear Safari', encl: [['BER-01', 'Sloth Bear']] }] },
+  { id: 'bg-zoo', name: 'Zoo Core', sections: [
+    { code: 'PRI', name: 'Primate Island', encl: [['PRI-02', 'Bonnet Macaque'], ['PRI-04', 'Sumatran Orangutan']] },
+    { code: 'AVI', name: 'Aviaries', encl: [['AVI-01', 'Hill Myna'], ['AVI-03', 'Cinereous Vulture']] },
+    { code: 'REP', name: 'Reptile House', encl: [['REP-01', 'Indian Rock Python'], ['REP-02', 'Indian Star Tortoise']] }] },
+  { id: 'hg-field', name: 'Hesaraghatta', sections: [{ code: 'GRS', name: 'Grassland', encl: [['GRS-01', 'Blackbuck'], ['GRS-02', 'Nilgai']] }] },
+  { id: 'ms-rescue', name: 'Mysuru Rescue', sections: [{ code: 'RSC', name: 'Rescue Holding', encl: [['RSC-01', 'Indian Leopard'], ['RSC-02', 'Sloth Bear']] }] },
+]
+const ENCL = SITES.flatMap((s) => s.sections.flatMap((sec) => sec.encl.map(([code, species]) => ({ code, species, section: sec.name, site: s.name }))))
+const RECENT_PLACES = ['CAR-03', 'BER-01', 'HRB-02']
+const LAST_USED = { medical: ['CAR-03', 14], dispense: ['BER-01', 1080], transfer: ['CAR-01', 2880], eggs: ['AVI-01', 5760], missing: ['HRB-02', 40], note: ['Zoo Core', 300], request: ['Bannerghatta Safari', 5760], hospitalize: ['CAR-03', 10080] }
+const RECENT_ACTIONS = ['dispense', 'medical', 'note', 'eggs']
+const SUGGEST = [
+  { action: 'dispense', place: 'BER-01', why: 'Medication round at 14:00, 3 animals due' },
+  { action: 'medical', place: 'CAR-03', why: 'You were at CAR-03 14 min ago' },
+  { action: 'eggs', place: 'AVI-01', why: 'Hill myna clutch due to be logged today' },
+  { action: 'note', place: 'Zoo Core', why: 'Your usual end-of-shift note' },
+]
+
+const A_ = Object.fromEntries(ACTIONS.map((a) => [a.id, a]))
+const G_ = Object.fromEntries(GROUPS.map((g) => [g.id, g]))
+const encl = (code) => ENCL.find((e) => e.code === code)
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const ico = (f) => `<img src="../assets/icon/${f}" alt="" width="20" height="20">`
+const tone = (g) => `--tone: var(--t-${g})`
+const ago = (m) => m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} hr ago` : `${Math.round(m / 1440)} d ago`
+const hl = (text, q) => { if (!q) return esc(text); const i = text.toLowerCase().indexOf(q.toLowerCase()); return i < 0 ? esc(text) : esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length)) }
+const needs = (a) => a.scope === 'enclosure' ? 'Asks for an enclosure' : a.scope === 'section' ? 'Asks for a section' : a.scope === 'site' ? 'Asks for a site' : 'Opens straight away'
+const S = {
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  chev: '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>',
+  scan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M7 12h10"/></svg>',
+}
+const head = `<div class="p-head"><span class="glyph" aria-hidden="true"><i></i><i></i><i></i><i></i></span><h3>Quick Actions</h3><button class="x" type="button" aria-label="Close" data-close>${S.x}</button></div>`
+const foot = `<div class="foot"><button type="button" data-global>${S.search}Search everything</button><button type="button" data-scan>${S.scan}Scan a tag</button></div>`
+const resumeRow = (r) => { const a = A_[r.action]
+  return `<button type="button" class="rrow" data-resume="${r.id}"><span class="disc" style="background:var(--t-${a.group})">${ico(a.icon)}</span>` +
+    `<span class="t"><b>${esc(a.label)}</b><small>${esc(r.where)} · ${esc(r.note)}</small></span><span class="pill ${r.kind}">${KINDS[r.kind].label}</span><span class="ago">${ago(r.mins)}</span>${S.chev}</button>` }
+
+/* the shared next step, mounted once per panel */
+function mountStep(panel) {
+  panel.insertAdjacentHTML('beforeend', `<div class="step" aria-hidden="true"></div><div class="toast" role="status"></div>`)
+  const step = panel.querySelector('.step'), toast = panel.querySelector('.toast')
+  let t = 0
+  const say = (html) => { toast.innerHTML = html; toast.classList.add('on'); clearTimeout(t); t = setTimeout(() => toast.classList.remove('on'), 2600) }
+  const close = () => { step.classList.remove('on'); step.setAttribute('aria-hidden', 'true') }
+  function start(id, place) {
+    const a = A_[id]
+    if (a.scope === 'none') return say(`Opening <b>${esc(a.label)}</b>…`)
+    if (place) return say(`<b>${esc(a.label)}</b> at ${esc(place)}, opening the form`)
+    let chosen = a.scope === 'enclosure' ? RECENT_PLACES[0] : null
+    const recents = a.scope === 'enclosure' ? RECENT_PLACES.map((c) => { const e = encl(c); return { key: c, b: `${c} · ${e.species}`, s: `${e.section}, ${e.site}` } })
+      : a.scope === 'section' ? [{ key: 'Carnivore Safari', b: 'Carnivore Safari', s: 'Bannerghatta Safari' }, { key: 'Aviaries', b: 'Aviaries', s: 'Zoo Core' }]
+      : SITES.map((s) => ({ key: s.name, b: s.name, s: `${s.sections.length} sections` }))
+    if (!chosen) chosen = recents[0].key
+    const site0 = SITES[0], sec0 = site0.sections[0]
+    step.innerHTML = `<div class="step__h"><button class="back" type="button" aria-label="Back" data-back>${S.back}</button><span class="disc" style="background:var(--t-${a.group})">${ico(a.icon)}</span><h4>${esc(a.label)}</h4></div>` +
+      `<div class="step__b"><h5>${a.scope === 'site' ? 'Which site' : 'Recent places'}</h5><div class="places">${recents.map((r) => `<button type="button" class="place" data-place="${esc(r.key)}" aria-pressed="${r.key === chosen}"><b>${esc(r.b)}</b><small>${esc(r.s)}</small></button>`).join('')}</div>` +
+      (a.scope === 'enclosure' ? `<h5>Or choose</h5><div class="crumbs"><label>Site<select>${SITES.map((s) => `<option>${esc(s.name)}</option>`).join('')}</select></label><label>Section<select>${site0.sections.map((s) => `<option>${esc(s.name)}</option>`).join('')}</select></label><label>Enclosure<select>${sec0.encl.map(([c, sp]) => `<option>${c} · ${esc(sp)}</option>`).join('')}</select></label></div>` : '') +
+      `</div><div class="step__f"><p>Starts at <b data-chosen>${esc(chosen)}</b></p><button type="button" class="go" data-go>Start</button></div>`
+    step.classList.add('on'); step.setAttribute('aria-hidden', 'false')
+    step.onclick = (e) => {
+      if (e.target.closest('[data-back]')) return close()
+      const p = e.target.closest('[data-place]')
+      if (p) { chosen = p.dataset.place; step.querySelectorAll('.place').forEach((x) => x.setAttribute('aria-pressed', String(x === p))); step.querySelector('[data-chosen]').textContent = chosen }
+      if (e.target.closest('[data-go]')) { close(); say(`<b>${esc(a.label)}</b> at ${esc(chosen)}, opening the form`) }
+    }
+    step.onchange = (e) => { if (e.target.matches('select')) { const v = e.target.closest('.crumbs').querySelectorAll('select')[2].value.split(' · ')[0]; chosen = v; step.querySelectorAll('.place').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.place === v))); step.querySelector('[data-chosen]').textContent = v } }
+  }
+  const resume = (id) => { const r = RESUME.find((x) => x.id === id); say(`<b>${KINDS[r.kind].verb}</b> ${esc(A_[r.action].label)} · ${esc(r.where)}`) }
+  panel.addEventListener('click', (e) => {
+    if (e.target.closest('[data-close]')) return say('Panel closes')
+    if (e.target.closest('[data-scan]')) return say('Opening the scanner')
+    const g = e.target.closest('[data-global]'); if (g) return say(g.dataset.global ? `Global Search for <b>“${esc(g.dataset.global)}”</b>` : 'Opening Global Search')
+    const r = e.target.closest('[data-resume]'); if (r) return resume(r.dataset.resume)
+    const m = e.target.closest('[data-module]'); if (m) return say(`Opening <b>${esc(G_[m.dataset.module].name)}</b>`)
+  })
+  return { start, say, close }
+}
+const match = (a, q) => !q || a.label.toLowerCase().includes(q.toLowerCase()) || G_[a.group].name.toLowerCase().includes(q.toLowerCase())
+
+/* ── A ── */
+;(function () {
+  const panel = document.getElementById('A')
+  let q = '', open = false
+  panel.innerHTML = head +
+    `<div class="a-cont"><div class="a-cont__h"><h4>Continue where you left off</h4><span class="count">${RESUME.length}</span><button class="more" type="button" aria-expanded="false" data-more>${RESUME.length - 3} more ${S.down}</button></div><div class="a-rows"></div></div>` +
+    `<div class="a-new"><h4>Start something new</h4><label class="search">${S.search}<input type="search" placeholder="Search actions" aria-label="Search actions"></label></div>` +
+    `<div class="a-cats"></div>` + foot
+  const ui = mountStep(panel), rows = panel.querySelector('.a-rows')
+  const drawRows = () => {
+    const from = rows.offsetHeight
+    rows.innerHTML = RESUME.slice(0, open ? RESUME.length : 3).map(resumeRow).join('')
+    const to = rows.scrollHeight
+    if (from) { rows.style.height = from + 'px'; requestAnimationFrame(() => { rows.style.height = to + 'px' }) ; setTimeout(() => rows.style.height = '', 400) }
+    const b = panel.querySelector('[data-more]'); b.setAttribute('aria-expanded', open); b.innerHTML = (open ? 'Show less ' : `${RESUME.length - 3} more `) + S.down
+  }
+  const drawCats = () => {
+    const cats = GROUPS.map((g) => {
+      const acts = ACTIONS.filter((a) => a.group === g.id && match(a, q))
+      if (!acts.length) return ''
+      return `<div class="a-cat" style="${tone(g.id)}"><button type="button" class="a-cat__h" data-module="${g.id}"><span class="disc">${ico(g.icon)}</span><span class="t"><b>${esc(g.name)}</b><small>${esc(g.desc)}</small></span>${S.chev}</button>` +
+        `<div class="a-chips">${acts.map((a) => `<button type="button" class="chip" data-act="${a.id}" title="${esc(a.label)}">${ico(a.icon)}<span>${hl(a.label, q)}</span></button>`).join('')}</div></div>`
+    }).join('')
+    panel.querySelector('.a-cats').innerHTML = cats || `<div class="empty" style="grid-column:1/-1">No action matches “${esc(q)}”<br><button type="button" data-global="${esc(q)}">Search everything for “${esc(q)}”</button></div>`
+  }
+  panel.querySelector('input').addEventListener('input', (e) => { q = e.target.value.trim(); drawCats() })
+  panel.addEventListener('click', (e) => {
+    if (e.target.closest('[data-more]')) { open = !open; return drawRows() }
+    const a = e.target.closest('[data-act]'); if (a) ui.start(a.dataset.act)
+  })
+  rows.innerHTML = RESUME.slice(0, 3).map(resumeRow).join('')
+  drawCats()
+})()
+
+/* ── B ── */
+;(function () {
+  const panel = document.getElementById('B')
+  let cur = 'continue', q = ''
+  panel.innerHTML = head + `<div class="b-body"><nav class="b-side"><label class="search">${S.search}<input type="search" placeholder="Search actions" aria-label="Search actions"></label>` +
+    `<button type="button" class="b-nav" data-nav="continue" style="--tone:#E4F4EA"><span class="disc"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#1E7A44" stroke-width="2.2" stroke-linecap="round"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="8"/></svg></span><span>Continue</span><i class="hot">${RESUME.length}</i></button><hr>` +
+    GROUPS.map((g) => `<button type="button" class="b-nav" data-nav="${g.id}" style="${tone(g.id)}"><span class="disc">${ico(g.icon)}</span><span>${esc(g.short)}</span><i>${ACTIONS.filter((a) => a.group === g.id).length}</i></button>`).join('') +
+    `<hr><button type="button" class="b-nav" data-scan><span class="disc" style="background:#fff">${S.scan.replace('<svg', '<svg width="16" height="16"')}</span><span>Scan a tag</span></button>` +
+    `</nav><div class="b-main"></div></div>`
+  const ui = mountStep(panel), main = panel.querySelector('.b-main')
+  const actRow = (a) => { const l = LAST_USED[a.id]
+    return `<button type="button" class="b-act" data-act="${a.id}" style="${tone(a.group)}"><span class="disc">${ico(a.icon)}</span><span class="t"><b>${hl(a.label, q)}</b><small>${needs(a)}${l ? ` · <em>Last: ${esc(l[0])}, ${ago(l[1])}</em>` : ''}</small></span>${S.chev}</button>` }
+  const draw = () => {
+    panel.querySelectorAll('.b-nav[data-nav]').forEach((b) => b.setAttribute('aria-current', String(!q && b.dataset.nav === cur)))
+    let html
+    if (q) {
+      const hits = ACTIONS.filter((a) => match(a, q))
+      html = `<h4 class="b-main__h">Results</h4><p class="b-main__s">${hits.length} action${hits.length === 1 ? '' : 's'} for “${esc(q)}”</p>` +
+        (hits.length ? hits.map(actRow).join('') : `<div class="empty"><button type="button" data-global="${esc(q)}">Search everything for “${esc(q)}”</button></div>`)
+    } else if (cur === 'continue') {
+      html = `<h4 class="b-main__h">Continue</h4><p class="b-main__s">What you started and what is waiting on someone else</p>` +
+        Object.keys(KINDS).map((k) => { const rs = RESUME.filter((r) => r.kind === k); if (!rs.length) return ''
+          return `<p class="b-kind">${KINDS[k].label} · ${rs.length}</p>` + rs.map((r) => { const a = A_[r.action]
+            return `<button type="button" class="rrow" data-resume="${r.id}"><span class="disc" style="background:var(--t-${a.group})">${ico(a.icon)}</span><span class="t"><b>${esc(a.label)}</b><small>${esc(r.where)} · ${esc(r.note)} · ${ago(r.mins)}</small></span><span class="b-verb ${k}">${KINDS[k].verb}</span></button>` }).join('') }).join('')
+    } else {
+      const g = G_[cur]
+      html = `<h4 class="b-main__h">${esc(g.name)}</h4><p class="b-main__s">${esc(g.desc)} · <button type="button" data-module="${g.id}" style="border:0;background:none;padding:0;color:var(--action);font-weight:600;font-size:13.5px">Open module</button></p>` +
+        ACTIONS.filter((a) => a.group === cur).map(actRow).join('')
+    }
+    main.innerHTML = `<div class="b-fade">${html}</div>`
+  }
+  panel.querySelector('input').addEventListener('input', (e) => { q = e.target.value.trim(); draw() })
+  panel.addEventListener('click', (e) => {
+    const n = e.target.closest('[data-nav]'); if (n) { cur = n.dataset.nav; q = ''; panel.querySelector('input').value = ''; return draw() }
+    const a = e.target.closest('[data-act]'); if (a) ui.start(a.dataset.act)
+  })
+  draw()
+})()
+
+/* ── C ── */
+;(function () {
+  const panel = document.getElementById('C')
+  panel.innerHTML = head +
+    `<div class="c-top"><label class="search">${S.search}<input type="search" placeholder="Search actions, animals, enclosures" aria-label="Search"></label><button type="button" class="scan" aria-label="Scan a tag" data-scan>${S.scan}</button></div>` +
+    `<div class="c-sec"><h4>Pick up <small>${RESUME.length} unfinished</small></h4><div class="c-rail">${RESUME.map((r) => { const a = A_[r.action]
+      return `<button type="button" class="c-card ${r.kind}" data-resume="${r.id}"><span class="top"><span class="pill ${r.kind}">${KINDS[r.kind].label}</span><span class="ago">${ago(r.mins)}</span></span><b>${esc(a.label)}</b><small>${esc(r.where)}<br>${esc(r.note)}</small>` +
+        (r.kind === 'draft' ? `<span class="c-bar"><i style="width:${r.done * 100}%"></i></span>` : '') + `<span class="verb">${KINDS[r.kind].verb} →</span></button>` }).join('')}</div></div>` +
+    `<div class="c-sec"><h4>Suggested now <small>place already set</small></h4><div class="c-sugg">${SUGGEST.map((s) => { const a = A_[s.action], e = encl(s.place)
+      return `<div class="c-tile" role="button" tabindex="0" style="${tone(a.group)}" data-sugg="${a.id}" data-place="${esc(s.place)}"><span class="disc">${ico(a.icon)}</span><span class="t"><b>${esc(a.label)}</b><button type="button" class="where" data-change="${a.id}" style="border:0">${S.pin}${esc(e ? `${s.place} · ${e.species}` : s.place)}</button><small>${esc(s.why)}</small></span></div>` }).join('')}</div></div>` +
+    `<div class="c-sec"><h4>All actions</h4><div class="c-all">${GROUPS.map((g) => `<div><h6 style="--dot:var(--i-${g.id})"><i></i>${esc(g.short)}</h6>${ACTIONS.filter((a) => a.group === g.id).map((a) => `<button type="button" data-act="${a.id}">${esc(a.label.replace('Report Missing / Escaped Animal', 'Missing / Escaped'))}</button>`).join('')}</div>`).join('')}</div></div>` + foot
+  const ui = mountStep(panel)
+  panel.querySelector('input').addEventListener('input', (e) => { const q = e.target.value.trim().toLowerCase()
+    panel.querySelectorAll('.c-all button').forEach((b) => { b.style.display = !q || b.textContent.toLowerCase().includes(q) ? '' : 'none' }) })
+  panel.addEventListener('click', (e) => {
+    const c = e.target.closest('[data-change]'); if (c) { e.stopPropagation(); return ui.start(c.dataset.change) }
+    const s = e.target.closest('[data-sugg]'); if (s) return ui.start(s.dataset.sugg, s.dataset.place)
+    const a = e.target.closest('[data-act]'); if (a) ui.start(a.dataset.act)
+  })
+})()
+
+/* ── D ── */
+;(function () {
+  const panel = document.getElementById('D')
+  let q = '', hi = 0, items = []
+  panel.innerHTML = head +
+    `<label class="d-field">${S.search}<input type="search" placeholder="What do you want to do?" aria-label="What do you want to do?" autocomplete="off"><button type="button" class="scan" data-scan>${S.scan}Scan</button></label>` +
+    `<div class="d-recent"></div><div class="d-list" role="listbox"></div>` +
+    `<div class="d-keys"><span><kbd>↑</kbd><kbd>↓</kbd>move</span><span><kbd>↵</kbd>start</span><span><kbd>esc</kbd>close</span><span>Try “leo”, “CAR-03” or “eggs”</span></div>`
+  const ui = mountStep(panel), list = panel.querySelector('.d-list'), recent = panel.querySelector('.d-recent'), input = panel.querySelector('input')
+  const bold = (text) => { if (!q) return esc(text); const i = text.toLowerCase().indexOf(q.toLowerCase()); return i < 0 ? esc(text) : esc(text.slice(0, i)) + '<strong>' + esc(text.slice(i, i + q.length)) + '</strong>' + esc(text.slice(i + q.length)) }
+  const item = (it, i) => `<button type="button" class="d-item${i === hi ? ' is-hi' : ''}" data-i="${i}" role="option" aria-selected="${i === hi}"><span class="disc" style="background:var(--t-${it.g})">${ico(it.icon)}</span><span class="t"><b>${it.b}</b><small>${it.s}</small></span>${it.pill || ''}<kbd>↵</kbd></button>`
+  const draw = () => {
+    items = []
+    let html = ''
+    const push = (group, arr, right = '') => { if (!arr.length) return; html += `<p class="d-group"><span>${group}</span><span>${right}</span></p>`; arr.forEach((it) => { html += item(it, items.length); items.push(it) }) }
+    if (!q) {
+      recent.hidden = false
+      recent.innerHTML = `<small>Recent</small>` + RECENT_ACTIONS.map((id) => { const a = A_[id]; return `<button type="button" data-act="${id}" style="${tone(a.group)}">${ico(a.icon)}${esc(a.label)}</button>` }).join('')
+      push('Continue', RESUME.slice(0, 3).map((r) => ({ run: () => ui.say(`<b>${KINDS[r.kind].verb}</b> ${esc(A_[r.action].label)}`), g: A_[r.action].group, icon: A_[r.action].icon, b: esc(A_[r.action].label), s: `${esc(r.where)} · ${esc(r.note)}`, pill: `<span class="pill ${r.kind}">${KINDS[r.kind].label}</span>` })), `${RESUME.length} unfinished`)
+      GROUPS.forEach((g) => push(g.name, ACTIONS.filter((a) => a.group === g.id).map((a) => ({ run: () => ui.start(a.id), g: a.group, icon: a.icon, b: esc(a.label), s: needs(a) }))))
+    } else {
+      recent.hidden = true
+      const lq = q.toLowerCase()
+      const places = ENCL.filter((e) => e.species.toLowerCase().includes(lq) || e.code.toLowerCase().startsWith(lq)).slice(0, 2)
+      const ready = places.flatMap((e) => ['dispense', 'medical', 'transfer'].map((id) => { const a = A_[id]
+        return { run: () => ui.start(id, e.code), g: a.group, icon: a.icon, b: `${esc(a.label)} · ${bold(e.species)}`, s: `${bold(e.code)} · ${esc(e.section)}, ready to start` } }))
+      push('Ready to go', ready.slice(0, 4), places.length ? 'place filled in' : '')
+      push('Actions', ACTIONS.filter((a) => match(a, q)).map((a) => ({ run: () => ui.start(a.id), g: a.group, icon: a.icon, b: bold(a.label), s: `${esc(G_[a.group].short)} · ${needs(a)}` })))
+      push('Continue', RESUME.filter((r) => (A_[r.action].label + ' ' + r.where).toLowerCase().includes(lq)).map((r) => ({ run: () => ui.say(`<b>${KINDS[r.kind].verb}</b> ${esc(A_[r.action].label)}`), g: A_[r.action].group, icon: A_[r.action].icon, b: esc(A_[r.action].label), s: `${bold(r.where)} · ${esc(r.note)}`, pill: `<span class="pill ${r.kind}">${KINDS[r.kind].label}</span>` })))
+      push('Everything else', [{ run: () => ui.say(`Global Search for <b>“${esc(q)}”</b>`), g: 'ops', icon: 'qa-actions.svg', b: `Search everything for “${esc(q)}”`, s: 'Animals, records, people and modules' }])
+    }
+    hi = Math.min(hi, items.length - 1)
+    list.innerHTML = html
+  }
+  const mark = () => list.querySelectorAll('.d-item').forEach((b) => { const on = +b.dataset.i === hi; b.classList.toggle('is-hi', on); b.setAttribute('aria-selected', on); if (on) b.scrollIntoView({ block: 'nearest' }) })
+  input.addEventListener('input', () => { q = input.value.trim(); hi = 0; draw() })
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); hi = Math.min(items.length - 1, hi + 1); mark() }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); hi = Math.max(0, hi - 1); mark() }
+    else if (e.key === 'Enter') { e.preventDefault(); items[hi]?.run() }
+    else if (e.key === 'Escape') { input.value = ''; q = ''; draw() }
+  })
+  list.addEventListener('pointermove', (e) => { const b = e.target.closest('.d-item'); if (b && +b.dataset.i !== hi) { hi = +b.dataset.i; mark() } })
+  panel.addEventListener('click', (e) => {
+    const b = e.target.closest('.d-item'); if (b) return items[+b.dataset.i].run()
+    const a = e.target.closest('[data-act]'); if (a) ui.start(a.dataset.act)
+  })
+  draw()
+})()
+</script>
+</body>
+</html>

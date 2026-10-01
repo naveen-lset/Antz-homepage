@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tabbed Home Header</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400..800&display=swap" rel="stylesheet">
+<style>
+/* Four headers for V2 Home, after the owner's reference recording
+   (Swiggy, 30 Sep 2026). What the recording does, read frame by frame:
+   · a row of folder tabs on a deep band; the active tab is the SAME colour
+     as the body below it, so tab and header are one shape
+   · the search hint rolls up to a new word every ~2s ("Cake" → "Sweets" →
+     "EatRight"), only the quoted word moves
+   · a chip row, underline on the active chip
+   · a condensed wordmark, PAY [photo] DAY: the photo swaps in place; when the
+     campaign changes the letters spread apart (P A Y  D A Y) and close again
+   · offer tiles sit INSIDE the coloured band; the band ends with a round
+     bottom and the white page starts.
+   All four keep that anatomy. Each changes what the tabs MEAN and what the
+   wordmark SAYS — where / what kind / what's due / what's special. */
+:root { --page: #EFF5F2; --ink: #1F415B; --ink-2: #4A5A63; --line: rgba(31, 65, 91, .12); --panel: #fff; --accent: #2F7A55; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page: #0F1715; --ink: #E4ECEE; --ink-2: #A9B7BC; --line: rgba(228, 236, 238, .14); --panel: #17211E; --accent: #6FC39A; } }
+:root[data-theme="dark"] { --page: #0F1715; --ink: #E4ECEE; --ink-2: #A9B7BC; --line: rgba(228, 236, 238, .14); --panel: #17211E; --accent: #6FC39A; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+
+.top { max-width: 1680px; margin: 0 auto; padding: 36px 24px 10px; display: flex; flex-wrap: wrap; gap: 18px 32px; align-items: flex-end; justify-content: space-between; }
+.top h1 { margin: 0 0 8px; font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+.top p { margin: 0; max-width: 860px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+.top p b { color: var(--ink); font-weight: 600; }
+.ctl { display: flex; flex-wrap: wrap; gap: 10px; }
+.seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: var(--line); }
+.seg button { min-height: 36px; padding: 0 14px; border: 0; border-radius: 9px; background: none; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--panel); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.xfer { max-width: 1680px; margin: 0 auto; padding: 8px 24px 4px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: 10px; }
+.xfer div { padding: 12px 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+.xfer b { display: block; margin-bottom: 2px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); }
+.xfer .no b { color: #B0533F; }
+
+.list { max-width: 1680px; margin: 0 auto; padding: 24px 24px 64px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(390px, 100%), 1fr)); gap: 44px 28px; }
+.list.is-tab { grid-template-columns: repeat(auto-fill, minmax(min(744px, 100%), 1fr)); }
+.v { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.v__tag { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.v__tag b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--page); letter-spacing: 0; }
+.v h2 { margin: -4px 0 0; font-size: 19px; font-weight: 700; letter-spacing: -.01em; }
+.v__premise { margin: -6px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
+.frame { width: 100%; max-width: var(--fw, 390px); border-radius: 30px; overflow: hidden; background: #F4F7F5; box-shadow: 0 0 0 1px rgba(31, 65, 91, .08), 0 24px 60px -28px rgba(16, 45, 52, .45); container-type: inline-size; }
+.list.is-tab .frame { --fw: 744px; border-radius: 22px; }
+.contract { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 7px 14px; max-width: 744px; font-size: 13px; line-height: 1.5; }
+.contract dt { font-weight: 700; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; padding-top: 1px; color: var(--ink); }
+.contract dd { margin: 0; color: var(--ink-2); }
+.contract dd.cost { color: var(--ink); }
+
+/* ───────────── the header (one component, four configs) ───────────── */
+.hd { --tint: #2F7A55; --deep: #173F2D; position: relative; color: #fff; border-radius: 0 0 26px 26px; overflow: hidden; background: var(--tint); transition: background-color .5s ease; }
+.hd__deep { background: var(--deep); transition: background-color .5s ease; }
+.hd__top { display: flex; align-items: center; gap: 10px; padding: 18px 16px 12px; }
+.hd__who { flex: 1; min-width: 0; }
+.hd__t { display: flex; align-items: center; gap: 4px; font-size: 17px; font-weight: 800; letter-spacing: -.01em; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd__t svg { flex: none; width: 14px; height: 14px; }
+.hd__s { font-size: 12.5px; line-height: 17px; opacity: .78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hd__btn { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: rgba(255, 255, 255, .14); border: 0; }
+.hd__btn img { width: 20px; height: 20px; filter: brightness(0) invert(1); }
+.hd__ava { flex: none; width: 38px; height: 38px; border-radius: 50%; overflow: hidden; background: #E4E0FA; box-shadow: 0 0 0 2px rgba(255, 255, 255, .5); }
+.hd__ava img { width: 100%; height: 100%; object-fit: cover; }
+
+/* folder tabs: the active one is the body's colour, with concave feet */
+.tabs { display: grid; grid-template-columns: repeat(var(--n, 4), 1fr); padding: 2px 6px 0; }
+.tab { position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px; min-height: 76px; padding: 9px 4px 8px; border: 0; background: none; border-radius: 18px 18px 0 0; cursor: pointer; color: rgba(255, 255, 255, .78); transition: background-color .5s ease, color .3s; -webkit-tap-highlight-color: transparent; }
+.tab[aria-selected="true"] { background: var(--tint); color: #fff; }
+.tab[aria-selected="true"]::before, .tab[aria-selected="true"]::after { content: ''; position: absolute; bottom: 0; width: 18px; height: 18px; pointer-events: none; transition: background .5s ease; }
+.tab[aria-selected="true"]::before { left: -18px; background: radial-gradient(circle at 0 0, transparent 17.5px, var(--tint) 18px); }
+.tab[aria-selected="true"]::after { right: -18px; background: radial-gradient(circle at 100% 0, transparent 17.5px, var(--tint) 18px); }
+.tab:first-child[aria-selected="true"]::before, .tab:last-child[aria-selected="true"]::after { display: none; }
+.tab:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
+.tab__pic { position: relative; width: 38px; height: 38px; border-radius: 12px; overflow: hidden; background: rgba(255, 255, 255, .16); display: grid; place-items: center; transition: transform .35s cubic-bezier(.3, 1.5, .5, 1); }
+.tab[aria-selected="true"] .tab__pic { transform: translateY(-2px) scale(1.08); box-shadow: 0 6px 14px -6px rgba(0, 0, 0, .5); }
+.tab__pic img { width: 100%; height: 100%; object-fit: cover; }
+.tab__pic svg { width: 22px; height: 22px; }
+.tab__lab { font-size: 12px; font-weight: 600; line-height: 14px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.tab__badge { position: absolute; top: 5px; left: calc(50% + 8px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #fff; color: var(--deep); font-size: 10.5px; font-weight: 800; line-height: 18px; text-align: center; box-shadow: 0 2px 6px rgba(0, 0, 0, .25); }
+
+.hd__body { position: relative; padding: 12px 16px 18px; isolation: isolate; }
+.pattern { position: absolute; inset: 0; z-index: -1; opacity: .09; background-repeat: repeat; background-size: 96px 96px; animation: pat 60s linear infinite; }
+@keyframes pat { to { background-position: 96px 96px; } }
+
+.srow { display: flex; gap: 8px; }
+.search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border-radius: 14px; background: #fff; color: #6B7A78; font-size: 14.5px; box-shadow: 0 6px 16px -10px rgba(0, 0, 0, .4); cursor: text; }
+.search > img { width: 20px; height: 20px; flex: none; }
+.search__txt { line-height: 20px; flex: 1; min-width: 0; display: flex; align-items: center; white-space: nowrap; overflow: hidden; }
+.roll { position: relative; display: inline-block; height: 20px; overflow: hidden; vertical-align: top; }
+.roll span { display: block; height: 20px; line-height: 20px; color: #3E4C4A; font-weight: 500; }
+.search__mic { width: 1px; height: 22px; background: #E1E6E4; flex: none; }
+.search svg { flex: none; width: 18px; height: 18px; }
+.scan { flex: none; width: 48px; height: 48px; border-radius: 14px; border: 0; background: #fff; display: grid; place-items: center; box-shadow: 0 6px 16px -10px rgba(0, 0, 0, .4); cursor: pointer; }
+.scan img { width: 22px; height: 22px; }
+
+.chips { display: flex; gap: 18px; margin: 14px -16px 0; padding: 0 16px 2px; overflow-x: auto; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; position: relative; display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 0; border: 0; background: none; color: rgba(255, 255, 255, .72); font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+.chip svg { width: 14px; height: 14px; }
+.chip[aria-pressed="true"] { color: #fff; }
+.chip[aria-pressed="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 1px; height: 2.5px; border-radius: 2px; background: #fff; }
+.chip i { font-style: normal; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: rgba(255, 255, 255, .22); font-size: 10px; line-height: 17px; letter-spacing: 0; text-align: center; }
+
+/* the wordmark: WORD [photo] WORD */
+.wm { position: relative; display: flex; align-items: center; justify-content: center; gap: 2.2cqw; width: 100%; margin: 16px 0 0; padding: 4px 0 20px; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.wm:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 16px; }
+.wm__w { font-family: Anton, "Bebas Neue", Impact, sans-serif; font-size: var(--wm, 64px); line-height: 1; letter-spacing: 0; white-space: nowrap; text-transform: uppercase; color: #fff; text-shadow: 0 3px 0 rgba(0, 0, 0, .14); }
+.wm__pic { position: relative; flex: none; width: var(--pw, 112px); height: calc(var(--pw, 112px) * .74); }
+.wm__card { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; border: 3px solid #fff; background: #ddd; transform: rotate(-4deg); box-shadow: 0 10px 22px -10px rgba(0, 0, 0, .55); }
+.wm__card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.wm__tag { position: absolute; left: 50%; bottom: -13px; z-index: 2; transform: translateX(-50%); padding: 4px 10px; border-radius: 999px; background: #fff; color: var(--deep); font-size: 10.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 4px 10px -4px rgba(0, 0, 0, .4); transition: color .5s; }
+.dots { display: flex; justify-content: center; gap: 5px; height: 6px; margin-top: 2px; }
+.dots i { width: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .35); transition: width .3s, background .3s; }
+.dots i.on { width: 16px; background: #fff; }
+
+/* tiles inside the band */
+.cards { display: flex; gap: 8px; margin: 16px -16px 0; padding: 0 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.cards::-webkit-scrollbar { display: none; }
+.card { flex: none; scroll-snap-align: start; position: relative; display: flex; flex-direction: column; justify-content: flex-start; width: 104px; height: 118px; padding: 9px 9px 0; border-radius: 16px; border: 1.5px solid rgba(255, 255, 255, .28); background: rgba(0, 0, 0, .16); text-align: center; overflow: hidden; cursor: pointer; color: #fff; }
+.card__k { font-size: 12px; font-weight: 700; line-height: 14.5px; min-height: 29px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card__v { margin-top: 5px; font-family: Anton, Impact, sans-serif; font-size: 32px; line-height: 36px; }
+.card__s { font-size: 10.5px; font-weight: 600; opacity: .8; }
+.card__img { position: absolute; left: 50%; bottom: -10px; width: 70px; height: 62px; transform: translateX(-50%) rotate(3deg); border-radius: 12px; overflow: hidden; border: 2px solid rgba(255, 255, 255, .9); }
+.card__img img { width: 100%; height: 100%; object-fit: cover; }
+.card--img .card__v { display: none; }
+.card--both { text-align: left; }
+.card--both .card__v { position: absolute; left: 10px; bottom: 8px; margin: 0; }
+.card--both .card__img { left: auto; right: 8px; bottom: 10px; width: 40px; height: 40px; transform: rotate(6deg); border-radius: 10px; }
+.card--long .card__v { font-size: 22px; line-height: 26px; }
+.card--long.card--both .card__img { width: 34px; height: 34px; bottom: 36px; }
+.card.in { animation: rise .45s cubic-bezier(.2, .9, .3, 1.2) both; animation-delay: calc(var(--i) * 45ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+
+/* the page after the band, so it reads as a header */
+.after { padding: 18px 16px 22px; }
+.after__h { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: #1F415B; margin-bottom: 10px; }
+.after__h span { font-size: 13px; font-weight: 600; color: #00AFD6; }
+.after__row { display: flex; gap: 10px; }
+.after__row div { flex: 1; height: 70px; border-radius: 14px; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .05); }
+
+/* tablet: V2's 744 artboard */
+@container (min-width: 600px) {
+  .hd__top { padding: 26px 24px 14px; }
+  .hd__t { font-size: 20px; }
+  .tabs { padding: 2px 14px 0; }
+  .tab { min-height: 84px; }
+  .tab__pic { width: 44px; height: 44px; }
+  .tab__lab { font-size: 13px; }
+  .hd__body { padding: 14px 24px 22px; }
+  .chips { margin-inline: -24px; padding-inline: 24px; }
+  .cards { margin-inline: -24px; padding-inline: 24px; }
+  .card { width: calc((100cqw - 48px - 24px) / 4); height: 128px; }
+  .card__img { width: 90px; height: 70px; }
+  .search { height: 52px; font-size: 15.5px; }
+  .scan { width: 52px; height: 52px; }
+  .after { padding: 22px 24px 26px; }
+}
+@media (prefers-reduced-motion: reduce) { .pattern { animation: none; } .card.in { animation: none; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <h1>Home header: four ideas from the Swiggy recording</h1>
+    <p>Is it the same concept? <b>Partly.</b> The tabs that grow into the header, the rolling search hint and the wordmark with a photo that swaps all carry over well. The offer tiles don’t: we have nothing to sell. Their place goes to <b>what the tab is about right now</b>. Each version below keeps Swiggy’s layout and changes what the tabs <b>mean</b>. Tap the tabs, the wordmark and the tiles. Under each version: what every part does when tapped, and what it costs to build.</p>
+  </div>
+  <div class="ctl">
+    <div class="seg" role="group" aria-label="Frame">
+      <button type="button" data-fw="phone" aria-pressed="true">Phone 390</button>
+      <button type="button" data-fw="tab" aria-pressed="false">Tablet 744</button>
+    </div>
+    <div class="seg" role="group" aria-label="Motion">
+      <button type="button" data-motion="on" aria-pressed="true">Motion on</button>
+      <button type="button" data-motion="off" aria-pressed="false">Hold</button>
+    </div>
+  </div>
+</header>
+
+<section class="xfer" aria-label="What carries over">
+  <div><b>Kept · folder tabs</b>The selected tab is the same colour as the band, so tab and header read as one shape. Switching tabs recolours the whole band in 0.5s.</div>
+  <div><b>Kept · rolling hint</b>Only the quoted word rolls up, every 2.4s. It hints at what search can find: an animal name, a tag, an enclosure.</div>
+  <div><b>Kept · the wordmark</b>WORD [photo] WORD. With the same words, only the photo changes. With new words, the letters spread apart and close up again, as in the recording.</div>
+  <div class="no"><b>Changed · offer tiles</b>The tiles show where the tab’s work is: counts, groups, tasks. Every tile opens a page.</div>
+</section>
+
+<main class="list" id="list"></main>
+
+<script>
+const IMG = (n) => `../assets/img/species/${n}.jpg`
+const ICON = {
+  chev: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5 10.5 8 6 12.5"/></svg>',
+  down: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6 8 10.5 12.5 6"/></svg>',
+  mic: '<svg viewBox="0 0 20 20" fill="none" stroke="#E0692C" stroke-width="1.8" stroke-linecap="round"><rect x="7" y="2.5" width="6" height="10" rx="3" fill="#E0692C" stroke="none"/><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5"/></svg>',
+  grid: '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="5" height="5" rx="1.2"/><rect x="9" y="2" width="5" height="5" rx="1.2"/><rect x="2" y="9" width="5" height="5" rx="1.2"/><rect x="9" y="9" width="5" height="5" rx="1.2"/></svg>',
+  paw: '<svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="16" rx="5" ry="4.2"/><circle cx="5.5" cy="10.5" r="2.2"/><circle cx="9.3" cy="6.2" r="2.2"/><circle cx="14.7" cy="6.2" r="2.2"/><circle cx="18.5" cy="10.5" r="2.2"/></svg>',
+  feather: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4c-7 0-13 5-13 12v4M7 16c5 0 9-3 10-8M9 12h6"/></svg>',
+  scale: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9c3-4 6-4 9 0s6 4 9 0M3 15c3-4 6-4 9 0s6 4 9 0"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  cross: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M12 8v8M8 12h8"/></svg>',
+  bowl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11h17a8.5 8.5 0 0 1-17 0ZM8 7c0-1.5 1-1.5 1-3M12 7c0-1.5 1-1.5 1-3M16 7c0-1.5 1-1.5 1-3"/></svg>',
+  eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
+  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>',
+  cake: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V13a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7M3 20h18M4 15c2 1.5 4 1.5 5.3 0 1.4 1.5 4 1.5 5.4 0 1.3 1.5 3.3 1.5 5.3 0M12 11V8M12 5.5c-.8-.8-.8-1.8 0-3 .8 1.2.8 2.2 0 3Z"/></svg>',
+  egg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c3.6 0 6.5 6 6.5 10a6.5 6.5 0 0 1-13 0C5.5 9 8.4 3 12 3Z"/><path d="m8 12 2 1.5 2-2 2 2 2-1.5" stroke-linejoin="round"/></svg>',
+  globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.5 3.5 5.5 3.5 8.5S14.5 18 12 20.5C9.5 18 8.5 15 8.5 12S9.5 6 12 3.5Z"/></svg>',
+  flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>',
+  pill: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8.5" width="18" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="m9.5 8.5 5 7"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.6 5.5 6 .8-4.4 4.1 1.1 6L12 16.5 6.7 19.4l1.1-6L3.4 9.3l6-.8Z"/></svg>',
+}
+/* the band's background motif, one per tab, like Swiggy's starbursts */
+const MOTIF = {
+  paw: '<g fill="#fff"><ellipse cx="24" cy="30" rx="8" ry="6.5"/><circle cx="14" cy="21" r="3.4"/><circle cx="20" cy="14" r="3.4"/><circle cx="28" cy="14" r="3.4"/><circle cx="34" cy="21" r="3.4"/></g><g fill="#fff" transform="translate(52 50) rotate(24 20 20)"><ellipse cx="20" cy="26" rx="7" ry="5.6"/><circle cx="11" cy="18" r="3"/><circle cx="16.5" cy="12" r="3"/><circle cx="23.5" cy="12" r="3"/><circle cx="29" cy="18" r="3"/></g>',
+  feather: '<g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M40 8C22 8 12 22 12 40M12 40c12 0 22-8 24-20M18 30h12"/><path d="M84 54C66 54 56 68 56 86M56 86c12 0 22-8 24-20M62 76h12"/></g>',
+  scale: '<g fill="none" stroke="#fff" stroke-width="3"><path d="M0 24c8-10 16-10 24 0s16 10 24 0 16-10 24 0 16 10 24 0M0 72c8-10 16-10 24 0s16 10 24 0 16-10 24 0 16 10 24 0"/></g>',
+  spark: '<g fill="#fff"><path d="m24 6 4 13 13 5-13 4-4 14-4-14-13-4 13-5Z"/><path d="m72 52 3 9 9 3-9 3-3 10-3-10-9-3 9-3Z"/></g>',
+  leaf: '<g fill="#fff"><path d="M10 40C10 20 26 8 42 8c0 20-14 32-32 32Z"/><path d="M58 88c0-18 14-30 30-30 0 18-12 30-30 30Z"/></g>',
+  clock: '<g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><circle cx="24" cy="24" r="14"/><path d="M24 16v8l6 4"/><circle cx="72" cy="72" r="10"/><path d="M72 66v6l4 3"/></g>',
+  cross: '<g fill="#fff"><path d="M20 10h8v10h10v8H28v10h-8V28H10v-8h10Z"/><path d="M68 58h6v8h8v6h-8v8h-6v-8h-8v-6h8Z"/></g>',
+  confetti: '<g fill="#fff"><rect x="10" y="12" width="10" height="4" rx="2" transform="rotate(30 15 14)"/><circle cx="40" cy="30" r="3.5"/><rect x="60" y="10" width="10" height="4" rx="2" transform="rotate(-20 65 12)"/><path d="m24 60 3 7 7 2-7 2-3 7-3-7-7-2 7-2Z"/><circle cx="80" cy="70" r="3"/><rect x="50" y="80" width="10" height="4" rx="2" transform="rotate(60 55 82)"/></g>',
+}
+const motifURL = (k) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'>${MOTIF[k]}</svg>`)}")`
+
+/* ── the four versions. Species counts per site are V2's database
+   (assets/data/v2-modules.json); every other figure is a sample. ── */
+const VERSIONS = [
+  {
+    key: 'sites', title: 'Sites', q: 'Where am I?',
+    premise: 'The tabs are the four sites. One tap moves the whole home to that site, the way Swiggy’s Food tab changes the app. The wordmark is the site’s own name, split around a photo of an animal that lives there.',
+    top: { t: 'Good morning, Sourav', s: 'Tuesday 30 Sep · 4 sites' },
+    chips: [['All', 'grid'], ['Mammals', 'paw'], ['Birds', 'feather'], ['Reptiles', 'scale'], ['Watchlist', 'eye', 3]],
+    tabs: [
+      { label: 'Clearspring', img: 'bengal-tiger', tint: '#2F7A55', deep: '#143A28', motif: 'paw',
+        hint: ['Ravi', 'Tag 200116', 'Willow Creek Den', 'Bengal Tiger'],
+        slides: [['Clear', 'spring', 'bengal-tiger', '470 species'], ['Clear', 'spring', 'indian-peafowl', '470 species'], ['Clear', 'spring', 'sloth-bear', '470 species'], ['Clear', 'spring', 'sarus-crane', '470 species']],
+        cards: [['Births · 7 days', '12', 'chital'], ['New arrivals', '3', 'sarus-crane'], ['Due today', '18'], ['Pending actions', '7'], ['On treatment', '5', 'gaur']] },
+      { label: 'Crimson Frosted', img: 'asiatic-lion', tint: '#9C3F3C', deep: '#4A1B1A', motif: 'leaf',
+        hint: ['Veer', 'Tag 196716', 'Juniper Copse Pen', 'Asiatic Lion'],
+        slides: [['Crimson', 'Frosted', 'asiatic-lion', '599 species'], ['Crimson', 'Frosted', 'gaur', '599 species'], ['Crimson', 'Frosted', 'blackbuck', '599 species']],
+        cards: [['Births · 7 days', '4', 'blackbuck'], ['New arrivals', '1', 'nilgai'], ['Due today', '26'], ['Pending actions', '11'], ['On treatment', '2', 'gaur']] },
+      { label: 'Hollowpine', img: 'sarus-crane', tint: '#2B6679', deep: '#10313B', motif: 'feather',
+        hint: ['Kaveri', 'Tag 201442', 'Fern Shaw Warren', 'Sarus Crane'],
+        slides: [['Hollow', 'pine', 'sarus-crane', '443 species'], ['Hollow', 'pine', 'black-kite', '443 species'], ['Hollow', 'pine', 'barasingha', '443 species']],
+        cards: [['Births · 7 days', '7', 'barasingha'], ['New arrivals', '0'], ['Due today', '9'], ['Pending actions', '2'], ['On treatment', '1', 'black-kite']] },
+      { label: 'Foxglen', img: 'indian-leopard', tint: '#A45F27', deep: '#4A290E', motif: 'spark',
+        hint: ['Mira', 'Tag 188230', 'Marsh Wick Burrow', 'Indian Leopard'],
+        slides: [['Fox', 'glen', 'indian-leopard', '680 species'], ['Fox', 'glen', 'bonnet-macaque', '680 species'], ['Fox', 'glen', 'indian-star-tortoise', '680 species']],
+        cards: [['Births · 7 days', '9', 'bonnet-macaque'], ['Rescues in', '6', 'indian-star-tortoise'], ['Due today', '31'], ['Pending actions', '14'], ['On treatment', '8', 'indian-leopard']] },
+    ],
+    contract: [
+      ['Tab', 'Switches the whole home to that site: band colour, wordmark, tiles, and what search looks through. Replaces the site picker in the greeting.'],
+      ['Search', 'Hint rolls through that site’s animals, tags and enclosures. Tap opens Global Search already set to the site.'],
+      ['Wordmark', 'Opens the site’s Species page. Resident photos change every 3.4s.'],
+      ['Tiles', 'Births → Natality. Arrivals → Transfers. Due today → today’s list. Pending → Pending Actions. Treatment → Medical.'],
+      ['Cost', 'Cheapest: the site scope already exists (reportScope). Falls down with more than 5 sites, when the tabs get too narrow. Then the row has to scroll.'],
+    ],
+  },
+  {
+    key: 'classes', title: 'Animal class', q: 'What kind of animal?',
+    premise: 'The tabs are animal classes, each with its own colour and motif: paws, feathers, scales. The wordmark names a group within the class (BIG [tiger] CATS), and the tiles are that class’s groups, like Swiggy’s offer tiles.',
+    top: { t: 'Clearspring Habitat', s: 'Good morning, Sourav', picker: true },
+    chips: [['All', 'grid'], ['Breeding', 'heart'], ['On treatment', 'pill', 5], ['New', 'star']],
+    tabs: [
+      { label: 'Mammals', img: 'bengal-tiger', tint: '#8F6428', deep: '#3F2B10', motif: 'paw',
+        hint: ['Big cats', 'Ravi', 'Sloth Bear', 'Tag 200116'],
+        slides: [['Big', 'Cats', 'bengal-tiger', '6 species'], ['Hoof', 'Stock', 'chital', '11 species'], ['Tree', 'Tops', 'bonnet-macaque', '5 primates'], ['Night', 'Walk', 'sloth-bear', '2 bears']],
+        cards: [['Big cats', '6', 'indian-leopard'], ['Deer & antelope', '11', 'blackbuck'], ['Primates', '5', 'rhesus-macaque'], ['Bears', '2', 'sloth-bear'], ['Cattle', '3', 'gaur']] },
+      { label: 'Birds', img: 'rose-ringed-parakeet', tint: '#3571AA', deep: '#15314F', motif: 'feather',
+        hint: ['Raptors', 'Kaveri', 'Hill Myna', 'Aviary 4'],
+        slides: [['High', 'Flyers', 'black-kite', '9 raptors'], ['Wade', 'Watch', 'sarus-crane', '4 cranes'], ['Song', 'Birds', 'hill-myna', '14 species'], ['Bright', 'Wings', 'rose-ringed-parakeet', '6 parrots']],
+        cards: [['Raptors', '9', 'cinereous-vulture'], ['Cranes & storks', '4', 'sarus-crane'], ['Parrots', '6', 'rose-ringed-parakeet'], ['Pheasants', '3', 'indian-peafowl'], ['Songbirds', '14', 'hill-myna']] },
+      { label: 'Reptiles', img: 'indian-rock-python', tint: '#56722B', deep: '#253410', motif: 'scale',
+        hint: ['Pythons', 'Star Tortoise', 'Terrarium 2', 'Tag 177012'],
+        slides: [['Cold', 'Blood', 'indian-rock-python', '8 snakes'], ['Slow', 'Steps', 'indian-star-tortoise', '5 chelonians']],
+        cards: [['Snakes', '8', 'indian-rock-python'], ['Tortoises', '5', 'indian-star-tortoise'], ['Heat lamps due', '3'], ['Sheds logged', '2']] },
+      { label: 'Invertebrates', img: 'giant-forest-scorpion', tint: '#6A4A87', deep: '#2F2043', motif: 'spark',
+        hint: ['Scorpions', 'Insectarium', 'Tag 150981'],
+        slides: [['Eight', 'Legs', 'giant-forest-scorpion', '4 species']],
+        cards: [['Scorpions', '4', 'giant-forest-scorpion'], ['Humidity checks', '6'], ['Counts due', '2']] },
+    ],
+    contract: [
+      ['Tab', 'Filters the home to one class: tiles, wordmark and search. The site stays in the greeting, with a picker to change it.'],
+      ['Search', 'Hint names groups first (“Big cats”), then animals. Tap searches that class, and the class can be removed to search everything.'],
+      ['Wordmark', 'Opens the species list for that group (BIG CATS → 6 species). The words change per group, so the letters spread and close on each change.'],
+      ['Tiles', 'Each group opens its species list. Tiles with no photo are that class’s care tasks (heat lamps, humidity).'],
+      ['Cost', 'The class and order are already in the data (c, o). The group names such as “Big cats” and “Hoof stock” have to be written once, as a small lookup table. Falls down for a user who works by enclosure rather than by taxon.'],
+    ],
+  },
+  {
+    key: 'today', title: 'Today’s work', q: 'What is due?',
+    premise: 'The tabs are kinds of work. The wordmark is the next task: the verb, the animal’s photo and the time (DEWORM [chital] 10:30). It moves on when a task is done. This is the one version where the wordmark is something to act on rather than a picture.',
+    top: { t: 'Clearspring Habitat', s: '18 due today · 9 done', picker: true },
+    chips: [['All', 'grid'], ['Mine', 'star', 6], ['Overdue', 'clock', 2], ['Done', 'cross']],
+    tabs: [
+      { label: 'Rounds', icon: 'sun', tint: '#23628F', deep: '#0D2C44', motif: 'clock', badge: 6,
+        hint: ['deworm', 'Tag 200116', 'Willow Creek Den', 'overdue'],
+        slides: [['Deworm', '10:30', 'chital', 'Chital · 14 animals'], ['Weigh', '11:00', 'indian-star-tortoise', 'Star tortoise · 3'], ['Feed', '11:30', 'sloth-bear', 'Sloth bear · 2']],
+        cards: [['Deworm chital', '10:30', 'chital'], ['Weigh tortoises', '11:00', 'indian-star-tortoise'], ['Feed sloth bears', '11:30', 'sloth-bear'], ['Enclosure check', '14:00'], ['Night count', '18:30']] },
+      { label: 'Medical', icon: 'cross', tint: '#2A7872', deep: '#103936', motif: 'cross', badge: 5,
+        hint: ['vaccine', 'Veer', 'limp', 'Tag 196716'],
+        slides: [['Vaccine', '12:15', 'indian-leopard', 'Leopard · booster'], ['Review', '14:00', 'gaur', 'Gaur · limp, day 3'], ['Dress', '16:00', 'black-kite', 'Kite · wing wound']],
+        cards: [['Leopard booster', '12:15', 'indian-leopard'], ['Gaur review', '14:00', 'gaur'], ['Kite dressing', '16:00', 'black-kite'], ['Necropsy report', 'Due']] },
+      { label: 'Feeds', icon: 'bowl', tint: '#93641D', deep: '#422C0B', motif: 'leaf', badge: 4,
+        hint: ['diet chart', 'browse', 'Sloth Bear', 'kitchen'],
+        slides: [['Feed', '11:30', 'sloth-bear', 'Sloth bear · 2'], ['Feed', '13:00', 'sarus-crane', 'Sarus · 4'], ['Feed', '17:00', 'bengal-tiger', 'Tiger · 3']],
+        cards: [['Sloth bears', '11:30', 'sloth-bear'], ['Sarus cranes', '13:00', 'sarus-crane'], ['Tigers', '17:00', 'bengal-tiger'], ['Kitchen stock', 'Low']] },
+      { label: 'Watch', icon: 'eye', tint: '#574893', deep: '#261F46', motif: 'spark', badge: 3,
+        hint: ['off food', 'Ravi', 'quarantine', 'new arrival'],
+        slides: [['Watch', 'Day 3', 'bengal-tiger', 'Ravi · off food'], ['Watch', 'Day 1', 'hill-myna', 'Myna · new arrival'], ['Watch', 'Day 6', 'sumatran-orangutan', 'Mira · pregnant']],
+        cards: [['Ravi · off food', 'D3', 'bengal-tiger'], ['Myna · arrival', 'D1', 'hill-myna'], ['Mira · pregnant', 'D6', 'sumatran-orangutan']] },
+    ],
+    contract: [
+      ['Tab', 'Switches the work type. The badge is what is still open in it. The band colour tells you which list you are in.'],
+      ['Search', 'Hint rolls task words (“deworm”, “overdue”) and animals. Tap searches today’s tasks first.'],
+      ['Wordmark', 'Opens that task, ready to complete. When it is done, the wordmark turns to the next task. It does not rotate on a timer, because the next task should not change on its own. (Here it rotates so you can see the motion.)'],
+      ['Tiles', 'The next five tasks in time order. Tap opens the task. Swipe the row for later ones.'],
+      ['Cost', 'Needs one feed of due tasks across Medical, Feeds and Rounds, which V2 doesn’t have yet (Pending Actions only covers medical). Falls down when nothing is due: the wordmark needs an “ALL [photo] DONE” state.'],
+    ],
+  },
+  {
+    key: 'occasions', title: 'Occasions', q: 'What is special today?',
+    premise: 'Swiggy’s PAY DAY is a campaign. Ours is the animals’ own calendar: birthdays, hatch days, arrivals and world wildlife days. The header is the one place that celebrates, and it changes by date, so it is different every morning.',
+    top: { t: 'Clearspring Habitat', s: 'Good morning, Sourav', picker: true },
+    chips: [['All', 'grid'], ['This week', 'star', 5], ['Keepers’ picks', 'heart'], ['Share', 'flag']],
+    tabs: [
+      { label: 'Today', icon: 'star', tint: '#B04A7E', deep: '#4E1C37', motif: 'confetti',
+        hint: ['Ravi', 'birthdays', 'hatchlings', 'Tiger Day'],
+        slides: [['Birth', 'Day', 'bengal-tiger', 'Ravi turns 7'], ['Hatch', 'Day', 'indian-peafowl', '3 peachicks'], ['New', 'Home', 'sarus-crane', 'Sarus pair arrived']],
+        cards: [['Ravi · 7 years', '', 'bengal-tiger'], ['3 peachicks', '', 'indian-peafowl'], ['Sarus pair in', '', 'sarus-crane'], ['This week', '5']] },
+      { label: 'Birthdays', icon: 'cake', tint: '#BD5A26', deep: '#53260C', motif: 'confetti', badge: 3,
+        hint: ['Mira', 'this week', 'oldest', 'Veer'],
+        slides: [['Birth', 'Day', 'bengal-tiger', 'Ravi · 7 years'], ['Birth', 'Day', 'sumatran-orangutan', 'Mira · 12 years'], ['Birth', 'Day', 'asiatic-lion', 'Veer · 4 years']],
+        cards: [['Ravi · Tue', '7', 'bengal-tiger'], ['Mira · Thu', '12', 'sumatran-orangutan'], ['Veer · Sat', '4', 'asiatic-lion'], ['Oldest here', '31']] },
+      { label: 'Hatchings', icon: 'egg', tint: '#8E6212', deep: '#3F2B05', motif: 'spark', badge: 2,
+        hint: ['incubator 2', 'pipping', 'peachicks', 'clutch 14'],
+        slides: [['Hatch', 'Day', 'indian-peafowl', '3 peachicks'], ['Pip', 'Watch', 'sarus-crane', '2 eggs pipping']],
+        cards: [['Peachicks', '3', 'indian-peafowl'], ['Pipping now', '2', 'sarus-crane'], ['In incubator', '14'], ['Hatch rate', '82%']] },
+      { label: 'Wild days', icon: 'globe', tint: '#2E7552', deep: '#123524', motif: 'leaf',
+        hint: ['Tiger Day', 'Vulture Day', 'events', 'talks'],
+        slides: [['Tiger', 'Day', 'bengal-tiger', '29 Jul · worldwide'], ['Orangutan', 'Day', 'sumatran-orangutan', '19 Aug'], ['Vulture', 'Day', 'cinereous-vulture', 'First Sat of Sep']],
+        cards: [['Tiger Day', '29', 'bengal-tiger'], ['Orangutan Day', '19', 'sumatran-orangutan'], ['Vulture Day', '6', 'cinereous-vulture'], ['Keeper talks', '4']] },
+    ],
+    contract: [
+      ['Tab', 'Today mixes the highlights. The other three tabs are their own calendars. The band colour is warm on purpose. This is the celebration header, not a work surface.'],
+      ['Search', 'Hint rolls names and occasions. Tap searches animals, with birthdays and hatchings first.'],
+      ['Wordmark', 'Opens the animal’s profile, or the clutch. Long-press makes a share card for the visitor team. BIRTH DAY keeps its words, so only the photo swaps.'],
+      ['Tiles', 'This week’s occasions in date order. The number is the age, the count or the date.'],
+      ['Cost', 'Needs date of birth and hatch dates per animal. The V5 dump has no parentage, and date of birth is patchy, so birthdays would show only for animals that have one. The most joy and the least work value. Best as a Home tab or a Monday state, not every day.'],
+    ],
+  },
+]
+
+/* ── one component ── */
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches
+let MOTION = !REDUCED
+const instances = []
+
+function Header(cfg, n) {
+  const el = document.createElement('article')
+  el.className = 'v'
+  el.innerHTML = `
+    <div class="v__tag"><b>${n}</b>${esc(cfg.q)}</div>
+    <h2>${esc(cfg.title)}</h2>
+    <p class="v__premise">${esc(cfg.premise)}</p>
+    <div class="frame">
+      <div class="hd">
+        <div class="hd__deep">
+          <div class="hd__top">
+            <div class="hd__who"><div class="hd__t">${esc(cfg.top.t)}${cfg.top.picker ? ICON.down : ''}</div><div class="hd__s">${esc(cfg.top.s)}</div></div>
+            <button class="hd__btn" type="button" aria-label="Notifications"><img src="../assets/icon/v2-bell.svg" alt=""></button>
+            <span class="hd__ava"><img src="../assets/img/avatar.png" alt=""></span>
+          </div>
+          <div class="tabs" role="tablist" style="--n:${cfg.tabs.length}">
+            ${cfg.tabs.map((t, i) => `<button class="tab" role="tab" type="button" aria-selected="${i === 0}" data-i="${i}">
+              <span class="tab__pic">${t.img ? `<img src="${IMG(t.img)}" alt="">` : ICON[t.icon]}</span>
+              ${t.badge ? `<span class="tab__badge">${t.badge}</span>` : ''}
+              <span class="tab__lab">${esc(t.label)}</span></button>`).join('')}
+          </div>
+        </div>
+        <div class="hd__body" role="tabpanel">
+          <div class="pattern"></div>
+          <div class="srow">
+            <div class="search"><img src="../assets/icon/v2-search.svg" alt=""><span class="search__txt">Search for “<span class="roll"><span></span><span></span></span>”</span><span class="search__mic"></span>${ICON.mic}</div>
+            <button class="scan" type="button" aria-label="Scan tag"><img src="../assets/icon/v2-scan.svg" alt=""></button>
+          </div>
+          <div class="chips">${cfg.chips.map(([l, ic, c], i) => `<button class="chip" type="button" aria-pressed="${i === 0}">${ICON[ic]}${esc(l)}${c ? `<i>${c}</i>` : ''}</button>`).join('')}</div>
+          <button class="wm" type="button"><span class="wm__w wm__l"></span><span class="wm__pic"><span class="wm__card"><img alt=""></span><em class="wm__tag"></em></span><span class="wm__w wm__r"></span></button>
+          <div class="dots"></div>
+          <div class="cards"></div>
+        </div>
+      </div>
+      <div class="after"><div class="after__h">Announcements<span>View all</span></div><div class="after__row"><div></div><div></div></div></div>
+    </div>
+    <dl class="contract">${cfg.contract.map(([k, v]) => `<dt>${k}</dt><dd${k === 'Cost' ? ' class="cost"' : ''}>${esc(v)}</dd>`).join('')}</dl>`
+
+  const $ = (s) => el.querySelector(s)
+  const hd = $('.hd'), frame = $('.frame'), wm = $('.wm'), L = $('.wm__l'), R = $('.wm__r'), pic = $('.wm__card'), img = $('.wm__card img'), tag = $('.wm__tag')
+  const rollEl = $('.roll'), [r0, r1] = rollEl.children
+  let tab = 0, slide = 0, hintI = 0, busy = false, visible = true, gen = 0
+  const cur = () => cfg.tabs[tab]
+  const textW = (t) => { const m = document.createElement('span'); m.style.cssText = 'position:absolute;visibility:hidden;font-weight:500;white-space:nowrap'; m.textContent = t; rollEl.parentNode.appendChild(m); const x = Math.ceil(m.getBoundingClientRect().width); m.remove(); return x }
+
+  /* fit the wordmark: both words + photo in ~90% of the band */
+  function fit(l, r) {
+    const W = frame.clientWidth - (frame.clientWidth >= 600 ? 48 : 32)
+    const pw = Math.round(Math.min(170, W * 0.3))
+    const max = W >= 560 ? 104 : 66
+    hd.style.setProperty('--pw', pw + 'px')
+    hd.style.setProperty('--wm', max + 'px')
+    // measure at rest (no spread), then scale the type down to fit
+    const gap = parseFloat(getComputedStyle(wm).columnGap) || 0
+    const ls = [L.style.letterSpacing, R.style.letterSpacing]; L.style.letterSpacing = R.style.letterSpacing = '0'
+    const words = L.getBoundingClientRect().width + R.getBoundingClientRect().width
+    L.style.letterSpacing = ls[0]; R.style.letterSpacing = ls[1]
+    const room = W * 0.94 - pw - gap * 2
+    const size = Math.max(28, Math.min(max, max * room / words))
+    hd.style.setProperty('--wm', size.toFixed(1) + 'px')
+  }
+  function paintSlide(s) {
+    L.textContent = s[0]; R.textContent = s[1]; img.src = IMG(s[2]); tag.textContent = s[3] + ' ›'
+    wm.setAttribute('aria-label', `${s[0]} ${s[1]}: ${s[3]}`)
+    fit(s[0], s[1])
+    const dots = $('.dots'), n = cur().slides.length
+    dots.innerHTML = n > 1 ? cur().slides.map((_, i) => `<i class="${i === slide ? 'on' : ''}"></i>`).join('') : ''
+  }
+  function paintHint(first) {
+    const h = cur().hint
+    r0.textContent = h[hintI % h.length]; r1.textContent = h[(hintI + 1) % h.length]
+    rollEl.style.width = textW(r0.textContent) + 'px'
+    if (first) { r0.style.transform = r1.style.transform = '' }
+  }
+  function rollHint() {
+    const h = cur().hint, t0 = tab
+    const next = h[(hintI + 1) % h.length]
+    r1.textContent = next
+    const w = textW(next)
+    const opts = { duration: 420, easing: 'cubic-bezier(.3,.8,.3,1)', fill: 'forwards' }
+    rollEl.animate([{ width: rollEl.offsetWidth + 'px' }, { width: w + 'px' }], opts)
+    const a = r0.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(-100%)', opacity: 0 }], opts)
+    r1.animate([{ transform: 'translateY(0)', opacity: 0 }, { transform: 'translateY(-100%)', opacity: 1 }], opts)
+    a.finished.then(() => {
+      if (t0 !== tab) return
+      hintI = (hintI + 1) % h.length
+      r0.getAnimations().concat(r1.getAnimations(), rollEl.getAnimations()).forEach((x) => x.cancel())
+      r0.textContent = next; rollEl.style.width = w + 'px'
+    }).catch(() => {})
+  }
+  function paintCards() {
+    const c = $('.cards')
+    c.innerHTML = cur().cards.map(([k, v, im], i) => `<button type="button" class="card in${im && !v ? ' card--img' : ''}${im && v ? ' card--both' : ''}${String(v).length > 3 ? ' card--long' : ''}" style="--i:${i}">
+      <div class="card__k">${esc(k)}</div>${v ? `<div class="card__v">${esc(v)}</div>` : ''}${im ? `<span class="card__img"><img src="${IMG(im)}" alt=""></span>` : ''}</button>`).join('')
+    c.scrollLeft = 0
+  }
+  function paintTab() {
+    const t = cur()
+    hd.style.setProperty('--tint', t.tint); hd.style.setProperty('--deep', t.deep)
+    $('.pattern').style.backgroundImage = motifURL(t.motif)
+    el.querySelectorAll('.tab').forEach((b, i) => b.setAttribute('aria-selected', i === tab))
+    ;[r0, r1, rollEl].forEach((x) => x.getAnimations().forEach((a) => a.cancel()))
+    hintI = 0; paintHint(true); paintCards()
+  }
+
+  /* the recording's move: same words → the photo alone drops out and in;
+     new words → the letters spread (P A Y  D A Y) as the photo shrinks,
+     swap at the midpoint, close up as the new photo springs in */
+  function go(nextSlide, force) {
+    if (busy && !force) return
+    const from = cur().slides[slide] || cur().slides[0]
+    slide = nextSlide % cur().slides.length
+    const to = cur().slides[slide]
+    const g = ++gen
+    ;[pic, tag, L, R].forEach((x) => x.getAnimations().forEach((a) => a.cancel()))
+    if (!MOTION) { paintSlide(to); busy = false; return }
+    busy = true
+    const sameWords = from[0] === to[0] && from[1] === to[1]
+    const out = { duration: 300, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' }
+    const inn = { duration: 520, easing: 'cubic-bezier(.2,1.4,.4,1)', fill: 'forwards' }
+    const words = [L, R]
+    const aOut = pic.animate([{ transform: 'rotate(-4deg) scale(1)', opacity: 1 }, { transform: `rotate(${sameWords ? -14 : 10}deg) scale(.35)`, opacity: 0 }], out)
+    tag.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: 'forwards' })
+    if (!sameWords) words.forEach((w) => w.animate([{ letterSpacing: '0em', opacity: 1, filter: 'blur(0)' }, { letterSpacing: '.32em', opacity: .15, filter: 'blur(2px)' }], out))
+    aOut.finished.then(() => {
+      if (g !== gen) return
+      paintSlide(to)
+      pic.getAnimations().forEach((a) => a.cancel())
+      const aIn = pic.animate([{ transform: 'translateY(-24px) rotate(8deg) scale(.4)', opacity: 0 }, { transform: 'rotate(-4deg) scale(1)', opacity: 1 }], inn)
+      tag.getAnimations().forEach((a) => a.cancel())
+      tag.animate([{ opacity: 0, transform: 'translate(-50%, 6px)' }, { opacity: 1, transform: 'translate(-50%, 0)' }], { duration: 260, delay: 240, fill: 'backwards', easing: 'ease-out' })
+      if (!sameWords) words.forEach((w) => { w.getAnimations().forEach((a) => a.cancel()); w.animate([{ letterSpacing: '.32em', opacity: .15, filter: 'blur(2px)' }, { letterSpacing: '0em', opacity: 1, filter: 'blur(0)' }], { duration: 480, easing: 'cubic-bezier(.2,.9,.3,1)' }) })
+      aIn.finished.then(() => { if (g !== gen) return; pic.getAnimations().forEach((a) => a.cancel()); busy = false }).catch(() => {})
+    }).catch(() => {})
+  }
+
+  el.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () => {
+    const i = +b.dataset.i; if (i === tab) return
+    const prevSlide = cur().slides[slide]
+    tab = i; paintTab()
+    slide = -1
+    // the old tab's words scatter into the new tab's
+    cfg.tabs[tab].slides.unshift(prevSlide); go(1, true); cfg.tabs[tab].slides.shift(); slide = 0
+    const dots = $('.dots'), n = cur().slides.length
+    dots.innerHTML = n > 1 ? cur().slides.map((_, k) => `<i class="${k === 0 ? 'on' : ''}"></i>`).join('') : ''
+    restart()
+  }))
+  el.querySelectorAll('.tabs').forEach((tl) => tl.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+    const bs = [...tl.children], i = (tab + (e.key === 'ArrowRight' ? 1 : -1) + bs.length) % bs.length
+    bs[i].focus(); bs[i].click()
+  }))
+  el.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => el.querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-pressed', x === c))))
+  wm.addEventListener('click', () => { go(slide + 1); restart() })
+
+  let tSlide, tHint
+  function restart() {
+    clearInterval(tSlide); clearInterval(tHint)
+    if (!MOTION) return
+    tSlide = setInterval(() => { if (visible && cur().slides.length > 1) go(slide + 1) }, 3400)
+    tHint = setInterval(() => { if (visible) rollHint() }, 2400)
+  }
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting }).observe(frame)
+
+  function mount() { paintTab(); paintSlide(cur().slides[0]); restart() }
+  return { el, mount, restart, refit: () => paintSlide(cur().slides[slide]) }
+}
+
+const list = document.getElementById('list')
+VERSIONS.forEach((cfg, i) => { const h = Header(cfg, i + 1); list.appendChild(h.el); instances.push(h) })
+document.fonts.ready.then(() => instances.forEach((h) => h.mount()))
+
+document.querySelectorAll('[data-fw]').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-fw]').forEach((x) => x.setAttribute('aria-pressed', x === b))
+  list.classList.toggle('is-tab', b.dataset.fw === 'tab')
+  instances.forEach((h) => h.refit())
+}))
+document.querySelectorAll('[data-motion]').forEach((b) => {
+  if (REDUCED) document.querySelectorAll('[data-motion]').forEach((x) => x.setAttribute('aria-pressed', x.dataset.motion === 'off'))
+  b.addEventListener('click', () => {
+    MOTION = b.dataset.motion === 'on'
+    document.querySelectorAll('[data-motion]').forEach((x) => x.setAttribute('aria-pressed', x === b))
+    instances.forEach((h) => h.restart())
+  })
+})
+addEventListener('resize', () => instances.forEach((h) => h.refit()))
+</script>
+</body>
+</html>

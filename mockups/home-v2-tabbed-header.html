@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V2 Tabbed Header</title>
+<link rel="icon" href="data:,">
+<style>
+/* V2 Home with the Swiggy-anatomy header (owner, 30 Sep 2026). The page
+   below is the REAL V2 (../index.html?v=2) in a frame; its greeting, search,
+   sky, Favourites rail and site tabs are hidden and this one band replaces
+   them. It is the owner's reference exactly: SITE folder tabs → search →
+   chip row → WORD [photo] WORD with dots → tiles. What changed is the
+   wordmark's content: the four dots are four slides, and each slide brings
+   its own chip row and tiles:
+     1 MY FAVOURITES · Species / Enclosures / Animals        (asked for)
+     2 NEW BORN      · 0–7 days / 8–30 days / 1–3 / 3–12 months (asked for)
+     3 VET WATCH     · Critical / Treating / Recovering / Quarantine (suggested)
+     4 ON THE MOVE   · Incoming / Outgoing / Settling in     (suggested)
+   Two earlier readings were sent back: slides with a pill switcher under the
+   wordmark, then the four as the folder tabs with the site in a pill.
+   Favourite species are V2's own; everything else is sample. */
+:root { --page: #E9EFEC; --ink: #1F415B; --ink-2: #4A5A63; --panel: #fff; --line: rgba(31, 65, 91, .12); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page: #0F1715; --ink: #E4ECEE; --ink-2: #A9B7BC; --panel: #17211E; --line: rgba(228, 236, 238, .14); } }
+:root[data-theme="dark"] { --page: #0F1715; --ink: #E4ECEE; --ink-2: #A9B7BC; --panel: #17211E; --line: rgba(228, 236, 238, .14); }
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; }
+.bar { width: 100%; max-width: 1100px; display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; padding: 14px 16px; }
+.bar h1 { margin: 0; font-size: 16px; font-weight: 700; }
+.bar p { margin: 2px 0 0; font-size: 12.5px; color: var(--ink-2); }
+.seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: var(--line); }
+.seg button { min-height: 34px; padding: 0 14px; border: 0; border-radius: 9px; background: none; color: inherit; font: 600 13px Inter, system-ui, sans-serif; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--panel); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.dev { flex: 1; min-height: 0; width: min(100% - 32px, var(--fw, 744px)); margin-bottom: 16px; border-radius: 28px; overflow: hidden; background: #fff; box-shadow: 0 0 0 1px rgba(31, 65, 91, .1), 0 30px 70px -30px rgba(16, 45, 52, .5); }
+.dev iframe { display: block; width: 100%; height: 100%; border: 0; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <div><h1>V2 Home · tabbed header</h1><p>The real V2 page; only the header is new. Site tabs on top; the four dots are Favourites, New Born, Vet Watch, On the Move.</p></div>
+  <div class="seg" role="group" aria-label="Width">
+    <button type="button" data-fw="390" aria-pressed="false">Phone 390</button>
+    <button type="button" data-fw="744" aria-pressed="true">Tablet 744</button>
+  </div>
+</div>
+<div class="dev" id="dev"><iframe id="app" src="../index.html?v=2" title="V2 Home"></iframe></div>
+
+<script>
+/* ─────────────── the header, injected into the V2 document ─────────────── */
+const CSS = `
+:root[data-home='v2'] .wsky, :root[data-home='v2'] .home-header, :root[data-home='v2'] .search-row,
+:root[data-home='v2'] #favSpecies, :root[data-home='v2'] #siteTabsV2 { display: none !important; }
+:root[data-home='v2'] .main-frame { padding-top: 20px; }
+.th { --tint: #2F7A55; --deep: #143A28; position: relative; z-index: 2; container-type: inline-size; margin: 0 calc(50% - 50vw); color: #fff; background: var(--tint); border-radius: 0 0 26px 26px; font-family: Inter, system-ui, sans-serif; transition: background-color .5s ease; }
+:where(.th) button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+.th__deep { position: relative; z-index: 3; background: var(--deep); transition: background-color .5s ease; }
+.th__top { display: flex; align-items: center; gap: 10px; padding: 18px 16px 12px; }
+.th__who { flex: 1; min-width: 0; }
+.th__hi { font-size: 19px; font-weight: 800; letter-spacing: -.01em; line-height: 24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.th__sub { font-size: 13px; line-height: 18px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.th__btn { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; border: 0; background: rgba(255, 255, 255, .14); cursor: pointer; }
+.th__btn img { width: 20px; height: 20px; filter: brightness(0) invert(1); }
+.th__ava { flex: none; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #E4E0FA; box-shadow: 0 0 0 2px rgba(255, 255, 255, .5); }
+.th__ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* folder tabs: the selected one is the band's colour, with concave feet */
+.th__tabs { display: grid; grid-template-columns: repeat(4, 1fr); padding: 2px 6px 0; }
+.th__tab { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 80px; padding: 9px 4px 9px; border: 0; background: none; border-radius: 18px 18px 0 0; color: rgba(255, 255, 255, .78); cursor: pointer; transition: background-color .5s ease, color .3s; }
+.th__tab[aria-selected="true"] { background: var(--tint); color: #fff; }
+.th__tab[aria-selected="true"]::before, .th__tab[aria-selected="true"]::after { content: ''; position: absolute; bottom: 0; width: 18px; height: 18px; pointer-events: none; }
+.th__tab[aria-selected="true"]::before { left: -18px; background: radial-gradient(circle at 0 0, transparent 17.5px, var(--tint) 18px); }
+.th__tab[aria-selected="true"]::after { right: -18px; background: radial-gradient(circle at 100% 0, transparent 17.5px, var(--tint) 18px); }
+.th__tab:first-child[aria-selected="true"]::before, .th__tab:last-child[aria-selected="true"]::after { display: none; }
+.th__tab:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
+.th__pic { width: 40px; height: 40px; border-radius: 12px; overflow: hidden; background: rgba(255, 255, 255, .16); transition: transform .35s cubic-bezier(.3, 1.5, .5, 1); }
+.th__tab[aria-selected="true"] .th__pic { transform: translateY(-2px) scale(1.08); box-shadow: 0 6px 14px -6px rgba(0, 0, 0, .5); }
+.th__pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.th__lab { font-size: 12.5px; font-weight: 600; line-height: 15px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+
+.th__body { position: relative; padding: 14px 16px 18px; isolation: isolate; border-radius: 0 0 26px 26px; overflow: hidden; }
+.th__pat { position: absolute; inset: 0; z-index: -1; opacity: .09; background-size: 96px 96px; animation: th-pat 60s linear infinite; }
+@keyframes th-pat { to { background-position: 96px 96px; } }
+
+.th__srow { display: flex; gap: 8px; }
+.th__search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 50px; padding: 0 14px; border-radius: 14px; background: #fff; color: #6B7A78; font-size: 15px; box-shadow: 0 6px 16px -10px rgba(0, 0, 0, .4); cursor: text; }
+.th__search > img { width: 20px; height: 20px; flex: none; }
+.th__stxt { flex: 1; min-width: 0; display: flex; align-items: center; white-space: nowrap; overflow: hidden; line-height: 20px; }
+.th__roll { position: relative; display: inline-block; height: 20px; overflow: hidden; vertical-align: top; }
+.th__roll span { display: block; height: 20px; line-height: 20px; color: #3E4C4A; font-weight: 500; }
+.th__rule { width: 1px; height: 22px; background: #E1E6E4; flex: none; }
+.th__search svg { width: 18px; height: 18px; flex: none; }
+.th__scan { flex: none; display: grid; place-items: center; width: 50px; height: 50px; border: 0; border-radius: 14px; background: #fff; box-shadow: 0 6px 16px -10px rgba(0, 0, 0, .4); cursor: pointer; }
+.th__scan img { width: 22px; height: 22px; }
+
+/* the chip row: the selected tab's own tabs */
+.th__chips { display: flex; gap: 20px; margin: 14px -16px 0; padding: 0 16px 2px; overflow-x: auto; scrollbar-width: none; }
+.th__chips::-webkit-scrollbar { display: none; }
+.th__chip { flex: none; position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0; border: 0; background: none; color: rgba(255, 255, 255, .72); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+.th__chip svg { width: 15px; height: 15px; }
+.th__chip i { font-style: normal; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: rgba(255, 255, 255, .22); font-size: 10.5px; line-height: 18px; letter-spacing: 0; text-align: center; }
+.th__chip i.hot { background: #E5484D; }
+.th__chip[aria-selected="true"] { color: #fff; }
+.th__chip[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 2px; height: 2.5px; border-radius: 2px; background: #fff; }
+.th__chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 4px; }
+
+/* the wordmark: WORD [photo] WORD; the photo walks through the chip's items */
+.th__wm { position: relative; touch-action: pan-y; display: flex; align-items: center; justify-content: center; gap: 2.2cqw; width: 100%; margin: 16px 0 0; padding: 4px 0 20px; border: 0; background: none; cursor: pointer; user-select: none; }
+.th__wm:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 16px; }
+.th__w, .th__ph { transition: none !important; }  /* V2 animates font-size; the fit must read the final box */
+.th__w { font-family: Anton, Impact, sans-serif; font-size: var(--wm, 64px); line-height: 1; white-space: nowrap; text-transform: uppercase; text-shadow: 0 3px 0 rgba(0, 0, 0, .14); }
+.th__ph { position: relative; flex: none; width: var(--pw, 112px); height: calc(var(--pw, 112px) * .74); }
+.th__card { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; border: 3px solid #fff; background: #ddd; transform: rotate(-4deg); box-shadow: 0 10px 22px -10px rgba(0, 0, 0, .55); }
+.th__card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.th__tag { position: absolute; left: 50%; bottom: -13px; z-index: 2; max-width: 160%; transform: translateX(-50%); padding: 4px 10px; border-radius: 999px; background: #fff; color: var(--deep); font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 4px 10px -4px rgba(0, 0, 0, .4); }
+.th__dots { display: flex; justify-content: center; gap: 1px; margin-top: 0; }
+.th__dot { display: grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 0; background: none; cursor: pointer; }
+.th__dot i { width: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .38); transition: width .3s, background .3s; }
+.th__dot[aria-current="true"] i { width: 16px; background: #fff; }
+.th__dot:focus-visible { outline: 2px solid #fff; border-radius: 6px; }
+
+/* tiles, the reference's grammar: label top, big number bottom-left, photo bottom-right */
+.th__tiles { display: flex; gap: 8px; margin: 16px -16px 0; padding: 0 16px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 16px; scrollbar-width: none; }
+.th__tiles::-webkit-scrollbar { display: none; }
+.th__tile { flex: none; scroll-snap-align: start; position: relative; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; width: 116px; height: 124px; padding: 10px; border: 1.5px solid rgba(255, 255, 255, .28); border-radius: 16px; background: rgba(0, 0, 0, .16); text-align: left; overflow: hidden; cursor: pointer; }
+.th__k { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 12.5px; font-weight: 700; line-height: 15px; }
+.th__s { display: block; margin-top: 2px; font-size: 11px; font-weight: 500; line-height: 13px; opacity: .78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.th__v { position: absolute; left: 10px; bottom: 6px; font-family: Anton, Impact, sans-serif; font-size: 32px; line-height: 38px; }
+.th__v--long { font-size: 26px; }  /* 4+ characters would run under the photo */
+.th__img { position: absolute; right: 8px; bottom: 10px; width: 42px; height: 42px; border-radius: 10px; overflow: hidden; border: 2px solid rgba(255, 255, 255, .9); transform: rotate(6deg); }
+.th__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.th__tile--hot { border-color: rgba(255, 150, 150, .85); background: rgba(229, 72, 77, .3); }
+.th__tile--all { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: rgba(255, 255, 255, .1); text-align: center; }
+.th__tile--all b { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #fff; color: var(--deep); font-size: 18px; }
+.th__tile--all span { font-size: 12.5px; font-weight: 700; }
+.th__tile:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.th__tile.in { animation: th-rise .42s cubic-bezier(.2, .9, .3, 1.2) both; animation-delay: calc(var(--i) * 40ms); }
+@keyframes th-rise { from { opacity: 0; transform: translateY(12px); } }
+.th__toast { position: fixed; left: 50%; bottom: 24px; z-index: 50; transform: translateX(-50%); padding: 10px 16px; border-radius: 12px; background: #1F2A28; color: #fff; font: 600 13px Inter, system-ui, sans-serif; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .5); pointer-events: none; }
+
+@container (min-width: 600px) {
+  .th__top { padding: 26px 24px 14px; }
+  .th__hi { font-size: 22px; line-height: 28px; }
+  .th__tabs { padding: 2px 14px 0; }
+  .th__tab { min-height: 88px; }
+  .th__pic { width: 46px; height: 46px; }
+  .th__lab { font-size: 14px; }
+  .th__body { padding: 16px 24px 22px; }
+  .th__search { height: 54px; font-size: 16px; }
+  .th__scan { width: 54px; height: 54px; }
+  .th__chips { gap: 26px; margin-inline: -24px; padding-inline: 24px; }
+  .th__chip { font-size: 13px; }
+  .th__tiles { margin-inline: -24px; padding-inline: 24px; scroll-padding-inline: 24px; }
+  .th__tile { width: calc((100cqw - 48px - 24px) / 4.3); height: 132px; padding: 12px; }
+  .th__k { font-size: 14px; line-height: 17px; }
+  .th__s { font-size: 12px; line-height: 15px; }
+  .th__v { left: 12px; font-size: 38px; line-height: 44px; }
+  .th__v--long { font-size: 30px; }
+  .th__img { width: 54px; height: 54px; }
+}
+@media (prefers-reduced-motion: reduce) { .th__pat { animation: none; } .th__tile.in { animation: none; } }
+`
+
+const ICON = {
+  mic: '<svg viewBox="0 0 20 20" fill="none" stroke="#E0692C" stroke-width="1.8" stroke-linecap="round"><rect x="7" y="2.5" width="6" height="10" rx="3" fill="#E0692C" stroke="none"/><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5"/></svg>',
+  down: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6 8 10.5 12.5 6"/></svg>',
+  paw: '<svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="16" rx="5" ry="4.2"/><circle cx="5.5" cy="10.5" r="2.2"/><circle cx="9.3" cy="6.2" r="2.2"/><circle cx="14.7" cy="6.2" r="2.2"/><circle cx="18.5" cy="10.5" r="2.2"/></svg>',
+  fence: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V7l2-3 2 3v13M15 20V7l2-3 2 3v13M3 10h18M3 16h18"/></svg>',
+  tag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3.5 12.5V4.5a1 1 0 0 1 1-1h8l8 8-9 9Z"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/></svg>',
+  sprout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-8M12 12C12 8 9 6 5 6c0 4 3 6 7 6ZM12 14c0-3 2.5-5 6-5 0 3-2.5 5-6 5Z"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 19.5H3Z"/><path d="M12 10v4M12 17h.01"/></svg>',
+  cross: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M12 8v8M8 12h8"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5 19.5 6v6c0 4.5-3.2 7.6-7.5 8.5C7.7 19.6 4.5 16.5 4.5 12V6Z"/></svg>',
+  in: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h5v16h-5M4 12h10M10 8l4 4-4 4"/></svg>',
+  out: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4H5v16h5M10 12h10M16 8l4 4-4 4"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 11 12 4.5 20 11v8.5H4Z"/><path d="M10 19.5v-5h4v5"/></svg>',
+}
+const MOTIF = {
+  paw: '<g fill="#fff"><ellipse cx="24" cy="30" rx="8" ry="6.5"/><circle cx="14" cy="21" r="3.4"/><circle cx="20" cy="14" r="3.4"/><circle cx="28" cy="14" r="3.4"/><circle cx="34" cy="21" r="3.4"/></g><g fill="#fff" transform="translate(52 50) rotate(24 20 20)"><ellipse cx="20" cy="26" rx="7" ry="5.6"/><circle cx="11" cy="18" r="3"/><circle cx="16.5" cy="12" r="3"/><circle cx="23.5" cy="12" r="3"/><circle cx="29" cy="18" r="3"/></g>',
+  leaf: '<g fill="#fff"><path d="M10 40C10 20 26 8 42 8c0 20-14 32-32 32Z"/><path d="M58 88c0-18 14-30 30-30 0 18-12 30-30 30Z"/></g>',
+  cross: '<g fill="#fff"><path d="M20 10h8v10h10v8H28v10h-8V28H10v-8h10Z"/><path d="M68 58h6v8h8v6h-8v8h-6v-8h-8v-6h8Z"/></g>',
+  feather: '<g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M40 8C22 8 12 22 12 40M12 40c12 0 22-8 24-20M18 30h12"/><path d="M84 54C66 54 56 68 56 86M56 86c12 0 22-8 24-20M62 76h12"/></g>',
+}
+const motifURL = (k) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'>${MOTIF[k]}</svg>`)}")`
+const IMG = (n) => `assets/img/species/${n}.jpg`
+
+/* the four sites are the folder tabs, as in the reference; a tab recolours
+   the band and moves V2's page too (its hidden site tabs are clicked) */
+const SITES = [
+  { label: 'Clearspring', img: 'bengal-tiger', tint: '#2F7A55', deep: '#143A28', motif: 'paw', hint: ['Ravi', 'Tag 200116', 'Willow Creek Den', 'Slate Pangolin'] },
+  { label: 'Crimson Frosted', img: 'asiatic-lion', tint: '#9C3F3C', deep: '#4A1B1A', motif: 'leaf', hint: ['Veer', 'Tag 196716', 'Juniper Copse Pen', 'Glacial Egret'] },
+  { label: 'Hollowpine', img: 'sarus-crane', tint: '#2B6679', deep: '#10313B', motif: 'feather', hint: ['Kaveri', 'Tag 201442', 'Fern Shaw Warren', 'Russet Whipsnake'] },
+  { label: 'Foxglen', img: 'indian-leopard', tint: '#A45F27', deep: '#4A290E', motif: 'cross', hint: ['Mira', 'Tag 188230', 'Marsh Wick Burrow', 'Marbled Phantom Saki'] },
+]
+
+/* sample pools; a site takes a different slice so the numbers visibly change */
+const ANIMALS = [
+  ['Ravi', 'bengal-tiger', 'Bengal tiger · ♂', '7', 'years'], ['Mira', 'indian-leopard', 'Leopard · ♀', '5', 'years'], ['Veer', 'asiatic-lion', 'Asiatic lion · ♂', '4', 'years'],
+  ['Kaveri', 'sarus-crane', 'Sarus crane · ♀', '11', 'years'], ['Bholu', 'sloth-bear', 'Sloth bear · ♂', '9', 'years'], ['Tara', 'sumatran-orangutan', 'Orangutan · ♀', '12', 'years'],
+  ['Neel', 'indian-peafowl', 'Peafowl · ♂', '3', 'years'], ['Chandni', 'blackbuck', 'Blackbuck · ♀', '2', 'years'],
+]
+const ENCLOSURES = [
+  ['Willow Creek Yard', 'bengal-tiger', 'Tigers · Zone B', '2'], ['Ridge Ford Burrow', 'sloth-bear', 'Bears · Zone D', '3'], ['Holly Creek Vivarium', 'indian-rock-python', 'Reptiles · House 2', '14'],
+  ['Larch Marsh Warren', 'sarus-crane', 'Wetland birds', '9'], ['Oak Dale Paddock', 'chital', 'Deer · Zone A', '41'], ['Ivy Rise Coop', 'hill-myna', 'Aviary 1', '22'],
+]
+const NEWBORN = [
+  ['Chital calf', 'chital', 'Oak Dale · ♀'], ['Blackbuck fawn', 'blackbuck', 'Flint Meadow · ♂'], ['Peachicks ×3', 'indian-peafowl', 'Ivy Rise Coop'],
+  ['Bonnet macaque', 'bonnet-macaque', 'Glen Knoll · ♀'], ['Nilgai calf', 'nilgai', 'Clover Grove · ♂'], ['Sambar fawn', 'sambar', 'Cedar Grove · ♀'],
+  ['Sarus chick', 'sarus-crane', 'Larch Marsh'], ['Barasingha calf', 'barasingha', 'Moss Combe · ♂'], ['Star tortoise ×4', 'indian-star-tortoise', 'Lake Ridge'],
+  ['Rhesus infant', 'rhesus-macaque', 'Briar Moor · ♀'], ['Parakeet chick', 'rose-ringed-parakeet', 'Ivy Rise Coop'], ['Gaur calf', 'gaur', 'Pine Leigh · ♂'],
+]
+const VET = [
+  ['Mira', 'indian-leopard', 'Dental abscess'], ['Gaur #12', 'gaur', 'Lame, left fore'], ['Black kite', 'black-kite', 'Wing fracture'], ['Bholu', 'sloth-bear', 'Post-op'],
+  ['Hill myna', 'hill-myna', 'Weight loss'], ['Python #4', 'indian-rock-python', 'Retained shed'], ['Sambar hind', 'sambar', 'Eye infection'], ['Tara', 'sumatran-orangutan', 'Respiratory'],
+]
+const MOVES = [
+  ['Sarus pair', 'sarus-crane', 'From Hollowpine'], ['Blackbuck ×6', 'blackbuck', 'From Foxglen'], ['Veer', 'asiatic-lion', 'To Crimson Frosted'],
+  ['Star tortoises', 'indian-star-tortoise', 'Rescue, in today'], ['Chital ×10', 'chital', 'To Hollowpine'], ['Cinereous vulture', 'cinereous-vulture', 'In quarantine'],
+  ['Hill myna ×4', 'hill-myna', 'In quarantine'], ['Nilgai bull', 'nilgai', 'To Foxglen'],
+]
+const take = (arr, from, n) => Array.from({ length: n }, (_, i) => arr[(from + i) % arr.length])
+
+/* the four slides. Each has chips; each chip has tiles; `unit` names the count in the wordmark tag.
+   Tile: { k: label, s: line, v: number, u: unit, img, hot, go } */
+function tabs(site, fav) {
+  const s = site
+  return [
+    { label: 'Favourites', pic: fav[0]?.img || IMG('bengal-tiger'), words: ['My', 'Favourites'],
+      chips: [
+        { label: 'Species', unit: 'species', icon: 'paw', tiles: fav.map((f) => ({ k: f.name, s: '', v: f.n, u: 'animals', img: f.img, go: { fav: f.name } })), all: 'Edit favourites' },
+        { label: 'Enclosures', unit: 'enclosures', icon: 'fence', tiles: take(ENCLOSURES, s, 4).map(([k, im, line, v]) => ({ k, s: line, v, u: 'animals', img: IMG(im), go: { toast: `${k} · enclosure page` } })), all: 'Edit favourites' },
+        { label: 'Animals', unit: 'animals', icon: 'tag', tiles: take(ANIMALS, s * 2, 5).map(([k, im, line, v, u]) => ({ k, s: line, v, u, img: IMG(im), go: { toast: `${k} · animal profile` } })), all: 'Edit favourites' },
+      ] },
+    { label: 'New Born', pic: IMG('chital'), words: ['New', 'Born'],
+      chips: [
+        { label: '0–7 days', unit: 'born', icon: 'sprout', tiles: take(NEWBORN, s, 3).map(([k, im, line], i) => ({ k, s: line, v: [2, 4, 6][i], u: 'days old', img: IMG(im), go: { hash: '#m/natality?days=10' } })), all: 'All births' },
+        { label: '8–30 days', unit: 'born', icon: 'clock', tiles: take(NEWBORN, s + 3, 4).map(([k, im, line], i) => ({ k, s: line, v: [11, 16, 22, 29][i], u: 'days old', img: IMG(im), go: { hash: '#m/natality?days=30' } })), all: 'All births' },
+        { label: '1–3 months', unit: 'born', icon: 'cal', tiles: take(NEWBORN, s + 7, 3).map(([k, im, line], i) => ({ k, s: line, v: [5, 8, 11][i], u: 'weeks old', img: IMG(im), go: { hash: '#m/natality?days=30' } })), all: 'All births' },
+        { label: '3–12 months', unit: 'born', icon: 'cal', tiles: take(NEWBORN, s + 10, 2).map(([k, im, line], i) => ({ k, s: line, v: [4, 9][i], u: 'months old', img: IMG(im), go: { hash: '#m/natality?days=30' } })), all: 'All births' },
+      ] },
+    { label: 'Vet Watch', pic: IMG('indian-leopard'), words: ['Vet', 'Watch'],
+      chips: [
+        { label: 'Critical', unit: 'critical', icon: 'alert', hot: true, tiles: take(VET, s, 1 + (s % 2)).map(([k, im, line], i) => ({ k, s: line, v: [2, 1][i], u: 'days in', img: IMG(im), hot: true, go: { hash: '#m/medical' } })), all: 'Medical' },
+        { label: 'Treating', unit: 'on treatment', icon: 'cross', tiles: take(VET, s + 2, 4).map(([k, im, line], i) => ({ k, s: line, v: `${[3, 5, 1, 8][i]}/${[7, 10, 5, 14][i]}`, u: 'day of course', img: IMG(im), go: { hash: '#m/medical' } })), all: 'Medical' },
+        { label: 'Recovering', unit: 'recovering', icon: 'heart', tiles: take(VET, s + 5, 2).map(([k, im], i) => ({ k, s: `Recheck ${['Thu', 'Sat'][i]}`, v: [12, 6][i], u: 'days since', img: IMG(im), go: { hash: '#m/medical' } })), all: 'Medical' },
+        { label: 'Quarantine', unit: 'in quarantine', icon: 'shield', tiles: take(VET, s + 6, 2).map(([k, im], i) => ({ k, s: `Release ${['Mon', 'Fri'][i]}`, v: `${[12, 4][i]}/21`, u: 'quarantine day', img: IMG(im), go: { hash: '#m/medical' } })), all: 'Medical' },
+      ] },
+    { label: 'On the Move', pic: IMG('sarus-crane'), words: ['On the', 'Move'],
+      chips: [
+        { label: 'Incoming', unit: 'coming in', icon: 'in', tiles: take(MOVES, s, 2).map(([k, im, line], i) => ({ k, s: line, v: ['Thu', 'Fri'][i], u: 'arrives', img: IMG(im), go: { toast: `${k} · transfer` } })), all: 'All transfers' },
+        { label: 'Outgoing', unit: 'going out', icon: 'out', tiles: take(MOVES, s + 2, 2).map(([k, im, line], i) => ({ k, s: line, v: ['Mon', 'Wed'][i], u: 'leaves', img: IMG(im), go: { toast: `${k} · transfer` } })), all: 'All transfers' },
+        { label: 'Settling in', unit: 'settling in', icon: 'home', tiles: take(MOVES, s + 5, 3).map(([k, im, line], i) => ({ k, s: line, v: `${[9, 3, 1][i]}/${[21, 30, 14][i]}`, u: 'settling day', img: IMG(im), go: { toast: `${k} · settling-in log` } })), all: 'All transfers' },
+      ] },
+  ]
+}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+
+function mountHeader(doc) {
+  const win = doc.defaultView
+  const REDUCED = win.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const style = doc.createElement('style'); style.textContent = CSS; doc.head.appendChild(style)
+  const font = doc.createElement('link'); font.rel = 'stylesheet'; font.href = 'https://fonts.googleapis.com/css2?family=Anton&display=swap'; doc.head.appendChild(font)
+
+  // favourites straight from V2's own rail, so the header and the app agree
+  const fav = [...doc.querySelectorAll('#favSpecies .fav__card[data-name]')].map((b) => ({
+    name: b.dataset.name, n: parseInt(b.querySelector('.fav__meta')?.textContent, 10) || 0, img: b.querySelector('img')?.getAttribute('src') || IMG('bengal-tiger'),
+  }))
+  if (!fav.length) fav.push({ name: 'Bengal Tiger', n: 4, img: IMG('bengal-tiger') })
+
+  const now = new Date(), h = now.getHours()
+  const hi = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
+  const day = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })
+  const who = (doc.querySelector('.greeting__name')?.textContent || 'Sourav').trim().split(/\s+/)[0]
+
+  let site = 0, T = tabs(0, fav), tab = 0, chip = T.map(() => 0), hintI = 0, gen = 0, busy = false, auto = !REDUCED
+
+  const el = doc.createElement('header')
+  el.className = 'th'
+  el.innerHTML = `
+    <div class="th__deep">
+      <div class="th__top">
+        <div class="th__who"><div class="th__hi">${esc(hi)}, ${esc(who)}</div>
+          <div class="th__sub">${esc(day)} · ${SITES.length} sites</div></div>
+        <button class="th__btn" type="button" aria-label="Notifications"><img src="assets/icon/v2-bell.svg" alt=""></button>
+        <span class="th__ava"><img src="assets/img/avatar.png" alt=""></span>
+      </div>
+      <div class="th__tabs" role="tablist" aria-label="Site"></div>
+    </div>
+    <div class="th__body" role="tabpanel">
+      <div class="th__pat"></div>
+      <div class="th__srow">
+        <div class="th__search"><img src="assets/icon/v2-search.svg" alt=""><span class="th__stxt">Search for “<span class="th__roll"><span></span><span></span></span>”</span><span class="th__rule"></span>${ICON.mic}</div>
+        <button class="th__scan" type="button" aria-label="Scan tag"><img src="assets/icon/v2-scan.svg" alt=""></button>
+      </div>
+      <div class="th__chips" role="tablist"></div>
+      <button class="th__wm" type="button"><span class="th__w th__l"></span><span class="th__ph"><span class="th__card"><img alt=""></span><em class="th__tag"></em></span><span class="th__w th__r"></span></button>
+      <div class="th__dots" role="tablist" aria-label="Slides"></div>
+      <div class="th__tiles"></div>
+    </div>`
+  doc.querySelector('main.page').insertBefore(el, doc.querySelector('.main-frame'))
+
+  const $ = (s) => el.querySelector(s)
+  const wm = $('.th__wm'), L = $('.th__l'), R = $('.th__r'), card = $('.th__card'), img = $('.th__card img'), tag = $('.th__tag')
+  const tabsEl = $('.th__tabs'), chipsEl = $('.th__chips'), dots = $('.th__dots'), tiles = $('.th__tiles'), roll = $('.th__roll'), [r0, r1] = roll.children
+  const cur = () => T[tab], curChip = () => T[tab].chips[chip[tab]], curTiles = () => curChip().tiles
+  const textW = (t) => { const m = doc.createElement('span'); m.style.cssText = 'position:absolute;visibility:hidden;font-weight:500;white-space:nowrap'; m.textContent = t; roll.parentNode.appendChild(m); const x = Math.ceil(m.getBoundingClientRect().width); m.remove(); return x }
+
+  // measured at rest (no letter spread), then checked against the real box
+  function fit() {
+    const W = el.clientWidth - (el.clientWidth >= 600 ? 48 : 32)
+    const pw = Math.round(Math.min(170, W * 0.28)), max = W >= 560 ? 104 : 64
+    el.style.setProperty('--pw', pw + 'px')
+    const ls = [L.style.letterSpacing, R.style.letterSpacing]; L.style.letterSpacing = R.style.letterSpacing = '0'
+    const gap = parseFloat(win.getComputedStyle(wm).columnGap) || 0
+    const room = W * 0.94 - pw - gap * 2
+    let size = max
+    for (let k = 0; k < 4; k++) {
+      el.style.setProperty('--wm', size.toFixed(1) + 'px')
+      const words = L.getBoundingClientRect().width + R.getBoundingClientRect().width
+      if (words <= room) break
+      size = Math.max(26, size * room / words - 0.5)
+    }
+    L.style.letterSpacing = ls[0]; R.style.letterSpacing = ls[1]
+  }
+
+  function paintTabs() {
+    tabsEl.innerHTML = SITES.map((t, i) => `<button class="th__tab" role="tab" type="button" aria-selected="${i === site}" data-i="${i}">
+      <span class="th__pic"><img src="${IMG(t.img)}" alt=""></span><span class="th__lab">${esc(t.label)}</span></button>`).join('')
+  }
+  function paintBand() {
+    const t = SITES[site]
+    el.style.setProperty('--tint', t.tint); el.style.setProperty('--deep', t.deep)
+    $('.th__pat').style.backgroundImage = motifURL(t.motif)
+    tabsEl.querySelectorAll('.th__tab').forEach((b, i) => b.setAttribute('aria-selected', i === site))
+  }
+  function paintChips() {
+    chipsEl.setAttribute('aria-label', cur().label)
+    chipsEl.innerHTML = cur().chips.map((c, i) => `<button class="th__chip" type="button" role="tab" aria-selected="${i === chip[tab]}" data-i="${i}">${ICON[c.icon]}${esc(c.label)}<i${c.hot ? ' class="hot"' : ''}>${c.tiles.length}</i></button>`).join('')
+    chipsEl.scrollLeft = 0
+  }
+  function paintItem() {
+    const t = cur(), c = curChip()
+    img.src = c.tiles[0]?.img || t.pic
+    tag.textContent = `${c.tiles.length} ${c.unit} ›`
+    wm.setAttribute('aria-label', `${t.words.join(' ')}: ${c.tiles.length} ${c.unit}. Next slide`)
+    dots.innerHTML = T.map((x, i) => `<button class="th__dot" type="button" role="tab" aria-label="${esc(x.words.join(' '))}" aria-current="${i === tab}"><i></i></button>`).join('')
+  }
+  function paintWords() { L.textContent = cur().words[0]; R.textContent = cur().words[1]; fit() }
+  function paintTiles() {
+    const c = curChip()
+    tiles.innerHTML = c.tiles.map((x, i) => `<button class="th__tile in${x.hot ? ' th__tile--hot' : ''}" type="button" data-i="${i}" style="--i:${i}">
+        <span class="th__k">${esc(x.k)}</span><span class="th__s">${esc([x.u, x.s].filter(Boolean).join(' · '))}</span>
+        <span class="th__v${String(x.v).length > 3 ? ' th__v--long' : ''}">${esc(x.v)}</span>
+        <span class="th__img"><img src="${x.img}" alt=""></span></button>`).join('')
+      + `<button class="th__tile th__tile--all in" type="button" data-all style="--i:${c.tiles.length}"><b>›</b><span>${esc(c.all)}</span></button>`
+    tiles.scrollLeft = 0
+  }
+  function paintHint() { const hs = SITES[site].hint; r0.textContent = hs[hintI % hs.length]; roll.style.width = textW(r0.textContent) + 'px' }
+  function rollHint() {
+    const hs = SITES[site].hint, next = hs[(hintI + 1) % hs.length], w = textW(next), s0 = site
+    r1.textContent = next
+    const o = { duration: 420, easing: 'cubic-bezier(.3,.8,.3,1)', fill: 'forwards' }
+    roll.animate([{ width: roll.offsetWidth + 'px' }, { width: w + 'px' }], o)
+    r0.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(-100%)', opacity: 0 }], o)
+    r1.animate([{ transform: 'translateY(0)', opacity: 0 }, { transform: 'translateY(-100%)', opacity: 1 }], o).finished.then(() => {
+      if (s0 !== site) return
+      hintI++; [r0, r1, roll].forEach((x) => x.getAnimations().forEach((a) => a.cancel()))
+      r0.textContent = next; roll.style.width = w + 'px'
+    }).catch(() => {})
+  }
+
+  /* the recording's move: same words → the photo alone drops out and in;
+     new words → the letters spread as the photo shrinks, close as it springs in */
+  function turn(apply, sameWords) {
+    const g = ++gen
+    ;[card, tag, L, R].forEach((x) => x.getAnimations().forEach((a) => a.cancel()))
+    if (REDUCED) { apply(); return }
+    busy = true
+    const out = { duration: 280, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' }
+    card.animate([{ transform: 'rotate(-4deg) scale(1)', opacity: 1 }, { transform: `rotate(${sameWords ? -14 : 10}deg) scale(.35)`, opacity: 0 }], out).finished.then(() => {
+      if (g !== gen) return
+      apply()
+      card.getAnimations().forEach((a) => a.cancel())
+      card.animate([{ transform: 'translateY(-24px) rotate(8deg) scale(.4)', opacity: 0 }, { transform: 'rotate(-4deg) scale(1)', opacity: 1 }], { duration: 520, easing: 'cubic-bezier(.2,1.4,.4,1)' })
+      tag.animate([{ opacity: 0, transform: 'translate(-50%, 6px)' }, { opacity: 1, transform: 'translate(-50%, 0)' }], { duration: 260, delay: 220, fill: 'backwards', easing: 'ease-out' })
+      if (!sameWords) [L, R].forEach((w) => { w.getAnimations().forEach((a) => a.cancel()); w.animate([{ letterSpacing: '.32em', opacity: .15, filter: 'blur(2px)' }, { letterSpacing: '0em', opacity: 1, filter: 'blur(0)' }], { duration: 460, easing: 'cubic-bezier(.2,.9,.3,1)' }) })
+      busy = false
+    }).catch(() => {})
+    tag.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: 'forwards' })
+    if (!sameWords) [L, R].forEach((w) => w.animate([{ letterSpacing: '0em', opacity: 1, filter: 'blur(0)' }, { letterSpacing: '.32em', opacity: .15, filter: 'blur(2px)' }], out))
+  }
+
+  function goSlide(i) {
+    const n = (i + T.length) % T.length
+    if (n === tab) return
+    tab = n
+    paintChips(); paintTiles()
+    turn(() => { paintWords(); paintItem() }, false)
+  }
+  function goChip(i) {
+    if (i === chip[tab]) return
+    chip[tab] = i
+    chipsEl.querySelectorAll('.th__chip').forEach((b, k) => b.setAttribute('aria-selected', k === i))
+    paintTiles()
+    turn(paintItem, true)
+  }
+  function goSite(i) {
+    if (i === site) return
+    site = i
+    T = tabs(i, fav)
+    paintBand(); paintChips(); paintTiles()
+    ;[r0, r1, roll].forEach((x) => x.getAnimations().forEach((a) => a.cancel())); hintI = 0; paintHint()
+    turn(() => { paintWords(); paintItem() }, true)
+    // V2's page below follows: its hidden site tab of the same name
+    ;[...doc.querySelectorAll('#siteTabsV2 .site-tabs__tab')].find((b) => b.textContent.trim() === SITES[i].label)?.click()
+  }
+  const stop = () => { auto = false }   // once someone works the slide, it stops turning on its own
+
+  tabsEl.addEventListener('click', (e) => { const b = e.target.closest('.th__tab'); if (b) goSite(+b.dataset.i) })
+  tabsEl.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+    const i = (site + (e.key === 'ArrowRight' ? 1 : -1) + SITES.length) % SITES.length
+    goSite(i); tabsEl.children[i].focus()
+  })
+  chipsEl.addEventListener('click', (e) => { const b = e.target.closest('.th__chip'); if (b) { stop(); goChip(+b.dataset.i) } })
+  dots.addEventListener('click', (e) => { const b = e.target.closest('.th__dot'); if (b) { stop(); goSlide([...dots.children].indexOf(b)) } })
+  let x0 = null, swiped = false
+  wm.addEventListener('pointerdown', (e) => { x0 = e.clientX; swiped = false })
+  wm.addEventListener('pointerup', (e) => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 36) { swiped = true; stop(); goSlide(tab + (dx < 0 ? 1 : -1)) } })
+  wm.addEventListener('click', () => { if (swiped) return; stop(); goSlide(tab + 1) })
+
+  let toastT
+  const toast = (msg) => {
+    doc.querySelector('.th__toast')?.remove(); clearTimeout(toastT)
+    const t = doc.createElement('div'); t.className = 'th__toast'; t.textContent = msg; doc.body.appendChild(t)
+    toastT = setTimeout(() => t.remove(), 1800)
+  }
+  const open = (x) => {
+    if (!x) return
+    if (x.go.fav) { const f = [...doc.querySelectorAll('#favSpecies .fav__card')].find((c) => c.dataset.name === x.go.fav); if (f) return f.click() }
+    if (x.go.hash) { win.location.hash = x.go.hash; return }
+    toast(`${x.go.toast || 'Opens'} (not built yet)`)
+  }
+  tiles.addEventListener('click', (e) => {
+    const b = e.target.closest('.th__tile'); if (!b) return
+    stop()
+    if (b.hasAttribute('data-all')) return toast(`${curChip().all} · opens the full list`)
+    open(curTiles()[+b.dataset.i])
+  })
+
+  // slides turn every 6s until someone touches a chip, dot, tile or the wordmark
+  let seen = true
+  new win.IntersectionObserver(([e]) => { seen = e.isIntersecting }).observe(el)
+  el.addEventListener('pointerenter', () => { el.dataset.hover = '1' }); el.addEventListener('pointerleave', () => { delete el.dataset.hover })
+  if (!REDUCED) setInterval(() => { if (auto && seen && !busy && !el.dataset.hover) goSlide(tab + 1) }, 6000)
+  if (!REDUCED) setInterval(() => { if (seen) rollHint() }, 2400)
+
+  font.addEventListener('load', () => doc.fonts.load('64px Anton').then(fit).catch(() => {}))
+  doc.fonts.addEventListener?.('loadingdone', fit)
+  new win.ResizeObserver(() => win.requestAnimationFrame(fit)).observe(el)
+
+  paintTabs(); paintBand(); paintChips(); paintTiles(); paintHint(); paintWords(); paintItem()
+  ;[...doc.querySelectorAll('#siteTabsV2 .site-tabs__tab')].find((b) => b.textContent.trim() === SITES[0].label)?.click()
+  return el
+}
+
+/* ── wait for V2 to draw its rail and site tabs, then mount ──
+   Opened from disk (file://) Chrome treats the frame as another origin, so
+   the header cannot be injected and plain V2 shows. Say so instead. */
+const app = document.getElementById('app')
+if (location.protocol === 'file:') {
+  const url = 'http://127.0.0.1:8000/mockups/home-v2-tabbed-header.html'
+  document.querySelector('.bar').insertAdjacentHTML('afterend', `<div style="width:min(100% - 32px,744px);margin:0 0 12px;padding:14px 16px;border-radius:14px;background:#FFF1E6;color:#6B2E0A;font:600 14px/1.5 Inter,system-ui,sans-serif">Opened as a file, so the new header can’t be added and you’re seeing plain V2. Open it through the local server instead: <a href="${url}" style="color:inherit">${url}</a></div>`)
+}
+app.addEventListener('load', () => {
+  let doc
+  try { doc = app.contentDocument; if (!doc) return } catch { return }
+  const t0 = Date.now()
+  ;(function wait() {
+    if (doc.querySelector('#favSpecies .fav__card[data-name]') && doc.querySelector('#siteTabsV2 .site-tabs__tab') && doc.querySelector('main.page .main-frame')) return mountHeader(doc)
+    if (Date.now() - t0 < 8000) setTimeout(wait, 80)
+  })()
+})
+
+document.querySelectorAll('[data-fw]').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-fw]').forEach((x) => x.setAttribute('aria-pressed', x === b))
+  document.getElementById('dev').style.setProperty('--fw', b.dataset.fw + 'px')
+}))
+</script>
+</body>
+</html>

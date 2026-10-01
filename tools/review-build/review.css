@@ -1,0 +1,342 @@
+/* ══ REVIEW SITE ONLY · 30 Sep 2026 ═══════════════════════════════════════════
+   Loaded by tools/review-build/build.py into home-page-redesign-gold.vercel.app
+   and nowhere else. Every rule hangs off `data-review`, which only the build's
+   pin script sets, so this file cannot leak into the main app even if copied.
+   Figma: CNhiaOGCLdnlNxj7x2Ohrd · Home 816:2. */
+
+/* HEADER STYLE (owner, 30 Sep 2026: "in profile give me option Header Style
+   Climate / Plain background, user can select"): PLAIN is the default and is
+   the still radial below; CLIMATE (`data-hdr-style="climate"`, set from the
+   profile menu and kept in localStorage 'rv-hdr') lifts these three rules and
+   the app's live weather sky shows through, as on the main V2.
+
+   HEADER · 816:3 "Weather Sky" — a still cream-to-mint radial with grain in
+   place of the live sky. The node's SVG radial is centred at (386.5, -249) on
+   744×437 with radii 415.78 × 686 and stops #FBF8D9 41.763% → #D2F7DF 100%;
+   the stops are the SAMPLED render (#EEECCF / #C9EAD5), because the node's
+   grain darkens both by ~5% and the render is the target. Kept in percentages
+   so the ellipse scales with the band from phone to desktop. */
+:root[data-review]:not([data-hdr-style='climate']) .wsky {
+  background:
+    radial-gradient(55.88% 157% at 51.95% -57%, #EEECCF 41.763%, #C9EAD5 100%);
+}
+:root[data-review]:not([data-hdr-style='climate']) .wsky::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: .14; mix-blend-mode: overlay;
+}
+:root[data-review]:not([data-hdr-style='climate']) .wsky__scene { display: none; }
+
+/* SITES · 829:595 "Segmented Control" — chips, not underlined tabs. 52 tall
+   (4 + 44 + 4), inset 24 at the 744 artboard, 8 between chips; the menu chip
+   and the rest on rgba(0,0,0,.05) at r10, the chosen one #1F415B at r12. */
+:root[data-review][data-home='v2'] .site-tabs--v2 {
+  height: 52px; padding-block: 4px; gap: 8px;
+  padding-inline: max(16px, calc(50vw - 50%)) max(3px, calc(50vw - 50% - 21px));
+  background: linear-gradient(to top, #FFFFFF 82.449%, #E5EBEC 138.87%);
+  box-shadow: none; /* the node draws no rule under the chips */
+}
+:root[data-review] .site-tabs--v2 .site-tabs__menu {
+  width: auto; padding: 0 12px; border-radius: 10px; background: rgba(0, 0, 0, .05); color: #44544A;
+}
+:root[data-review] .site-tabs--v2 .site-tabs__track { gap: 8px; align-items: center; }
+:root[data-review][data-home='v2'] .site-tabs--v2 .site-tabs__tab {
+  flex: none; min-width: 88px; height: 44px; padding: 0 12px; border-radius: 10px;
+  background: rgba(0, 0, 0, .05); color: #44544A;
+  font: 500 14px/normal Inter, system-ui, sans-serif; letter-spacing: .1px;
+}
+:root[data-review][data-home='v2'] .site-tabs--v2 .site-tabs__tab[aria-selected='true'] {
+  min-width: 109px; padding: 0 14px; border-radius: 12px; background: #1F415B; color: #FFFFFF;
+}
+:root[data-review] .site-tabs--v2 .site-tabs__tab[aria-selected='true']::after { content: none; }
+:root[data-review] .site-tabs--v2 .site-tabs__tab:focus-visible { outline: 2px solid #1F415B; outline-offset: 2px; }
+
+/* VIEW ALL · 816:152 and 816:177 — one mark on the page: #44544A text and the
+   double chevron (Icon / Chevron, a 14×15 box whose glyph starts at 44.64%).
+   The announcement foot is 12px, the notes head 14px; the dots (816:144)
+   already match the node and are left alone. */
+:root[data-review] .adeck__all { color: #44544A; }
+:root[data-review] :is(.adeck__all, .obs-head__all) { display: inline-flex; align-items: center; gap: 0; }
+:root[data-review] :is(.adeck__all, .obs-head__all) img.rv-chev { flex: none; width: 7.91667px; height: 8.66667px; margin: 0 3px 0 5.5px; }
+
+/* SITES, STUCK · ONE GLASS WITH THE SEARCH BAR (owner, 30 Sep 2026: "on the
+   site selection also make the background as glass, now it's breaking", then
+   "top different, site selection different — can you merge, same effect").
+   Two backdrop layers never match: each blurs only what is under its own box,
+   so the pair showed a seam and, with a veil on the chips, two tints. So when
+   the chips stick there is ONE sheet: the chips' ::before reaches up behind
+   the search row (it sits in the chips' stacking context, z 6, under the
+   search row's z 20) and the search row's own glass steps aside. No fill —
+   the 25 Sep ruling for the search bar ("make it blur, don't give me
+   background colour") now holds for both; one rule and one shadow at the foot. */
+:root[data-review][data-home='v2'].v2-tabs-stuck .search-row::before { opacity: 0; }
+:root[data-review][data-home='v2'].v2-tabs-stuck .site-tabs--v2 { background: transparent; box-shadow: none; }
+:root[data-review][data-home='v2'].v2-tabs-stuck .site-tabs--v2::before {
+  /* 12 of glass under the chips (owner: "need down padding"); the glass grows,
+     not the row, so the page under it does not shift when the bar sticks */
+  content: ''; position: absolute; left: 0; right: 0; bottom: -12px; top: calc(-1 * var(--v2-search-h, 72px)); z-index: -1; pointer-events: none;
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid rgba(195, 206, 199, .38);
+  box-shadow: 0 8px 20px -14px rgba(22, 55, 61, .38);
+}
+:root[data-review][data-home='v2'].v2-tabs-stuck .site-tabs--v2 .site-tabs__menu,
+:root[data-review][data-home='v2'].v2-tabs-stuck .site-tabs--v2 .site-tabs__tab:not([aria-selected='true']) { background: rgba(255, 255, 255, .6); }
+
+/* SITES, AT REST · room above the chips (owner, 30 Sep 2026: "top padding
+   need here"). 12 over the chips, 4 under, so the strip stands 60 and the
+   chips no longer touch the band above. */
+:root[data-review][data-home='v2'] .site-tabs--v2 { height: 60px; padding-top: 12px; padding-bottom: 4px; }
+
+/* PENDING ACTIONS · THE NOTES FILL THE BOARD (owner, 30 Sep 2026: "Pending
+   actions make it fill"). The notes were a fixed 1 : .78, so two rows stood
+   taller than the board and the second row was cut by the board's own
+   scroll. Here the board is a two-column grid whose rows share its height
+   equally: every note shows whole, however many there are, and nothing
+   scrolls. An odd last note keeps a column's width, centred. */
+:root[data-review] .l-v2bd__board { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: minmax(0, 1fr); align-content: stretch; overflow: hidden; padding: 8px 2px 4px; }
+:root[data-review] .l-v2bd__note { width: auto; height: auto; aspect-ratio: auto; min-height: 0; }
+:root[data-review] .l-v2bd__note:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 6px); }
+/* on a phone the board is short and three rows of notes are ~55 tall: the
+   number steps down from its cqw size so the label keeps its line above it */
+@media (max-width: 599px) {
+  :root[data-review] .l-v2bd__board { gap: 10px 10px; }
+  :root[data-review] .l-v2bd__note { padding: 6px 9px 5px; justify-content: space-between; }
+  :root[data-review] .l-v2bd__t { font-size: 12px; -webkit-line-clamp: 1; }
+  :root[data-review] .l-v2bd__note b { font-size: 22px !important; }  /* the inline cqw size is the tablet's */
+  :root[data-review] .l-v2bd__note em { right: 7px; bottom: 6px; }
+}
+
+/* NOTE POPUP ON A PHONE · the card reads like the tablet's (owner, 30 Sep
+   2026: "in mobile inside container make it same as tablet version, outside
+   container make height"). The box was the tablet's 640 tall on a 330-wide
+   phone, so the same content ran 66 past it: it scrolled, and "Scroll for
+   full screen" sat on the author row. The phone box now takes the screen's
+   height less 48, capped at 780, so the whole note shows as it does on a
+   tablet and the hint lands in the body's own 64 of foot room. */
+@media (max-width: 600px) {
+  /* 1 Oct 2026 ("reduce the card height, it become so big"): no taller than
+     the longest note in the set (`--dpop-fit`, measured by DetailPopup), so a
+     short note no longer leaves a band of empty white under its author */
+  :root[data-review] .dpop:not(.is-full) { height: min(var(--dpop-fit, 780px), 780px, calc(100dvh - 48px)); }
+  /* a short phone (667–740 tall) gives the photo back what the note needs: 260 down to 170 */
+  :root[data-review] .dpop:not(.is-full) .dpop__media { height: clamp(170px, calc(100dvh - 500px), 260px); }
+}
+
+/* HEADER · THE AVATAR LEADS THE GREETING (owner, 30 Sep 2026: "on header
+   only, profile avatar move to left near the Good morning — avatar, and next
+   the good-morning name"). The avatar is still the same button (it opens the
+   side drawer); only its place changes. `.header-actions` dissolves into the
+   header row so its three children can be ordered: avatar · greeting ·
+   (weather, bell) on the right. The phone rule that puts the weather first
+   (`order: -1`) is outranked here. */
+:root[data-review][data-home='v2'] .home-header { justify-content: flex-start; gap: 14px; }
+:root[data-review][data-home='v2'] .home-header .header-actions { display: contents; }
+:root[data-review][data-home='v2'] .home-header .header-actions #avatarBtn { order: -2; flex: none; width: 48px; height: 48px; }
+:root[data-review][data-home='v2'] .home-header .greeting { order: -1; flex: 0 1 auto; }
+:root[data-review][data-home='v2'] .home-header .header-actions .wx { order: 1; margin-left: auto; margin-right: 0; }
+:root[data-review][data-home='v2'] .home-header .header-actions .icon-btn--bell { order: 2; flex: none; }
+@media (max-width: 743px) {
+  :root[data-review][data-home='v2'] .home-header { gap: 10px; }
+  :root[data-review][data-home='v2'] .home-header .header-actions #avatarBtn { width: 44px; height: 44px; }
+}
+/* THE GREETING, SMALLER ON A PHONE (owner, 30 Sep 2026: "can you reduce the
+   font size for mobile", of the header): the name 24 → 20, the salutation
+   15 → 13, the avatar 44 → 40 to keep the pair in proportion; the narrowest
+   phones take the name to 18 so it and its wave share one line. */
+@media (max-width: 743px) {
+  :root[data-review][data-home='v2'] .greeting__name, :root[data-review][data-home='v2'] .greeting__wave { font-size: 20px; letter-spacing: -.2px; }
+  :root[data-review][data-home='v2'] .greeting__word { font-size: 13px; }
+  :root[data-review][data-home='v2'] .home-header .header-actions #avatarBtn { width: 40px; height: 40px; }
+}
+@media (max-width: 379px) {
+  :root[data-review][data-home='v2'] .greeting__name, :root[data-review][data-home='v2'] .greeting__wave { font-size: 18px; letter-spacing: -.18px; }
+}
+
+/* EDIT, IN WORDS ONLY · and VIEW beside it (owner, 30 Sep 2026: "Edit text —
+   remove pencil icon, itself enough; also near have to give me view"). Both
+   heads' Edit lose the glyph; View opens the quick module list (index.html,
+   `.mview`, gated on data-review) and steps aside while the grid is being
+   edited, where Done and Add take the row. */
+/* ICONS, NOT WORDS (owner, 30 Sep 2026, third ruling: "for Edit show pencil
+   icon, for View show plus icon; same way for My species — show only pencil
+   icon"). The words stay as the buttons' accessible names (aria-label on the
+   Modules Edit, font-size 0 text on My species' Edit, an sr-only span on View). */
+:root[data-review][data-home='v2'] .section-head--home .link-btn:not(.link-btn--done):not(.mview-btn) > span { display: none; }
+:root[data-review][data-home='v2'] .section-head--home .link-btn:not(.link-btn--done)::before { width: 22px; height: 22px; background-size: 22px 22px; }
+:root[data-review][data-home='v2'] .section-head--home .mview-btn::before { content: none; display: none; }
+:root[data-review][data-home='v2'] .section-head--home .mview-btn { color: #006D35; }
+:root[data-review][data-home='v2'] .section-head--home .mview-btn .icon { display: block; width: 24px; height: 24px; stroke-width: 2.2; }
+:root[data-review][data-home='v2'] .fav__edit { font-size: 0 !important; gap: 0; }  /* over the phone rule's #favTitle-weighted :is() */
+:root[data-review][data-home='v2'] .fav__edit::before { width: 22px; height: 22px; -webkit-mask-size: 22px 22px; mask-size: 22px 22px; }
+:root[data-review] .section-head--home .section-head__actions { gap: 20px; }
+:root[data-review] .section-head--editing .mview-btn, body.is-editing .mview-btn { display: none; }
+
+/* THE LIST · "Your Modules" (redrawn 1 Oct 2026: "fix the Add Module bottom
+   sheet — every bottom sheet has to have a proper header, left & right 16px;
+   each module one line explanation; on the top remove tick mark; remove from
+   home interaction has to give"). A bottom sheet at every width, 16 off each
+   side (to 760, then centred), the screen less 24 above on a phone and 88% on
+   a tablet. The head is the other sheets' own: the title left, a round close
+   right — no Cancel, no ✓. A row is the module's tile, its name over its one
+   line, a chevron. TAP opens it; SWIPE LEFT reveals Add to Home (Antz
+   OnSurface #006D35) or, on a module already there, Remove (Tertiary
+   #FA6140), either done at once with Undo in the notice. Nothing behind
+   scrolls. */
+.mview-scrim { position: fixed; inset: 0; z-index: 460; background: rgba(16, 45, 52, .32); opacity: 0; transition: opacity 240ms ease; }
+.mview-scrim.is-on { opacity: 1; }
+.mview { position: fixed; z-index: 461; left: 50%; bottom: 0; width: min(760px, calc(100vw - 32px)); height: min(88dvh, 900px); display: flex; flex-direction: column;
+  border-radius: 20px 20px 0 0; background: #F4F7F6; box-shadow: 0 -20px 60px -20px rgba(16, 45, 52, .4);
+  transform: translate(-50%, 104%); transition: transform 320ms cubic-bezier(.32, .72, 0, 1); font-family: Inter, system-ui, sans-serif; }
+.mview.is-on { transform: translate(-50%, 0); }
+/* CLOSED IS GONE (1 Oct 2026). `display: flex` above outranks the UA's
+   [hidden], so the closed sheet stayed laid out and took every tap over it. */
+.mview[hidden] { display: none; }
+@media (max-width: 600px) { .mview { height: calc(100dvh - 24px); } }
+@media (prefers-reduced-motion: reduce) { .mview, .mview-scrim { transition: none; } }
+.mview__handle { flex: none; width: 40px; height: 5px; margin: 8px auto 0; border-radius: 3px; background: rgba(31, 65, 91, .18); }
+/* the head: the section heads' type (16 Medium), in the page's black */
+.mview__head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px 4px 20px; }
+.mview__title { margin: 0; font-size: 16px; font-weight: 500; line-height: normal; letter-spacing: 0; color: #000; }
+.mview__x { flex: none; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: rgba(0, 0, 0, .05); color: #44544A; cursor: pointer; }
+.mview__x .icon { width: 18px; height: 18px; stroke-width: 2.2; }
+@media (hover: hover) { .mview__x:hover { background: rgba(0, 0, 0, .08); } }
+.mview__x:focus-visible { outline: 2px solid #00AFD6; outline-offset: 2px; }
+.mview__search { flex: none; display: flex; align-items: center; gap: 10px; margin: 12px 16px 4px; height: 44px; padding: 0 14px; border-radius: 12px; background: rgba(0, 0, 0, .05); color: #7A8684; }
+.mview__search .icon { width: 18px; height: 18px; }
+.mview__search input { flex: 1; min-width: 0; border: 0; background: none; font: 400 16px Inter, sans-serif; color: #44544A; outline: 0; }
+.mview__hint { flex: none; margin: 6px 20px 0; font-size: 12px; color: #7A8684; }
+.mview__list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 0 16px 24px; }
+.mview__cat { margin: 16px 4px 8px; font-size: 12px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: #7A8684; }
+.mview__item { position: relative; margin-bottom: 8px; border-radius: 14px; overflow: hidden; }
+/* the action is the colour of what it does; drawn only while its row moves */
+.mview__act { position: absolute; top: 0; right: 0; bottom: 0; width: 124px; padding-left: 20px; border-radius: 14px; background: #006D35 !important; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; color: #fff; font: 600 13px Inter, sans-serif; cursor: pointer; }
+.mview__act.is-remove { background: #FA6140 !important; }
+.mview__act { visibility: hidden; } .mview__item.is-swiping .mview__act { visibility: visible; }
+.mview__act .icon { width: 22px; height: 22px; stroke-width: 2.4; }
+.mview__row { position: relative; display: flex; align-items: center; gap: 14px; min-height: 68px; padding: 12px 14px; background: #fff; border-radius: 14px; cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.mview__row:focus-visible { outline: 2px solid #00AFD6; outline-offset: -2px; }
+.mview__ico { position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; }
+.mview__badge { position: absolute; right: -5px; bottom: -5px; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #006D35; color: #fff; box-shadow: 0 0 0 2px #fff; }
+.mview__ico img { width: 26px; height: 26px; pointer-events: none; }
+.mview__ico .icon { width: 24px; height: 24px; color: #fff; }
+/* the name (Antz_Body_Title, a size up) over its one line (Antz_Body_Regular, grey, cut with an ellipsis) */
+.mview__txt { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.mview__txt b { display: block; font-size: 15px; font-weight: 600; line-height: normal; color: #1F415B; }
+.mview__txt small { display: block; font-size: 13px; font-weight: 400; line-height: normal; color: #7A8684; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mview__chev { flex: none; color: rgba(31, 65, 91, .35); }
+.mview__chev .icon { width: 20px; height: 20px; }
+.mview__empty { padding: 24px; text-align: center; color: #7A8684; }
+.mview__toast { position: absolute; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 3; display: flex; align-items: center; gap: 14px; max-width: calc(100% - 32px); padding: 10px 12px 10px 16px; border-radius: 12px; background: #1F415B; color: #fff; font: 500 14px Inter, sans-serif; white-space: nowrap; transform: translate(-50%, 12px); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+.mview__toast > span { overflow: hidden; text-overflow: ellipsis; }
+.mview__toast.is-on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.mview__undo { flex: none; padding: 6px 10px; border: 0; border-radius: 8px; background: rgba(255, 255, 255, .14); color: #A5F3C4; font: 600 14px Inter, sans-serif; cursor: pointer; }
+.mview__toast.is-page { position: fixed; z-index: 470; bottom: calc(96px + env(safe-area-inset-bottom)); pointer-events: none; }
+
+/* KEY INSIGHTS HEAD, COMPACT ON A PHONE (owner, 30 Sep 2026: "can we reduce
+   this for mobile"). Five 52-wide tabs and a 17px title ran the calendar off
+   the card's edge; here the title is 15, the tabs 42 (Today 50), 12px text on
+   a 5px pad, the calendar glyph 16 — the whole row fits beside the title. */
+@media (max-width: 743px) {
+  /* the app's phone rule lists #favTitle in its :is(), which lends it an id's weight; this :is() carries one too */
+  :root[data-review][data-home='v2'] :is(#kinsTitle, .kins__title) { font-size: 15px; }
+  :root[data-review][data-home='v2'] .kins__head { gap: 8px; }
+  :root[data-review][data-home='v2'] .kins__tab { width: 42px; padding: 5px 0; font-size: 12px; }
+  :root[data-review][data-home='v2'] .kins__tab[data-r='today'] { width: 50px; }
+  :root[data-review][data-home='v2'] .kins__tab[data-r='today'], :root[data-review][data-home='v2'] .kins__tab[data-r='w'] { padding: 6px 0; }
+  :root[data-review][data-home='v2'] .kins__tab img { width: 16px; height: 16px; }
+}
+
+/* DRAWER SPACING · "still need spacing — can see the difference" (owner, 30
+   Sep 2026, on the 398×859 drawer). Measured: every row 40 tall with 73 of
+   the list left empty under Reset, and the rule over "This page" running the
+   list's full width while the two under it were inset 16. So the rows take
+   height the list has, 34 to 56 each (flex, so it fills exactly and a 667
+   phone still does not scroll) — the groups get the same step between them,
+   and all three rules share one inset. */
+:root[data-review] .pdrawer__list { display: flex; flex-direction: column; padding-top: clamp(4px, 1dvh, 12px); }
+/* the rows SHARE the height the list has, 34 to 56 each, so it fills without
+   overflowing on any phone; what is left past 56 stays at the foot */
+:root[data-review] .pdrawer .pdrawer__list > .pmenu__item { flex: 1 0 auto; min-height: 34px; max-height: 56px; }
+:root[data-review] .pdrawer .pdrawer__list > .pdrawer__seg { flex: 1 0 auto; min-height: 40px; max-height: 58px; }
+:root[data-review] .pdrawer .pdrawer__list > :is(.pdrawer__h, .pmenu__rule) { flex: none; }
+:root[data-review] .pdrawer .pdrawer__h { margin: clamp(6px, 1.4dvh, 14px) 16px clamp(2px, .6dvh, 8px); padding: clamp(8px, 1.6dvh, 16px) 0 0; }
+:root[data-review] .pdrawer .pmenu__rule { margin-block: clamp(6px, 1.2dvh, 12px); }
+:root[data-review] .pdrawer .pdrawer__row .pmenu__label, :root[data-review] .pdrawer .pdrawer__list .pmenu__label { font-size: 15px; }
+
+/* EDIT MODE · TWO BUTTONS, NOT ONE CAPSULE (owner, 1 Oct 2026: "Add module
+   button has to be an two buttons concept. Tick mark has to onsurface
+   colour"). The capsule gives its glass back to the two inside it: Add
+   Module is its own glass pill, and Done its own glass disc beside it, 10
+   apart, the tick in Antz OnSurface #006D35 — one height, one material, two
+   things to press. */
+:root[data-review] body.is-editing .qa-edit {
+  gap: 10px; padding: 0; background: none; box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+:root[data-review] body.is-editing .qa-edit > .add-module-btn,
+:root[data-review] body.is-editing .qa-edit > .link-btn--done {
+  height: var(--qa-h, 52px); border-radius: 999px; background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-lift));
+          backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-lift));
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25), inset 0 1px 0 0 var(--glass-spec), inset 0 -1px 0 0 var(--glass-bounce),
+              inset 0 0 0 1px var(--glass-rim), inset 0 -6px 12px -6px var(--glass-depth);
+  transition: transform 160ms cubic-bezier(.34, 1.56, .64, 1);
+}
+:root[data-review] body.is-editing .qa-edit > .add-module-btn { padding: 0 22px 0 18px; }
+:root[data-review] body.is-editing .qa-edit > .link-btn--done { width: var(--qa-h, 52px); padding: 0; color: #006D35; }
+:root[data-review] body.is-editing .qa-edit > .link-btn--done .icon { width: 24px; height: 24px; stroke-width: 2.4; }
+:root[data-review] body.is-editing .qa-edit > .link-btn--done:hover { background: var(--glass-fill); filter: brightness(1.04); }
+:root[data-review] body.is-editing .qa-edit > :is(.add-module-btn, .link-btn--done):active { transform: scale(.95); }
+@media (prefers-reduced-motion: reduce) { :root[data-review] body.is-editing .qa-edit > * { transition: none; } }
+
+/* SECTION HEADS IN BLACK (owner, 1 Oct 2026: "all headings like Key
+   Insights, Notes, My Species labels make it black colour"). The id in the
+   :is() lends the weight to pass the app's phone rule (which lists #favTitle).
+   Under a dark live sky My species stays white, as WeatherSky sets it. */
+:root[data-review][data-home='v2'] :is(#obsTitle, #kinsTitle, #modulesTitle, .obs-head__title, .kins__title, .section-head--home .section-head__title) { color: #000; }
+:root[data-review][data-home='v2']:not([data-sky-tone='dark']) :is(#favTitle, .fav__title) { color: #000; }
+
+/* THE TICKER · ROOM AFTER LIVE (owner, 1 Oct 2026: "in tickers part live icon
+   after that label need some space"): the label starts 14 after the mark,
+   not the node's 8 — in the tape and on the pinned copy alike */
+:root[data-review] .hstrip__label { padding-left: 14px; }
+
+/* THE DOCKED PROFILE STAYS ON THE LEFT (owner, 1 Oct 2026: "on the header when
+   I scroll profile going right side, it has to be on left side only. Make it
+   all proper animations"). The review header leads with the avatar, so the
+   one that docks into the stuck search bar takes the row's FIRST place, not
+   its last. It arrives from where the header's avatar went — up and to the
+   left — growing out of nothing as the field gives it room, on the bar's own
+   clock; it leaves the same way. At rest it is 0 wide with the row's 8 of gap
+   taken back, so the field does not shift a pixel until the bar sticks. */
+:root[data-review][data-home='v2'] .search-row__profile {
+  order: -1; margin-left: 0 !important; margin-right: -8px;   /* !important over the app's V2 rest rule, which takes back the gap on the LEFT (0,5,0) */
+  transform: translate(-8px, -10px) scale(.6); transform-origin: 0 50%;
+  transition: width 300ms cubic-bezier(.32, .72, 0, 1), margin-right 300ms cubic-bezier(.32, .72, 0, 1),
+              transform 360ms cubic-bezier(.34, 1.4, .64, 1), opacity 160ms ease, visibility 0s linear 300ms;
+}
+:root[data-review][data-home='v2'] .search-row.is-stuck .search-row__profile {
+  width: 38px; margin-left: 0; margin-right: 4px; opacity: 1; visibility: visible; transform: none;
+  transition: width 300ms cubic-bezier(.32, .72, 0, 1), margin-right 300ms cubic-bezier(.32, .72, 0, 1),
+              transform 420ms cubic-bezier(.34, 1.4, .64, 1) 40ms, opacity 220ms ease 60ms, visibility 0s linear 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-review][data-home='v2'] .search-row__profile,
+  :root[data-review][data-home='v2'] .search-row.is-stuck .search-row__profile { transform: none; transition: visibility 0s linear; }
+}
+
+/* EDIT MODE, SECOND PASS (owner, 1 Oct 2026: "Choose Size not required; the
+   tick button has to be filled with background OnSurface, tick as white").
+   The resize popover loses its "Choose Size" line — the three sizes say what
+   they are — though the words stay for a screen reader, which names the
+   radio group by them. Done is a filled #006D35 disc with a white tick. */
+:root[data-review] .size-pop .size-picker__label {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+:root[data-review] body.is-editing .qa-edit > .link-btn--done {
+  background: #006D35; color: #fff;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  box-shadow: 0 6px 16px -6px rgba(0, 109, 53, .55), inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+:root[data-review] body.is-editing .qa-edit > .link-btn--done:hover { background: #005C2D; filter: none; }

@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weather Header Sky</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=DM+Sans:opsz,wght@9..40,400..700&display=swap" rel="stylesheet">
+<style>
+/* V2's header as Apple Weather's sky, ALIVE, in all eight climate states
+   and SNOW (second round, 28 Sep: Morning, Sunny, Mist and Sunset each made
+   unlike the others; Night's stars blink; snow redone as crystals, wind gusts and frost)
+   (owner, 28 Sep 2026: "it has to move like clouds moving, if it's raining
+   drops … all climate variation has to be there"). The eight are
+   ClimateBackground.js's own PRESETS: Clear Morning, Sunny, Cloudy, Rain,
+   Mist, Sunset, Night, Storm.
+
+   HOW IT MOVES
+   · Clouds are fractal noise lit from above, rendered ONCE into a tile that
+     wraps seamlessly (stitchTiles), then the tile slides sideways on the
+     compositor. Two or three layers slide at different speeds, so the sky
+     has depth. The mask that says where clouds may form stays still, so
+     clouds drift through the sky rather than the sky moving.
+   · Rain is a canvas: streaks at three depths, slanted by the wind; the
+     nearest drops land on the search field and the species cards and
+     splash.
+   · Storm adds lightning: the sky flashes twice and a bolt forks down behind
+     the UI, every 3–8 seconds.
+   · Mist is two fog banks rolling at different speeds across the lower sky.
+   · Night twinkles its stars and sends a shooting star now and then.
+   · The sun's glare breathes.
+   Reduced motion: everything holds still; rain is drawn once. */
+:root { --page: #EEF1F3; --page-ink: #1F2A33; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page: #0F1518; --page-ink: #E4ECEE; } }
+:root[data-theme="dark"] { --page: #0F1518; --page-ink: #E4ECEE; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--page-ink); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.top { max-width: 1600px; margin: 0 auto; padding: 36px 24px 8px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.top h1 { margin: 0 0 6px; font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+.top p { margin: 0; max-width: 780px; font-size: 14.5px; line-height: 1.55; opacity: .8; }
+.ctl { display: flex; flex-wrap: wrap; gap: 10px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 12px; background: rgba(120, 140, 150, .16); }
+.seg button { min-height: 36px; padding: 0 14px; border: 0; border-radius: 9px; background: none; color: inherit; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: #fff; color: #1F415B; box-shadow: 0 1px 3px rgba(31, 65, 91, .14); }
+.live { max-width: 1600px; margin: 0 auto; padding: 20px 24px 8px; display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: flex-start; }
+.live__side { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.live__side h2 { margin: 0; font-size: 19px; font-weight: 600; }
+.live__side p { margin: 0; font-size: 13.5px; line-height: 1.55; opacity: .78; max-width: 520px; }
+.live__side .seg button { min-height: 32px; padding: 0 11px; font-size: 13px; }
+.bar { height: 3px; border-radius: 2px; background: rgba(120, 140, 150, .2); overflow: hidden; max-width: 520px; }
+.bar i { display: block; height: 100%; width: 0; background: #3C6FB0; }
+.list { max-width: 1600px; margin: 0 auto; padding: 24px 24px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(744px, 100%), 1fr)); gap: 40px 32px; }
+.list.is-phone { grid-template-columns: repeat(auto-fill, minmax(min(390px, 100%), 1fr)); }
+.v { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.v__tag { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .65; }
+.v__tag b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #3C6FB0; color: #fff; letter-spacing: 0; font-size: 12px; }
+.v p { margin: 0 0 4px; font-size: 13.5px; line-height: 1.5; opacity: .78; max-width: 700px; }
+.frame { width: var(--fw, 744px); max-width: 100%; border-radius: 22px; overflow: hidden; background: #fff; box-shadow: 0 0 0 1px rgba(31, 65, 91, .06), 0 20px 50px -24px rgba(16, 45, 52, .35); }
+.readouts { max-width: 1600px; margin: 0 auto; padding: 0 24px 64px; }
+.readouts h3 { margin: 0 0 12px; font-size: 15px; }
+.readouts__row { display: flex; flex-wrap: wrap; gap: 12px; }
+.readouts__row > div { display: grid; place-items: center; min-width: 150px; padding: 22px 18px; border-radius: 16px; background: #F0F4F1; }
+.readouts__row .wx { transform: scale(1.5); }
+
+/* ── the header, V2's numbers at 744 ── */
+.hdr { --ink: #1F415B; --ink-2: #44544A; --edit: #00AFD6; --wx-ink: #4A5550; position: relative; height: 396px; background: #fff; border-radius: 0 0 20px 20px; overflow: hidden; color: var(--ink); isolation: isolate; }
+.hdr[data-tone='dark'] { --ink: #fff; --ink-2: rgba(255, 255, 255, .88); --edit: #fff; --wx-ink: #fff; }
+.hdr[data-tone='dark'] :is(.g-word, .g-name, .f-head, .wx) { text-shadow: 0 1px 8px rgba(10, 30, 70, .3); }
+.hdr[data-tone='dark'] .f-head span img { filter: brightness(0) invert(1); }
+.hdr :is(.g-word, .g-name, .f-head, .f-head span, .wx) { transition: color .9s ease; }
+.art { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: #6F9BD6; }
+.scene { position: absolute; inset: 0; transition: opacity 1.6s ease; }
+.scene > * { position: absolute; display: block; }
+.hdr__in { position: relative; padding: 40px 24px 0; }
+.g-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.g-word { font-family: "DM Sans", sans-serif; font-size: 16px; line-height: 21px; color: var(--ink-2); }
+.g-name { margin-top: 4px; font-size: 28px; font-weight: 600; line-height: 34px; white-space: nowrap; }
+.g-act { display: flex; align-items: center; gap: 12px; margin-top: 11px; }
+.bell { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .04); }
+.bell img { width: 22px; height: 22px; }
+.ava { width: 38px; height: 38px; border-radius: 50%; background: #E4E0FA; overflow: hidden; }
+.ava img { width: 100%; height: 100%; object-fit: cover; }
+.s-row { display: flex; gap: 8px; margin-top: 24px; }
+.search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; height: 52px; padding: 0 20px; border-radius: 12px; background: #fff; font-size: 15.5px; color: #7A8684; white-space: nowrap; overflow: hidden; }
+.search img { width: 22px; height: 22px; flex: none; }
+.scan { display: grid; place-items: center; width: 52px; height: 52px; flex: none; border-radius: 16px; background: #fff; }
+.scan img { width: 22px; height: 22px; }
+.f-head { display: flex; justify-content: space-between; align-items: center; margin: 30px 0 14px; font-size: 16px; font-weight: 500; color: var(--ink-2); }
+.f-head span { display: inline-flex; align-items: center; gap: 6px; color: var(--edit); font-weight: 500; }
+.f-head img { width: 20px; height: 20px; }
+.rail { display: flex; gap: 8px; overflow: hidden; }
+.card { position: relative; flex: none; width: 138px; height: 146px; border-radius: 12px; overflow: hidden; background: #333; box-shadow: 0 6px 16px -10px rgba(10, 30, 60, .5); }
+.card img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.card::after { content: ''; position: absolute; inset: 40% 0 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .62)); }
+.card div { position: absolute; left: 0; right: 0; bottom: 10px; z-index: 1; padding: 0 11px; color: #fff; }
+.card b { display: block; font-size: 14.5px; font-weight: 600; line-height: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card small { font-size: 12px; opacity: .92; }
+
+/* ── the weather readout, left of the bell ── */
+.wx { display: grid; grid-template-columns: auto auto; align-items: center; column-gap: 7px; row-gap: 1px; color: var(--wx-ink, #4A5550); }
+.wx svg { width: 27px; height: 22px; overflow: visible; }
+.wx__t { font-size: 23px; font-weight: 700; line-height: 25px; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.wx__c { grid-column: 1 / -1; font-size: 13.5px; line-height: 16px; white-space: nowrap; opacity: .92; }
+/* a phone has no room for the condition line beside the name, nor for the
+   icon beside the temperature: at 390 the name, the readout and two buttons
+   overran by 25px, so the icon stacks over the number (63px → 36px) */
+.is-phone .hdr { height: 380px; }
+.is-phone .card { width: 124px; height: 140px; }
+.is-phone .g-name { font-size: 24px; }
+.is-phone .search span { font-size: 14px; }
+.is-phone .g-act { gap: 10px; }
+.is-phone .wx { grid-template-columns: auto; justify-items: center; row-gap: 0; }
+.is-phone .wx__c { display: none; }
+.is-phone .wx__t { font-size: 18px; line-height: 21px; }
+.is-phone .wx svg { width: 23px; height: 19px; }
+
+/* ── the moving parts ── */
+.cl { inset: 0; }
+.cl__strip { position: absolute; top: 0; left: 0; height: 100%; background-repeat: repeat-x; will-change: transform; animation: cl-drift linear infinite; }
+@keyframes cl-drift { from { transform: translateX(calc(-1 * var(--tw))); } to { transform: translateX(0); } }
+.glare { animation: glare 7s ease-in-out infinite alternate; }
+@keyframes glare { from { opacity: .82; } to { opacity: 1; } }
+.stars circle { animation: flicker var(--d, 3s) steps(1, end) infinite, twinkle calc(var(--d, 3s) * 1.7) ease-in-out infinite alternate; animation-delay: var(--dl, 0s); }
+@keyframes twinkle { from { opacity: .2; } to { opacity: 1; } }
+/* a star blinks: bright, a quick dip, bright again — not a slow fade */
+@keyframes flicker { 0% { fill-opacity: 1; } 42% { fill-opacity: .25; } 47% { fill-opacity: 1; } 71% { fill-opacity: .45; } 75% { fill-opacity: 1; } }
+.spark { transform-box: fill-box; transform-origin: center; animation: spark var(--d, 3s) ease-in-out infinite; animation-delay: var(--dl, 0s); }
+@keyframes spark { 0%, 100% { opacity: .3; transform: scale(.4) rotate(0deg); } 38% { opacity: 1; transform: scale(1.05) rotate(8deg); } 46% { opacity: .35; transform: scale(.55) rotate(10deg); } 54% { opacity: 1; transform: scale(1.2) rotate(12deg); } 72% { opacity: .5; transform: scale(.7) rotate(16deg); } }
+.rays--spin { animation: rays-spin 120s linear infinite; }
+@keyframes rays-spin { to { transform: rotate(360deg); } }
+.rays--sway { animation: rays-sway 16s ease-in-out infinite alternate; }
+@keyframes rays-sway { from { transform: rotate(-3deg); opacity: .75; } to { transform: rotate(3deg); opacity: 1; } }
+.breathe { animation: breathe 9s ease-in-out infinite alternate; }
+.breathe--slow { animation-duration: 18s; }
+@keyframes breathe { from { opacity: .5; } to { opacity: 1; } }
+.bird { transform-box: fill-box; transform-origin: center; animation: flap .42s ease-in-out infinite alternate; }
+@keyframes flap { from { transform: scaleY(1); } to { transform: scaleY(-.35); } }
+.flock { left: 0; top: 0; overflow: visible; opacity: 0; }
+.frost path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: frost 5s ease-out forwards; }
+@keyframes frost { to { stroke-dashoffset: 0; } }
+.fg { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; transition: opacity 1.6s ease; }
+.shoot { left: 0; top: 0; width: 90px; height: 1.6px; border-radius: 1px; background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff); opacity: 0; transform-origin: right center; }
+.flash { inset: 0; background: #DDE6FF; opacity: 0; mix-blend-mode: screen; }
+.bolt { inset: 0; width: 100%; height: 100%; opacity: 0; filter: drop-shadow(0 0 6px rgba(200, 215, 255, .95)) drop-shadow(0 0 18px rgba(170, 190, 255, .7)); }
+canvas.rain { inset: 0; width: 100%; height: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .frost path { animation: none; stroke-dashoffset: 0; }
+  .cl__strip, .glare, .stars circle, .spark, .rays--spin, .rays--sway, .breathe, .bird { animation: none; }
+  .scene { transition: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Header sky · every climate, moving</h1>
+    <p>The header is live sky, like Apple Weather, in all eight of V2’s climate states plus snow. Clouds drift in two or three layers at different speeds. Rain falls and splashes on the search field and the cards. Storms flash with lightning, mist rolls through the trees, snow crystals swirl in the wind while frost creeps in at the corners, and at night the stars blink. The readout next to the bell always matches the sky behind it.</p>
+  </div>
+  <div class="ctl">
+    <div class="seg" role="group" aria-label="Sky">
+      <button type="button" aria-pressed="true" data-sky="blue">Weather tones</button>
+      <button type="button" aria-pressed="false" data-sky="light">Lighter</button>
+    </div>
+    <div class="seg" role="group" aria-label="Width">
+      <button type="button" aria-pressed="true" data-w="744">Tablet · 744</button>
+      <button type="button" aria-pressed="false" data-w="390">Phone · 390</button>
+    </div>
+  </div>
+</header>
+
+<section class="live">
+  <div class="frame" id="liveFrame"></div>
+  <div class="live__side">
+    <h2>Live · as it would run in the app</h2>
+    <p>This header changes weather every 7 seconds. The new sky fades in over the old one in 1.6 seconds, and the readout and the text colour change with it. Tap a state to hold it there; tap Play to start the cycle again.</p>
+    <div class="seg" role="group" aria-label="State" id="liveSeg"></div>
+    <div class="bar"><i id="liveBar"></i></div>
+  </div>
+</section>
+<main class="list" id="list"></main>
+<section class="readouts">
+  <h3>The readout, in every state</h3>
+  <div class="readouts__row" id="readouts"></div>
+</section>
+
+<template id="hdr">
+  <div class="hdr">
+    <div class="art"></div>
+    <div class="hdr__in">
+      <div class="g-row">
+        <div><div class="g-word">Good Morning,</div><div class="g-name">Sourav Tambe 👋🏻</div></div>
+        <div class="g-act"><div class="wx"></div><span class="bell"><img src="../assets/icon/v2-bell.svg" alt=""></span><span class="ava"><img src="../assets/img/avatar.png" alt=""></span></div>
+      </div>
+      <div class="s-row"><div class="search"><img src="../assets/icon/v2-search.svg" alt=""><span>Search “Ravi”</span></div><span class="scan"><img src="../assets/icon/v2-scan.svg" alt=""></span></div>
+      <div class="f-head">My Species <span>Edit <img src="../assets/icon/v2-add-circle.svg" alt=""></span></div>
+      <div class="rail">
+        <div class="card"><img src="../assets/img/species/asiatic-lion.jpg" alt=""><div><b>Asiatic lion</b><small>9 animals</small></div></div>
+        <div class="card"><img src="../assets/img/species/blackbuck.jpg" alt=""><div><b>Blackbuck</b><small>64 animals</small></div></div>
+        <div class="card"><img src="../assets/img/species/indian-star-tortoise.jpg" alt=""><div><b>Indian star tortoise</b><small>43 animals</small></div></div>
+        <div class="card"><img src="../assets/img/species/sarus-crane.jpg" alt=""><div><b>Sarus crane</b><small>6 animals</small></div></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches
+let uid = 0
+const rand = (a, b) => a + Math.random() * (b - a)
+
+/* ── condition icons, in Weather's multicolour ─────────────────────────── */
+const G = () => { const u = ++uid; return { u, defs: `<defs>
+  <linearGradient id="k${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7CC0FF"/><stop offset="1" stop-color="#3D8EF0"/></linearGradient>
+  <linearGradient id="b${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4E9BEF"/><stop offset="1" stop-color="#2F73D6"/></linearGradient>
+  <linearGradient id="d${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9B6C8"/><stop offset="1" stop-color="#6F7F96"/></linearGradient></defs>` } }
+const CLOUD = (fill, dy = 0) => `<path transform="translate(0 ${dy})" d="M5.4 18.6a4.3 4.3 0 0 1-.7-8.5 6 6 0 0 1 11.3-1.6 4.6 4.6 0 0 1 1.4 9.1c-.3.6-.9 1-1.6 1z" fill="${fill}"/>`
+const SUN = (cx, cy, r, n = 8) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#FFD233"/>` + Array.from({ length: n }, (_, i) => `<rect x="${cx - .75}" y="${cy - r - 3.4}" width="1.5" height="2.6" rx=".75" fill="#FFD233" transform="rotate(${i * 360 / n} ${cx} ${cy})"/>`).join('')
+const HALF = (u) => `<clipPath id="h${u}"><rect width="27" height="16"/></clipPath><g clip-path="url(#h${u})">${SUN(13.5, 16, 5.2, 7)}</g>`
+const ICON = {
+  sun: () => `<svg viewBox="0 0 27 22" aria-hidden="true">${SUN(13.5, 11, 5.2)}</svg>`,
+  sunrise: () => `<svg viewBox="0 0 27 22" aria-hidden="true">${HALF(++uid)}<rect x="4" y="17.2" width="19" height="1.6" rx=".8" fill="#FFD233"/></svg>`,
+  sunset: () => `<svg viewBox="0 0 27 22" aria-hidden="true">${HALF(++uid)}<rect x="4" y="17.2" width="19" height="1.6" rx=".8" fill="#FF9F43"/></svg>`,
+  cloud: () => { const g = G(); return `<svg viewBox="0 0 27 22" aria-hidden="true">${g.defs}<path d="M13 9.2a4.2 4.2 0 0 1 8-1.2 3.3 3.3 0 0 1 3.4 5.5H14.5z" fill="url(#b${g.u})"/>${CLOUD(`url(#k${g.u})`)}</svg>` },
+  rain: () => { const g = G(); return `<svg viewBox="0 0 27 22" aria-hidden="true">${g.defs}${CLOUD(`url(#k${g.u})`, -3)}${[7, 11.5, 16].map((x) => `<path d="M${x} 18.2l-1.1 2.6" stroke="#4FB0FF" stroke-width="1.7" stroke-linecap="round"/>`).join('')}</svg>` },
+  mist: () => { const g = G(); return `<svg viewBox="0 0 27 22" aria-hidden="true">${g.defs}${CLOUD(`url(#d${g.u})`, -4)}${[[3, 17.5, 18], [7, 20.6, 16]].map(([x, y, l]) => `<rect x="${x}" y="${y - .8}" width="${l}" height="1.6" rx=".8" fill="#9AA7B8"/>`).join('')}</svg>` },
+  moon: () => `<svg viewBox="0 0 27 22" aria-hidden="true"><path d="M15.6 3.2a8 8 0 1 0 7.8 10.4 6.4 6.4 0 0 1-7.8-10.4z" fill="#F4E7A6"/><path d="M22.4 3.4l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5z" fill="#F4E7A6"/></svg>`,
+  snow: () => { const g = G(); return `<svg viewBox="0 0 27 22" aria-hidden="true">${g.defs}${CLOUD(`url(#k${g.u})`, -4)}${[[7.5, 18.6], [13, 20.2], [18.5, 18.6]].map(([x, y]) => `<g stroke="#8FD0FF" stroke-width="1.1" stroke-linecap="round"><path d="M${x - 1.9} ${y}h3.8M${x - .95} ${y - 1.65}l1.9 3.3M${x + .95} ${y - 1.65}l-1.9 3.3"/></g>`).join('')}</svg>` },
+  storm: () => { const g = G(); return `<svg viewBox="0 0 27 22" aria-hidden="true">${g.defs}${CLOUD(`url(#d${g.u})`, -4)}<path d="M13.8 14.6l-3 4.4h2.6l-1.6 3.4 4.6-5h-2.6l1.6-2.8z" fill="#FFD233"/><path d="M7 16.4l-1 2.3M20 16.4l-1 2.3" stroke="#4FB0FF" stroke-width="1.6" stroke-linecap="round"/></svg>` },
+}
+
+/* ── clouds: one seamless tile, sliding ───────────────────────────────────
+   feTurbulence with stitchTiles repeats exactly every TW pixels, so a strip
+   two tiles wide can slide one tile and start again with no jump. A colour
+   matrix turns the noise into alpha with a hard ramp (only the peaks become
+   cloud); diffuse lighting over the same noise, from above, shades each puff;
+   a transfer function tints the shade instead of greying it. Fog skips the
+   lighting and is blurred by CSS, which blurs across the seam too. */
+const TW = 1400
+/* THIRD ROUND (28 Sep: "no sunrise too much … make everything a little light
+   weight … weather has to be there but not fully highlighted"). One knob per
+   kind of effect, so the sky stays in the background of the header: clouds,
+   sunlight and sunbeams are all drawn at these fractions of their first
+   strength; precipitation counts and flashes are cut in their own configs. */
+const QUIET = { cloud: .7, sun: .6, rays: .4 }
+function tile(o, H) {
+  const m = `<feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${o.ramp[0]} 0 0 0 ${o.ramp[1]}" result="a"/>`
+  const body = o.flat
+    ? `${m}<feFlood flood-color="${o.light || '#fff'}"/><feComposite in2="a" operator="in"/>`
+    : `${m}<feDiffuseLighting in="n" surfaceScale="${o.relief || 4}" diffuseConstant="1.15" lighting-color="${o.light || '#fff'}" result="l"><feDistantLight azimuth="${o.az || 250}" elevation="${o.el || 52}"/></feDiffuseLighting>
+       <feComponentTransfer in="l" result="t">${['R', 'G', 'B'].map((c, i) => `<feFunc${c} type="linear" slope="${1 - o.shade[i]}" intercept="${o.shade[i]}"/>`).join('')}</feComponentTransfer>
+       <feComposite in="t" in2="a" operator="in"/>`
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${TW}" height="${H}" viewBox="0 0 ${TW} ${H}"><filter id="f" x="0" y="0" width="${TW}" height="${H}" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="${o.freq}" numOctaves="${o.oct || 6}" seed="${o.seed || 1}" stitchTiles="stitch" result="n"/>${body}</filter><rect width="${TW}" height="${H}" filter="url(#f)"/></svg>`
+  return 'data:image/svg+xml,' + encodeURIComponent(svg).replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29')
+}
+/* where clouds may form (o.cover, a CSS gradient), and — under white ink —
+   soft clear patches behind the greeting, the readout and "My Species", the way
+   Weather keeps a city's name off the brightest cloud */
+function layer(o, w, h, clear) {
+  const masks = [o.cover || 'linear-gradient(#000, #000)']
+  if (clear) masks.unshift(
+    `radial-gradient(ellipse ${w < 744 ? 170 : 230}px 70px at ${w < 744 ? 120 : 150}px 66px, rgba(0,0,0,${(1 - clear).toFixed(2)}) 30%, #000 100%)`,
+    `radial-gradient(ellipse ${w < 744 ? 110 : 150}px 56px at ${w - 150}px 66px, rgba(0,0,0,${(1 - clear).toFixed(2)}) 30%, #000 100%)`,
+    `radial-gradient(ellipse 120px 30px at 70px 215px, rgba(0,0,0,${(1 - clear).toFixed(2)}) 30%, #000 100%)`)
+  const secs = o.speed / (w < 744 ? 1.3 : 1)
+  return `<div class="cl ${o.cls || ''}" style="opacity:${((o.alpha || 1) * QUIET.cloud).toFixed(2)}; mask-image:${masks.join(', ')}; mask-composite: intersect;">
+    <div class="cl__strip" style="--tw:${TW}px; width:${TW * 2}px; background-image:url('${tile(o, h)}'); background-size:${TW}px ${h}px; animation-duration:${secs}s;${o.reverse ? ' animation-direction: reverse;' : ''} animation-delay:${-rand(0, secs).toFixed(1)}s;${o.blur ? ` filter: blur(${o.blur}px);` : ''}"></div></div>`
+}
+
+/* the sun: a hot core, a wide glare that breathes, Weather's faint rainbow
+   halo, and two lens ghosts down the line away from it */
+function sunHTML(x, y, r, s = 1, o = {}) {
+  s *= QUIET.sun
+  const warm = o.warm ? ['255, 236, 200', '255, 214, 160', '255, 190, 130'] : ['255, 253, 240', '255, 248, 225', '255, 245, 220']
+  let html = `<div class="glare" style="inset:0; background: radial-gradient(circle at ${x}px ${y}px, rgba(255, 255, 255, ${s}) 0 ${r * .45}px, rgba(${warm[0]}, ${.85 * s}) ${r * .8}px, rgba(${warm[1]}, ${.45 * s}) ${r * 1.6}px, rgba(${warm[2]}, ${.16 * s}) ${r * 3}px, rgba(${warm[2]}, 0) ${r * (o.wide || 4.6)}px)"></div>`
+  if (o.halo) {
+    const hr = r * 5.2
+    html += `<div style="inset:0; background: radial-gradient(circle at ${x}px ${y}px, transparent ${hr - 16}px, rgba(255, 140, 120, ${.07 * s}) ${hr - 9}px, rgba(255, 230, 140, ${.08 * s}) ${hr - 4}px, rgba(160, 230, 170, ${.06 * s}) ${hr}px, rgba(140, 190, 255, ${.07 * s}) ${hr + 5}px, transparent ${hr + 14}px)"></div>
+      <div class="glare" style="left:${x + r * 1.6}px; top:${y + r * 4.2}px; width:${r * 1.1}px; height:${r * 1.1}px; border-radius:50%; background: radial-gradient(circle, rgba(255, 255, 255, .02) 40%, rgba(255, 255, 255, ${.1 * s}) 70%, rgba(255, 255, 255, 0) 72%)"></div>
+      <div class="glare" style="left:${x + r * 2.6}px; top:${y + r * 7}px; width:${r * 1.9}px; height:${r * 1.9}px; border-radius:50%; background: radial-gradient(circle, rgba(200, 225, 255, ${.08 * s}) 0 60%, rgba(255, 255, 255, ${.12 * s}) 68%, rgba(255, 255, 255, 0) 71%)"></div>`
+  }
+  return html
+}
+
+/* sunbeams: a wheel of soft rays from one point, faded out with distance;
+   'spin' turns it slowly, 'sway' rocks it a few degrees. The element is
+   three times the header so its corners never show while it turns. */
+function raysHTML(x, y, len, rgb, a, n, motion) {
+  a *= QUIET.rays
+  const step = 360 / n
+  return `<div class="rays--${motion}" style="left:${-3 * len}px; top:${-3 * len}px; width:${6 * len}px; height:${6 * len}px; transform-origin:${x + 3 * len}px ${y + 3 * len}px;
+    background: repeating-conic-gradient(from 0deg at ${x + 3 * len}px ${y + 3 * len}px, rgba(${rgb}, ${a}) 0deg ${(step * .28).toFixed(1)}deg, rgba(${rgb}, 0) ${(step * .5).toFixed(1)}deg ${step}deg);
+    mask-image: radial-gradient(circle at ${x + 3 * len}px ${y + 3 * len}px, #000 0, rgba(0,0,0,.5) ${len * .45}px, transparent ${len}px)"></div>`
+}
+/* a tree line in fog: sal and pine silhouettes on a ground band, one flat tone */
+function treesHTML(w, h, base, hmin, hmax, fill, op) {
+  let d = ''
+  for (let x = -12; x < w + 20; x += rand(10, 22)) {
+    const t = rand(hmin, hmax), hw = t * rand(.2, .3)
+    if (Math.random() < .5) d += `M${(x - hw).toFixed(0)} ${base} L${(x - hw * .5).toFixed(0)} ${(base - t * .42).toFixed(0)} L${(x - hw * .75).toFixed(0)} ${(base - t * .42).toFixed(0)} L${x.toFixed(0)} ${(base - t).toFixed(0)} L${(x + hw * .75).toFixed(0)} ${(base - t * .42).toFixed(0)} L${(x + hw * .5).toFixed(0)} ${(base - t * .42).toFixed(0)} L${(x + hw).toFixed(0)} ${base}Z `
+    else { const r = t * .34, cy = base - t + r; d += `M${(x - r).toFixed(0)} ${cy.toFixed(0)} a${r.toFixed(0)} ${(r * 1.15).toFixed(0)} 0 1 1 ${(2 * r).toFixed(0)} 0 L${(x + 1.5).toFixed(0)} ${base} L${(x - 1.5).toFixed(0)} ${base}Z ` }
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="left:0;top:0"><path d="${d}M-20 ${base - 2} H${w + 20} V${h + 20} H-20Z" fill="${fill}" opacity="${op}"/></svg>`
+}
+
+/* ── the nine states ─────────────────────────────────────────────────────
+   Each has two skies: Weather's own tones (white ink where Weather would use
+   it) and a lighter one that keeps V2's dark ink wherever the sky allows.
+   Night, Sunset and Storm are dark in both. A sky is two to four stops,
+   spread evenly top to bottom. */
+const TOP = (a, b, c) => `linear-gradient(180deg, #000 ${a}%, rgba(0,0,0,.75) ${b}%, transparent ${c}%)`
+const WISPS = (w) => ({ freq: '.0022 .03', oct: 5, seed: 11, ramp: [3.4, -1.55], relief: 2, shade: [.8, .86, .94], alpha: .8, speed: 150,
+  cover: `radial-gradient(ellipse ${Math.round(w * .55)}px 170px at ${Math.round(w * .86)}px 30px, #000 20%, transparent 100%)` })
+const STATES = {
+  'clear-morning': { label: 'Clear Morning', cond: 'Clear', temp: '24°', icon: 'sunrise', birds: { color: 'rgba(52, 58, 84, .35)', dir: 1 },
+    about: 'Dawn: a sky from cool blue down through pink to peach, sunbeams fanning up from a sun rising at the bottom right, thin pink cloud strips across the middle, and a flock of birds flying across now and then.',
+    blue: { sky: ['#6388C6', '#A7B0D6', '#DDB8C2', '#F6D8B8'], dark: true }, light: { sky: ['#A3BFE6', '#D0D2E9', '#EFD4D8', '#FBE7CF'], dark: false },
+    scene: (w, h, P) => {
+      const sx = w < 744 ? w * .92 : w * .93, sy = h * .98
+      return raysHTML(sx, sy, h * .9, '255, 232, 200', .16, 18, 'sway') + sunHTML(sx, sy, 28, 1, { warm: true, wide: 6 }) +
+        layer({ freq: '.0012 .045', oct: 4, seed: 31, ramp: [3, -1.35], relief: 1.5, shade: [.86, .64, .7], light: '#FFE6DA', alpha: .7, speed: 190,
+          cover: 'linear-gradient(180deg, transparent 28%, #000 44%, #000 60%, transparent 76%)' }, w, h, P.clear) +
+        layer({ ...WISPS(w), seed: 12, shade: [.88, .8, .86], alpha: .6 }, w, h, P.clear)
+    } },
+  sunny: { label: 'Sunny', cond: 'Sunny', temp: '31°', icon: 'sun',
+    about: 'High noon: a deep, clean blue, the sun at the top with a slow wheel of sunbeams, the rainbow halo and lens ghosts, and white fair-weather cumulus drifting along the horizon behind the species.',
+    blue: { sky: ['#1D5BB5', '#3A82D4', '#86BDEE'], dark: true }, light: { sky: ['#5C9CE0', '#97C4F0', '#D8EBFA'], dark: false },
+    scene: (w, h, P) => {
+      const sx = w < 744 ? w * .56 : w * .44
+      return raysHTML(sx, -24, h * 1.1, '255, 252, 235', P.dark ? .13 : .1, 24, 'spin') + sunHTML(sx, -24, w < 744 ? 28 : 34, P.dark ? 1 : .85, { halo: true }) +
+        layer({ freq: '.0065 .011', oct: 6, seed: 41, ramp: [3.9, -2.15], relief: 6, shade: [.7, .79, .92], speed: 170,
+          cover: 'linear-gradient(180deg, transparent 52%, #000 78%)' }, w, h) +
+        layer({ ...WISPS(w), alpha: .55 }, w, h, P.clear)
+    } },
+  cloudy: { label: 'Cloudy', cond: 'Cloudy', temp: '28°', icon: 'cloud',
+    about: 'The New Delhi frame: a far, dim cloud deck and a nearer bank with white tops, drifting at two speeds across the top of the header.',
+    blue: { sky: ['#4E6B8E', '#6D89AA', '#94AAC4'], dark: true }, light: { sky: ['#9CB0C6', '#C2CFDD', '#E4EAF0'], dark: false },
+    scene: (w, h, P) =>
+      layer({ freq: '.004 .008', oct: 5, seed: 2, ramp: [2.8, -1.1], relief: 3, shade: [.6, .65, .74], alpha: .75, speed: 260, cover: TOP(0, 50, 85) }, w, h, P.clear) +
+      layer({ freq: '.0036 .0075', oct: 6, seed: 8, ramp: [3.1, -1.3], relief: 6, shade: [.56, .62, .72], speed: 120, cover: TOP(0, 38, 68) }, w, h, P.clear) },
+  rain: { label: 'Rain', cond: 'Rain', temp: '25°', icon: 'rain',
+    about: 'A low, grey rain deck moving fast, and rain in three depths slanted by the wind. The nearest drops land on the search field and the cards and splash.',
+    blue: { sky: ['#34495F', '#4F6680', '#7489A0'], dark: true, drop: '225, 235, 248' }, light: { sky: ['#8497AB', '#A9B8C7', '#D3DCE5'], dark: false, drop: '70, 95, 125' },
+    scene: (w, h, P) =>
+      layer({ freq: '.004 .009', oct: 5, seed: 4, ramp: [2.6, -.9], relief: 3, shade: [.42, .47, .55], light: '#DCE2EA', alpha: .9, speed: 140, cover: TOP(0, 45, 80) }, w, h, P.clear) +
+      layer({ freq: '.0035 .007', oct: 6, seed: 9, ramp: [3, -1.2], relief: 5, shade: [.36, .41, .5], light: '#E6EAF0', speed: 75, cover: TOP(0, 30, 60) }, w, h, P.clear),
+    rain: { count: 105, speed: 780, slant: .12, len: 15, alpha: .7 } },
+  mist: { label: 'Mist', cond: 'Mist', temp: '22°', icon: 'mist',
+    about: 'Fog in the forest: two tree lines fading into the white, a pale sun showing through, and fog banks rolling past in opposite directions, growing thicker and thinner as they go.',
+    blue: { sky: ['#93A3B3', '#B8C4CF', '#DCE2E7'], dark: false }, light: { sky: ['#AEBBC8', '#CCD5DD', '#E9EDF0'], dark: false },
+    scene: (w, h) => `<div class="breathe" style="inset:0; background: radial-gradient(circle at ${w * .6}px 64px, rgba(255, 255, 255, .95) 0 20px, rgba(255, 255, 255, .45) 27px, rgba(255, 255, 255, .12) 70px, rgba(255, 255, 255, 0) 150px)"></div>` +
+      layer({ flat: true, freq: '.003 .012', oct: 4, seed: 51, ramp: [2, -.8], blur: 7, alpha: .55, speed: 150, reverse: true, cover: 'linear-gradient(180deg, transparent 8%, #000 30%, #000 50%, transparent 70%)' }, w, h) +
+      treesHTML(w, h, h * .66, 26, 58, '#8795A4', .38) +
+      layer({ flat: true, freq: '.0024 .006', oct: 4, seed: 6, ramp: [2.2, -.55], blur: 10, alpha: .8, speed: 110, cls: 'breathe', cover: 'linear-gradient(180deg, transparent 30%, #000 55%, #000 100%)' }, w, h) +
+      treesHTML(w, h, h * .84, 44, 92, '#6B7B8C', .42) +
+      layer({ flat: true, freq: '.0032 .01', oct: 4, seed: 13, ramp: [2.4, -.7], blur: 6, alpha: .9, speed: 55, reverse: true, cls: 'breathe', cover: 'linear-gradient(180deg, transparent 45%, #000 72%, #000 100%)' }, w, h) +
+      `<div style="inset:0; background: linear-gradient(180deg, rgba(240, 244, 247, 0) 40%, rgba(240, 244, 247, .6) 100%)"></div>` },
+  sunset: { label: 'Sunset', cond: 'Sunset', temp: '27°', icon: 'sunset', birds: { color: 'rgba(34, 20, 44, .55)', dir: -1 },
+    about: 'Golden hour going down: violet to magenta to fire orange, the sun half set on the horizon at the bottom right, dark clouds lit orange along their undersides, birds flying home, and the dusk slowly deepening.',
+    blue: { sky: ['#232A63', '#6D3C86', '#D8567A', '#FF9A52'], dark: true }, light: { sky: ['#4B4F95', '#9A5D9C', '#EE8292', '#FFB978'], dark: true },
+    scene: (w, h, P) => {
+      const sx = w < 744 ? w * .88 : w * .9
+      return raysHTML(sx, h, h * 1.1, '255, 190, 130', .14, 16, 'sway') +
+        `<div style="inset:0; background: radial-gradient(ellipse ${w * .9}px ${h * .55}px at ${sx}px ${h}px, rgba(255, 200, 120, .42), rgba(255, 140, 90, .18) 40%, rgba(255, 120, 90, 0) 70%)"></div>` +
+        `<div style="left:${sx - 22}px; top:${h - 22}px; width:44px; height:44px; border-radius:50%; background: radial-gradient(circle, #FFF3D6 0 30%, #FFD48A 60%, #FFB060 100%); box-shadow: 0 0 24px 6px rgba(255, 170, 90, .4)"></div>` +
+        layer({ freq: '.0042 .018', oct: 5, seed: 17, ramp: [3.3, -1.55], relief: 4, shade: [.3, .16, .34], light: '#FFB27E', alpha: .8, speed: 210, el: 14, az: 90,
+          cover: 'linear-gradient(180deg, transparent 6%, #000 24%, #000 52%, transparent 74%)' }, w, h, P.clear) +
+        `<div class="breathe breathe--slow" style="inset:0; background: linear-gradient(180deg, rgba(20, 14, 60, .28), rgba(20, 14, 60, 0) 55%)"></div>`
+    } },
+  night: { label: 'Night', cond: 'Clear', temp: '23°', icon: 'moon', night: true,
+    about: 'A deep night: a faint Milky Way across the sky, stars flickering, the brightest ones flashing as four-point sparkles, a moon with its glow, thin moonlit cloud, and a shooting star every few seconds.',
+    blue: { sky: ['#050B1F', '#0E1E45', '#23396B'], dark: true }, light: { sky: ['#12234C', '#243F75', '#44639A'], dark: true },
+    scene: (w, h) => {
+      let st = '', sp = ''
+      for (let i = 0; i < 80; i++) {
+        /* two in five sit in the Milky Way's band */
+        const band = i % 5 < 2, x = rand(0, w), y = band ? h * .75 - x * .55 + rand(-26, 26) : rand(0, h * .8)
+        st += `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${rand(.4, band ? 1 : 1.4).toFixed(2)}" style="--d:${rand(1.2, 3.4).toFixed(1)}s; --dl:${-rand(0, 3).toFixed(1)}s"/>`
+      }
+      for (let i = 0; i < 8; i++) {
+        const x = rand(10, w - 10), y = rand(8, h * .7), k = rand(.5, .85), c = ['#FFFFFF', '#DCE8FF', '#FFF1D8'][i % 3]
+        sp += `<g transform="translate(${x.toFixed(0)} ${y.toFixed(0)}) scale(${k.toFixed(2)})"><g class="spark" style="--d:${rand(1.8, 4.2).toFixed(1)}s; --dl:${-rand(0, 4).toFixed(1)}s" fill="${c}"><path d="M0 -7 L1 -1 L7 0 L1 1 L0 7 L-1 1 L-7 0 L-1 -1Z" opacity=".9"/><circle r="1.6"/><circle r="4" opacity=".18"/></g></g>`
+      }
+      const mx = Math.round(w < 744 ? w * .56 : w * .5)
+      return `<div style="inset:0; background: linear-gradient(${Math.round(Math.atan2(h, w) * 180 / Math.PI + 60)}deg, transparent 32%, rgba(190, 200, 255, .06) 44%, rgba(215, 220, 255, .12) 50%, rgba(190, 200, 255, .06) 56%, transparent 68%)"></div>
+        <svg class="stars" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="left:0;top:0" fill="#fff">${st}${sp}</svg>
+        <div class="glare" style="inset:0; background: radial-gradient(circle at ${mx}px 40px, rgba(220, 230, 255, .28), rgba(220, 230, 255, 0) 120px)"></div>
+        <svg viewBox="0 0 40 40" width="40" height="40" style="left:${mx - 20}px; top:20px"><circle cx="20" cy="20" r="12" fill="#F4F1E4"/><circle cx="16" cy="17" r="2.4" fill="#E2DECB"/><circle cx="23" cy="24" r="1.6" fill="#E2DECB"/></svg>` +
+        layer({ freq: '.004 .014', oct: 5, seed: 21, ramp: [3.2, -1.6], relief: 3, shade: [.14, .18, .3], light: '#AFC0DE', alpha: .45, speed: 220, cover: TOP(0, 35, 62) }, w, h)
+    } },
+  storm: { label: 'Storm', cond: 'Thunderstorm', temp: '26°', icon: 'storm', lightning: true,
+    about: 'A dark, fast storm deck in two layers, heavy slanted rain with splashes, and lightning: the sky flashes twice and a bolt forks down every few seconds.',
+    blue: { sky: ['#1C2433', '#2E3A4D', '#4A5770'], dark: true, drop: '215, 225, 240' }, light: { sky: ['#364256', '#526077', '#76859A'], dark: true, drop: '215, 225, 240' },
+    scene: (w, h) =>
+      layer({ freq: '.0038 .007', oct: 6, seed: 3, ramp: [2.7, -.95], relief: 5, shade: [.2, .23, .3], light: '#B8C2D0', alpha: .95, speed: 70, cover: TOP(0, 45, 78) }, w, h) +
+      layer({ freq: '.003 .006', oct: 6, seed: 14, ramp: [3, -1.15], relief: 7, shade: [.16, .19, .25], light: '#A9B4C4', speed: 42, cover: TOP(0, 28, 55) }, w, h) +
+      `<svg class="bolt" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path fill="none" stroke="#F4F6FF" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg><div class="flash"></div>`,
+    rain: { count: 170, speed: 1050, slant: .22, len: 20, alpha: .75 } },
+  snow: { label: 'Snow', cond: 'Snow', temp: '-1°', icon: 'snow',
+    about: 'A winter morning: a pale sun behind thin cloud, snow-covered pines along the horizon and frost spreading across the empty corners. Real six-armed crystals fall slowly and turn, big blurred ones drift close in front, and every few seconds a gust of wind swirls the snow sideways, then it settles again.',
+    blue: { sky: ['#6F87A6', '#9AAEC6', '#D2DCE7'], dark: true }, light: { sky: ['#A2B5CB', '#C4D2E0', '#E9EEF4'], dark: false },
+    scene: (w, h, P) =>
+      `<div class="breathe breathe--slow" style="inset:0; background: radial-gradient(circle at ${Math.round(w * .62)}px 50px, rgba(255, 255, 255, .7) 0 14px, rgba(245, 250, 255, .3) 24px, rgba(235, 243, 255, .1) 70px, rgba(235, 243, 255, 0) 140px)"></div>` +
+      layer({ freq: '.0035 .008', oct: 5, seed: 61, ramp: [2.4, -.85], relief: 2, shade: [.7, .75, .84], light: '#F4F7FB', alpha: .7, speed: 260, cover: TOP(0, 38, 70) }, w, h, P.clear) +
+      snowPinesHTML(w, h, h * .9) + frostHTML(w, h),
+    snow: true },
+}
+const KEYS = Object.keys(STATES)
+
+/* ── systems: rain, lightning, shooting stars; one clock for all ────────── */
+const systems = new Set()
+let last = performance.now()
+function tick(t) {
+  const dt = Math.min(.05, (t - last) / 1000); last = t
+  systems.forEach((s) => s.visible && s.step(dt, t))
+  requestAnimationFrame(tick)
+}
+requestAnimationFrame(tick)
+const io = new IntersectionObserver((es) => es.forEach((e) => (e.target.__sys || []).forEach((s) => (s.visible = e.isIntersecting))))
+
+function Rain(scene, hdr, cfg, color) {
+  const cv = document.createElement('canvas'); cv.className = 'rain'
+  scene.insertBefore(cv, scene.querySelector('.bolt'))
+  const W = hdr.clientWidth, H = hdr.clientHeight, dpr = Math.min(2, devicePixelRatio || 1)
+  cv.width = W * dpr; cv.height = H * dpr
+  const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr)
+  /* the surfaces a drop can land on: the search field, the scan button and
+     the top edge of every species card, in the header's own coordinates */
+  const hb = hdr.getBoundingClientRect()
+  const surf = [...hdr.querySelectorAll('.search, .scan, .card')].map((el) => { const b = el.getBoundingClientRect(); return [b.left - hb.left + 4, b.right - hb.left - 4, b.top - hb.top] })
+  const spawn = (any) => ({ x: rand(-60, W + 20), y: any ? rand(-H, H) : rand(-80, -10), z: Math.random() < .5 ? .45 : Math.random() < .6 ? .7 : 1 })
+  const drops = Array.from({ length: cfg.count }, () => spawn(true))
+  const splashes = []
+  const s = { visible: true, step(dt) {
+    ctx.clearRect(0, 0, W, H)
+    const byZ = { .45: [], .7: [], 1: [] }
+    for (const d of drops) {
+      const v = cfg.speed * (.55 + d.z * .45), dy = v * dt
+      d.y += dy; d.x += dy * cfg.slant
+      const hit = d.z === 1 && surf.find(([l, r, y]) => d.x > l && d.x < r && d.y >= y && d.y - dy < y)
+      if (hit) {
+        for (let k = 0; k < 3; k++) splashes.push({ x: d.x, y: hit[2] - 1, vx: rand(-60, 60), vy: rand(-110, -50), life: .32, ring: k === 0 })
+        Object.assign(d, spawn())
+      } else if (d.y > H + 20) Object.assign(d, spawn())
+      byZ[d.z].push(d)
+    }
+    ctx.lineCap = 'round'
+    for (const z of [.45, .7, 1]) {
+      const len = cfg.len * (.5 + z * .5)
+      ctx.strokeStyle = `rgba(${color}, ${((.12 + z * .38) * (cfg.alpha || 1)).toFixed(3)})`; ctx.lineWidth = .7 + z * .8
+      ctx.beginPath()
+      for (const d of byZ[z]) { ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - len * cfg.slant, d.y - len) }
+      ctx.stroke()
+    }
+    for (let i = splashes.length - 1; i >= 0; i--) {
+      const p = splashes[i]; p.life -= dt
+      if (p.life <= 0) { splashes.splice(i, 1); continue }
+      const a = p.life / .32
+      if (p.ring) {
+        ctx.strokeStyle = `rgba(${color}, ${.5 * a})`; ctx.lineWidth = 1
+        ctx.beginPath(); ctx.ellipse(p.x, p.y, 2 + (1 - a) * 7, .8 + (1 - a) * 1.6, 0, Math.PI, 0); ctx.stroke()
+      } else {
+        p.vy += 520 * dt; p.x += p.vx * dt; p.y += p.vy * dt
+        ctx.fillStyle = `rgba(${color}, ${.7 * a})`; ctx.beginPath(); ctx.arc(p.x, p.y, 1.1, 0, 7); ctx.fill()
+      }
+    }
+  } }
+  if (REDUCED) { s.step(0); return null }
+  return s
+}
+
+/* SNOW, fifth round (28 Sep: "snow not at all good, try something unique").
+   Nothing lands on the interface any more. Instead:
+   · real crystals: four six-armed designs drawn once to sprites (dendrites
+     with side branches, a plate, a star), falling slowly and turning;
+   · depth: tiny soft flakes far back, crystals in the middle, and three big
+     out-of-focus crystals drifting in front of everything;
+   · wind: every 8–12 s a gust sweeps the whole fall sideways and a swirl
+     curls through it, then the air goes still again;
+   · frost creeps across the empty corners when the state comes in, and
+     snow-covered pines stand on the horizon. */
+const CRYSTALS = (() => {
+  const make = (draw, blur) => {
+    const c = document.createElement('canvas'); c.width = c.height = 64
+    const x = c.getContext('2d'); x.translate(32, 32); x.lineCap = 'round'; x.lineJoin = 'round'
+    if (blur) x.filter = `blur(${blur}px)`
+    x.shadowColor = 'rgba(70, 95, 135, .35)'; x.shadowBlur = 2
+    x.strokeStyle = '#fff'; x.fillStyle = '#fff'
+    for (let k = 0; k < 6; k++) { draw(x); x.rotate(Math.PI / 3) }
+    return c
+  }
+  const arm = (side) => (x) => {
+    x.lineWidth = 2.2; x.beginPath(); x.moveTo(0, 0); x.lineTo(0, -26); x.stroke()
+    x.lineWidth = 1.5
+    side.forEach(([at, len]) => { x.beginPath(); x.moveTo(0, -at); x.lineTo(-len * .87, -at - len * .5); x.moveTo(0, -at); x.lineTo(len * .87, -at - len * .5); x.stroke() })
+  }
+  const designs = [
+    arm([[9, 8], [16, 6], [22, 3.5]]),                       /* a fern dendrite */
+    arm([[13, 10]]),                                        /* a simple star with one fork */
+    (x) => { x.lineWidth = 2; x.beginPath(); x.moveTo(0, 0); x.lineTo(0, -24); x.stroke(); x.beginPath(); x.moveTo(-6, -12); x.lineTo(0, -18); x.lineTo(6, -12); x.stroke() },
+    (x) => { x.lineWidth = 1.8; x.beginPath(); x.moveTo(0, -10); x.lineTo(8.7, -5); x.stroke(); x.beginPath(); x.moveTo(0, 0); x.lineTo(0, -22); x.stroke(); x.beginPath(); x.arc(0, -22, 2.4, 0, 7); x.fill() },
+  ]
+  return { sharp: designs.map((d) => make(d)), soft: designs.map((d) => make(d, 3.5)) }
+})()
+
+function Snow(scene, hdr, cfg, dark) {
+  const bg = document.createElement('canvas'); bg.className = 'rain'; scene.append(bg)
+  const fg = document.createElement('canvas'); fg.className = 'fg'; hdr.append(fg); scene.__fg = fg
+  const W = hdr.clientWidth, H = hdr.clientHeight, dpr = Math.min(2, devicePixelRatio || 1)
+  const [b, f] = [bg, fg].map((c) => { c.width = W * dpr; c.height = H * dpr; const x = c.getContext('2d'); x.scale(dpr, dpr); return x })
+  const mk = (kind, any) => {
+    const o = { kind, x: rand(-40, W + 40), y: any ? rand(-H * .2, H) : rand(-40, -10), ph: rand(0, 6.3), sw: rand(.5, 1.2), rot: rand(0, 6.3), spin: rand(-.8, .8), d: Math.floor(rand(0, 4)) }
+    if (kind === 'far') Object.assign(o, { r: rand(.8, 1.5), v: rand(18, 28), z: .35 })
+    if (kind === 'mid') Object.assign(o, { r: rand(6, 11), v: rand(30, 44), z: .7 })
+    if (kind === 'near') Object.assign(o, { r: rand(16, 26), v: rand(55, 75), z: 1.3 })
+    return o
+  }
+  const far = Array.from({ length: 90 }, () => mk('far', true))
+  const mid = Array.from({ length: 30 }, () => mk('mid', true))
+  const near = Array.from({ length: 3 }, () => mk('near', true))
+  let gustAt = performance.now() + rand(2500, 4500), gust = 0
+  const move = (k, dt, sec, wind) => {
+    k.y += k.v * dt
+    /* a curl of air: the swirl bends each flake by where it is, so a gust
+       looks like wind moving through the snow, not the snow sliding */
+    k.x += (wind * k.z + Math.sin(sec * k.sw + k.ph) * 10 * k.z + Math.sin(k.y * .018 + sec * 1.3) * gust * 38 * k.z) * dt
+    k.rot += (k.spin + gust * 1.6 * Math.sign(k.spin || 1)) * dt
+    if (k.y > H + 30 || k.x > W + 50 || k.x < -60) Object.assign(k, mk(k.kind), k.x > W + 50 ? { x: rand(-50, W * .5), y: rand(-40, H * .6) } : {})
+  }
+  const sprite = (c, k, set, alpha) => { c.save(); c.globalAlpha = alpha; c.translate(k.x, k.y); c.rotate(k.rot); c.drawImage(set[k.d], -k.r, -k.r, k.r * 2, k.r * 2); c.restore() }
+  const s = { visible: true, step(dt, t) {
+    const sec = t / 1000
+    /* a gust rises and falls over about three seconds */
+    if (t > gustAt) { gustAt = t + rand(8000, 12000) }
+    const g = (t - (gustAt - 10000)) / 3000
+    gust = g > 0 && g < 1 ? Math.sin(g * Math.PI) ** 2 : gust * (1 - Math.min(1, dt * 2))
+    const wind = 8 + gust * 90
+    b.clearRect(0, 0, W, H); f.clearRect(0, 0, W, H)
+    b.fillStyle = dark ? 'rgba(255, 255, 255, .7)' : 'rgba(255, 255, 255, .85)'
+    if (!dark) { b.shadowColor = 'rgba(70, 95, 135, .35)'; b.shadowBlur = 2 }
+    b.beginPath()
+    for (const k of far) { move(k, dt, sec, wind); b.moveTo(k.x + k.r, k.y); b.arc(k.x, k.y, k.r, 0, 7) }
+    b.fill(); b.shadowBlur = 0
+    for (const k of mid) { move(k, dt, sec, wind); sprite(b, k, CRYSTALS.sharp, .9) }
+    for (const k of near) { move(k, dt, sec, wind); sprite(f, k, CRYSTALS.soft, .38) }
+  } }
+  if (REDUCED) { s.step(0, 0); return null }
+  return s
+}
+
+/* snow-covered pines on the horizon: dark tiers with white on every tier */
+function snowPinesHTML(w, h, base) {
+  let dark = '', white = ''
+  for (let x = -10; x < w + 20; x += rand(12, 24)) {
+    const t = rand(36, 70), hw = t * rand(.22, .3)
+    for (let k = 0; k < 3; k++) {
+      const top = base - t + k * t * .28, bot = top + t * .42, ww = hw * (.55 + k * .25)
+      dark += `M${x.toFixed(0)} ${top.toFixed(0)} L${(x + ww).toFixed(0)} ${bot.toFixed(0)} L${(x - ww).toFixed(0)} ${bot.toFixed(0)}Z `
+      white += `M${x.toFixed(0)} ${top.toFixed(0)} L${(x + ww * .6).toFixed(0)} ${(top + t * .2).toFixed(0)} Q${x.toFixed(0)} ${(top + t * .26).toFixed(0)} ${(x - ww * .6).toFixed(0)} ${(top + t * .2).toFixed(0)}Z `
+    }
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="left:0;top:0"><path d="${dark}" fill="#5C7389" opacity=".42"/><path d="${white}" fill="#fff" opacity=".7"/><rect x="-10" y="${base}" width="${w + 20}" height="${h}" fill="#EEF3F8" opacity=".85"/></svg>`
+}
+
+/* frost: feathery crystal branches that grow in from a corner, drawn with a
+   dash that runs out along each stroke once, when the state arrives */
+function frostHTML(w, h) {
+  const seg = [[], [], []]
+  const grow = (x, y, a, len, depth) => {
+    if (depth > 2 || len < 5) return
+    const x1 = x + Math.cos(a) * len, y1 = y + Math.sin(a) * len
+    seg[depth].push(`M${x.toFixed(1)} ${y.toFixed(1)} L${x1.toFixed(1)} ${y1.toFixed(1)}`)
+    for (let k = 1; k <= 3; k++) {
+      const px = x + Math.cos(a) * len * k / 4, py = y + Math.sin(a) * len * k / 4
+      grow(px, py, a + Math.PI / 3, len * .38 * (1 - k * .12), depth + 1)
+      grow(px, py, a - Math.PI / 3, len * .38 * (1 - k * .12), depth + 1)
+    }
+  }
+  /* the bottom-right corner, past the species rail, and a smaller one top-left */
+  for (let i = 0; i < 7; i++) grow(w + 4, h + 4, Math.PI + i * (Math.PI / 2) / 6 + rand(-.08, .08), rand(60, 110) * (w < 744 ? .7 : 1), 0)
+  for (let i = 0; i < 5; i++) grow(-4, -4, i * (Math.PI / 2) / 4 + rand(-.08, .08), rand(22, 40), 0)
+  const wd = [1.4, .9, .6]
+  return `<svg class="frost" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="left:0;top:0">
+    <defs><radialGradient id="fr${++uid}" cx="1" cy="1" r=".45"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+    <rect width="${w}" height="${h}" fill="url(#fr${uid})"/>
+    ${seg.map((d, i) => `<path d="${d.join(' ')}" pathLength="1" fill="none" stroke="#fff" stroke-opacity="${.75 - i * .15}" stroke-width="${wd[i]}" stroke-linecap="round" style="animation-delay:${i * .6}s"/>`).join('')}</svg>`
+}
+
+/* a flock: five birds in a loose V, wings beating, crossing the sky every
+   10–18 seconds — left to right at dawn, right to left going home at dusk */
+function Flock(scene, W, H, cfg) {
+  const pos = [[0, 0], [-14, -7], [-13, 8], [-27, -13], [-26, 15]]
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  el.setAttribute('class', 'flock'); el.setAttribute('width', 60); el.setAttribute('height', 50); el.setAttribute('viewBox', '-40 -25 60 50')
+  el.innerHTML = pos.map(([x, y], i) => `<g transform="translate(${x} ${y}) scale(${cfg.dir})"><path class="bird" style="animation-delay:${-i * .09}s" d="M-6 0 Q-3 -4 0 0 Q3 -4 6 0" fill="none" stroke="${cfg.color}" stroke-width="1.5" stroke-linecap="round"/></g>`).join('')
+  scene.append(el)
+  let next = performance.now() + rand(800, 2500)
+  return { visible: true, step(dt, t) {
+    if (t < next) return
+    next = t + rand(10000, 18000)
+    const y0 = rand(H * .12, H * .3), from = cfg.dir > 0 ? -70 : W + 70, to = cfg.dir > 0 ? W + 70 : -70
+    el.animate([{ transform: `translate(${from}px, ${y0}px)`, opacity: 1 }, { transform: `translate(${(from + to) / 2}px, ${y0 - 18}px)`, opacity: 1 }, { transform: `translate(${to}px, ${y0 - 6}px)`, opacity: 1 }], { duration: 9000, easing: 'linear' })
+  } }
+}
+
+/* lightning: a jagged bolt from the cloud base with one fork, and a double
+   flash of the whole sky — then 3 to 8 seconds of dark */
+function Lightning(scene, W) {
+  const path = scene.querySelector('.bolt path'), bolt = scene.querySelector('.bolt'), flash = scene.querySelector('.flash')
+  let next = performance.now() + rand(1200, 3000)
+  const jag = (x, y, y1, spread) => { let d = `M${x.toFixed(0)} ${y.toFixed(0)}`; while (y < y1) { y += rand(10, 22); x += rand(-spread, spread); d += ` L${x.toFixed(0)} ${y.toFixed(0)}` } return [d, x, y] }
+  return { visible: true, step(dt, t) {
+    if (t < next) return
+    next = t + rand(3000, 8000)
+    const [main, fx, fy] = jag(rand(W * .25, W * .8), -4, rand(120, 170), 14)
+    const [fork] = jag(fx, fy - rand(40, 70), fy + 30, 12)
+    path.setAttribute('d', main + ' ' + fork)
+    bolt.animate([{ opacity: 0 }, { opacity: 1, offset: .08 }, { opacity: .2, offset: .25 }, { opacity: 1, offset: .38 }, { opacity: 0 }], { duration: 520 })
+    flash.animate([{ opacity: 0 }, { opacity: .3, offset: .06 }, { opacity: .05, offset: .22 }, { opacity: .22, offset: .34 }, { opacity: 0 }], { duration: 700, easing: 'ease-out' })
+  } }
+}
+
+function Shooting(scene, W) {
+  const el = document.createElement('div'); el.className = 'shoot'; scene.append(el)
+  let next = performance.now() + rand(2000, 5000)
+  return { visible: true, step(dt, t) {
+    if (t < next) return
+    next = t + rand(4000, 8000)
+    const x = rand(W * .3, W * .85), y = rand(10, 70)
+    el.animate([{ transform: `translate(${x}px, ${y}px) rotate(-155deg) scaleX(.2)`, opacity: 0 }, { opacity: 1, offset: .2 }, { transform: `translate(${x - 160}px, ${y + 70}px) rotate(-155deg) scaleX(1)`, opacity: 0 }], { duration: 900, easing: 'ease-in' })
+  } }
+}
+
+/* build one state's scene into a header; the scene carries its systems, so a
+   cross-fade can retire the old one when the new one is in */
+function mount(hdr, key, sky, fadeIn) {
+  const S = STATES[key], P0 = S[sky], w = hdr.clientWidth, h = hdr.clientHeight
+  const P = { ...P0, clear: P0.dark && !S.night && key !== 'storm' ? .88 : 0 }
+  const scene = document.createElement('div'); scene.className = 'scene'
+  scene.style.background = `linear-gradient(180deg, ${P.sky.map((c, i) => `${c} ${Math.round(i / (P.sky.length - 1) * 100)}%`).join(', ')})`
+  scene.innerHTML = S.scene(w, h, P)
+  if (fadeIn && !REDUCED) scene.style.opacity = 0
+  hdr.querySelector('.art').append(scene)
+  const sys = []
+  if (S.rain) { const r = Rain(scene, hdr, S.rain, P.drop); if (r) sys.push(r) }
+  if (S.snow) { const n = Snow(scene, hdr, S.snow, P.dark); if (n) sys.push(n) }
+  if (S.birds && !REDUCED) sys.push(Flock(scene, w, h, S.birds))
+  if (S.lightning && !REDUCED) sys.push(Lightning(scene, w))
+  if (S.night && !REDUCED) sys.push(Shooting(scene, w))
+  sys.forEach((s) => systems.add(s))
+  scene.__sys = sys; io.observe(scene)
+  hdr.dataset.tone = P.dark ? 'dark' : 'light'
+  hdr.dataset.state = key
+  hdr.querySelector('.wx').innerHTML = `${ICON[S.icon]()}<span class="wx__t">${S.temp}</span><span class="wx__c">${S.cond}</span>`
+  if (fadeIn && !REDUCED) {
+    if (scene.__fg) scene.__fg.style.opacity = 0
+    requestAnimationFrame(() => requestAnimationFrame(() => { scene.style.opacity = 1; if (scene.__fg) scene.__fg.style.opacity = 1 }))
+  }
+  return scene
+}
+function retire(scene) {
+  if (!scene) return
+  io.unobserve(scene); (scene.__sys || []).forEach((s) => systems.delete(s)); scene.remove()
+  if (scene.__fg) scene.__fg.remove()
+}
+
+/* ── the page ── */
+const list = document.getElementById('list'), tpl = document.getElementById('hdr')
+const live = { i: 0, playing: true, since: 0, hdr: null, scene: null }
+let state = { w: 744, sky: 'blue' }
+function frameFor(el) { el.style.setProperty('--fw', state.w + 'px'); el.innerHTML = ''; el.append(tpl.content.cloneNode(true)); return el.querySelector('.hdr') }
+function render() {
+  const phone = state.w < 744
+  document.querySelectorAll('.scene').forEach(retire)
+  list.innerHTML = ''
+  list.classList.toggle('is-phone', phone)
+  document.querySelector('.live').classList.toggle('is-phone', phone)
+  KEYS.forEach((k, i) => {
+    const S = STATES[k], el = document.createElement('section')
+    el.className = 'v' + (phone ? ' is-phone' : '')
+    el.innerHTML = `<div class="v__tag"><b>${i + 1}</b>${S.label}</div><p>${S.about}</p><div class="frame"></div>`
+    list.append(el)
+    mount(frameFor(el.querySelector('.frame')), k, state.sky)
+  })
+  live.hdr = frameFor(document.getElementById('liveFrame'))
+  live.scene = mount(live.hdr, KEYS[live.i], state.sky)
+  live.since = performance.now()
+}
+
+/* the live header: a new state every 7s, cross-faded over the old one */
+const seg = document.getElementById('liveSeg')
+seg.innerHTML = `<button type="button" aria-pressed="true" data-play>Play</button>` + KEYS.map((k, i) => `<button type="button" aria-pressed="false" data-i="${i}">${STATES[k].label}</button>`).join('')
+function goLive(i) {
+  live.i = i; live.since = performance.now()
+  const old = live.scene
+  if (old && old.__fg) old.__fg.style.opacity = 0
+  live.scene = mount(live.hdr, KEYS[i], state.sky, true)
+  setTimeout(() => retire(old), REDUCED ? 0 : 1700)
+  seg.querySelectorAll('[data-i]').forEach((b) => b.setAttribute('aria-pressed', String(!live.playing && +b.dataset.i === i)))
+}
+seg.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  if (b.hasAttribute('data-play')) { live.playing = true; b.setAttribute('aria-pressed', 'true'); goLive((live.i + 1) % KEYS.length) }
+  else { live.playing = false; seg.querySelector('[data-play]').setAttribute('aria-pressed', 'false'); goLive(+b.dataset.i) }
+})
+const bar = document.getElementById('liveBar')
+systems.add({ visible: true, step(dt, t) {
+  if (!live.playing || !live.hdr) { bar.style.width = '0'; return }
+  const k = (t - live.since) / 7000
+  bar.style.width = Math.min(100, k * 100) + '%'
+  if (k >= 1) goLive((live.i + 1) % KEYS.length)
+} })
+
+document.getElementById('readouts').innerHTML = KEYS.map((k) => { const S = STATES[k]; return `<div><div class="wx">${ICON[S.icon]()}<span class="wx__t">${S.temp}</span><span class="wx__c">${S.cond}</span></div></div>` }).join('')
+
+render()
+document.querySelectorAll('.ctl .seg button').forEach((b) => b.addEventListener('click', () => {
+  b.parentElement.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+  if (b.dataset.w) state.w = +b.dataset.w
+  if (b.dataset.sky) state.sky = b.dataset.sky
+  render()
+}))
+</script>
+</body>
+</html>

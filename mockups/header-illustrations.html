@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Header Illustrations</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=DM+Sans:opsz,wght@9..40,400..700&display=swap" rel="stylesheet">
+<style>
+/* Five backgrounds for V2's mint header: animals, forest, doodles (owner,
+   25 Sep 2026). Every one sits behind a faithful copy of the header as it is
+   at 744 — the greeting, bell, avatar, search row and My Species rail, with
+   the app's own icons and photographs — and is drawn only in the header's
+   own family: the mint rgba(175,239,235,.5) on white, the teal ink it
+   already uses, white, and a touch of the brand green. The art is placed
+   where the header has room: right of the greeting, around the My Species
+   title, and the edges. */
+:root { --page: #EDF2F1; --ink: #1F415B; --ink-2: #44544A; --mute: #7A8684; --mint: rgba(175, 239, 235, .5); --teal: 0, 128, 118; --edit: #00AFD6; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page: #0E1719; --page-ink: #E4EEEE; } }
+:root[data-theme="dark"] { --page: #0E1719; --page-ink: #E4EEEE; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--page-ink, var(--ink)); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.top { max-width: 1600px; margin: 0 auto; padding: 36px 24px 8px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.top h1 { margin: 0 0 6px; font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+.top p { margin: 0; max-width: 720px; font-size: 14.5px; line-height: 1.55; opacity: .8; }
+.seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: rgba(31, 65, 91, .08); }
+.seg button { min-height: 36px; padding: 0 14px; border: 0; border-radius: 9px; background: none; color: inherit; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(31, 65, 91, .14); }
+.list { max-width: 1600px; margin: 0 auto; padding: 16px 24px 64px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(744px, 100%), 1fr)); gap: 40px 32px; }
+.v { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.v__tag { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .65; }
+.v__tag b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #327A93; color: #fff; letter-spacing: 0; font-size: 12px; }
+.v h2 { margin: 0; font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+.v p { margin: 0; font-size: 13.5px; line-height: 1.5; opacity: .78; max-width: 680px; }
+.v ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.55; opacity: .72; }
+.frame { width: var(--fw, 744px); max-width: 100%; border-radius: 22px; overflow: hidden; background: #fff; box-shadow: 0 0 0 1px rgba(31, 65, 91, .06), 0 20px 50px -24px rgba(16, 45, 52, .35); }
+
+/* ── the header, V2's numbers at 744 ── */
+.hdr { position: relative; height: 421px; background: #fff; border-radius: 0 0 20px 20px; overflow: hidden; color: var(--ink); isolation: isolate; }
+.hdr::before { content: ''; position: absolute; inset: 0; background: var(--mint); z-index: -2; }
+.art { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.art svg { position: absolute; display: block; }
+.hdr__in { position: relative; padding: 40px 24px 0; }
+.g-row { display: flex; align-items: flex-start; justify-content: space-between; }
+.g-word { font-family: "DM Sans", sans-serif; font-size: 16px; line-height: 21px; color: var(--ink-2); }
+.g-name { margin-top: 4px; font-size: 28px; font-weight: 600; line-height: 34px; white-space: nowrap; }
+.g-act { display: flex; gap: 12px; margin-top: 11px; }
+.bell { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .04); }
+.bell img { width: 22px; height: 22px; }
+.ava { width: 38px; height: 38px; border-radius: 50%; background: #E4E0FA; overflow: hidden; }
+.ava img { width: 100%; height: 100%; object-fit: cover; }
+.s-row { display: flex; gap: 8px; margin-top: 24px; }
+.search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; height: 52px; padding: 0 20px; border-radius: 12px; background: #fff; font-size: 15.5px; color: #7A8684; white-space: nowrap; overflow: hidden; }
+.search img { width: 22px; height: 22px; flex: none; }
+.scan { display: grid; place-items: center; width: 52px; height: 52px; flex: none; border-radius: 16px; background: #fff; }
+.scan img { width: 22px; height: 22px; }
+.f-head { display: flex; justify-content: space-between; align-items: center; margin: 32px 0 16px; font-size: 16px; font-weight: 500; color: var(--ink-2); }
+.f-head span { display: inline-flex; align-items: center; gap: 6px; color: var(--edit); font-weight: 500; }
+.f-head img { width: 20px; height: 20px; }
+.rail { display: flex; gap: 8px; margin-right: -24px; overflow: hidden; }
+.card { flex: none; width: 148px; height: 158px; border-radius: 12px; overflow: hidden; background: #000; }
+.card img { display: block; width: 100%; height: 106px; object-fit: cover; }
+.card div { padding: 7px 12px 0; color: #fff; }
+.card b { display: block; font-size: 14px; font-weight: 600; line-height: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card small { font-size: 12px; opacity: .92; }
+/* the phone: V2's own step at 743 */
+.is-phone .hdr { height: 409px; }
+.is-phone .card { width: 124px; height: 156px; }
+.is-phone .card img { height: 104px; }
+.is-phone .g-name { font-size: 24px; }
+.is-phone .search span { font-size: 14px; }
+
+/* motion, kept to a breath: the forest's birds, the wallpaper's drift */
+@keyframes drift { from { transform: translate(0, 0); } to { transform: translate(-140px, -140px); } }
+@keyframes fly { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-6px, -3px); } }
+.fly { animation: fly 5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Header backgrounds · animals, forest, doodles</h1>
+    <p>Five backgrounds for V2’s mint header, each behind a faithful copy of the header as it is today. Everything is drawn in the header’s own colours: its mint, the teal ink, white, and a touch of the brand green. The art sits where the header has room, so the greeting, search and species cards read exactly as they do now.</p>
+  </div>
+  <div class="seg" role="group" aria-label="Width">
+    <button type="button" aria-pressed="true" data-w="744">Tablet · 744</button>
+    <button type="button" aria-pressed="false" data-w="390">Phone · 390</button>
+  </div>
+</header>
+<main class="list" id="list"></main>
+
+<template id="hdr">
+  <div class="hdr">
+    <div class="art"></div>
+    <div class="hdr__in">
+      <div class="g-row">
+        <div><div class="g-word">Good Afternoon,</div><div class="g-name">Sourav Tambe 👋🏻</div></div>
+        <div class="g-act"><span class="bell"><img src="../assets/icon/v2-bell.svg" alt=""></span><span class="ava"><img src="../assets/img/avatar.png" alt=""></span></div>
+      </div>
+      <div class="s-row"><div class="search"><img src="../assets/icon/v2-search.svg" alt=""><span>Search “Dhruva”</span></div><span class="scan"><img src="../assets/icon/v2-scan.svg" alt=""></span></div>
+      <div class="f-head">My Species <span>Edit <img src="../assets/icon/v2-add-circle.svg" alt=""></span></div>
+      <div class="rail">
+        <div class="card"><img src="../assets/img/species/asiatic-lion.jpg" alt=""><div><b>Asiatic lion</b><small>9 animals</small></div></div>
+        <div class="card"><img src="../assets/img/species/bengal-tiger.jpg" alt=""><div><b>Bengal tiger</b><small>6 animals</small></div></div>
+        <div class="card"><img src="../assets/img/species/bonnet-macaque.jpg" alt=""><div><b>Bonnet macaque</b><small>27 animals</small></div></div>
+        <div class="card"><img src="../assets/img/species/gaur.jpg" alt=""><div><b>Gaur</b><small>12 animals</small></div></div>
+        <div class="card"><img src="../assets/img/species/nilgai.jpg" alt=""><div><b>Nilgai</b><small>40 animals</small></div></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg'
+const T = (a) => `rgba(0, 128, 118, ${a})`          /* the header's teal ink */
+const G = (a) => `rgba(55, 189, 105, ${a})`         /* brand Primary green */
+const W = (a) => `rgba(255, 255, 255, ${a})`
+let seed = 7
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647
+
+/* ── the drawings, each a small function returning SVG markup ── */
+const elephant = (x, y, s, fill, flip = false) => `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s})" fill="${fill}">
+  <ellipse cx="50" cy="30" rx="31" ry="21"/><circle cx="20" cy="24" r="15"/><ellipse cx="29" cy="25" rx="10" ry="13"/>
+  <path d="M8 24 C1 33 1 45 5 55 L11 55 C8 46 8 37 14 30Z"/>
+  <rect x="27" y="38" width="9" height="20" rx="3.5"/><rect x="40" y="40" width="9" height="18" rx="3.5"/><rect x="58" y="40" width="9" height="18" rx="3.5"/><rect x="70" y="38" width="9" height="20" rx="3.5"/>
+  <path d="M80 26 q7 4 5 14" stroke="${fill}" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>`
+const deer = (x, y, s, fill) => `<g transform="translate(${x} ${y}) scale(${s})" fill="${fill}" stroke="${fill}" stroke-linecap="round">
+  <ellipse cx="34" cy="30" rx="21" ry="10" stroke="none"/><path d="M50 26 L58 10 L64 12 L58 30Z" stroke="none"/><ellipse cx="63" cy="10" rx="7" ry="4.5" stroke="none"/>
+  <path d="M60 6 L56 -6 M57 -1 L52 -4 M62 5 L66 -7 M65 -2 L70 -5" stroke-width="1.8" fill="none"/>
+  <path d="M20 36 L18 54 M26 38 L27 54 M44 37 L42 54 M50 35 L53 54" stroke-width="3" fill="none"/><path d="M13 26 l-5 -3" stroke-width="3" fill="none"/></g>`
+const peacockBird = (x, y, s, c) => `<g transform="translate(${x} ${y}) scale(${s})" fill="${c}"><path d="M0 0 q10 -8 20 0 q-6 3 -10 3 q-4 0 -10 -3z"/></g>`
+const bird = (x, y, s, c) => `<path class="fly" d="M${x} ${y} q${6 * s} ${-6 * s} ${12 * s} 0 q${6 * s} ${-6 * s} ${12 * s} 0" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>`
+const roundTree = (x, y, h, fill) => `<g fill="${fill}"><rect x="${x - 2}" y="${y - h * .45}" width="4" height="${h * .45}"/><circle cx="${x}" cy="${y - h * .62}" r="${h * .3}"/><circle cx="${x - h * .2}" cy="${y - h * .5}" r="${h * .22}"/><circle cx="${x + h * .2}" cy="${y - h * .52}" r="${h * .24}"/></g>`
+const pine = (x, y, h, fill) => `<g fill="${fill}"><rect x="${x - 1.6}" y="${y - h * .2}" width="3.2" height="${h * .2}"/><path d="M${x} ${y - h} L${x + h * .22} ${y - h * .55} L${x + h * .12} ${y - h * .55} L${x + h * .3} ${y - h * .18} L${x - h * .3} ${y - h * .18} L${x - h * .12} ${y - h * .55} L${x - h * .22} ${y - h * .55}Z"/></g>`
+const paw = (x, y, s, c, r = 0, fill = false) => `<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})" ${fill ? `fill="${c}"` : `fill="none" stroke="${c}" stroke-width="${1.5 / s}"`}>
+  <path d="M0 4 C-7 4 -9 11 -6 14 C-3 17 3 17 6 14 C9 11 7 4 0 4Z"/><ellipse cx="-8" cy="-2" rx="2.6" ry="3.4"/><ellipse cx="-3" cy="-6.5" rx="2.6" ry="3.4"/><ellipse cx="3" cy="-6.5" rx="2.6" ry="3.4"/><ellipse cx="8" cy="-2" rx="2.6" ry="3.4"/></g>`
+const leaf = (x, y, len, wid, rot, fill, vein) => `<g transform="translate(${x} ${y}) rotate(${rot})"><path d="M0 0 C${wid} ${-len * .25} ${wid * .8} ${-len * .8} 0 ${-len} C${-wid * .8} ${-len * .8} ${-wid} ${-len * .25} 0 0Z" fill="${fill}"/>${vein ? `<path d="M0 0 L0 ${-len * .95}" stroke="${vein}" stroke-width="1.4" fill="none"/>` + [.3, .5, .7].map((k) => `<path d="M0 ${-len * k} L${wid * .55} ${-len * (k + .12)} M0 ${-len * k} L${-wid * .55} ${-len * (k + .12)}" stroke="${vein}" stroke-width="1" fill="none"/>`).join('') : ''}</g>`
+
+/* A · the forest horizon */
+function artForest(w) {
+  seed = 11
+  const back = [], mid = [], front = []
+  for (let x = w * .34; x < w + 30; x += 22 + rnd() * 14) back.push((rnd() > .35 ? roundTree : pine)(x, 118, 56 + rnd() * 26, T(.07)))
+  for (let x = w * .4; x < w + 30; x += 30 + rnd() * 18) mid.push((rnd() > .45 ? roundTree : pine)(x, 122, 44 + rnd() * 20, T(.11)))
+  const ridge = `<path d="M${w * .3} 123 C${w * .45} 108 ${w * .62} 104 ${w * .78} 110 S${w * .95} 104 ${w + 10} 108 L${w + 10} 130 L${w * .3} 130Z" fill="${T(.13)}"/>`
+  for (let x = w * .86; x < w + 30; x += 46 + rnd() * 20) front.push(roundTree(x, 124, 34 + rnd() * 12, T(.16)))
+  const fade = `<defs><linearGradient id="fA" x1="0" x2="1"><stop offset=".28" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff"/></linearGradient><mask id="mA"><rect width="${w}" height="140" fill="url(#fA)"/></mask></defs>`
+  /* the animals are the darkest thing in the scene, so they read in front of the trees */
+  const animals = elephant(w * .5, 84, .6, T(.34)) + elephant(w * .5 + 56, 98, .34, T(.34)) + deer(w * .7, 96, .44, T(.32))
+  const birds = bird(w * .44, 34, 1, T(.28)) + bird(w * .5, 22, .7, T(.22)) + bird(w * .56, 40, .55, T(.2))
+  /* and the same forest, lower and quieter, along the foot where the rail runs out */
+  const foot = Array.from({ length: Math.ceil(w / 34) }, (_, i) => roundTree(i * 34 + 10, 421, 26 + (i % 3) * 7, W(.5))).join('')
+  return `<svg viewBox="0 0 ${w} 421" width="${w}" height="421" style="left:0;top:0">${fade}<g mask="url(#mA)">${back.join('')}${mid.join('')}${ridge}${front.join('')}${animals}</g>${birds}<g opacity=".9">${foot}</g></svg>`
+}
+
+/* B · the doodle wallpaper */
+function artDoodles(w) {
+  const c = T(.16), sw = 1.5
+  const tile = `
+    ${paw(22, 26, 1, c, -18)}
+    ${leaf(96, 34, 26, 9, 38, 'none', null).replace('fill="none"', `fill="none" stroke="${c}" stroke-width="${sw}"`)}<path d="M96 34 l14 -18" stroke="${c}" stroke-width="1.2"/>
+    <g transform="translate(64 78)" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"><ellipse cx="-7" cy="-4" rx="7" ry="5" transform="rotate(-25 -7 -4)"/><ellipse cx="7" cy="-4" rx="7" ry="5" transform="rotate(25 7 -4)"/><ellipse cx="-5" cy="5" rx="4.5" ry="3.5"/><ellipse cx="5" cy="5" rx="4.5" ry="3.5"/><path d="M0 -8 V9 M0 -8 l-3 -6 M0 -8 l3 -6"/></g>
+    <g transform="translate(118 104)" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"><ellipse rx="14" ry="10"/><path d="M-6 -9 L-2 -2 L6 -3 L8 -9 M-2 -2 L-4 7 M6 -3 L7 7"/><circle cx="17" cy="-1" r="3.5"/><path d="M-10 8 l-3 4 M9 8 l3 4 M-10 -8 l-3 -4 M9 -8 l3 -4"/></g>
+    <g transform="translate(26 112) rotate(-30)" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"><path d="M0 -18 C4 -6 4 6 0 18"/>${[-12, -6, 0, 6, 12].map((y) => `<path d="M${1.5} ${y} l7 -4 M${1} ${y} l-7 -4"/>`).join('')}</g>
+    ${bird(70, 128, .8, c)}
+    <circle cx="112" cy="62" r="1.8" fill="${c}"/><circle cx="46" cy="52" r="1.4" fill="${c}"/><circle cx="130" cy="18" r="1.4" fill="${c}"/>`
+  return `<svg viewBox="0 0 ${w} 421" width="${w}" height="421" style="left:0;top:0"><defs><pattern id="pB" width="140" height="140" patternUnits="userSpaceOnUse">${tile}</pattern>
+    <linearGradient id="fB" x1="0" y1="0" x2="1" y2=".35"><stop offset=".05" stop-color="#fff" stop-opacity=".25"/><stop offset=".55" stop-color="#fff"/></linearGradient><mask id="mB"><rect width="${w}" height="421" fill="url(#fB)"/></mask></defs>
+    <rect width="${w}" height="421" fill="url(#pB)" mask="url(#mB)"/></svg>`
+}
+
+/* C · the jungle canopy frame */
+function artCanopy(w) {
+  seed = 5
+  const big = [[w + 18, -14, 170, 60, 212], [w + 26, 40, 150, 52, 238], [w - 30, -26, 120, 44, 190], [w + 30, 110, 110, 40, 258], [w - 90, -30, 96, 34, 172]]
+  const leaves = big.map(([x, y, l, wd, r], i) => leaf(x, y, l, wd, r, i % 2 ? G(.32) : T(.26), W(.6))).join('')
+  const fern = (x, y, len, rot, c) => `<g transform="translate(${x} ${y}) rotate(${rot})"><path d="M0 0 Q ${len * .1} ${-len * .5} 0 ${-len}" stroke="${c}" stroke-width="1.6" fill="none"/>${Array.from({ length: 11 }, (_, i) => { const k = (i + 1) / 12, yy = -len * k, lw = 16 * (1 - k * .7); return leaf(0, yy, lw, 4, 62, c) + leaf(0, yy, lw, 4, -62, c) }).join('')}</g>`
+  /* left of the bell and avatar at either width */
+  const vineX = w < 744 ? w * .63 : w * .8
+  const vine = `<path d="M${vineX} -4 C${vineX - 16} 30 ${vineX + 14} 52 ${vineX - 4} 88" stroke="${T(.3)}" stroke-width="1.8" fill="none"/>` + [18, 42, 66].map((y, i) => leaf(vineX + (i % 2 ? 6 : -6), y, 16, 6, i % 2 ? 40 : -40, G(.35))).join('')
+  /* a rose-ringed parakeet on the vine: the header's one bright note */
+  /* perched on the vine, facing left: a tilted body, a darker wing, two
+     long tapering tail feathers, the red hooked beak and the black ring */
+  const parakeet = `<g transform="translate(${vineX - 4} 84) rotate(12)">
+    <path d="M4 12 C2 26 -2 40 -8 52 C-4 42 -1 28 0 13Z" fill="#2E9E57"/><path d="M8 12 C9 26 8 40 4 54 C6 42 6 27 5 13Z" fill="#37BD69"/>
+    <ellipse cx="5" cy="4" rx="8" ry="11" fill="#37BD69"/><path d="M8 -3 C14 2 14 10 8 15 C10 8 10 2 6 -2Z" fill="#2E9E57"/>
+    <circle cx="1" cy="-8" r="6.5" fill="#46C877"/><path d="M-5 -10 C-10 -10 -11 -5 -7 -3 C-7 -6 -6 -8 -4 -8Z" fill="#E93353"/>
+    <circle cx="0" cy="-9.5" r="1.3" fill="#1F415B"/><path d="M-4 -3 C-1 0 4 0 7 -4" stroke="#1F415B" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    <path d="M1 15 l-2 4 M6 15 l1 4" stroke="#6B5B3E" stroke-width="1.4" stroke-linecap="round"/></g>`
+  const left = fern(-6, 421, 150, 28, T(.22)) + fern(40, 430, 110, 14, G(.26)) + leaf(-10, 200, 120, 42, 64, T(.14), W(.5))
+  return `<svg viewBox="0 0 ${w} 421" width="${w}" height="421" style="left:0;top:0">${left}${leaves}${vine}${parakeet}</svg>`
+}
+
+/* D · the pugmark trail across a reserve map */
+function artTrail(w) {
+  seed = 3
+  const rings = []
+  const blob = (cx, cy, r, n) => { let d = ''; for (let i = 0; i <= 48; i++) { const a = i / 48 * Math.PI * 2, rr = r * (1 + .08 * Math.sin(a * 3 + n) + .05 * Math.cos(a * 5 + n * 2)); d += `${i ? 'L' : 'M'}${(cx + Math.cos(a) * rr * 1.4).toFixed(1)} ${(cy + Math.sin(a) * rr).toFixed(1)}` } return d + 'Z' }
+  for (let k = 1; k <= 7; k++) rings.push(`<path d="${blob(w * .78, 60, k * 26, k)}" fill="none" stroke="${W(.75)}" stroke-width="1.2"/>`)
+  for (let k = 1; k <= 4; k++) rings.push(`<path d="${blob(w * .1, 400, k * 30, k + 3)}" fill="none" stroke="${W(.7)}" stroke-width="1.2"/>`)
+  /* a tiger's walk: pugmarks in pairs along a curve from the greeting's
+     right, over the search row, down past the My Species title */
+  const pts = []
+  for (let t = 0; t <= 1.0001; t += 1 / 13) {
+    const x = w * .4 + (w * .26) * t, y = 30 + 176 * t + 22 * Math.sin(t * 5)
+    const ang = Math.atan2(176 + 110 * Math.cos(t * 5), w * .26) * 180 / Math.PI
+    const side = pts.length % 2 ? 1 : -1
+    pts.push(paw(x + side * 6 * Math.sin(ang * Math.PI / 180), y - side * 6 * Math.cos(ang * Math.PI / 180), .72, T(.2), ang + 90, true))
+  }
+  const pin = `<g transform="translate(${w * .7} 226)"><path d="M0 0 C-10 -12 -10 -24 0 -28 C10 -24 10 -12 0 0Z" fill="${T(.3)}"/><circle cy="-19" r="4" fill="#fff"/></g>`
+  return `<svg viewBox="0 0 ${w} 421" width="${w}" height="421" style="left:0;top:0">${rings.join('')}${pts.join('')}${pin}</svg>`
+}
+
+/* E · one line drawing: a peacock opening its fan above the search row */
+function artPeacock(w) {
+  /* on a phone the body stands behind the search field, not in the gap
+     beside the scan button, and the fan is scaled to the narrower block */
+  const phone = w < 744
+  const cx = phone ? w * .75 : w * .76, cy = 150, R = phone ? 100 : 150
+  const a0 = phone ? 1.14 : 1.04, span = phone ? .82 : .92   /* on a phone the fan starts past the name */
+  const n = 15, feathers = []
+  for (let i = 0; i < n; i++) {
+    const a = Math.PI * (a0 + i / (n - 1) * span), ex = cx + Math.cos(a) * R, ey = cy + Math.sin(a) * R
+    const qx = cx + Math.cos(a) * R * .5 + Math.sin(a) * 10, qy = cy + Math.sin(a) * R * .5 - Math.cos(a) * 10
+    const deg = a * 180 / Math.PI + 90
+    feathers.push(`<path d="M${cx} ${cy} Q${qx.toFixed(1)} ${qy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke="${W(.9)}" stroke-width="1.6"/>`)
+    feathers.push(`<g transform="translate(${ex.toFixed(1)} ${ey.toFixed(1)}) rotate(${deg.toFixed(1)})"><ellipse rx="11" ry="15" fill="${W(.55)}" stroke="${W(.95)}" stroke-width="1.6"/><ellipse rx="6" ry="8.5" cy="1" fill="${T(.3)}"/><ellipse rx="3" ry="4" cy="2" fill="${T(.45)}"/></g>`)
+    if (i < n - 1) { const b = a + Math.PI * span / (n - 1) / 2, bx = cx + Math.cos(b) * R * .72, by = cy + Math.sin(b) * R * .72; feathers.push(`<g transform="translate(${bx.toFixed(1)} ${by.toFixed(1)}) rotate(${(b * 180 / Math.PI + 90).toFixed(1)})"><ellipse rx="6" ry="9" fill="${W(.45)}" stroke="${W(.9)}" stroke-width="1.3"/><ellipse rx="3" ry="4.5" cy="1" fill="${T(.28)}"/></g>`) }
+  }
+  const body = `<path d="M${cx - 14} ${cy + 20} C${cx - 18} ${cy - 10} ${cx - 8} ${cy - 30} ${cx - 4} ${cy - 46} C${cx - 1} ${cy - 58} ${cx - 3} ${cy - 66} ${cx - 8} ${cy - 70} L${cx - 3} ${cy - 72} C${cx + 4} ${cy - 62} ${cx + 4} ${cy - 52} ${cx + 3} ${cy - 44} C${cx + 10} ${cy - 20} ${cx + 16} ${cy - 4} ${cx + 14} ${cy + 20}Z" fill="rgba(0, 122, 149, .72)"/>
+    <g fill="none" stroke="${W(.95)}" stroke-width="2" stroke-linecap="round"><path d="M${cx - 14} ${cy + 20} C${cx - 18} ${cy - 10} ${cx - 8} ${cy - 30} ${cx - 2} ${cy - 44} C${cx + 2} ${cy - 56} ${cx - 2} ${cy - 66} ${cx - 8} ${cy - 70}"/><path d="M${cx + 14} ${cy + 20} C${cx + 16} ${cy - 4} ${cx + 8} ${cy - 20} ${cx - 2} ${cy - 44}"/>
+    <circle cx="${cx - 10}" cy="${cy - 74}" r="7" fill="rgba(0, 122, 149, .85)" stroke="${W(.95)}"/><path d="M${cx - 17} ${cy - 73} l-7 2"/><path d="M${cx - 10} ${cy - 81} l-4 -12 M${cx - 8} ${cy - 81} l0 -13 M${cx - 6} ${cy - 81} l4 -12"/></g>
+    <circle cx="${cx - 14}" cy="${cy - 93}" r="2.2" fill="${W(.95)}"/><circle cx="${cx - 8}" cy="${cy - 95}" r="2.2" fill="${W(.95)}"/><circle cx="${cx - 2}" cy="${cy - 93}" r="2.2" fill="${W(.95)}"/><circle cx="${cx - 12}" cy="${cy - 75}" r="1.6" fill="#fff"/>`
+  const glow = `<defs><radialGradient id="gE"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><ellipse cx="${cx}" cy="${cy - 30}" rx="${R * 1.15}" ry="${R * .9}" fill="url(#gE)"/>`
+  return `<svg viewBox="0 0 ${w} 421" width="${w}" height="421" style="left:0;top:0">${glow}${feathers.join('')}${body}</svg>`
+}
+
+const VARIANTS = [
+  { title: 'Forest horizon', art: artForest,
+    about: 'A layered tree line rises behind the right half of the greeting: three depths of sal trees and pines, a ridge, an elephant with her calf and a chital walking along it, and three birds overhead. It fades out before it reaches the name. A low, white row of trees closes the foot of the block.',
+    notes: ['Reads as “a zoo in a forest” at a glance, and only one area is busy.', 'Everything sits right of the greeting, so the name and the bell stay on clean mint.'] },
+  { title: 'Doodle wallpaper', art: artDoodles,
+    about: 'A hand-drawn wallpaper, like a chat background: pugmarks, leaves, butterflies, a star tortoise, feathers and birds in one fine teal line, repeating across the whole block and fading toward the greeting.',
+    notes: ['The most playful, and the most “doodle”.', 'Even texture everywhere, so it never competes for one spot. It is also the busiest behind the text.'] },
+  { title: 'Jungle canopy', art: artCanopy,
+    about: 'Big leaves hang in from the top-right corner, with a vine and a rose-ringed parakeet perched beside the bell. Ferns rise in from the bottom-left behind the first species card. The middle of the block stays clear.',
+    notes: ['A frame, not a pattern: the corners are lush and the content sits in the clearing.', 'The parakeet is the one bright note. It uses the brand green, with the red beak of the real bird.'] },
+  { title: 'Pugmark trail', art: artTrail,
+    about: 'The header as a reserve map: soft white contour lines, and a tiger’s pugmarks walking from beside the greeting, across the search row and down past the My Species title to a map pin.',
+    notes: ['Tells a small story that ends where your species are.', 'The quietest of the five: white lines on mint and pale teal prints.'] },
+  { title: 'One peacock', art: artPeacock,
+    about: 'A single line drawing of a peacock, India’s national bird, standing behind the search row with its fan opening above it, behind the bell and avatar. White strokes, teal eye-spots and a soft glow.',
+    notes: ['One confident illustration instead of many small ones.', 'The fan sits behind the bell and avatar, which already carry white plates, so they stay crisp.'] },
+]
+
+const list = document.getElementById('list'), tpl = document.getElementById('hdr')
+function render(width) {
+  list.innerHTML = ''
+  VARIANTS.forEach((v, i) => {
+    const el = document.createElement('section')
+    el.className = 'v' + (width < 744 ? ' is-phone' : '')
+    el.innerHTML = `<div class="v__tag"><b>${i + 1}</b>Variation</div><h2>${v.title}</h2><p>${v.about}</p><ul>${v.notes.map((n) => `<li>${n}</li>`).join('')}</ul><div class="frame" style="--fw:${width}px"></div>`
+    const frame = el.querySelector('.frame')
+    frame.append(tpl.content.cloneNode(true))
+    frame.querySelector('.art').innerHTML = v.art(width)
+    list.append(el)
+  })
+}
+render(744)
+document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+  list.style.gridTemplateColumns = b.dataset.w === '390' ? 'repeat(auto-fill, minmax(390px, 1fr))' : ''
+  render(+b.dataset.w)
+}))
+</script>
+</body>
+</html>

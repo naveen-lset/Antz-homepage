@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realistic Header Skies</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=DM+Sans:opsz,wght@9..40,400..700&display=swap" rel="stylesheet">
+<style>
+/* Six realistic backgrounds for V2's header (owner, 28 Sep 2026: "its become
+   too dark … something realistic, not like these … check real world"). The
+   live climate meadow is a flat cartoon on a saturated #7EC4EC sky; each of
+   these is a different premise for "real": a sky only, haze, a photograph,
+   a blurred photograph, depth of field. Every one is light — the header's
+   ink stays #1F415B and never flips to white in daylight. The header copy
+   below is the same one mockups/header-illustrations.html uses, at V2's 744. */
+:root { --page: #EEF1F2; --page-ink: #1F2A33; --ink: #1F415B; --ink-2: #44544A; --edit: #00AFD6; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page: #0F1518; --page-ink: #E4ECEE; } }
+:root[data-theme="dark"] { --page: #0F1518; --page-ink: #E4ECEE; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--page-ink); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.top { max-width: 1600px; margin: 0 auto; padding: 36px 24px 8px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.top h1 { margin: 0 0 6px; font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+.top p { margin: 0; max-width: 760px; font-size: 14.5px; line-height: 1.55; opacity: .8; }
+.seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: rgba(120, 140, 150, .16); }
+.seg button { min-height: 36px; padding: 0 14px; border: 0; border-radius: 9px; background: none; color: inherit; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: #fff; color: #1F415B; box-shadow: 0 1px 3px rgba(31, 65, 91, .14); }
+.list { max-width: 1600px; margin: 0 auto; padding: 16px 24px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(744px, 100%), 1fr)); gap: 44px 32px; }
+.list.is-phone { grid-template-columns: repeat(auto-fill, minmax(min(390px, 100%), 1fr)); }
+.v { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.v__tag { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .65; }
+.v__tag b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #327A93; color: #fff; letter-spacing: 0; font-size: 12px; }
+.v__tag i { font-style: normal; font-weight: 600; letter-spacing: .02em; text-transform: none; opacity: .9; }
+.v h2 { margin: 0; font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+.v p { margin: 0; font-size: 13.5px; line-height: 1.5; opacity: .78; max-width: 700px; }
+.v ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.55; opacity: .72; max-width: 700px; }
+.frame { width: var(--fw, 744px); max-width: 100%; border-radius: 22px; overflow: hidden; background: #fff; box-shadow: 0 0 0 1px rgba(31, 65, 91, .06), 0 20px 50px -24px rgba(16, 45, 52, .35); }
+.credit { font-size: 11.5px; opacity: .55; }
+.credit a { color: inherit; }
+.foot { max-width: 1600px; margin: 0 auto; padding: 0 24px 56px; font-size: 12.5px; line-height: 1.6; opacity: .6; }
+.foot a { color: inherit; }
+
+/* ── the header, V2's numbers at 744 ── */
+.hdr { position: relative; height: 396px; background: #fff; border-radius: 0 0 20px 20px; overflow: hidden; color: var(--ink); isolation: isolate; }
+.art { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.art > * { position: absolute; display: block; }
+.hdr__in { position: relative; padding: 40px 24px 0; }
+.g-row { display: flex; align-items: flex-start; justify-content: space-between; }
+.g-word { font-family: "DM Sans", sans-serif; font-size: 16px; line-height: 21px; color: var(--ink-2); }
+.g-name { margin-top: 4px; font-size: 28px; font-weight: 600; line-height: 34px; white-space: nowrap; }
+.g-act { display: flex; gap: 12px; margin-top: 11px; }
+.bell { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .04); }
+.bell img { width: 22px; height: 22px; }
+.ava { width: 38px; height: 38px; border-radius: 50%; background: #E4E0FA; overflow: hidden; }
+.ava img { width: 100%; height: 100%; object-fit: cover; }
+.s-row { display: flex; gap: 8px; margin-top: 24px; }
+.search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; height: 52px; padding: 0 20px; border-radius: 12px; background: #fff; font-size: 15.5px; color: #7A8684; white-space: nowrap; overflow: hidden; box-shadow: 0 1px 2px rgba(20, 40, 60, .05); }
+.search img { width: 22px; height: 22px; flex: none; }
+.scan { display: grid; place-items: center; width: 52px; height: 52px; flex: none; border-radius: 16px; background: #fff; box-shadow: 0 1px 2px rgba(20, 40, 60, .05); }
+.scan img { width: 22px; height: 22px; }
+.f-head { display: flex; justify-content: space-between; align-items: center; margin: 30px 0 14px; font-size: 16px; font-weight: 500; color: var(--ink-2); }
+.f-head span { display: inline-flex; align-items: center; gap: 6px; color: var(--edit); font-weight: 500; }
+.f-head img { width: 20px; height: 20px; }
+.rail { display: flex; gap: 8px; overflow: hidden; }
+/* the live card: a full-bleed photograph with its name on a dark foot */
+.card { position: relative; flex: none; width: 138px; height: 146px; border-radius: 12px; overflow: hidden; background: #333; box-shadow: 0 6px 16px -10px rgba(20, 40, 50, .45); }
+.card img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.card::after { content: ''; position: absolute; inset: 40% 0 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .62)); }
+.card div { position: absolute; left: 0; right: 0; bottom: 10px; z-index: 1; padding: 0 11px; color: #fff; }
+.card b { display: block; font-size: 14.5px; font-weight: 600; line-height: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card small { font-size: 12px; opacity: .92; }
+.is-phone .hdr { height: 380px; }
+.is-phone .card { width: 124px; height: 140px; }
+.is-phone .g-name { font-size: 24px; }
+.is-phone .search span { font-size: 14px; }
+
+/* ── the art layers ── */
+.sky { inset: 0; }
+.photo { inset: -2px; background-size: cover; background-repeat: no-repeat; }
+.wash { inset: 0; }
+.drift { animation: drift 60s ease-in-out infinite alternate; }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(28px); } }
+@media (prefers-reduced-motion: reduce) { .drift { animation: none; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Header backgrounds · realistic, and light</h1>
+    <p>Six ways to make V2’s header feel like a real place instead of a cartoon, each behind the same copy of the header. They follow what real apps do: Apple Weather paints a real sky and nothing else, Calm and Headspace keep nature soft and pale, and iOS blurs a photograph into a wash of colour. All six stay light, so the dark ink text stays as it is.</p>
+  </div>
+  <div class="seg" role="group" aria-label="Width">
+    <button type="button" aria-pressed="true" data-w="744">Tablet · 744</button>
+    <button type="button" aria-pressed="false" data-w="390">Phone · 390</button>
+  </div>
+</header>
+<main class="list" id="list"></main>
+<p class="foot">Photographs: “Kaziranga grassland” (the silk cotton tree), “Misty hills and valley reservoir at sunrise from Kolukkumalai, Kerala” and “Golden Meadows!”, all from <a href="https://commons.wikimedia.org/">Wikimedia Commons</a> under CC BY-SA 4.0. They are stand-ins to judge the look. A shipped header would use photographs ANTZ owns or licenses, ideally of the zoo’s own grounds.</p>
+
+<template id="hdr">
+  <div class="hdr">
+    <div class="art"></div>
+    <div class="hdr__in">
+      <div class="g-row">
+        <div><div class="g-word">Good Morning,</div><div class="g-name">Sourav Tambe 👋🏻</div></div>
+        <div class="g-act"><span class="bell"><img src="../assets/icon/v2-bell.svg" alt=""></span><span class="ava"><img src="../assets/img/avatar.png" alt=""></span></div>
+      </div>
+      <div class="s-row"><div class="search"><img src="../assets/icon/v2-search.svg" alt=""><span>Search “Ravi”</span></div><span class="scan"><img src="../assets/icon/v2-scan.svg" alt=""></span></div>
+      <div class="f-head">My Species <span>Edit <img src="../assets/icon/v2-add-circle.svg" alt=""></span></div>
+      <div class="rail">
+        <div class="card"><img src="../assets/img/species/asiatic-lion.jpg" alt=""><div><b>Asiatic lion</b><small>9 animals</small></div></div>
+        <div class="card"><img src="../assets/img/species/blackbuck.jpg" alt=""><div><b>Blackbuck</b><small>64 animals</small></div></div>
+        <div class="card"><img src="../assets/img/species/indian-star-tortoise.jpg" alt=""><div><b>Indian star tortoise</b><small>43 animals</small></div></div>
+        <div class="card"><img src="../assets/img/species/sarus-crane.jpg" alt=""><div><b>Sarus crane</b><small>6 animals</small></div></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+let seed = 7
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647
+let uid = 0
+
+/* A real cloud is not three circles: it is a lumpy mass whose edge is torn by
+   turbulence, lit from above and greyer underneath. Each cloud is a cluster of
+   soft ellipses, pushed around by fractal noise and blurred at the edge, with
+   a cool shadow copy drawn a little lower. */
+function clouds(w, h, list, opts = {}) {
+  const id = 'c' + (++uid)
+  const lit = opts.lit || '#FFFFFF', shade = opts.shade || 'rgba(150, 172, 196, .38)'
+  const blobs = (x, y, s) => {
+    let g = ''
+    const n = 7
+    for (let i = 0; i < n; i++) {
+      const k = i / (n - 1), bx = x + (k - .5) * 150 * s, by = y - Math.sin(k * Math.PI) * 26 * s + (rnd() - .5) * 8 * s
+      const rx = (26 + rnd() * 22) * s * (1 - Math.abs(k - .5) * .6), ry = rx * (.7 + rnd() * .25)
+      g += `<ellipse cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}"/>`
+    }
+    return g + `<ellipse cx="${x}" cy="${y + 10 * s}" rx="${95 * s}" ry="${16 * s}"/>`
+  }
+  const body = list.map(([x, y, s]) => blobs(x, y, s)).join('')
+  return `<svg class="drift" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="left:0;top:0"><defs>
+    <filter id="${id}" x="-20%" y="-40%" width="140%" height="180%">
+      <feTurbulence type="fractalNoise" baseFrequency=".013 .02" numOctaves="4" seed="${seed % 97}" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="${opts.tear || 38}" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="${opts.soft || 3.2}"/></filter>
+    <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset=".35" stop-color="${lit}"/><stop offset="1" stop-color="${lit}" stop-opacity=".75"/></linearGradient></defs>
+    <g filter="url(#${id})"><g fill="${shade}" transform="translate(0 ${opts.drop || 9})">${body}</g><g fill="url(#${id}g)" opacity="${opts.alpha || .96}">${body}</g></g></svg>`
+}
+
+/* a ridge line: a few long swells plus fine noise, so it reads as land, not a wave */
+function ridge(w, base, amp, rough, s) {
+  seed = s
+  const ph = [rnd() * 6, rnd() * 6, rnd() * 6]
+  let d = `M-10 ${base}`
+  for (let x = -10; x <= w + 10; x += 4) {
+    const y = base - amp * (.55 * Math.sin(x / 190 + ph[0]) + .3 * Math.sin(x / 77 + ph[1]) + .15 * Math.sin(x / 31 + ph[2])) - (rnd() - .5) * rough
+    d += ` L${x} ${y.toFixed(1)}`
+  }
+  return d + ` L${w + 10} 900 L-10 900Z`
+}
+
+/* ─ A · a real sky, nothing else ─ Apple Weather's premise */
+function artSky(w, h) {
+  seed = 21
+  const sx = w < 744 ? w * .7 : w * .6
+  return `<div class="sky" style="background:
+      radial-gradient(circle at ${sx}px 70px, rgba(255, 250, 228, .95) 0 26px, rgba(255, 246, 214, .55) 34px, rgba(255, 242, 206, .22) 90px, rgba(255, 242, 206, 0) 230px),
+      linear-gradient(180deg, #A9CCEA 0%, #C3DCEF 28%, #DDEAF3 52%, #F1F5F6 70%, #FFFFFF 88%)"></div>` +
+    clouds(w, h, w < 744 ? [[250, 40, .36], [120, 196, .6], [330, 188, .5]] : [[430, 44, .5], [250, 196, .7], [560, 186, .62], [720, 250, .7]], { alpha: .92 })
+}
+
+/* ─ B · hazy ridges ─ aerial perspective: the farther the hill, the more it
+   takes the colour of the air. Western Ghats at seven in the morning. */
+function artRidges(w, h) {
+  const layers = [
+    [198, 26, 2, '#CDDBE4', 3], [214, 30, 3, '#BACFD8', 5], [236, 26, 4, '#A8C4C3', 9],
+    [268, 32, 6, '#98B9AA', 13], [320, 30, 8, '#8AAF97', 17]]
+  const mist = (y, a) => `<rect x="-20" y="${y}" width="${w + 40}" height="46" fill="#F6F7F4" opacity="${a}" filter="url(#bm${uid})"/>`
+  uid++
+  let g = ''
+  layers.forEach(([b, a, r, c, s], i) => { g += `<path d="${ridge(w, b, a, r, s)}" fill="${c}"/>`; if (i < 4) g += mist(b - 6, .55 - i * .08) })
+  return `<div class="sky" style="background:
+      radial-gradient(ellipse 60% 55% at 78% 58%, rgba(255, 236, 206, .9), rgba(255, 236, 206, 0) 70%),
+      linear-gradient(180deg, #CFE0EC 0%, #E1EAEF 40%, #F4EEE5 62%, #F7F1E8 100%)"></div>
+    <svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="left:0;top:0"><defs><filter id="bm${uid - 1}" x="-5%" y="-100%" width="110%" height="300%"><feGaussianBlur stdDeviation="10"/></filter></defs>${g}</svg>` +
+    clouds(w, h, [[w * .52, 40, .34]], { alpha: .7, shade: 'rgba(190, 196, 210, .3)', soft: 5 })
+}
+
+/* ─ C · a photograph, daylight ─ the Kaziranga grassland, lifted and fading
+   to white under the species cards. At 180% from the top-left corner the
+   tree, which stands mid-frame, lands in the open space right of the rail
+   and below Edit; a phone has no such space, so at 280% it keeps only the sky. */
+function artPhoto(w, h) {
+  return `<div class="photo" style="background-image:url(header-realistic/kaz.jpg); background-repeat: no-repeat; background-position: 0 0; background-size: ${w < 744 ? 280 : 180}% auto; filter: brightness(1.08) saturate(.9)"></div>
+    <div class="wash" style="background: linear-gradient(180deg, rgba(255, 255, 255, .28) 0%, rgba(255, 255, 255, .05) 30%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, .55) 88%, rgba(255, 255, 255, .8) 100%)"></div>`
+}
+
+/* ─ D · a photograph, sunrise ─ mist in the valleys from Kolukkumalai; only
+   the sky and the mist are used, the dark hills are below the fold */
+function artSunrise(w, h) {
+  return `<div class="photo" style="background-image:url(header-realistic/kolu.jpg); background-position: 50% 8%; background-size: ${w < 744 ? 'auto 190%' : '150% auto'}; filter: brightness(1.12) saturate(.8) contrast(.9)"></div>
+    <div class="wash" style="background: linear-gradient(180deg, rgba(255, 250, 244, .45) 0%, rgba(255, 250, 244, .1) 34%, rgba(255, 255, 255, 0) 50%, rgba(250, 250, 250, .72) 76%, #fff 100%)"></div>`
+}
+
+/* ─ E · a blurred photograph ─ what iOS does behind a lock screen: the same
+   Kaziranga frame, blurred until only its light and colour are left */
+function artBlur(w, h) {
+  return `<div class="photo" style="inset: -60px; background-image:url(header-realistic/kaz.jpg); background-position: 50% 20%; background-size: cover; filter: blur(34px) brightness(1.16) saturate(1.05)"></div>
+    <div class="wash" style="background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .08) 45%, rgba(255, 255, 255, .5) 100%)"></div>`
+}
+
+/* ─ F · depth of field ─ standing in the grass at dawn: a bright sky, a soft
+   tree line on the horizon, and the nearest blades of grass out of focus in
+   the two bottom corners, the way a camera sees them */
+function artField(w, h) {
+  seed = 4
+  const u = ++uid
+  const blades = (x0, x1, y0, n, len, col, bl) => {
+    let g = ''
+    for (let i = 0; i < n; i++) {
+      const x = x0 + rnd() * (x1 - x0), l = len * (.6 + rnd() * .6), lean = (rnd() - .5) * 60, wd = 2 + rnd() * 3
+      g += `<path d="M${x - wd} ${y0} Q${x + lean * .4} ${y0 - l * .6} ${x + lean} ${y0 - l} Q${x + lean * .4 + 1} ${y0 - l * .55} ${x + wd} ${y0}Z" fill="${col}"/>`
+    }
+    return `<g filter="url(#fb${u}${bl})">${g}</g>`
+  }
+  let trees = ''
+  for (let x = -10; x < w + 20; x += 10 + rnd() * 16) { const r = 8 + rnd() * 14; trees += `<ellipse cx="${x}" cy="${214 - r * .5}" rx="${r}" ry="${r * .8}"/>` }
+  return `<div class="sky" style="background:
+      radial-gradient(ellipse 70% 60% at 30% 52%, rgba(255, 232, 190, .85), rgba(255, 232, 190, 0) 70%),
+      linear-gradient(180deg, #BCD5E6 0%, #D8E5EC 34%, #F3ECDF 50%, #EFE3C8 54%, #E4D4A6 64%, #EDE3C6 100%)"></div>
+    <svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="left:0;top:0"><defs>
+      <filter id="fb${u}a" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
+      <filter id="fb${u}b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>
+      <filter id="fb${u}c" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter></defs>
+      <g fill="#A7B79A" opacity=".75" filter="url(#fb${u}a)">${trees}</g>
+      <rect x="0" y="208" width="${w}" height="20" fill="#F2EAD6" opacity=".7" filter="url(#fb${u}b)"/>
+      ${blades(-20, w + 20, 236, 160, 22, 'rgba(196, 170, 104, .55)', 'a')}
+      ${blades(-20, w + 20, 290, 120, 40, 'rgba(184, 160, 92, .5)', 'b')}
+      ${blades(-30, w * .22, h + 10, 34, 150, 'rgba(160, 150, 82, .55)', 'c')}
+      ${blades(w * .78, w + 30, h + 10, 40, 200, 'rgba(162, 146, 76, .55)', 'c')}
+    </svg>`
+}
+
+const VARIANTS = [
+  { title: 'A real sky, nothing else', ref: 'Apple Weather', art: artSky,
+    about: 'Only the sky: a soft blue that pales toward the horizon, one hazy sun, and clouds drawn with torn, lit edges and grey undersides instead of three circles. There is no ground, so the space behind the species cards goes to near white.',
+    notes: ['The lightest and quietest option. It is also the easiest to run through all eight climate states: only the colours and the clouds change.', 'The clouds drift slowly, and stand still with reduced motion.'] },
+  { title: 'Hazy ridges', ref: 'Calm, and any Western Ghats morning', art: artRidges,
+    about: 'Five hill lines, one behind the other, each taking on more of the colour of the air the farther away it is, with mist lying in the valleys between them. It uses the same layers as the current meadow, but pale and without outlines.',
+    notes: ['Still drawn, so it relights for dusk, rain and night like the current system does.', 'The hills sit behind the species cards. The greeting and search stay on clear sky.'] },
+  { title: 'A photograph, daylight', ref: 'Airbnb, Google Travel', art: artPhoto,
+    about: 'A real photograph of the Kaziranga grassland: cumulus sky, a flowering silk cotton tree and the grass line. It is brightened a little, and fades to white under the species cards.',
+    notes: ['The most realistic, and the most Indian. It could be a photo of the zoo’s own grounds.', 'A single photo cannot follow the weather. It needs one photo per climate state, or a small set that changes by the hour.'] },
+  { title: 'A photograph, sunrise', ref: 'Travel and wellness apps', art: artSunrise,
+    about: 'Dawn over the Western Ghats from Kolukkumalai: a peach sky over layers of valley mist. Only the sky and the mist are in frame. The dark hills are cut off and washed out below the search row.',
+    notes: ['Warm, and a good fit for “Good Morning”. The same frame could be swapped for a midday or dusk photo.', 'The softest photo option: nothing sharp sits behind the text.'] },
+  { title: 'A blurred photograph', ref: 'iOS lock screen and widgets', art: artBlur,
+    about: 'The same Kaziranga photo, blurred until only its light is left: sky blue at the top, fading to soft green at the foot. It gives the feel of being outdoors without any detail behind the interface.',
+    notes: ['Works with any photo, so the zoo could use its own, even low-quality ones.', 'The white search field and the cards stand out clearly against it.'] },
+  { title: 'Grass in the foreground', ref: 'camera depth of field', art: artField,
+    about: 'Eye level in a grassland at dawn: a bright sky, a soft tree line on the horizon, and the nearest grass blades out of focus in the two bottom corners, as a camera would show them. Real because of the focus, not because of detail.',
+    notes: ['The warmest option, and it frames the species rail instead of sitting behind it.', 'Drawn, so it can be relit. The grass could sway in the wind.'] },
+]
+
+const list = document.getElementById('list'), tpl = document.getElementById('hdr')
+function render(width) {
+  list.innerHTML = ''
+  list.classList.toggle('is-phone', width < 744)
+  VARIANTS.forEach((v, i) => {
+    const el = document.createElement('section')
+    el.className = 'v' + (width < 744 ? ' is-phone' : '')
+    el.innerHTML = `<div class="v__tag"><b>${String.fromCharCode(65 + i)}</b><i>Like ${v.ref}</i></div><h2>${v.title}</h2><p>${v.about}</p><ul>${v.notes.map((n) => `<li>${n}</li>`).join('')}</ul><div class="frame" style="--fw:${width}px"></div>`
+    const frame = el.querySelector('.frame')
+    frame.append(tpl.content.cloneNode(true))
+    frame.querySelector('.art').innerHTML = v.art(width, width < 744 ? 380 : 396)
+    list.append(el)
+  })
+}
+render(744)
+document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+  render(+b.dataset.w)
+}))
+</script>
+</body>
+</html>

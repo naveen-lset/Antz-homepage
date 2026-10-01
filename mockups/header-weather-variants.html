@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weather Sky Variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Mist, Snow and Sunset: the current state beside three sky-only versions
+     (28 Sep 2026: "not matching with the theme — make some matching versions").
+     Every tile is the real V2 header, live and animated, at 1024 wide. */
+  :root {
+    --bg: #F4F6F7; --card: #FFFFFF; --ink: #1F415B; --ink-2: #5A6B78; --line: #E1E6EA; --pick: #00AFD6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #12181D; --card: #1B232A; --ink: #E7EEF3; --ink-2: #9AAAB7; --line: #2A353E; }
+  }
+  :root[data-theme="dark"] { --bg: #12181D; --card: #1B232A; --ink: #E7EEF3; --ink-2: #9AAAB7; --line: #2A353E; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+  header { max-width: 1480px; margin: 0 auto; padding: 32px 24px 8px; }
+  h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -.3px; }
+  header p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.5; max-width: 820px; }
+  section { max-width: 1480px; margin: 0 auto; padding: 24px; }
+  h2 { margin: 0 0 14px; font-size: 18px; font-weight: 600; }
+  .row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 1100px) { .row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .row { grid-template-columns: minmax(0, 1fr); } }
+  figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  figure.is-now { opacity: .85; }
+  .frame { position: relative; width: 100%; aspect-ratio: 1024 / 440; overflow: hidden; background: #DDE3E8; }
+  .frame iframe { position: absolute; left: 0; top: 0; width: 1024px; height: 520px; border: 0; transform-origin: 0 0; pointer-events: none; }
+  .frame a { position: absolute; inset: 0; }
+  figcaption { padding: 12px 14px 14px; }
+  figcaption b { display: block; font-size: 14px; font-weight: 600; }
+  figcaption span { display: block; margin-top: 3px; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+  .tag { display: inline-block; margin-bottom: 6px; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; background: var(--line); color: var(--ink-2); }
+  .tag--new { background: color-mix(in srgb, var(--pick) 16%, transparent); color: var(--pick); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Weather sky: Mist, Snow and Sunset</h1>
+  <p>The first tile in each row is what the header shows today. The other three follow the same idea as Sunny, Cloudy, Rain, Night and Storm: sky only, just colour, soft cloud and light, with no trees, pines or frost. Every tile is the live header and it moves; click one to open it full size. Pick one per row.</p>
+</header>
+
+<main id="rows"></main>
+
+<script>
+  const ROWS = [
+    ['Mist', [
+      ['mist', 'Today', 'Fog through two illustrated tree lines.'],
+      ['mist-a', 'A · Fog bank', 'Clear grey sky above; a bright bank of fog rolls in low from the right, where the sky is open.'],
+      ['mist-b', 'B · Haze veils', 'An even warm-grey haze, crossed by long thin veils sliding past.'],
+      ['mist-c', 'C · Dawn mist', 'The sun just up behind the mist: warm glow top right, peach where the light meets it.'],
+    ]],
+    ['Snow', [
+      ['snow', 'Today', 'Crystals with snowy pines on the horizon and frost in the corners.'],
+      ['snow-a', 'A · Soft flakes', 'A pale overcast sky; soft round flakes drifting down, a light breeze.'],
+      ['snow-b', 'B · Crystal light', 'A bright icy blue sky and a cold sun; a few crystals turning slowly.'],
+      ['snow-c', 'C · Flurry', 'A heavier lilac-grey cloud deck; a dense flurry blown sideways in gusts.'],
+    ]],
+    ['Sunset', [
+      ['sunset', 'Today', 'Clear Morning’s pastel with a small sun in the corner.'],
+      ['sunset-a', 'A · Golden hour', 'Gold: the sun still up, low on the right, clouds lit gold from beneath.'],
+      ['sunset-b', 'B · Afterglow', 'Pink: the sun already down; a magenta band, an amber horizon, cirrus and the first stars.'],
+      ['sunset-c', 'C · Behind the clouds', 'Cloud: the sun behind a bank of cloud on the right, rays fanning up from it.'],
+    ]],
+  ]
+  const url = (k) => `../index.html?v=2&sky=${k}`
+  const main = document.getElementById('rows')
+  for (const [title, items] of ROWS) {
+    const sec = document.createElement('section')
+    sec.innerHTML = `<h2>${title}</h2><div class="row">` + items.map(([k, name, what], i) =>
+      `<figure class="${i ? '' : 'is-now'}"><div class="frame"><iframe src="${url(k)}" loading="lazy" title="${name}"></iframe><a href="${url(k)}" target="_blank" aria-label="Open ${title} ${name} full size"></a></div>
+        <figcaption><span class="tag ${i ? 'tag--new' : ''}">${i ? 'New' : 'Current'}</span><b>${name}</b><span>${what}</span></figcaption></figure>`).join('') + `</div>`
+    main.append(sec)
+  }
+  /* scale each 1024-wide page to its tile */
+  const fit = () => document.querySelectorAll('.frame').forEach((f) => { f.querySelector('iframe').style.transform = `scale(${f.clientWidth / 1024})` })
+  addEventListener('resize', fit); fit()
+</script>
+</body>
+</html>

@@ -33,7 +33,7 @@ import json, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cdp import Chrome
 
-BASE = (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8000/").rstrip("/") + "/"
+BASE = (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8080/").rstrip("/") + "/"
 WIDTH = int(sys.argv[2]) if len(sys.argv) > 2 else 1024
 fails = []
 
@@ -878,24 +878,29 @@ def main():
         # NODE 718:17169 "V2 Design Figma" (24 Sep 2026): My Species, no clock,
         # no Site reports, and the frame's thirteen cards in its order
         check("the node's composition: My Species, no clock, no Site reports", o["fav"] and not o["clock"] and not o["reports"], str({k: o[k] for k in ('fav', 'clock', 'reports')}))
-        want = ['medical.default', 'housing.default', 'species.stats', 'hospital.photo', 'insights.v3', 'species.newlist', 'diet.photo',
-                'administer.default', 'mortality.default', 'eggs.default', 'species.newcount', 'users.default', 'security.default']
+        # 29 Sep 2026: Key Insights and the Animals list left the grid; Pending Actions took the list's slot.
+        # The order is Home 816:2's Module Grid (816:936), read card by card on 1 Oct 2026: Users and
+        # Security come before Eggs and the Animals card on its last row.
+        want = ['medical.default', 'housing.default', 'species.stats', 'hospital.photo', 'pending.v2', 'diet.photo',
+                'administer.default', 'mortality.default', 'users.default', 'security.default', 'eggs.default', 'species.newcount']
         got = c.eval("[...document.querySelectorAll('#moduleGrid .card')].map(x => x.dataset.variant)")
-        check("…and the frame's thirteen cards, in its order", got == want, str(got))
+        check("…and the frame's cards, in its order (twelve since 29 Sep)", got == want, str(got))
         g2 = c.eval("""(()=>{const q=s=>document.querySelector(s);const R=e=>e.getBoundingClientRect();const r=v=>Math.round(v*10)/10;
           const cards=[...document.querySelectorAll('#moduleGrid .card')].map(x=>R(x));const grid=R(q('#moduleGrid'));
           const pad=parseFloat(getComputedStyle(q('.main-frame')).paddingLeft), col=innerWidth-2*pad;
           return {pad, col, mint:getComputedStyle(q('.home-header')).backgroundColor, page:getComputedStyle(document.documentElement).backgroundColor,
-            climate:(()=>{const e=q('.climate'),h=q('.home-header'),f=q('#favSpecies');if(!e||!h||!f)return null;const a=R(e),b=R(h),c=R(f);return [r(a.top-b.top), r(a.bottom-c.bottom), getComputedStyle(e).zIndex]})(),
+            climate:(()=>{const e=q('.wsky'),h=q('.home-header'),f=q('#favSpecies');if(!e||!h||!f)return null;const a=R(e),b=R(h),c=R(f);return [r(a.top-b.top), r(a.bottom-c.bottom), getComputedStyle(e).zIndex]})(),
             greetY:r(R(q('.greeting__word')).top+scrollY), nameH:r(R(q('.greeting__name')).height), searchW:r(R(q('.search')).width), scanX:r(R(q('.search-btn')).left),
             favCard:[r(R(q('.fav__card')).width), r(R(q('.fav__card')).height)], plate:getComputedStyle(q('.fav__txt')).backgroundColor, favImg:r(R(q('.fav__card .fav__img')).height), favFade:getComputedStyle(q('.fav__card'),'::after').display, favRadius:getComputedStyle(q('#favSpecies')).borderBottomLeftRadius,
             bandsW:[r(R(q('#heroStage')).width), r(R(q('#recentObs')).width)], obs:[r(R(q('.obs')).width), r(R(q('.obs')).height)], obsHeadX:r(R(q('#recentObs .obs-head')).left),
             headH:r(R(q('#modulesHead')).height), heroH:r(R(q('.hero--estate')).height), row:r(cards[0].height), gridW:r(grid.width), banner:r(R(q('.hero--estate')).top-R(q('#modulesHead')).bottom),
             headTxt:[q('#obsTitle').textContent, q('#modulesTitle').textContent, q('#modulesHead .link-btn span')?.textContent]}})()""")
         # THE CLIMATE BACKGROUND replaced the mint on 25 Sep 2026 ("implement the
-        # climate change"): the band goes clear and the scene behind it is measured
-        # to exactly the header's top and My Species' foot, under the UI.
-        check("a climate scene on a white page: the band clear, the scene fitted to it and behind it",
+        # climate change"), and the live WEATHER SKY (.wsky, WeatherSky.js)
+        # replaced the climate scene on 28 Sep: the band goes clear and the sky
+        # behind it is measured to exactly the header's top and My Species'
+        # foot, under the UI.
+        check("a weather sky on a white page: the band clear, the sky fitted to it and behind it",
               g2["mint"] == "rgba(0, 0, 0, 0)" and g2["page"] == "rgb(255, 255, 255)" and g2["climate"] == [0, 0, "-1"],
               f"{g2['mint']} / {g2['page']} / {g2['climate']}")
         col, pad = g2["col"], g2["pad"]
@@ -905,7 +910,7 @@ def main():
         # 158 and the words sit on the dark fade, no black plate
         check("species cards 148×158, the photograph filling the card under the fade, the block's corners rounded 20",
               g2["favCard"] == [148, 158] and g2["favImg"] == 158 and g2["favFade"] == "block" and g2["plate"] == "rgba(0, 0, 0, 0)" and g2["favRadius"] == "20px", str(g2))
-        check("both bands the column plus 8 a side; a 290×430 note card, the notes head 24 inside", g2["bandsW"] == [col + 16, col + 16] and g2["obs"] == [290, 430] and g2["obsHeadX"] == pad - 8 + 24, str(g2))
+        check("both bands the column plus 8 a side; a 290×417 note card (13 off the node's 430 since the note went to 3 lines, 29 Sep), the notes head 24 inside", g2["bandsW"] == [col + 16, col + 16] and g2["obs"] == [290, 417] and g2["obsHeadX"] == pad - 8 + 24, str(g2))
         row = round((col - 48) / 4 / 1.125, 1)   # 144 on the 744 artboard
         check("Modules: a 19px head, the banner 16 under it, banner and rows at the node's 162:144", g2["headH"] == 19 and g2["banner"] == 16 and g2["heroH"] == row and g2["row"] == row and g2["gridW"] == col, str(g2))
         check("the heads say Observation Notes, Modules and Edit", g2["headTxt"] == ["Observation Notes", "Modules", "Edit"], str(g2["headTxt"]))
@@ -924,17 +929,29 @@ def main():
         g = c.eval("""(()=>{const q=s=>document.querySelector(s);const R=e=>e.getBoundingClientRect();
           const band=R(q('#heroStage')), col=R(q('#panel-modules')), st=R(q('.adeck__stack')), f=R(q('.adeck__card[data-i="0"]')), p1=R(q('.adeck__card[data-i="1"]')), p2=R(q('.adeck__card[data-i="2"]'));
           const r=v=>Math.round(v*10)/10;
-          return {bandW:r(band.width-col.width), bandPadL:r(st.left-band.left), bandPadT:r(st.top-band.top), bandH:r(band.height), foot:r(R(q('.adeck__foot')).height), footGap:r(R(q('.adeck__foot')).top-st.bottom), footPadB:r(band.bottom-R(q('.adeck__foot')).bottom), allRight:r(band.right-R(q('.adeck__all')).right),
+          return {bandW:r(band.width-col.width), bandPadL:r(st.left-band.left), bandPadT:r(st.top-band.top), bandH:r(band.height), foot:r(R(q('.adeck__foot')).height), footGap:r(R(q('.adeck__foot')).top-st.bottom), footPadB:r(band.bottom-R(q('.adeck__foot')).bottom), allRight:r(band.right-R(q('.adeck__all')).right), footCentre:r((R(q('.adeck__dots')).left+R(q('.adeck__all')).right)/2-(band.left+band.width/2)), allGap:r(R(q('.adeck__all')).left-R(q('.adeck__dots')).right),
             frontIn:r(st.width-f.width), p1out:r(p1.right-f.right), p2out:r(p2.right-f.right), p1down:r(p1.top-f.top),
             chip:r(R(q('.adeck__card[data-i="0"] .adeck__chip')).height), photo:q('.adeck__card[data-i="0"] .adeck__img')?r(R(q('.adeck__card[data-i="0"] .adeck__img')).width):180,
             dot:r(R(q('.adeck__dots i:not(.on)')).width), dotOn:r(R(q('.adeck__dots i.on')).width), dotsGap:r(R(q('.adeck__dots')).top-st.bottom), dotsCentre:(()=>{const ds=[...document.querySelectorAll('.adeck__dots i')].map(R),a=R(q('.adeck__all')),f=R(q('.adeck__foot'));return r((Math.min(...ds.map(x=>x.left))+Math.max(...ds.map(x=>x.right)))/2-(f.left+(a.left-f.left)/2))})(),
-            above:r(band.top-R(q('#favSpecies')).bottom), below:r(R(q('#recentObs .obs-head')).top-band.bottom)}})()""")
+            above:r(band.top-R(q('#healthStrip')).bottom), strip:r(R(q('#healthStrip')).top-R(q('#favSpecies')).bottom), stripW:r(R(q('#healthStrip')).width-band.width),
+            laneH:r(R(q('.hstrip__lane')).height), laneW:r(R(q('.hstrip__lane')).width-R(q('#healthStrip')).width), runs:[...q('.hstrip__set').children].map(x=>x.dataset.k).join(','),
+            live:[r(R(q('.hstrip__live')).left-R(q('.hstrip__lane')).left), r(R(q('.hstrip__live')).top-R(q('.hstrip__lane')).top), r(R(q('.hstrip__live')).width), r(R(q('.hstrip__live')).height)],
+            capPos:getComputedStyle(q('.hstrip__cap')).position, runPad:getComputedStyle(q('.hstrip__run')).paddingLeft, labelPos:getComputedStyle(q('.hstrip__pin')).position+' '+getComputedStyle(q('.hstrip__pin')).left, below:r(R(q('#recentObs .obs-head')).top-band.bottom)}})()""")
         check("the band is the column plus 8 a side, padded 16, the stack straight under its top", g["bandW"] == 16 and g["bandPadL"] == 16 and g["bandPadT"] == 16, str(g))
-        check("the node's 275: a 17px foot row 16 under the stack and 16 over the band's foot, View all 16 in", g["bandH"] == 275 and g["foot"] == 17 and g["footGap"] == 16 and g["footPadB"] == 16 and g["allRight"] == 16, str(g))
+        # 29 Sep 2026, node 753:20981 ("view all become down side"): the dots and
+        # View all are one centred group 16 apart, on a 19px foot row
+        check("the node's 277: a 19px foot row 16 under the stack and 16 over the band's foot, dots and View all centred 16 apart", g["bandH"] == 277 and g["foot"] == 19 and g["footGap"] == 16 and g["footPadB"] == 16 and abs(g["footCentre"]) <= .5 and g["allGap"] == 16, str(g))
         check("the front card is the stack less 32; the peeks stand out 16 and 32, the first 10 down", g["frontIn"] == 32 and abs(g["p1out"] - 16) < .6 and abs(g["p2out"] - 32) < .6 and g["p1down"] == 10, str(g))
         check("a 36px chip and a 180px photograph", g["chip"] == 36 and g["photo"] == 180, f"{g['chip']} / {g['photo']}")
-        check("8px dots, the lit one 20 wide, centred in the foot row left of View all", g["dot"] == 8 and g["dotOn"] == 20 and abs(g["dotsCentre"]) <= .5, str(g))
-        check("16 under the species block, 40 to the notes head (16 to its band, 24 inside it)", g["above"] == 16 and g["below"] == 40, f"{g['above']} / {g['below']}")
+        check("8px dots, the lit one 20 wide, just left of View all", g["dot"] == 8 and g["dotOn"] == 20 and g["allGap"] == 16, str(g))
+        # 1 Oct 2026, node 851:10787: the health strip sits between them, 20 off each
+        check("the health strip 20 under the species block and 20 over the band, on the band's width", g["strip"] == 20 and g["above"] == 20 and g["stripW"] == 0, str({k: g[k] for k in ('strip', 'above', 'stripW')}))
+        # same day, Figma 863:173 "Tickers": one lane of three runs, the LIVE mark pinned at 12,8 (18.5 x 26.6) on its cap
+        check("a 42.6 lane the strip's width: natality, mortality, audit; the LIVE mark pinned at 12,8, 18.5 x 26.6; no lead-in, the pinned label a still overlay after the mark", g["laneH"] == 42.6 and g["laneW"] == 0 and g["runs"] == "natality,mortality,audit" and g["live"] == [12, 8, 18.5, 26.6] and g["capPos"] == "absolute" and g["runPad"] == "0px" and g["labelPos"] == "absolute 30.5px", str({k: g[k] for k in ('laneH', 'laneW', 'runs', 'live', 'capPos', 'runPad', 'labelPos')}))
+        # since 30 Sep the sites band stands between them (816:2's Frame 3,
+        # 829:612): 20 to the band, its 60 (12 over the chips at the owner's
+        # word, where the frame has 20), 16 to the notes, 24 inside them
+        check("120 to the notes head (20 to the sites band, its 60, 16 to the notes, 24 inside)", g["below"] == 120, f"{g['below']}")
 
         # THE CARD IS A FIXED BOX ("Announcement card has fixed size. Do not
         # reduce the Size", 25 Sep 2026): the node's 210 on EVERY card — the
@@ -965,9 +982,81 @@ def main():
             cards:cards.map(x=>[r(R(x).width),r(R(x).height)]), kinds:cards.map(x=>x.dataset.k), rowH:r(R(q('.kins__row')).height),
             scrollable:cards.map(x=>x.classList.contains('is-scrollable')), over:cards.map(x=>{const l=x.querySelector('.kins__list');return l.scrollHeight>l.clientHeight}),
             broken:[...b.querySelectorAll('img')].filter(i=>i.complete&&!i.naturalWidth).length}})()""")
-        check("Key Insights sits 16 under the notes, the column plus 8 a side", k.get("n") == 1 and k.get("after") == "recentObs" and k.get("gap") == 16 and k.get("wide") == 16, str(k))
-        check("…four 297×430 cards — natality, mortality, transfers, food — with 43px rows and every image loaded",
-              k.get("kinds") == ["natality", "mortality", "transfer", "food"] and all(x == [297, 430] for x in k.get("cards", [])) and k.get("rowH") == 43 and k.get("broken") == 0, str(k))
+        # 20, as Home 816:2 draws it (notes 1210 → insights 1230; spacing audit, 1 Oct 2026)
+        check("Key Insights sits 20 under the notes, the column plus 8 a side", k.get("n") == 1 and k.get("after") == "recentObs" and k.get("gap") == 20 and k.get("wide") == 16, str(k))
+        # 29 Sep 2026: "Weekly Insights" with a window picker; External
+        # Transfers and Food Wastage gave way to the medical backlog cards
+        check("…five 297×430 cards — natality, mortality, vaccination, deworming, admin — with 43px rows and every image loaded",
+              sorted(k.get("kinds") or []) == ["admin", "deworming", "mortality", "natality", "vaccination"]  # an empty card steps to the end (29 Sep), so the order is the data's
+               and all(x == [297, 430] for x in k.get("cards", [])) and k.get("rowH") == 43 and k.get("broken") == 0, str(k))
+        # 29 Sep 2026, node 792:8202: the head is "Key Insights" and a segmented
+        # filter — Today · W · M ǀ 6M ǀ calendar — Today by default; M recounts
+        # the flows, the backlog cards stay put; W is left picked for the pages below
+        w = c.eval("""(()=>{const q=s=>document.querySelector(s),nat=()=>q('.kins__card[data-k=natality] .kins__name').textContent,vac=()=>q('.kins__card[data-k=vaccination] .kins__name').textContent;
+          const on=()=>q('.kins__tab[aria-pressed=true]')?.dataset.r;const t=q('.kins__title').textContent,tabs=[...document.querySelectorAll('.kins__tab')].map(b=>b.dataset.r),rules=document.querySelectorAll('.kins__rule').length;
+          const d0=on(),n0=nat(),v0=vac();q('.kins__tab[data-r=m]').click();const d1=on(),n1=nat(),v1=vac();q('.kins__tab[data-r=w]').click();
+          return {t,tabs,rules,d0,d1,n0,n1,v0,v1,back:on(),all:!!q('.kins__all')}})()""")
+        check("the head is Key Insights and the node's filter: Today by default, M recounts the flows and not the backlog", w["t"] == "Key Insights" and w["tabs"] == ["today", "w", "m", "6m", "custom"] and w["rules"] == 2
+              and w["d0"] == "today" and w["d1"] == "m" and w["n0"] != w["n1"] and w["v0"] == w["v1"] and w["back"] == "w" and not w["all"], str(w))
+        # 29 Sep 2026: the Natality card opens its own page on the card's window —
+        # the Circle of Life births layout: filter row, Over Time + by Gender, the list
+        nt = c.eval("""(async()=>{const w=(ms)=>new Promise(r=>setTimeout(r,ms)),q=s=>document.querySelector(s),num=s=>(q(s)?.textContent||'').replace(/\\D/g,'');
+          const n=num('.kins__card[data-k=natality] .kins__name');
+          q('.kins__card[data-k=natality] .kins__open').click();await w(2600);
+          const o={hash:location.hash,n,ring:num('.nat-ring__mid b'),list:(q('.nat-pager span')?.textContent.split(' of ')[1]||'').replace(/\\D/g,''),title:q('.mpage__title').textContent,sub:q('.mpage__sub').textContent,
+            seg:[...document.querySelectorAll('.nat-filters .mp-seg button')].map(b=>b.textContent),chart:!!q('.nat-chart svg'),rows:document.querySelectorAll('.nat-table .nat-at:not(.nat-at--h)').length};
+          q('[data-act=years][data-v="3"]').click();await w(600);o.years=q('.nat-keys').innerText.split(/\\s+/);
+          q('.mpage__back').click();await w(700);o.home=location.hash==='';return o})()""", await_promise=True)
+        check("Key Insights → Natality: its own page on the card's window and number, 1Y·2Y·3Y·Custom, a year to a line, ten births a page",
+              nt["hash"] == "#m/natality?days=7" and nt["ring"] == nt["n"] == nt["list"] and nt["title"] == "Natality" and nt["sub"] == ""
+              and nt["seg"][:3] == ["1Y", "2Y", "3Y"] and nt["chart"] and nt["rows"] == 10 and nt["years"] == ["2026", "2025", "2024", "2023"] and nt["home"], str(nt))
+        # 29 Sep 2026: the Mortality card opens its own insights page on the card's window
+        mo = c.eval("""(async()=>{const w=(ms)=>new Promise(r=>setTimeout(r,ms)),q=s=>document.querySelector(s),num=s=>(q(s)?.textContent||'').replace(/\\D/g,'');
+          const n=num('.kins__card[data-k=mortality] .kins__name');q('.kins__card[data-k=mortality] .kins__open').click();await w(2600);
+          const o={hash:location.hash,n,sum:num('.mor-sum__n'),title:q('.mpage__title').textContent,
+            parts:['#morAttnH','#morTimeH','#morCauseH','#morWhereH','#morListH'].map(s=>!!q(s)),rows:document.querySelectorAll('.nat-table .mor-st:not(.mor-st--h)').length,
+            queue:q('.mor-kpi[href]')?.getAttribute('data-go')};
+          q('.mor-bars [data-act=cause]').click();await w(600);o.narrowed=q('.nat-other .mp-badge')?.textContent;o.chip=document.querySelectorAll('.mor-chip').length;
+          q('.nat-table .mor-st:not(.mor-st--h)').click();await w(600);o.drill=q('#morListH').textContent;q('[data-act=clearall]').click();await w(600);o.cleared=!q('.mor-chips');
+          q('.mpage__back').click();await w(700);o.home=location.hash==='';return o})()""", await_promise=True)
+        check("Key Insights → Mortality: its own page on the card's window and number; Needs attention, day bars, causes, sites, the list; a cause and a species narrow it, chips clear it, the queue is a link",
+              mo["hash"] == "#m/deaths?days=7" and mo["sum"] == mo["n"] and mo["title"] == "Mortality" and all(mo["parts"]) and mo["rows"] > 0 and mo["queue"] == "necropsy/pending"
+              and mo["narrowed"] == "1" and mo["chip"] == 1 and mo["drill"].startswith("Deaths of ") and mo["cleared"] and mo["home"], str(mo))
+        # 29–30 Sep 2026: Pending Actions is a corkboard (owner: "make it fill"), Home 816:2's
+        # 816:986 — the head's open total, then the five jobs as notes pinned to the board, each a
+        # button to its page; the two medical ones overdue
+        pd = c.eval("""(()=>{const P='#moduleGrid [data-variant="pending.v2"]',k=document.querySelector(P+' .card');
+          const notes=[...document.querySelectorAll(P+' .l-v2bd__note')];
+          return {ground:k.style.getPropertyValue('--card-bg'),layout:k.dataset.layout,
+            notes:notes.map(n=>n.tagName+':'+n.dataset.key),overdue:notes.filter(n=>n.querySelector('em')).map(n=>n.dataset.key),
+            total:Number(document.querySelector(P+' .l-v2bd__head strong').textContent.replace(/\\D/g,'')),sum:notes.reduce((t,n)=>t+Number(n.dataset.n),0),
+            shown:notes.every(n=>Number(n.querySelector('b').textContent.replace(/\\D/g,''))==n.dataset.n)}})()""")
+        check("Pending Actions: the corkboard, five jobs pinned as notes, each a button to its page", pd["layout"] == "v2-board" and pd["notes"] == ["BUTTON:sexing", "BUTTON:microchip", "BUTTON:necropsy", "BUTTON:deworming", "BUTTON:vaccination"], str(pd))
+        check("…the head's open total is the notes' sum, each note shows its own count, deworming and vaccinations overdue", pd["total"] == pd["sum"] and pd["shown"] and pd["overdue"] == ["deworming", "vaccination"], str(pd))
+        # 29 Sep 2026: the module pages — a Pending Actions row and a module card each open their page
+        mp = c.eval("""(async()=>{const w=(ms)=>new Promise(r=>setTimeout(r,ms)),out={};
+          document.querySelector('#moduleGrid .l-v2bd__note[data-key="necropsy"]').click();await w(1600);
+          out.nec=location.hash+' '+(document.querySelector('.nc-tab[aria-selected=true]')?.textContent.replace(/[\\d,]/g,'').trim());document.querySelector('.mpage__back').click();await w(700);
+          document.querySelector('#moduleGrid .card[data-variant="species.stats"]').click();await w(1200);
+          out.sp=location.hash+' '+document.querySelector('.mpage__title').textContent;document.querySelector('.mpage__back').click();await w(700);
+          out.home=location.hash===''&&document.querySelector('.mpage').hidden;return out})()""", await_promise=True)
+        check("Necropsy reports opens Necropsy › Pending; the Species card opens Species Management; Back comes home", mp["nec"] == "#m/necropsy/pending Pending" and mp["sp"] == "#m/species Species Management" and mp["home"], str(mp))
+        # 29 Sep 2026: a favourite opens its species page; its tabs replace the address, its star keeps the rail, its rows lead out and Back returns
+        sp = c.eval("""(async()=>{const w=(ms)=>new Promise(r=>setTimeout(r,ms)),out={},q=(s)=>document.querySelector(s);
+          const card=q('#favSpecies .fav__card:not(.fav__card--add)'),name=card.dataset.name,rail=()=>!!q(`#favSpecies .fav__card[data-name="${CSS.escape(name)}"]`);
+          card.click();await w(1800);
+          out.open=location.hash===`#m/species/${encodeURIComponent(name)}`&&q('.sph__name')?.textContent===name;
+          out.tabs=[...document.querySelectorAll('.sp-tabs a')].map(a=>a.dataset.go.split('/').pop());
+          const h0=history.length;q('.sp-tabs a[data-go$="/mortality"]').click();await w(600);
+          out.replaced=history.length===h0&&location.hash.endsWith('/mortality');
+          q('.sph__fav').click();await w(400);out.off=!rail();q('.sph__fav').click();await w(400);out.on=rail();
+          const d=q('.sr-content a.sr-tr[data-go^="mortality/animal/"]');if(d){d.click();await w(700);out.death=location.hash.startsWith('#m/mortality/animal/');q('.mpage__back').click();await w(700)}else out.death='none';
+          out.backToTab=location.hash.endsWith('/mortality');q('.mpage__back').click();await w(700);
+          out.home=location.hash===''&&q('.mpage').hidden;return out})()""", await_promise=True)
+        check("a favourite opens its species page, whose tabs change without adding history",
+              sp["open"] and sp["replaced"] and {"profile", "population", "housing", "life", "health", "ledger", "mortality", "necropsy"} <= set(sp["tabs"]), str(sp))
+        check("…its star takes the species off the rail and puts it back; a death opens its record, Back returns to the tab, then home",
+              sp["off"] and sp["on"] and sp["death"] in (True, "none") and sp["backToTab"] and sp["home"], str(sp))
         check("…the thumb shows exactly on the cards whose list overflows", k.get("scrollable") == k.get("over"), str(k))
         c.eval("document.getElementById('keyInsights').scrollIntoView({block:'center'}); 1"); time.sleep(0.4)
         pt = json.loads(c.eval("(r=>JSON.stringify([r.left+r.width/2,r.top+r.height/2]))(document.querySelector('.kins__card .kins__list').getBoundingClientRect())"))
@@ -1010,8 +1099,11 @@ def main():
 
         # THE NOTES FILTER AND THE HOLD MENU
         c.eval("document.querySelector('.v2seg__opt[data-k=enclosure]').click(); 1"); time.sleep(0.8)
-        shown = c.eval("[...document.querySelectorAll('.obs')].filter(o=>!o.hidden).length")
-        check("Enclosures narrows the rail to the enclosure notes", shown == 2, str(shown))
+        # the filter hides with its own class (1 Oct 2026), and every note the rail
+        # will load takes the pick: what shows is the tab's own count
+        shown = c.eval("[...document.querySelectorAll('#obsRail .obs')].filter(o=>!o.hidden&&getComputedStyle(o).display!=='none').length")
+        want = c.eval("Number(document.querySelector('#recentObs .v2seg__opt[data-k=enclosure]').textContent.replace(/\\D/g,''))")
+        check("Enclosures narrows the rail to the enclosure notes, as many as its tab says", shown == want == 2, f"{shown} shown, tab {want}")
         c.eval("document.querySelector('.v2seg__opt[data-k=all]').click(); 1"); time.sleep(0.8)
         c.eval("document.querySelector('.obs').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,cancelable:true,clientX:100,clientY:100})); 1"); time.sleep(0.5)
         check("press-and-hold / right-click lifts the note with a menu", c.eval("document.body.classList.contains('v2ctx-open') && !!document.querySelector('.v2ctx-lift')"), "")
@@ -1083,11 +1175,12 @@ def main():
         c.eval(OPEN_MENU)
         time.sleep(0.35)
         g = c.eval(VER_GROUP)
-        # THREE SINCE 16 SEP, not two — V3 is the black page, node 506:10213.
+        # THREE SINCE 16 SEP, not two — V3 is the black page, node 506:10213 —
+        # and SIX since V4 (24 Sep), V5 and V6 (30 Sep) joined it.
         # The count is asserted rather than "at least two" because a row that
         # fails to render is exactly the failure this group has had before.
-        check("the menu carries a Home page group of three radios",
-              g["open"] and len(g["ver"]) == 3
+        check("the menu carries a Home page group of six radios",
+              g["open"] and len(g["ver"]) == 6
               and all(r["role"] == "menuitemradio" for r in g["ver"])
               and "HOME PAGE" in [h.upper() for h in g["heads"]],
               f"{g['heads']} {[r['label'] for r in g['ver']]}")
@@ -1096,7 +1189,7 @@ def main():
         # was not showing. It reads its own predicate now, and what is asserted
         # is the invariant rather than three separate values.
         check("the tick is on the page you are actually on, and only there",
-              [r["checked"] for r in g["ver"]] == ["true", "false", "false"],
+              [r["checked"] for r in g["ver"]] == ["true"] + ["false"] * 5,
               str([r["checked"] for r in g["ver"]]))
         check("neither row clips its note",
               not any(r["clipped"] for r in g["ver"]),
@@ -1119,7 +1212,7 @@ def main():
         time.sleep(0.35)
         g = c.eval(VER_GROUP)
         check("the tick has moved with the page",
-              [r["checked"] for r in g["ver"]] == ["false", "true", "false"],
+              [r["checked"] for r in g["ver"]] == ["false", "true"] + ["false"] * 4,
               str([r["checked"] for r in g["ver"]]))
         c.eval(PRESS_VER % "2")
         time.sleep(1.0)
@@ -1769,29 +1862,27 @@ def main():
                 chatOp: +getComputedStyle(document.querySelector('.qa-chat')).opacity,
               };
             })())"""))
-            check("it opens the sixteen chips, and no modules",
-                  m["open"] and len(panel["labels"]) == 16 and m["tiles"] == 0,
-                  f"chips={len(panel['labels'])} tiles={m['tiles']}")
-            check("…and they are the node's sixteen, in its order",
-                  panel["labels"] == SHEET,
-                  "" if panel["labels"] == SHEET else
-                  f"{[x for x in panel['labels'] if x not in SHEET] or '—'} "
-                  f"in place of {[x for x in SHEET if x not in panel['labels']] or '—'}")
-            # FOUR GROUPS, FOUR APIECE, AND EACH ON ITS OWN TONE. The fills
-            # are the node's literal values: this is the check that fails if
-            # someone "tidies" four tints into one.
-            got = [tuple(x) for x in panel["cats"]]
-            check("…in the node's four categories, four chips each",
-                  [g[0] for g in got] == [c[0] for c in CATS] and panel["perCat"] == [4, 4, 4, 4],
-                  f"{[g[0] for g in got]} / {panel['perCat']}")
-            check("…each group on its own fill and its own ink",
-                  got == CATS,
-                  "; ".join(f"{g[0]}: {g[1]} / {g[2]}" for g, w in zip(got, CATS) if g != w)
-                  or "")
-            check("every chip glyph is a file that actually loaded",
-                  not panel["hollow"], ", ".join(panel["hollow"]))
-            check("…and no label is cropped — a chip is as wide as its words",
-                  not panel["cropped"], ", ".join(panel["cropped"]))
+            # V2'S PANEL IS FOUR FOLDERS since 29 Sep 2026 (the manager rejected
+            # the chip panel; the owner picked "Folders"): one card per category
+            # in QA_GROUPS' order, each with its four actions as rows, the
+            # sixteen in the set's order. V4 keeps the chips (checked below).
+            fd = json.loads(c.eval("""JSON.stringify((()=>{const f=[...document.querySelectorAll('.qa-fold')];
+              return {names:f.map(x=>x.querySelector('.qa-fold__t').textContent.trim()), per:f.map(x=>x.querySelectorAll('.qa-frow').length),
+                rows:[...document.querySelectorAll('.qa-frow__t')].map(t=>t.textContent.trim()), chips:document.querySelectorAll('.qa-chip').length,
+                hollow:[...document.querySelectorAll('.qa-frow')].filter(r=>{const i=r.querySelector('img');return !(i&&i.complete&&i.naturalWidth>0)}).map(r=>r.textContent.trim()),
+                cropped:[...document.querySelectorAll('.qa-frow__t, .qa-fold__t')].filter(t=>t.scrollWidth-t.clientWidth>1).map(t=>t.textContent.trim())}})())"""))
+            check("it opens the four folders, and no chips or modules",
+                  m["open"] and len(fd["names"]) == 4 and fd["chips"] == 0 and m["tiles"] == 0, str(fd))
+            check("…named for the four categories, four actions in each",
+                  fd["names"] == [cat[0] for cat in CATS] and fd["per"] == [4, 4, 4, 4], f"{fd['names']} / {fd['per']}")
+            check("…and they are the sixteen, in the set's order",
+                  fd["rows"] == SHEET,
+                  "" if fd["rows"] == SHEET else
+                  f"{[x for x in fd['rows'] if x not in SHEET] or '—'} in place of {[x for x in SHEET if x not in fd['rows']] or '—'}")
+            check("every row glyph is a file that actually loaded",
+                  not fd["hollow"], ", ".join(fd["hollow"]))
+            check("…and no label is cropped",
+                  not fd["cropped"], ", ".join(fd["cropped"]))
             # THE FIELD · 635:21411. Asserted as present and as EMPTY-LABELLED:
             # the node's placeholder is the only text in it.
             check("the panel carries the node's search field",
@@ -1804,7 +1895,9 @@ def main():
             # them is for, and chat is a conversation — with a control of its
             # own already, the disc beside the pill.
             check("…and a foot row of the two places it can send you",
-                  panel["foot"] == ["Search everything", "Scan a tag"],
+                  # on V2 the second door is Edit Modules (owner, 28 Sep 2026: "Instead
+                  # of this Edit modules"); Scan stays in the search row
+                  panel["foot"] == ["Search everything", "Edit Modules"],
                   str(panel["foot"]))
             check("…every one of them over the 44px touch floor",
                   panel["footH"] and min(panel["footH"]) >= 44, str(panel["footH"]))
@@ -2291,9 +2384,10 @@ def main():
         # that merely faded in would pass every geometry check in this file.
         #
         # FROZEN AND SEEKED, never slept through.
-        print("\nthe sixteen verbs unfold out of the pill")
+        # the sixteen CHIPS unfold on V4 since 29 Sep: V2's panel is the folders
+        print("\nthe sixteen verbs unfold out of the pill (V4's chip panel)")
         with Chrome(width=WIDTH, height=900, reduced_motion=False) as c:
-            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.goto(BASE + "index.html?v=4", settle=2.0)
             c.eval("document.querySelector('.qa-pill').click(); 1")
             freeze_at(c, "is-open")
 
@@ -2348,7 +2442,7 @@ def main():
 
         print("\nand it folds back the same way, in reverse")
         with Chrome(width=WIDTH, height=900, reduced_motion=False) as c:
-            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.goto(BASE + "index.html?v=4", settle=2.0)
             c.eval("document.querySelector('.qa-pill').click(); 1")
             time.sleep(0.9)
             c.eval("document.querySelector('.qa-pill').click(); 1")
@@ -2377,11 +2471,13 @@ def main():
         # that rots silently — a version-scoped feature leaks the day someone
         # lifts a rule out of `.qa--ctx`, and nothing about V2 looks wrong when
         # it does. So the last block opens V1, V3 and V4 and asserts ABSENCE.
-        print("\nV2 opens on what you have not finished")
+        # SINCE 29 SEP the Continue band and the picker live on V4 only: V2's panel
+        # is the four folders (checked above), so these two run on ?v=4
+        print("\nV4 opens on what you have not finished (V2's until its folders, 29 Sep)")
         with Chrome(width=WIDTH, height=900) as c:
-            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.goto(BASE + "index.html?v=4", settle=2.0)
             c.eval("localStorage.removeItem('antz.qa.scope'); 1")
-            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.goto(BASE + "index.html?v=4", settle=2.0)
             c.eval("window.__a=[];const o=console.info;"
                    "console.info=(...x)=>{window.__a.push(x.join(' '));o(...x)}; 1")
             c.eval("document.querySelector('.qa-pill').click(); 1")
@@ -2603,11 +2699,11 @@ def main():
             check("no console errors through any of it",
                   not c.errors(), "; ".join(str(e)[:110] for e in c.errors()[:3]))
 
-        print("\nV2 asks where a new one goes")
+        print("\nV4 asks where a new one goes")
         with Chrome(width=WIDTH, height=900) as c:
-            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.goto(BASE + "index.html?v=4", settle=2.0)
             c.eval("localStorage.removeItem('antz.qa.scope'); 1")
-            c.goto(BASE + "index.html?v=2", settle=2.0)
+            c.goto(BASE + "index.html?v=4", settle=2.0)
             c.eval("window.__a=[];const o=console.info;"
                    "console.info=(...x)=>{window.__a.push(x.join(' '));o(...x)}; 1")
             q = lambda js: json.loads(c.eval("JSON.stringify(" + js + ")"))

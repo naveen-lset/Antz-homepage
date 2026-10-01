@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Species Page Ideas</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  /* SPECIES PAGE — IDEAS FROM THE REFERENCE (29 Sep 2026: "get some data idea
+     from here" → "can u make mockup first"). The reference is the Species
+     Management iPad build (species-management-iota.vercel.app, species 449,
+     Aaru Macaw). This is V2's own species page (#m/species/…) in the clean
+     pass's parts — #EFF5F2, white cards, one hairline, underline tabs, stat
+     tiles label-over-figure — with the reference's data ideas moved in.
+     Same species, OUR numbers: everything marked "Our data" is computed from
+     assets/data/v2-modules.json; "Sample" is what the dump does not hold. */
+  :root {
+    --mp-bg: #EFF5F2; --mp-card: #fff; --mp-line: #DFE8E4; --mp-line-2: #EAF0ED;
+    --mp-ink: #1C3A48; --mp-text: #3D4D48; --mp-mute: #6B7A75; --mp-faint: #97A4A0;
+    --mp-green: #0E7A45; --mp-green-bg: #E3F3EA; --mp-primary: #1E4F5A; --mp-focus: #00AFD6;
+    --mp-r: 12px; --mp-edge: 24px;
+    --m: #1A9A9A; --f: #E8603C; --u: #5B8FB0; --birth: #3DAA70; --death: #E8795A;
+    --page: #DCE6E1; --note-bg: #FFFBEA; --note-line: #F0E2A8;
+    --font: Inter, system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --page: #11181B; }
+  }
+  :root[data-theme="dark"] { --page: #11181B; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--mp-text); font-family: var(--font); font-size: 14px; line-height: 20px; }
+  @media (max-width: 699px) { :root { --mp-edge: 16px; } }
+
+  /* ── the brief above the device ── */
+  .brief { max-width: 1072px; margin: 0 auto; padding: 32px 16px 16px; }
+  .brief h1 { margin: 0 0 6px; font-size: 24px; line-height: 1.2; font-weight: 700; letter-spacing: -.3px; color: var(--mp-ink); }
+  .brief p { margin: 0; max-width: 820px; font-size: 15px; line-height: 22px; color: var(--mp-text); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .brief :is(h1, p) { color: #E3ECE8; } }
+  :root[data-theme="dark"] .brief :is(h1, p) { color: #E3ECE8; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .toggle { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--mp-line); border-radius: 16px; background: #fff; font: inherit; font-size: 13px; font-weight: 600; color: var(--mp-ink); cursor: pointer; }
+  .toggle[aria-pressed="false"] { color: var(--mp-mute); }
+
+  /* ── the device: V2's module page, not fixed ── */
+  .device { max-width: 1072px; margin: 0 auto 48px; padding: 0 16px; }
+  .mpage { border-radius: 20px; overflow: hidden; background: var(--mp-bg); box-shadow: 0 20px 50px -24px rgba(20, 50, 44, .45); }
+  @media (max-width: 699px) { .device { padding: 0; } .mpage { border-radius: 0; } }
+  .mpage__bar { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 12px var(--mp-edge) 8px; }
+  .mpage__back { display: grid; place-items: center; width: 44px; height: 44px; margin-left: -12px; border: 0; border-radius: 50%; background: none; color: var(--mp-ink); }
+  .mpage__back svg { width: 24px; height: 24px; }
+  .mpage__head { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+  .mpage__title { margin: 0; font-size: 22px; font-weight: 600; line-height: 28px; letter-spacing: -.01em; color: var(--mp-ink); }
+  .mpage__sub { font-size: 13px; line-height: 18px; color: var(--mp-mute); font-style: italic; }
+  .mpage__body { display: flex; flex-direction: column; gap: 16px; padding: 8px var(--mp-edge) 32px; }
+
+  /* ── shared parts (from index.html's .mp-* set) ── */
+  .mp-pick { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border: 1px solid var(--mp-line); border-radius: 10px; background: var(--mp-card); font: inherit; font-size: 13px; font-weight: 500; color: var(--mp-ink); white-space: nowrap; }
+  .mp-pick svg { width: 16px; height: 16px; color: var(--mp-mute); }
+  .mp-panel { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid var(--mp-line); border-radius: var(--mp-r); background: var(--mp-card); min-width: 0; }
+  .mp-panel__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .mp-panel__head p { margin: 2px 0 0; font-size: 13px; line-height: 18px; color: var(--mp-mute); }
+  .mp-h { margin: 0; font-size: 15px; font-weight: 600; line-height: 20px; color: var(--mp-ink); }
+  .mp-h small { margin-left: 6px; font-size: 13px; font-weight: 400; color: var(--mp-mute); }
+  .mp-note { margin: 0; font-size: 13px; line-height: 18px; color: var(--mp-mute); }
+  .mp-note b { font-weight: 600; color: var(--mp-text); }
+  .mp-num { font-family: 'DM Sans', var(--font); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .mp-aaid { font-size: 13px; font-weight: 600; color: var(--mp-primary); font-variant-numeric: tabular-nums; }
+  .mp-chip, .mp-tag { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; font-style: normal; white-space: nowrap; background: #EEF3F1; color: var(--mp-text); }
+  .mp-chip[data-s='m'] { background: #E2F4F4; color: #117E7E; } .mp-chip[data-s='f'] { background: #FDEBE4; color: #C9502E; } .mp-chip[data-s='u'] { background: #E8EFF5; color: #3F6E8C; }
+  .mp-tag[data-tone='ok'] { background: var(--mp-green-bg); color: var(--mp-green); } .mp-tag[data-tone='warn'] { background: #FFF3D1; color: #7A5700; }
+  .mp-tag[data-tone='info'] { background: #E1F2F7; color: #0B6A86; } .mp-tag[data-tone='bad'] { background: #FDECEC; color: #B8323A; }
+  .mp-seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: #E2EBE7; }
+  .mp-seg button { height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--mp-text); cursor: pointer; white-space: nowrap; }
+  .mp-seg button[aria-pressed='true'] { background: var(--mp-card); color: var(--mp-ink); font-weight: 600; box-shadow: 0 1px 2px rgba(28, 58, 72, .1); }
+  .mp-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .mp-stats.is-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 699px) { .mp-stats, .mp-stats.is-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .mp-stat { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid var(--mp-line); border-radius: var(--mp-r); background: var(--mp-card); color: var(--mp-ink); }
+  .mp-stat span { font-size: 13px; font-weight: 500; line-height: 18px; color: var(--mp-mute); }
+  .mp-stat b { font-family: 'DM Sans', var(--font); font-size: 26px; font-weight: 600; line-height: 32px; font-variant-numeric: tabular-nums; }
+  .mp-stat small { font-size: 12px; line-height: 16px; color: var(--mp-mute); }
+  .mp-stat[data-k='bad'] b { color: #B8323A; } .mp-stat[data-k='g'] b { color: var(--mp-green); }
+  .mp-kv dl { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; }
+  .mp-kv dt { font-size: 12px; line-height: 16px; color: var(--mp-mute); }
+  .mp-kv dd { margin: 2px 0 0; font-size: 14px; font-weight: 500; line-height: 20px; color: var(--mp-ink); }
+  @media (max-width: 699px) { .mp-kv dl { grid-template-columns: minmax(0, 1fr); } }
+  .mp-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 799px) { .mp-two { grid-template-columns: minmax(0, 1fr); } }
+
+  /* the summary card */
+  .mp-summary { display: flex; align-items: flex-start; gap: 16px; padding: 16px; border: 1px solid var(--mp-line); border-radius: var(--mp-r); background: var(--mp-card); }
+  .mp-summary img { flex: none; width: 96px; height: 96px; border-radius: 12px; object-fit: cover; background: #DCEFE8; }
+  .mp-summary__body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  .mp-eyebrow { font-size: 12px; font-weight: 600; line-height: 16px; letter-spacing: .04em; text-transform: uppercase; color: var(--mp-mute); }
+  .mp-figs { display: flex; gap: 28px; flex-wrap: wrap; }
+  .mp-figs span { display: flex; flex-direction: column; font-size: 12px; color: var(--mp-mute); }
+  .mp-figs b { font-family: 'DM Sans', var(--font); font-size: 24px; font-weight: 600; line-height: 30px; color: var(--mp-ink); font-variant-numeric: tabular-nums; }
+  .mp-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  @media (max-width: 599px) { .mp-summary img { width: 64px; height: 64px; } .mp-figs { gap: 18px; } }
+
+  /* underline tabs */
+  .mp-subtabs { display: flex; gap: 24px; border-bottom: 1px solid var(--mp-line); overflow-x: auto; scrollbar-width: none; }
+  .mp-subtabs::-webkit-scrollbar { display: none; }
+  .mp-subtabs a { position: relative; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 44px; font-size: 14px; font-weight: 500; color: var(--mp-mute); text-decoration: none; white-space: nowrap; }
+  .mp-subtabs a[aria-current='page'] { color: var(--mp-ink); font-weight: 600; }
+  .mp-subtabs a[aria-current='page']::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--mp-green); }
+  .mp-subtabs a:focus-visible, button:focus-visible { outline: 2px solid var(--mp-focus); outline-offset: 2px; }
+  /* the mockup's own marker on a tab: what the idea does to it */
+  .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot[data-k='new'] { background: #0E7A45; } .dot[data-k='better'] { background: #00AFD6; } .dot[data-k='same'] { background: #C5CFCB; }
+
+  /* tables */
+  .mp-table { display: flex; flex-direction: column; overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+  .mp-tr { display: grid; align-items: center; gap: 12px; min-height: 52px; padding: 8px 0; border-top: 1px solid var(--mp-line-2); font-size: 14px; color: var(--mp-text); min-width: var(--minw, 0); }
+  .mp-th { min-height: 36px; border-top: 0; font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--mp-mute); }
+  .mp-tr > .r { text-align: right; font-variant-numeric: tabular-nums; }
+  .mp-name { display: flex; flex-direction: column; min-width: 0; }
+  .mp-name i { font-size: 12px; font-style: normal; color: var(--mp-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sx { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 10px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #fff; }
+  .sx[data-s='m'] { background: var(--m); } .sx[data-s='f'] { background: var(--f); } .sx[data-s='u'] { background: var(--u); }
+  .cellname { display: flex; align-items: center; min-width: 0; }
+
+  /* ── IUCN scale ── */
+  .iucn { display: flex; gap: 6px; flex-wrap: wrap; }
+  .iucn span { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; font-size: 12px; font-weight: 700; color: #fff; opacity: .28; }
+  .iucn span.is-on { opacity: 1; box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--c); }
+  .iucn-read { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+  .iucn-read b { color: var(--mp-green); font-weight: 600; }
+  /* the key-attribute grid */
+  .attrs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  @media (max-width: 599px) { .attrs { grid-template-columns: minmax(0, 1fr); } }
+  .attr { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid var(--mp-line-2); border-radius: 10px; background: #F7FAF9; }
+  .attr__ico { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: #E6F0EE; color: var(--mp-primary); }
+  .attr__ico svg { width: 18px; height: 18px; }
+  .attr span { display: flex; flex-direction: column; min-width: 0; }
+  .attr small { font-size: 12px; line-height: 16px; color: var(--mp-mute); }
+  .attr b { font-size: 14px; font-weight: 600; line-height: 20px; color: var(--mp-ink); }
+  .attr i { font-size: 12px; font-style: normal; color: var(--mp-mute); }
+  .attr.is-warn { grid-column: 1 / -1; background: #FDF3F1; border-color: #F6DCD6; }
+  .attr.is-warn .attr__ico { background: #FBE3DE; color: #B8323A; }
+  .links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .links a { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border: 1px solid var(--mp-line); border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--mp-green); text-decoration: none; }
+  .links svg { width: 14px; height: 14px; }
+
+  /* ── charts ── */
+  .bars { position: relative; display: flex; align-items: flex-end; gap: 4px; height: 150px; padding-top: 18px; }
+  .bars > span { position: relative; flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; }
+  .bars i { display: block; width: 100%; max-width: 22px; height: calc(var(--h) * (100% - 20px)); min-height: 2px; border-radius: 4px 4px 0 0; background: var(--c, var(--birth)); }
+  .bars i.stack { display: flex; flex-direction: column; gap: 2px; background: none; }
+  .bars i.stack em { display: block; border-radius: 0; }
+  .bars i.stack em:first-child { border-radius: 4px 4px 0 0; }
+  .bars small { height: 14px; font-size: 10px; line-height: 14px; color: var(--mp-faint); white-space: nowrap; }
+  .bars b { position: absolute; top: calc((1 - var(--h)) * (100% - 20px) - 20px); font-size: 11px; font-weight: 600; color: var(--mp-text); font-family: 'DM Sans', var(--font); }
+  .bars > span:hover i { filter: brightness(.92); }
+  .tip { position: fixed; z-index: 9; pointer-events: none; padding: 6px 10px; border-radius: 8px; background: #1C3A48; color: #fff; font-size: 12px; line-height: 16px; white-space: nowrap; opacity: 0; transition: opacity 120ms; }
+  .tip.is-on { opacity: 1; }
+  .hbars { display: flex; flex-direction: column; gap: 10px; }
+  .hbar { display: grid; grid-template-columns: minmax(110px, 36%) minmax(0, 1fr) 44px; align-items: center; gap: 12px; font-size: 13px; }
+  .hbar > span:first-child { color: var(--mp-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hbar__track { height: 10px; border-radius: 0 5px 5px 0; background: var(--mp-line-2); }
+  .hbar__track i { display: block; height: 100%; width: calc(var(--w) * 100%); min-width: 3px; border-radius: 0 5px 5px 0; background: var(--c, var(--mp-primary)); }
+  .hbar b { font-family: 'DM Sans', var(--font); font-weight: 600; color: var(--mp-ink); text-align: right; font-variant-numeric: tabular-nums; }
+  .key { display: flex; gap: 6px 16px; flex-wrap: wrap; font-size: 12px; color: var(--mp-mute); }
+  .key span { display: inline-flex; align-items: center; gap: 6px; }
+  .key span::before { content: ''; width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+  /* one stacked strip: parts of a whole, 2px gaps */
+  .strip { display: flex; gap: 2px; height: 14px; }
+  .strip i { flex: var(--n) 1 0; min-width: 4px; background: var(--c); }
+  .strip i:first-child { border-radius: 5px 0 0 5px; } .strip i:last-child { border-radius: 0 5px 5px 0; }
+  /* survival buckets */
+  .buckets { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+  @media (max-width: 599px) { .buckets { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .bucket { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 10px; background: #F7FAF9; border: 1px solid var(--mp-line-2); }
+  .bucket b { font-family: 'DM Sans', var(--font); font-size: 22px; font-weight: 600; line-height: 28px; color: var(--mp-ink); }
+  .bucket span { font-size: 13px; font-weight: 600; color: var(--mp-text); }
+  .bucket small { font-size: 12px; line-height: 16px; color: var(--mp-mute); }
+  .bucket i { display: block; height: 4px; margin-top: 6px; border-radius: 2px; background: var(--mp-line-2); }
+  .bucket i::after { content: ''; display: block; height: 100%; width: calc(var(--w) * 100%); border-radius: 2px; background: var(--death); }
+  /* the egg funnel */
+  .funnel { display: flex; flex-direction: column; gap: 8px; }
+  .funnel > div { display: grid; grid-template-columns: 80px minmax(0, 1fr) 96px; gap: 12px; align-items: center; font-size: 13px; }
+  .funnel .bar { height: 28px; border-radius: 0 6px 6px 0; background: var(--c); width: calc(var(--w) * 100%); }
+  .funnel b { font-family: 'DM Sans', var(--font); font-weight: 600; color: var(--mp-ink); }
+  .funnel small { color: var(--mp-mute); }
+  /* enclosure make-up: two lines per cell */
+  .dem .mp-tr { --minw: 900px; grid-template-columns: minmax(170px, 1.6fr) repeat(8, minmax(72px, 1fr)); }
+  .dem .cell { display: flex; flex-direction: column; }
+  .dem .cell b { font-family: 'DM Sans', var(--font); font-size: 16px; font-weight: 600; color: var(--mp-ink); }
+  .dem .cell i { font-size: 11px; font-style: normal; line-height: 14px; color: var(--mp-mute); white-space: nowrap; }
+  .dem .cell.is-nil { color: var(--mp-faint); }
+  /* the overdue heat table */
+  .heat .mp-tr { --minw: 560px; grid-template-columns: minmax(120px, 1.4fr) 90px repeat(4, minmax(60px, 1fr)); }
+  .heat .cell { display: grid; place-items: center; height: 36px; border-radius: 8px; font-family: 'DM Sans', var(--font); font-weight: 600; color: var(--mp-ink); background: rgba(217, 63, 69, var(--a)); }
+  .heat .cell.is-hot { color: #fff; }
+
+  /* ── the idea note: this mockup's commentary, not the app ── */
+  .idea { display: flex; gap: 12px; padding: 12px 14px; border: 1px dashed #D9C77A; border-radius: 12px; background: var(--note-bg); font-size: 13px; line-height: 19px; color: #5C4B10; }
+  .idea b { color: #3F330A; }
+  .idea__tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .idea__tags em { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 5px; font-size: 11px; font-weight: 700; font-style: normal; background: #fff; border: 1px solid var(--note-line); }
+  .idea__tags em[data-k='ours'] { color: var(--mp-green); border-color: #BFE3CD; }
+  .idea__tags em[data-k='sample'] { color: #7A5700; }
+  .idea__tags em[data-k='new'] { color: #fff; background: var(--mp-green); border-color: var(--mp-green); }
+  .idea__tags em[data-k='better'] { color: #fff; background: #0B8BAA; border-color: #0B8BAA; }
+  body.no-notes .idea { display: none; }
+  .mp-sample { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 12px; background: #FFF3D1; color: #7A5700; font-size: 11px; font-weight: 700; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="brief">
+  <h1>Species page: ideas from the reference</h1>
+  <p>This is our V2 species page for the <b>same bird as the reference, Aaru Macaw</b>, with that app's data ideas moved in. It is built from our module page's parts, so there are no dark blocks and it keeps one card shape. The dot on each tab shows what changes: green is a <b>new tab</b>, blue is an <b>existing tab with more in it</b>, grey is unchanged. The yellow notes say where each idea comes from and whether its numbers are <b>ours</b> (from the V5 dump) or <b>sample</b> data.</p>
+  <div class="legend">
+    <button class="toggle" type="button" aria-pressed="true" id="notes">Notes: on</button>
+  </div>
+</header>
+
+<div class="device">
+  <div class="mpage">
+    <div class="mpage__bar">
+      <button class="mpage__back" type="button" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="mpage__head"><h1 class="mpage__title" id="title"></h1><span class="mpage__sub" id="latin"></span></div>
+      <span class="mp-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>All sites</span>
+    </div>
+    <div class="mpage__body" id="body"></div>
+  </div>
+</div>
+<div class="tip" id="tip" role="status"></div>
+
+<script>
+/* OUR DATA — Aaru Macaw out of assets/data/v2-modules.json (Dump20260622, today 2026-05-20) */
+const D = {"name":"Aaru Macaw","latin":"Quelulix tenanus","cls":"Aves","order":"Brealusiformes","family":"Nyxanidae","iucn":"Least Concern","cites":"Appendix II","today":"2026-05-20","sites":[{"name":"Hollowpine Wetland Quarter Park","m":3,"f":2,"u":12,"encl":4,"chip":8},{"name":"Foxglen Sanctuary","m":7,"f":8,"u":4,"encl":8,"chip":12},{"name":"Clearspring Habitat","m":48,"f":57,"u":54,"encl":76,"chip":136}],"dem":[{"site":"Hollowpine Wetland Quarter Park","c":{"ud":[1,0,0,12],"single":[1,1,0,0],"pair":[2,2,2,0]}},{"site":"Foxglen Sanctuary","c":{"female":[1,0,2,0],"mixed":[2,3,3,2],"pair":[2,2,2,0],"male":[1,2,0,0],"single":[1,0,1,0],"ud":[1,0,0,2]}},{"site":"Clearspring Habitat","c":{"ud":[22,0,0,41],"mixed":[17,22,25,13],"single":[18,8,10,0],"pair":[16,16,16,0],"mdom":[1,2,1,0],"female":[2,0,5,0]}}],"deaths":[{"aaid":57679,"site":"Clearspring","date":"2026-05-09","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Lake Dell Aviary","dob":null},{"aaid":58111,"site":"Clearspring","date":"2026-05-07","cause":"Chronic Illness","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Flint Knoll Yard","dob":null},{"aaid":57696,"site":"Clearspring","date":"2026-04-30","cause":"Under Treatment","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Flint Knoll Yard","dob":null},{"aaid":196912,"site":"Clearspring","date":"2026-04-22","cause":"Congential Types","nec":"Pending","disp":null,"sex":2,"encl":"Larch Nook Yard","dob":"2026-04-18"},{"aaid":190215,"site":"Clearspring","date":"2026-04-02","cause":"Indeterminate","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Oak Vale Burrow","dob":"2026-02-19"},{"aaid":149212,"site":"Clearspring","date":"2026-03-24","cause":"Undetermined","nec":"Pending","disp":"Incinerated","sex":2,"encl":"Ivy Field Aviary","dob":"2025-07-07"},{"aaid":189007,"site":"Clearspring","date":"2026-03-09","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Oak Vale Burrow","dob":"2026-02-19"},{"aaid":57741,"site":"Clearspring","date":"2026-02-25","cause":"Attacked","nec":"Pending","disp":"Incinerated","sex":1,"encl":"Slate Hollow Den","dob":null},{"aaid":149214,"site":"Clearspring","date":"2026-02-13","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Ridge Creek Den","dob":"2025-07-09"},{"aaid":57700,"site":"Clearspring","date":"2026-02-13","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Hollow Heath Burrow","dob":null},{"aaid":57913,"site":"Clearspring","date":"2026-02-07","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Moss Meadow Habitat","dob":null},{"aaid":32802,"site":"Clearspring","date":"2026-02-06","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Aspen Bend Habitat","dob":"2024-05-14"},{"aaid":140188,"site":"Clearspring","date":"2026-02-05","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Moss Meadow Habitat","dob":"2025-06-12"},{"aaid":58140,"site":"Clearspring","date":"2026-02-04","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Bramble Gate Range","dob":null},{"aaid":58079,"site":"Clearspring","date":"2026-02-04","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Flint Marsh Coop","dob":null},{"aaid":58077,"site":"Clearspring","date":"2026-02-04","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Meadow Slade Range","dob":null},{"aaid":58158,"site":"Clearspring","date":"2026-02-03","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Willow Gate Burrow","dob":null},{"aaid":58139,"site":"Clearspring","date":"2026-02-03","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Bramble Gate Range","dob":null},{"aaid":58130,"site":"Clearspring","date":"2026-02-03","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Flint Heath Enclosure","dob":null},{"aaid":57753,"site":"Clearspring","date":"2026-02-03","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Marsh Creek Pen","dob":null},{"aaid":58154,"site":"Clearspring","date":"2026-02-02","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Slate Bank Vivarium","dob":null},{"aaid":58091,"site":"Clearspring","date":"2026-02-02","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Marsh Bank Coop","dob":null},{"aaid":58071,"site":"Clearspring","date":"2026-02-02","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Laurel Acre Warren","dob":null},{"aaid":57760,"site":"Clearspring","date":"2026-02-02","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Elder Rise Burrow","dob":null},{"aaid":57695,"site":"Clearspring","date":"2026-02-02","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Flint Heath Enclosure","dob":null},{"aaid":57694,"site":"Clearspring","date":"2026-02-02","cause":"Acute Disease","nec":"Pending","disp":null,"sex":1,"encl":"Flint Heath Enclosure","dob":null},{"aaid":58136,"site":"Clearspring","date":"2026-02-01","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Heather Hollow Coop","dob":null},{"aaid":58095,"site":"Clearspring","date":"2026-01-31","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Sorrel Mere Terrarium","dob":null},{"aaid":58070,"site":"Clearspring","date":"2026-01-31","cause":"Under Treatment","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Laurel Acre Warren","dob":null},{"aaid":57750,"site":"Clearspring","date":"2026-01-31","cause":"Acute Disease","nec":"Pending","disp":null,"sex":1,"encl":"Flint Gate Range","dob":null},{"aaid":57682,"site":"Clearspring","date":"2026-01-31","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Glen Field Den","dob":null},{"aaid":58125,"site":"Clearspring","date":"2026-01-30","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Vale Dell Vivarium","dob":null},{"aaid":58073,"site":"Clearspring","date":"2026-01-30","cause":"Acute Disease","nec":"Pending","disp":null,"sex":2,"encl":"Alder Bend Pen","dob":null},{"aaid":57943,"site":"Clearspring","date":"2026-01-30","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Thistle Bend Roost","dob":null},{"aaid":57914,"site":"Clearspring","date":"2026-01-30","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Moss Meadow Habitat","dob":null},{"aaid":58094,"site":"Clearspring","date":"2026-01-29","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Sorrel Mere Terrarium","dob":null},{"aaid":57923,"site":"Clearspring","date":"2026-01-29","cause":"Undetermined","nec":"Pending","disp":null,"sex":1,"encl":"Ridge Shaw Aviary","dob":null},{"aaid":57912,"site":"Clearspring","date":"2026-01-29","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Flint Dell Aviary","dob":null},{"aaid":57749,"site":"Clearspring","date":"2026-01-29","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Flint Gate Range","dob":null},{"aaid":57697,"site":"Clearspring","date":"2026-01-29","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Flint Knoll Yard","dob":null},{"aaid":58131,"site":"Clearspring","date":"2026-01-28","cause":"Undetermined","nec":"Pending","disp":null,"sex":1,"encl":"Vale Dell Vivarium","dob":null},{"aaid":58129,"site":"Clearspring","date":"2026-01-28","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Larch Acre Pen","dob":null},{"aaid":58072,"site":"Clearspring","date":"2026-01-28","cause":"Acute Disease","nec":"Pending","disp":null,"sex":2,"encl":"Alder Bend Pen","dob":null},{"aaid":58068,"site":"Clearspring","date":"2026-01-28","cause":"Acute Disease","nec":"Pending","disp":null,"sex":0,"encl":"Willow Path Paddock","dob":null},{"aaid":57707,"site":"Clearspring","date":"2026-01-28","cause":"Undetermined","nec":"Pending","disp":null,"sex":0,"encl":"Vale Dell Vivarium","dob":null},{"aaid":57767,"site":"Clearspring","date":"2026-01-27","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Pine Gate Habitat","dob":null},{"aaid":57743,"site":"Clearspring","date":"2026-01-27","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Cedar Creek Burrow","dob":null},{"aaid":149200,"site":"Clearspring","date":"2026-01-26","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":2,"encl":"Bramble Ridge Roost","dob":"2025-07-15"},{"aaid":58096,"site":"Clearspring","date":"2026-01-26","cause":"Acute Disease","nec":"Pending","disp":null,"sex":0,"encl":"Willow Knoll Run","dob":null},{"aaid":58075,"site":"Clearspring","date":"2026-01-25","cause":"Indeterminate","nec":"Completed","disp":"Incinerated","sex":1,"encl":"Moss Copse Burrow","dob":null},{"aaid":57927,"site":"Clearspring","date":"2026-01-25","cause":"Indeterminate","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Laurel Vale Yard","dob":null},{"aaid":57925,"site":"Clearspring","date":"2026-01-25","cause":"Acute Disease","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Dell Creek Habitat","dob":null},{"aaid":57916,"site":"Clearspring","date":"2026-01-25","cause":"Indeterminate","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Vale Ridge Yard","dob":null},{"aaid":58078,"site":"Clearspring","date":"2026-01-24","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Flint Marsh Coop","dob":null},{"aaid":57933,"site":"Clearspring","date":"2026-01-24","cause":"Undetermined","nec":"Completed","disp":"Incinerated","sex":0,"encl":"Holly Field Paddock","dob":null},{"aaid":57928,"site":"Clearspring","date":"2025-12-10","cause":"Under Treatment","nec":"Pending","disp":null,"sex":1,"encl":"Laurel Vale Yard","dob":null},{"aaid":57919,"site":"Clearspring","date":"2025-12-09","cause":"Undetermined","nec":"Pending","disp":null,"sex":2,"encl":"Meadow Grove Yard","dob":null},{"aaid":57936,"site":"Clearspring","date":"2025-12-07","cause":"Under Treatment","nec":"Pending","disp":"Incinerated","sex":2,"encl":"Bramble Marsh Stable","dob":null},{"aaid":140187,"site":"Clearspring","date":"2025-12-05","cause":"Undetermined","nec":"Pending","disp":null,"sex":2,"encl":"Moss Meadow Habitat","dob":"2025-06-12"},{"aaid":57685,"site":"Clearspring","date":"2025-12-03","cause":"Undetermined","nec":"Pending","disp":"Incinerated","sex":1,"encl":"Ivy Field Aviary","dob":null},{"aaid":57684,"site":"Clearspring","date":"2025-12-03","cause":"Infectious Systemic Failure","nec":"Pending","disp":null,"sex":0,"encl":"Ivy Field Aviary","dob":null}],"life":[["2025-06",9,2],["2025-07",13,1],["2025-08",1,0],["2025-09",1,3],["2025-10",0,0],["2025-11",0,1],["2025-12",0,7],["2026-01",0,28],["2026-02",2,20],["2026-03",0,2],["2026-04",5,3],["2026-05",0,2]],"lifeAll":[171,73],"animals":[[197577,2,2,"Fern Shaw Warren","2026-04-30","2026-04-29",0,null],[197323,2,2,"Fern Shaw Warren","2026-04-26","2026-04-26",0,null],[197211,2,2,"Fern Shaw Warren","2026-04-24","2026-04-24",0,null],[194053,1,3,"Marsh Wick Burrow",null,"2026-04-12",1,null],[194052,1,3,"Marsh Wick Burrow",null,"2026-04-12",1,null],[193704,2,2,"Fern Shaw Warren","2026-04-11","2026-04-11",0,null]],"siteNames":["Crimson Frosted Wildlife Estate","Clearspring Habitat","Hollowpine Wetland Quarter Park","Foxglen Sanctuary"]}
+</script>
+<script>
+const $ = (s, r = document) => r.querySelector(s)
+const fmt = (n) => Number(n).toLocaleString('en-IN')
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const dd = (iso) => { if (!iso) return '—'; const [y, m, d] = iso.split('-'); return `${d} ${MON[+m - 1]} ${y}` }
+const SX = ['m', 'f', 'u'], SXL = ['Male', 'Female', 'Unsexed']
+const sum = (a, k) => a.reduce((t, x) => t + (k ? x[k] : x), 0)
+
+const T = { m: sum(D.sites, 'm'), f: sum(D.sites, 'f'), u: sum(D.sites, 'u'), encl: sum(D.sites, 'encl'), chip: sum(D.sites, 'chip') }
+T.t = T.m + T.f + T.u
+const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0)
+const nPend = D.deaths.filter((d) => d.nec !== 'Completed').length, nDone = D.deaths.length - nPend
+
+const idea = (html, tags) => `<aside class="idea"><div>${html}<div class="idea__tags">${tags.map(([k, l]) => `<em data-k="${k}">${l}</em>`).join('')}</div></div></aside>`
+const panel = (title, sub, body, right = '') => `<section class="mp-panel"><div class="mp-panel__head"><div><h3 class="mp-h">${title}</h3>${sub ? `<p>${sub}</p>` : ''}</div>${right}</div>${body}</section>`
+const stat = (label, v, k = '', small = '') => `<div class="mp-stat" data-k="${k}"><span>${label}</span><b>${v}</b>${small ? `<small>${small}</small>` : ''}</div>`
+const hbars = (rows, c) => { const max = Math.max(...rows.map((r) => r[1]), 1); return `<div class="hbars">` + rows.map(([l, n]) =>
+  `<div class="hbar" data-tip="${esc(l)}: ${n}"><span>${esc(l)}</span><span class="hbar__track"><i style="--w:${(n / max).toFixed(3)};--c:${c}"></i></span><b>${fmt(n)}</b></div>`).join('') + `</div>` }
+const bars = (vals, labels, c, unit) => { const max = Math.max(...vals, 1), top = vals.indexOf(Math.max(...vals)); return `<div class="bars">` + vals.map((v, i) =>
+  `<span data-tip="${esc(labels[i])}: ${v} ${unit}"><i style="--h:${(v / max).toFixed(3)};--c:${c}"></i>${i === top && v ? `<b style="--h:${(v / max).toFixed(3)}">${v}</b>` : ''}<small>${esc(labels[i])}</small></span>`).join('') + `</div>` }
+const seg = (opts, on) => `<div class="mp-seg">${opts.map((o) => `<button type="button" aria-pressed="${o === on}">${o}</button>`).join('')}</div>`
+const sample = `<span class="mp-sample">Sample data</span>`
+
+/* ── the head ── */
+$('#title').textContent = D.name
+$('#latin').textContent = D.latin
+const hero = `<section class="mp-summary"><img src="../assets/img/species/rose-ringed-parakeet.jpg" alt="">` +
+  `<div class="mp-summary__body"><span class="mp-eyebrow">IUCN · LC · CITES ${esc(D.cites)}</span>` +
+  `<span class="mp-figs"><span><b>${fmt(T.t)}</b>Animals</span><span><b>${D.sites.length}</b>Sites</span><span><b>${fmt(T.encl)}</b>Enclosures</span></span>` +
+  `<span class="mp-tags"><em class="mp-chip" data-s="m">M ${T.m}</em><em class="mp-chip" data-s="f">F ${T.f}</em><em class="mp-chip" data-s="u">U ${T.u}</em>` +
+  `<em class="mp-chip">Ratio ${(T.m / T.f).toFixed(1)} : 1</em><em class="mp-chip">Sexed ${pct(T.m + T.f, T.t)}%</em><em class="mp-chip">Chipped ${pct(T.chip, T.t)}% (${T.chip})</em></span></div></section>`
+
+/* ── the tabs ── */
+const TABS = [
+  ['profile', 'Profile', 'better'], ['population', 'Population', 'same'], ['housing', 'Housing', 'same'], ['enclosures', 'Enclosure make-up', 'new'],
+  ['life', 'Circle of Life', 'better'], ['eggs', 'Eggs', 'new'], ['medical', 'Medical', 'new'], ['hospital', 'Hospital', 'new'],
+  ['ledger', 'Ledger', 'new'], ['mortality', 'Mortality', 'better'], ['necropsy', 'Necropsy', 'better']]
+
+const I = { // small 24px line icons
+  home: '<path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z"/>',
+  leaf: '<path d="M5 19c0-8 5-14 15-15-1 10-7 15-15 15zM5 19l7-7"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>',
+  group: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M15 14.5c3 0 6 2 6 5.5"/>',
+  heart: '<path d="M12 20s-7-4.5-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.5-7 10-7 10z"/>',
+  drop: '<path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/>',
+  alert: '<path d="M12 3l10 18H2zM12 10v5M12 18v.5"/>',
+  chat: '<path d="M4 5h16v11H9l-5 4z"/>',
+  ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/>' }
+const ico = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`
+
+const IUCN = [['NA', '#B9C3C0'], ['DD', '#A6AEB0'], ['NE', '#8E9A9C'], ['LC', '#2BA163'], ['NT', '#9CC43A'], ['VU', '#E3B51C'], ['EN', '#E8843C'], ['CR', '#D93F45'], ['RE', '#9B5FA8'], ['EW', '#6B4C8A'], ['EX', '#2C2F33']]
+
+const PAGES = {
+  profile() {
+    const attr = (k, label, v, hint, warn) => `<div class="attr${warn ? ' is-warn' : ''}"><span class="attr__ico">${ico(k)}</span><span><small>${label}</small><b>${v}</b><i>${hint}</i></span></div>`
+    return idea('<b>From the reference:</b> the IUCN category is shown on the full 11-step scale, not as a code, and the Profile reads like a <b>field guide</b>: what a group and a baby are called, habitat, diet, activity, mating, venom and how dangerous it is to handle. The <b>danger rating</b> is the one attribute that gets a red card, because it is the one a keeper must not miss.', [['better', 'More in an existing tab'], ['ours', 'Taxonomy, IUCN, CITES, sites: ours'], ['sample', 'Attributes: sample (not in the dump)']]) +
+      panel('Conservation status', '', `<div class="iucn">${IUCN.map(([c, col]) => `<span style="background:${col};--c:${col}" class="${c === 'LC' ? 'is-on' : ''}" title="${c}">${c}</span>`).join('')}</div>` +
+        `<div class="iucn-read">IUCN Red List <b>Least Concern</b><span class="mp-note">·</span>CITES <b>${esc(D.cites)}</b></div>`) +
+      `<div class="mp-two">` +
+        panel('About this species', '', `<div class="attrs">${attr('group', 'A group is called', 'Flock', '')}${attr('heart', 'A baby is called', 'Chick', '')}</div>`, sample) +
+        `<section class="mp-panel mp-kv"><h3 class="mp-h">Taxonomy</h3><dl><div><dt>Class</dt><dd>${esc(D.cls)}</dd></div><div><dt>Order</dt><dd>${esc(D.order)}</dd></div><div><dt>Family</dt><dd>${esc(D.family)}</dd></div><div><dt>Scientific name</dt><dd><i>${esc(D.latin)}</i></dd></div></dl></section>` +
+      `</div>` +
+      panel('Key attributes', 'How to house, feed and handle it', `<div class="attrs">` +
+        attr('home', 'Where it lives', 'Arboreal / Aerial', 'Trees and flight') + attr('leaf', 'Diet', 'Granivore / Frugivore', 'Seeds and fruit') +
+        attr('sun', 'Activity', 'Diurnal', 'Active by day') + attr('group', 'Social grouping', 'Flock / Pair', 'Flocks or pairs') +
+        attr('heart', 'Mating', 'Monogamous', 'One partner') + attr('drop', 'Venom / poison', 'Non-venomous', 'Safe') +
+        attr('chat', 'Communication', 'Calls and body language', 'Vocal, visual display') + attr('home', 'Migration', 'Not a migrant', 'Stays in one area') +
+        attr('alert', 'Danger to handlers', '1 of 5 · Safe', 'Handle trained birds only', true) + `</div>`, sample) +
+      panel('Reference links', '', `<div class="links"><a href="https://www.iucnredlist.org/search?query=${encodeURIComponent(D.latin)}" target="_blank" rel="noopener">${ico('ext')}IUCN Red List</a><a href="https://checklist.cites.org/#/en/search?fullText=${encodeURIComponent(D.latin)}" target="_blank" rel="noopener">${ico('ext')}CITES checklist</a></div>`)
+  },
+
+  population() {
+    const age = (iso) => { if (!iso) return '—'; const days = Math.round((new Date(D.today) - new Date(iso)) / 864e5); return days < 60 ? `${days}d` : days < 730 ? `${Math.round(days / 30)}m` : `${Math.floor(days / 365)}y` }
+    return idea('<b>Unchanged.</b> The reference’s list matches ours: sex, ID, site, age. It adds <b>weight</b>, which our dump does not have yet.', [['ours', 'Our data']]) +
+      panel(`Animals · ${fmt(T.t)}`, '', `<div class="mp-table" style="--cols:minmax(180px,2fr) 1fr 80px 100px"><div class="mp-tr mp-th" style="grid-template-columns:var(--cols)"><span>Animal</span><span>Enclosure</span><span>Age</span><span>Chip</span></div>` +
+        D.animals.map((a) => `<div class="mp-tr" style="grid-template-columns:var(--cols)"><span class="cellname"><span class="sx" data-s="${SX[a[1]]}">${'MFU'[a[1]]}</span><span class="mp-name"><b class="mp-aaid">AAID: ${a[0]}</b><i>${esc(D.siteNames[a[2]])}</i></span></span><span>${esc(a[3])}</span><span>${age(a[5] || a[4])}</span><span>${a[6] ? '<em class="mp-tag" data-tone="ok">Chipped</em>' : '<em class="mp-tag" data-tone="bad">No chip</em>'}</span></div>`).join('') + `</div>`, seg(['All', 'Male', 'Female', 'Unsexed'], 'All'))
+  },
+
+  housing() {
+    const cols = 'minmax(180px,2fr) repeat(5,minmax(52px,1fr))'
+    return idea('<b>Unchanged.</b> It is the same site table as the reference. The one new thing the reference does here is the tab next door.', [['ours', 'Our data']]) +
+      panel(`Sites · ${D.sites.length}`, '', `<div class="mp-table"><div class="mp-tr mp-th" style="grid-template-columns:${cols}"><span>Site</span><span class="r">M</span><span class="r">F</span><span class="r">U</span><span class="r">Total</span><span class="r">Encl.</span></div>` +
+        D.sites.map((s) => `<div class="mp-tr" style="grid-template-columns:${cols}"><span>${esc(s.name)}</span><span class="r">${s.m}</span><span class="r">${s.f}</span><span class="r">${s.u}</span><span class="r"><b>${s.m + s.f + s.u}</b></span><span class="r">${s.encl}</span></div>`).join('') + `</div>`, seg(['Site-wise', 'Enclosure-wise'], 'Site-wise'))
+  },
+
+  enclosures() {
+    const K = [['pair', 'Pair', '1 M + 1 F'], ['mixed', 'Mixed', 'M, F and unsexed'], ['single', 'Single', 'One animal'], ['male', 'Male only'], ['female', 'Female only'], ['mdom', 'Male dom.', 'More M than F'], ['fdom', 'Female dom.', 'More F than M'], ['ud', 'Unsexed only']]
+    const all = {}; D.dem.forEach((r) => K.forEach(([k]) => { const v = r.c[k]; if (v) { const a = all[k] || (all[k] = [0, 0, 0, 0]); v.forEach((n, i) => (a[i] += n)) } }))
+    const COL = { pair: '#1E4F5A', mixed: '#3E8E86', single: '#8FB8B0', male: '#1A9A9A', female: '#E8603C', mdom: '#6FC3C3', fdom: '#F2A186', ud: '#5B8FB0' }
+    const sexLine = (v) => [v[1] && `${v[1]}M`, v[2] && `${v[2]}F`, v[3] && `${v[3]}U`].filter(Boolean).join(' · ') || `${v[0]} animals`
+    const cell = (v) => v ? `<span class="cell"><b>${v[0]}</b><i>${sexLine(v)}</i></span>` : `<span class="cell is-nil">—</span>`
+    const tot = sum(Object.values(all).map((v) => v[0]))
+    return idea('<b>New tab, from the reference’s “Enclosure Demographics”.</b> Each enclosure is sorted by who is in it: pairs, mixed groups, singles, one-sex groups, or <b>unsexed only</b>. Each cell is <b>a bold enclosure count over a quiet animal line</b>. It answers “where can I pair birds?” and “how many enclosures still need sexing?” without opening each one. This is computed from our enclosure register.', [['new', 'New tab'], ['ours', `Our data: ${tot} occupied enclosures`]]) +
+      `<div class="mp-stats">${stat('Pairs', all.pair?.[0] || 0, 'g', `${(all.pair?.[0] || 0) * 2} birds ready to breed`)}${stat('Single birds', all.single?.[0] || 0, '', 'housed alone')}${stat('Unsexed only', all.ud?.[0] || 0, 'bad', `${all.ud?.[3] || 0} birds to sex`)}${stat('Mixed groups', all.mixed?.[0] || 0, '', `${sum(all.mixed || [0]) - (all.mixed?.[0] || 0)} birds`)}</div>` +
+      panel('How the enclosures are made up', `${tot} enclosures with this species`, `<div class="strip">${K.filter(([k]) => all[k]).map(([k, l]) => `<i style="--n:${all[k][0]};--c:${COL[k]}" data-tip="${l}: ${all[k][0]} enclosures"></i>`).join('')}</div>` +
+        `<div class="key">${K.filter(([k]) => all[k]).map(([k, l]) => `<span style="--c:${COL[k]}">${l} · ${all[k][0]}</span>`).join('')}</div>`) +
+      panel('By site', 'The bold figure is the enclosure count; the line under it is the animals in them', `<div class="mp-table dem"><div class="mp-tr mp-th"><span>Site</span>${K.map(([, l]) => `<span>${l}</span>`).join('')}</div>` +
+        D.dem.map((r) => `<div class="mp-tr"><span>${esc(r.site)}</span>${K.map(([k]) => cell(r.c[k])).join('')}</div>`).join('') + `</div>`, seg(['Site-wise', 'Enclosure-wise'], 'Site-wise'))
+  },
+
+  life() {
+    const lbl = D.life.map(([k]) => MON[+k.slice(5) - 1])
+    const B = D.life.map((r) => r[1]), De = D.life.map((r) => r[2])
+    const aged = D.deaths.filter((d) => d.dob).map((d) => (new Date(d.date) - new Date(d.dob)) / 864e5)
+    const bk = [['0–7 d', 'First week', 0, 7], ['8–30 d', 'First month', 8, 30], ['31–90 d', 'First 3 months', 31, 90], ['91–365 d', 'First year', 91, 365], ['1 y +', 'Over a year', 366, 1e9]]
+      .map(([l, s, a, b]) => [l, s, aged.filter((x) => x >= a && x <= b).length])
+    const causes = Object.entries(D.deaths.reduce((m, d) => ((m[d.cause] = (m[d.cause] || 0) + 1), m), {})).sort((a, b) => b[1] - a[1])
+    return idea('<b>More in an existing tab.</b> We already draw births and deaths per month. The reference adds three answers underneath: <b>how soon they die</b> (survival buckets), <b>what they die of</b> (causes, ranked) and <b>how old they are when they die</b>. All three are computed from our deaths. Only 9 of the 61 have a birth date, and the survival panel says so.', [['better', 'More in an existing tab'], ['ours', 'Our data']]) +
+      `<div class="mp-two">` +
+        panel('Births', `Last 12 months · <b>${sum(B)}</b>`, bars(B, lbl, 'var(--birth)', 'births'), seg(['1Y', '2Y', '3Y'], '1Y')) +
+        panel('Deaths', `Last 12 months · <b>${sum(De)}</b>`, bars(De, lbl, 'var(--death)', 'deaths')) +
+      `</div>` +
+      panel('How soon they die', `Age at death, for the <b>${aged.length}</b> of ${D.deaths.length} deaths with a birth date`, `<div class="buckets">${bk.map(([l, s, n]) => `<div class="bucket"><b>${n}</b><span>${l}</span><small>${s}</small><i style="--w:${(n / Math.max(1, aged.length)).toFixed(3)}"></i></div>`).join('')}</div>`) +
+      `<div class="mp-two">` +
+        panel('What they die of', `${D.deaths.length} deaths recorded`, hbars(causes.slice(0, 6), 'var(--death)') + (causes.length > 6 ? `<p class="mp-note">+ ${causes.length - 6} more causes</p>` : '')) +
+        panel('Age at death', '', `<div class="mp-stats is-3" style="grid-template-columns:repeat(3,minmax(0,1fr))">${stat('Average', `${(sum(aged) / aged.length / 365).toFixed(1)} y`)}${stat('Oldest', `${(Math.max(...aged) / 365).toFixed(1)} y`)}${stat('Records', aged.length)}</div><p class="mp-note">Most of the dated deaths are birds <b>under a year old</b>. That is the reference’s “survived over a year” reading turned round.</p>`) +
+      `</div>`
+  },
+
+  eggs() {
+    const laid = 214, fertile = 171, hatched = 128
+    const mon = [12, 9, 4, 2, 0, 0, 1, 6, 22, 31, 18, 14]
+    return idea('<b>New tab, from the reference’s Eggs.</b> Eggs are read as <b>a funnel</b> (laid → fertile → hatched), with a ranked list of <b>why eggs were discarded</b> and each female compared with <b>her last season</b>. It would replace the sample egg data we show now with one clear question: where are we losing eggs?', [['new', 'New tab'], ['sample', 'Sample data (egg records are not in the dump)']]) +
+      `<div class="mp-stats">${stat('Laid', laid)}${stat('Fertile', fertile, '', `${pct(fertile, laid)}% of laid`)}${stat('Hatched', hatched, 'g', `${pct(hatched, fertile)}% of fertile`)}${stat('Avg egg weight', '42.8 g')}</div>` +
+      `<div class="mp-two">` +
+        panel('Where eggs are lost', 'Last 12 months', `<div class="funnel">${[['Laid', laid, '#1E4F5A'], ['Fertile', fertile, '#3E8E86'], ['Hatched', hatched, '#3DAA70']].map(([l, n, c]) =>
+          `<div><span>${l}</span><span><span class="bar" style="--w:${(n / laid).toFixed(3)};--c:${c};display:block"></span></span><span><b>${n}</b> <small>${pct(n, laid)}%</small></span></div>`).join('')}</div>`, sample) +
+        panel('Why eggs were discarded', `${laid - hatched} eggs`, hbars([['Infertile on candling', 43], ['Died in shell', 24], ['Cracked in handling', 9], ['Rotten / contaminated', 6], ['Abandoned in nest', 4]], '#8A6D1F')) +
+      `</div>` +
+      panel('Eggs laid, month by month', '2025–26', bars(mon, ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'], '#C9A13B', 'eggs'), seg(['1Y', '2Y', '3Y'], '1Y')) +
+      panel(`Females · ${T.f}`, 'Each female against her last season', (() => { const cols = 'minmax(180px,2fr) 80px 70px 80px minmax(130px,1fr)'
+        const rows = [[57913, 3, 9, 7, '+2 on last season', 'ok'], [58140, 2, 6, 5, 'Same as last season', ''], [34555, 2, 7, 3, '−3 on last season', 'bad'], [57741, 1, 3, 0, 'First clutch', 'info'], [149214, 0, 0, 0, 'No eggs this season', 'warn']]
+        return `<div class="mp-table"><div class="mp-tr mp-th" style="grid-template-columns:${cols}"><span>Female</span><span class="r">Clutches</span><span class="r">Eggs</span><span class="r">Hatched</span><span>Vs last season</span></div>` +
+          rows.map(([id, c, e, h, v, t]) => `<div class="mp-tr" style="grid-template-columns:${cols}"><span class="cellname"><span class="sx" data-s="f">F</span><b class="mp-aaid">AAID: ${id}</b></span><span class="r">${c}</span><span class="r">${e}</span><span class="r">${h}</span><span><em class="mp-tag" data-tone="${t}">${v}</em></span></div>`).join('') + `</div>` })())
+  },
+
+  medical() {
+    const P = [['Vaccination', 18, 7, 3, 2, 6], ['Deworming', 26, 8, 4, 6, 8], ['Supplements', 21, 6, 3, 5, 7]]
+    const max = 8
+    const newS = [2, 1, 2, 1, 3, 4, 3, 6, 9, 7, 5, 4], oldS = [3, 3, 2, 2, 2, 3, 4, 4, 7, 9, 8, 6]
+    const lbl = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'], top = Math.max(...newS.map((n, i) => n + oldS[i]))
+    return idea('<b>New tab, from the reference’s Medical.</b> Its best idea is the <b>overdue preventive-care table</b>: vaccination, deworming and supplements, each split by how long they are overdue. The darker the cell, the more birds. It would be the species-level twin of our Pending Actions card. We also chart <b>newly sick against still sick</b> each month.', [['new', 'New tab'], ['sample', 'Sample: our dose table has no rows for this species']]) +
+      `<div class="mp-stats is-3">${stat('Sick right now', 9, 'bad')}${stat('Sick more than once', 14)}${stat('On medication', 4)}</div>` +
+      panel('Overdue preventive care', 'Birds overdue, by how long', `<div class="mp-table heat"><div class="mp-tr mp-th"><span>Program</span><span class="r">Overdue</span><span>0–30 d</span><span>31–60 d</span><span>61–90 d</span><span>90 d +</span></div>` +
+        P.map(([p, t, ...c]) => `<div class="mp-tr"><span><b style="color:var(--mp-ink);font-weight:600">${p}</b></span><span class="r mp-num">${t}</span>${c.map((n) => `<span class="cell${n / max > .6 ? ' is-hot' : ''}" style="--a:${(0.08 + (n / max) * 0.8).toFixed(2)}" data-tip="${p}: ${n} birds">${n}</span>`).join('')}</div>`).join('') + `</div>`, sample) +
+      panel('Sick birds each month', 'Newly sick on top of those still sick from the month before', `<div class="key"><span style="--c:#D93F45">Newly sick</span><span style="--c:#F2B3A4">Still sick</span></div><div class="bars">` +
+        newS.map((n, i) => `<span data-tip="${lbl[i]}: ${n} new, ${oldS[i]} still sick"><i class="stack" style="--h:${((n + oldS[i]) / top).toFixed(3)}"><em style="flex:${n};background:#D93F45"></em><em style="flex:${oldS[i]};background:#F2B3A4"></em></i><small>${lbl[i]}</small></span>`).join('') + `</div>`, seg(['1Y', '2Y', '3Y'], '1Y'))
+  },
+
+  hospital() {
+    const cols = 'minmax(170px,1.6fr) 100px 60px minmax(120px,1fr) minmax(150px,1.2fr)'
+    const rows = [[58111, 1, '02 May 2026', '1 d', 'Inappetence', 'Pinecrest Veterinary'], [57696, 0, '29 Apr 2026', '4 d', 'Laboured breathing', 'Riverside Wildlife'], [34555, 1, '26 Apr 2026', '7 d', 'Feather cyst', 'Riverside Wildlife'], [149214, 2, '18 Apr 2026', '15 d', 'Parasitism', 'Pinecrest Veterinary']]
+    return idea('<b>New tab, from the reference’s Hospital.</b> The admissions are summarised: how many are <b>in care now</b>, how long they stay (a stay over 14 days is the warning), <b>who keeps coming back</b>, and whether surgery happened in hospital or in the field.', [['new', 'New tab'], ['sample', 'Sample data (hospital stays are not in the dump)']]) +
+      `<div class="mp-stats">${stat('In care now', 6, 'bad')}${stat('Admissions', 41, '', 'all time')}${stat('Average stay', '12.4 d')}${stat('Back more than once', 9)}</div>` +
+      `<div class="mp-two">` +
+        panel('How long they stay', '46% of stays run past 14 days', hbars([['1–3 days', 7], ['4–7 days', 9], ['8–14 days', 6], ['15 days +', 19]], '#1E4F5A'), sample) +
+        panel('Where surgery happens', '11 surgeries', `<div class="strip" style="height:18px"><i style="--n:8;--c:#1E4F5A" data-tip="In hospital: 8"></i><i style="--n:3;--c:#8FB8B0" data-tip="In the field: 3"></i></div><div class="key"><span style="--c:#1E4F5A">In hospital · 8 · 73%</span><span style="--c:#8FB8B0">In the field · 3 · 27%</span></div>` +
+          `<div class="mp-stats is-3" style="grid-template-columns:repeat(3,minmax(0,1fr))">${stat('Discharged', 33)}${stat('Still in', 6)}${stat('Died in care', 2, 'bad')}</div>`) +
+      `</div>` +
+      panel('In care now', '', `<div class="mp-table"><div class="mp-tr mp-th" style="grid-template-columns:${cols}"><span>Animal</span><span>Admitted</span><span>Stay</span><span>Condition</span><span>Hospital</span></div>` +
+        rows.map(([id, s, d, st, c, h]) => `<div class="mp-tr" style="grid-template-columns:${cols};--minw:640px"><span class="cellname"><span class="sx" data-s="${SX[s]}">${'MFU'[s]}</span><b class="mp-aaid">AAID: ${id}</b></span><span>${d}</span><span>${parseInt(st) > 14 ? `<em class="mp-tag" data-tone="bad">${st}</em>` : st}</span><span>${c}</span><span>${h}</span></div>`).join('') + `</div>`)
+  },
+
+  ledger() {
+    const cols = '120px 100px minmax(200px,1fr) 70px'
+    const out = D.deaths.slice(0, 7).map((d) => [d.date, 'Death', d.disp ? `Carcass ${d.disp.toLowerCase()} · ${d.encl}` : `${d.encl} · disposal pending`, 'out', 1])
+    const tr = [['2026-05-12', 'Transfer', 'Foxglen Sanctuary → Clearspring Habitat', 'move', 2], ['2026-05-04', 'Transfer', 'Hollowpine Wetland → Foxglen Sanctuary', 'move', 1], ['2026-04-26', 'Birth', 'Fern Shaw Warren, Hollowpine', 'in', 1], ['2026-04-18', 'Acquisition', 'From: Wildlife Rescue Centre', 'in', 3]]
+    const all = [...out, ...tr].sort((a, b) => b[0].localeCompare(a[0]))
+    const tone = { out: 'bad', in: 'ok', move: 'info' }, dir = { out: 'Out', in: 'In', move: 'Moved' }
+    return idea('<b>New tab, from the reference’s Ledger.</b> One running list of <b>every time the head-count changed</b>: births, acquisitions, transfers, deaths and disposals, each with a direction and a count. With it, “why is it 195 today?” can be answered, and the reference reconciles it against the census.', [['new', 'New tab'], ['ours', 'Deaths and disposals: ours'], ['sample', 'Transfers and acquisitions: sample']]) +
+      `<div class="mp-stats">${stat('In', 4, 'g', 'animals born or acquired')}${stat('Out', out.length, 'bad', 'animals died')}${stat('Moved', 3, '', 'animals between sites')}${stat('Net change', `${4 - out.length}`.replace('-', '−'), '', `since ${dd(all[all.length - 1][0])}`)}</div>` +
+      panel(`Ledger · ${all.length}`, 'Newest first', `<div class="mp-table"><div class="mp-tr mp-th" style="grid-template-columns:${cols}"><span>Date</span><span>Event</span><span>Detail</span><span class="r">Animals</span></div>` +
+        all.map(([d, e, x, k, n]) => `<div class="mp-tr" style="grid-template-columns:${cols};--minw:560px"><span>${dd(d)}</span><span><em class="mp-tag" data-tone="${tone[k]}">${e}</em></span><span class="mp-name">${esc(x)}<i>${dir[k]}</i></span><span class="r mp-num">${n}</span></div>`).join('') + `</div>`, seg(['All', 'In', 'Out', 'Moved'], 'All'))
+  },
+
+  mortality() {
+    const cols = 'minmax(170px,1.5fr) 110px 70px minmax(130px,1fr) 110px 110px'
+    const age = (d) => (d.dob ? `${((new Date(d.date) - new Date(d.dob)) / 864e5 / 365).toFixed(1)} y` : '—')
+    const top = Object.entries(D.deaths.reduce((m, d) => ((m[d.cause] = (m[d.cause] || 0) + 1), m), {})).sort((a, b) => b[1] - a[1])[0]
+    return idea('<b>More in an existing tab.</b> The reference adds <b>necropsy status</b> and <b>age at death</b> to each row. We add the carcass <b>disposal</b> too, which leads into Carcass Transfer, and four figures at the top.', [['better', 'More in an existing tab'], ['ours', 'Our data']]) +
+      `<div class="mp-stats">${stat('Deaths', D.deaths.length)}${stat('Top cause', top[0], '', `${top[1]} deaths · ${pct(top[1], D.deaths.length)}%`)}${stat('Necropsy pending', nPend, 'bad')}${stat('Disposal pending', D.deaths.filter((d) => !d.disp).length)}</div>` +
+      panel(`Deaths · ${D.deaths.length}`, 'The last 120 days, and each site’s latest in every necropsy status', `<div class="mp-table"><div class="mp-tr mp-th" style="grid-template-columns:${cols}"><span>Animal</span><span>Date of death</span><span>Age</span><span>Cause</span><span>Necropsy</span><span>Disposal</span></div>` +
+        D.deaths.slice(0, 10).map((d) => `<div class="mp-tr" style="grid-template-columns:${cols};--minw:720px"><span class="cellname"><span class="sx" data-s="${SX[d.sex]}">${'MFU'[d.sex]}</span><span class="mp-name"><b class="mp-aaid">AAID: ${d.aaid}</b><i>${esc(d.encl)}</i></span></span><span>${dd(d.date)}</span><span>${age(d)}</span><span>${esc(d.cause)}</span>` +
+          `<span><em class="mp-tag" data-tone="${d.nec === 'Completed' ? 'ok' : 'warn'}">${esc(d.nec)}</em></span><span>${d.disp ? esc(d.disp) : '<em class="mp-tag" data-tone="bad">Pending</em>'}</span></div>`).join('') + `</div>`)
+  },
+
+  necropsy() {
+    const cols = 'minmax(170px,1.5fr) 110px minmax(130px,1fr) 110px'
+    const list = D.deaths.filter((d) => d.nec !== 'Completed')
+    const oldest = list.reduce((a, d) => (d.date < a ? d.date : a), '9999')
+    const late = list.filter((d) => (new Date(D.today) - new Date(d.date)) / 864e5 > 30).length
+    return idea('<b>More in an existing tab.</b> Pending and Completed become <b>tabs with their counts</b>, as in the reference. We add how long the oldest pending necropsy has waited, since that is the number a vet acts on.', [['better', 'More in an existing tab'], ['ours', 'Our data']]) +
+      `<div class="mp-stats">${stat('Pending', nPend, 'bad')}${stat('Completed', nDone, 'g')}${stat('Waiting over 30 days', late)}${stat('Oldest pending', dd(oldest).slice(0, 6), '', `${Math.round((new Date(D.today) - new Date(oldest)) / 864e5)} days ago`)}</div>` +
+      panel(`Necropsies · ${D.deaths.length}`, '', seg([`Pending (${nPend})`, `Completed (${nDone})`, `All (${D.deaths.length})`], `Pending (${nPend})`) +
+        `<div class="mp-table"><div class="mp-tr mp-th" style="grid-template-columns:${cols}"><span>Animal</span><span>Date of death</span><span>Cause</span><span>Waiting</span></div>` +
+        list.slice(0, 10).map((d) => { const w = Math.round((new Date(D.today) - new Date(d.date)) / 864e5); return `<div class="mp-tr" style="grid-template-columns:${cols};--minw:560px"><span class="cellname"><span class="sx" data-s="${SX[d.sex]}">${'MFU'[d.sex]}</span><span class="mp-name"><b class="mp-aaid">AAID: ${d.aaid}</b><i>${esc(d.encl)}</i></span></span><span>${dd(d.date)}</span><span>${esc(d.cause)}</span><span><em class="mp-tag" data-tone="${w > 30 ? 'bad' : 'warn'}">${w} days</em></span></div>` }).join('') + `</div>`)
+  },
+}
+
+function render() {
+  const tab = (location.hash.slice(1) in PAGES) ? location.hash.slice(1) : 'profile'
+  const nav = `<nav class="mp-subtabs" aria-label="Species sections">${TABS.map(([k, l, s]) => `<a href="#${k}" aria-current="${k === tab ? 'page' : 'false'}"><span class="dot" data-k="${s}" aria-hidden="true"></span>${l}</a>`).join('')}</nav>`
+  $('#body').innerHTML = hero + nav + PAGES[tab]()
+  $('.mp-subtabs a[aria-current="page"]').scrollIntoView({ block: 'nearest', inline: 'nearest' })
+}
+addEventListener('hashchange', render)
+render()
+
+/* the mockup's segmented controls only show which is picked */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.mp-seg button'); if (!b) return
+  b.parentElement.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+})
+const notes = $('#notes')
+notes.addEventListener('click', () => { const on = notes.getAttribute('aria-pressed') !== 'true'; notes.setAttribute('aria-pressed', String(on)); notes.textContent = on ? 'Notes: on' : 'Notes: off'; document.body.classList.toggle('no-notes', !on) })
+
+/* hover: one tooltip for every mark that carries data-tip */
+const tip = $('#tip')
+document.addEventListener('pointerover', (e) => { const t = e.target.closest('[data-tip]'); if (!t) { tip.classList.remove('is-on'); return } tip.textContent = t.dataset.tip; tip.classList.add('is-on') })
+document.addEventListener('pointermove', (e) => { if (!tip.classList.contains('is-on')) return; const w = tip.offsetWidth; tip.style.left = Math.min(innerWidth - w - 8, e.clientX + 12) + 'px'; tip.style.top = (e.clientY - 36) + 'px' })
+</script>
+</body>
+</html>
