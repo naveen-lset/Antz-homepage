@@ -21,6 +21,10 @@ python3 -m http.server 8080
 
 The page always opens on V2. A small script at the top of `index.html` rewrites any `?v=` value to `?v=2` before the app reads it.
 
+No install step, no build step, no dependencies: any static file server works (`npx serve`, `php -S`, nginx…).
+
+> **One console 404 on localhost is expected.** The last script in `index.html` tries to load an internal feedback toolbar (`tools/agentation/agentation.js`), and only when the host is `localhost` or `127.0.0.1`. That file isn't in this branch. The 404 is harmless, and nothing loads on any other host. To silence it, delete that final `<script>` block.
+
 **Deploy:** the link is the Vercel project `home-page-redesign` (team `naveen-lsets-projects`). To redeploy this branch as it is:
 
 ```bash
