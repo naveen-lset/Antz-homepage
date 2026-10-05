@@ -4428,49 +4428,68 @@ body.is-report { overflow: hidden; }
    Read More where they are cut, the attachments line, then the photograph
    taking all that is left of the box. The box stays one height on every card
    — the deck needs it — so a short post gives its room to the picture. The
-   pile shows UNDER the card: the two behind are 12 and 24 lower and 6% and
+   pile shows UNDER the card: the two behind are 10 and 20 lower and 6% and
    12% narrower about the foot, so two white edges stand below the front one
    on a faint mint each, so they read as cards and not as a shadow (the
    drag's peekAt in AnnouncementDeck.js uses the same numbers).
    Every rule carries `.adeck` so it outranks the V2 phone type sizes. */
 @media (max-width: 743px) {
-  :root[data-home='v2'] .adeck .adeck__stack { margin-bottom: 24px; }
+  /* TO THE PHONE'S OWN SCALE (owner, same day, on a phone: "mobile view
+     become show big, please reduce other things too — based on the Mobile
+     Guidelines; when I change to tab it has Tablet Guidelines"). The first
+     cut carried the reference screenshot's numbers, which were a larger
+     screen's: a 22px title, a 40 chip and a 522 box at 390. Now the phone
+     type scale (iOS Headline 17 for the title, Body 14, Footnote 13, a 11
+     capital chip; 12 is the floor of 30 Sep) and the photograph at 2 : 1 of
+     the card's inner width, so the box is 240 + 50vw — 435 at 390. */
+  :root[data-home='v2'] .adeck .adeck__stack { margin-bottom: 20px; }
   :root[data-home='v2'] .adeck .adeck__card {
-    --adeck-h: min(calc(296px + 58vw), 660px);
-    width: 100%; flex-direction: column; gap: 14px; padding: 16px; border-radius: 24px;
+    --adeck-h: min(calc(240px + 50vw), 540px);
+    width: 100%; flex-direction: column; gap: 10px; padding: 14px; border-radius: 20px;
     box-shadow: 0 2px 12px rgba(31, 65, 91, .08); transform-origin: 50% 100%;
   }
-  :root[data-home='v2'] .adeck .adeck__card[data-i='1'] { transform: translateY(12px) scale(.94); background: #F6FAF9; box-shadow: 0 2px 10px rgba(31, 65, 91, .08); }
+  :root[data-home='v2'] .adeck .adeck__card[data-i='1'] { transform: translateY(10px) scale(.94); background: #F6FAF9; box-shadow: 0 2px 10px rgba(31, 65, 91, .08); }
   :root[data-home='v2'] .adeck .adeck__card[data-i='2'],
-  :root[data-home='v2'] .adeck .adeck__card[data-i='3'] { transform: translateY(24px) scale(.88); background: #EDF4F2; box-shadow: 0 2px 8px rgba(31, 65, 91, .07); }
+  :root[data-home='v2'] .adeck .adeck__card[data-i='3'] { transform: translateY(20px) scale(.88); background: #EDF4F2; box-shadow: 0 2px 8px rgba(31, 65, 91, .07); }
   /* the deepest cards are only an edge: their contents stay hidden, or the
      third card's photograph shows under the second as a finger lifts it
      (the leaver is data-i 3 while it flies, so it is excepted) */
   :root[data-home='v2'] .adeck .adeck__card:is([data-i='2'], [data-i='3']):not(.is-flying) > * { visibility: hidden; }
-  :root[data-home='v2'] .adeck .adeck__body { flex: none; gap: 14px; padding: 0; }
-  :root[data-home='v2'] .adeck .adeck__chip { height: 40px; gap: 10px; padding: 2px 18px 2px 2px; font-size: 13px; font-weight: 500; letter-spacing: 1.4px; color: #37BD69; background: rgba(55, 189, 105, .1); }
-  :root[data-home='v2'] .adeck .adeck__chip img { width: 36px; height: 36px; }
+  :root[data-home='v2'] .adeck .adeck__body { flex: none; gap: 10px; padding: 0; }
+  :root[data-home='v2'] .adeck .adeck__chip { height: 30px; gap: 8px; padding: 2px 12px 2px 2px; font-size: 11px; font-weight: 600; letter-spacing: 1px; color: #2FA85C; background: rgba(55, 189, 105, .1); }
+  :root[data-home='v2'] .adeck .adeck__chip img { width: 26px; height: 26px; }
   :root[data-home='v2'] .adeck .adeck__card[data-k='important'] .adeck__chip { color: #E93353; background: rgba(233, 51, 83, .1); }
-  :root[data-home='v2'] .adeck .adeck__state { display: block; position: absolute; top: 20px; right: 16px; padding: 7px 12px; border-radius: 6px; background: #D9434F; font-size: 13px; font-weight: 500; line-height: normal; letter-spacing: .8px; color: #fff; }
-  :root[data-home='v2'] .adeck .adeck__text { gap: 10px; }
-  :root[data-home='v2'] .adeck .adeck__hl { font-size: 22px; font-weight: 600; line-height: 28px; letter-spacing: -.2px; -webkit-line-clamp: 2; }
-  :root[data-home='v2'] .adeck .adeck__card[data-state='cancelled'] .adeck__hl { text-decoration: line-through; text-decoration-thickness: 2px; }
+  :root[data-home='v2'] .adeck .adeck__state { display: block; position: absolute; top: 16px; right: 14px; padding: 5px 8px; border-radius: 6px; background: #D9434F; font-size: 11px; font-weight: 600; line-height: normal; letter-spacing: .6px; color: #fff; }
+  :root[data-home='v2'] .adeck .adeck__text { gap: 8px; }
+  :root[data-home='v2'] .adeck .adeck__hl { font-size: 17px; font-weight: 600; line-height: 22px; letter-spacing: -.1px; -webkit-line-clamp: 2; }
+  :root[data-home='v2'] .adeck .adeck__card[data-state='cancelled'] .adeck__hl { text-decoration: line-through; text-decoration-thickness: 1.5px; }
   :root[data-home='v2'] .adeck .adeck__card[data-state='cancelled'][data-k='important'] .adeck__hl { text-decoration-color: #E04D5C; }
   :root[data-home='v2'] .adeck .adeck__card[data-state='cancelled']:not([data-k='important']) .adeck__hl { text-decoration-color: #4FB98A; }
-  :root[data-home='v2'] .adeck .adeck__by { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; font-size: 15px; font-weight: 400; line-height: 20px; color: #7A8684; white-space: nowrap; }
+  :root[data-home='v2'] .adeck .adeck__by { display: flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; font-size: 13px; font-weight: 400; line-height: 18px; color: #7A8684; white-space: nowrap; }
   :root[data-home='v2'] .adeck .adeck__by > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   :root[data-home='v2'] .adeck .adeck__by > span:first-of-type { flex: none; max-width: 60%; }
-  :root[data-home='v2'] .adeck .adeck__by b { flex: none; font-size: 10px; font-weight: 400; }
-  :root[data-home='v2'] .adeck .adeck__av { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #E1F9ED, #CFF5F3); font-size: 12px; font-weight: 600; font-style: normal; color: #1F515B; }
-  :root[data-home='v2'] .adeck .adeck__desc { font-size: 15px; line-height: 21px; color: #1C1B1F; -webkit-line-clamp: 3; }
-  :root[data-home='v2'] .adeck .adeck__text.is-cut .adeck__more { display: block; margin-top: -4px; font-size: 15px; font-weight: 400; line-height: 21px; color: #2E9FCF; }
-  :root[data-home='v2'] .adeck .adeck__att { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; font-size: 14px; line-height: 20px; color: #7A8684; white-space: pre; }
-  :root[data-home='v2'] .adeck .adeck__att svg { flex: none; }
+  :root[data-home='v2'] .adeck .adeck__by b { flex: none; font-size: 8px; font-weight: 400; }
+  :root[data-home='v2'] .adeck .adeck__av { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #E1F9ED, #CFF5F3); font-size: 10px; font-weight: 600; font-style: normal; color: #1F515B; }
+  :root[data-home='v2'] .adeck .adeck__desc { font-size: 14px; line-height: 20px; color: #1C1B1F; -webkit-line-clamp: 3; }
+  :root[data-home='v2'] .adeck .adeck__text.is-cut .adeck__more { display: block; margin-top: -4px; font-size: 14px; font-weight: 500; line-height: 20px; color: #2E9FCF; }
+  :root[data-home='v2'] .adeck .adeck__att { display: flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; font-size: 13px; line-height: 18px; color: #7A8684; white-space: pre; }
+  :root[data-home='v2'] .adeck .adeck__att svg { flex: none; width: 16px; height: 16px; }
   :root[data-home='v2'] .adeck .adeck__att span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   :root[data-home='v2'] .adeck .adeck__meta { display: none; }
-  :root[data-home='v2'] .adeck .adeck__img { flex: 1 1 0; min-height: 0; width: auto; align-self: stretch; border-radius: 16px; }
-  :root[data-home='v2'] .adeck .adeck__n { display: inline-flex; align-items: center; gap: 4px; position: absolute; top: 12px; right: 12px; height: 30px; padding: 0 12px 0 10px; border-radius: 100px; background: rgba(28, 27, 31, .72); font-size: 15px; font-weight: 600; line-height: 1; color: #fff; }
-  /* a post with no photograph: the text keeps the top, the space under it stays white */
+  :root[data-home='v2'] .adeck .adeck__img { flex: 1 1 0; min-height: 0; width: auto; align-self: stretch; border-radius: 12px; }
+  :root[data-home='v2'] .adeck .adeck__n { display: inline-flex; align-items: center; gap: 4px; position: absolute; top: 10px; right: 10px; height: 26px; padding: 0 10px 0 8px; border-radius: 100px; background: rgba(28, 27, 31, .72); font-size: 13px; font-weight: 600; line-height: 1; color: #fff; }
+  :root[data-home='v2'] .adeck .adeck__n svg { width: 15px; height: 15px; }
+  /* A POST WITH NO PHOTOGRAPH takes the photograph's place in its type's own
+     wash, the type's glyph at its centre — the deck's first rule ("a card
+     without a photograph is its tone's gradient instead") — rather than the
+     white hole the fixed box left under its text */
+  :root[data-home='v2'] .adeck .adeck__card:not(:has(.adeck__img))::after {
+    content: ''; flex: 1 1 0; min-height: 0; border-radius: 12px;
+    background: url("assets/icon/an-announce.svg") center / 44px no-repeat, linear-gradient(-72deg, rgba(0, 175, 214, .1) 3.9%, rgba(55, 189, 105, .12) 108%);
+  }
+  :root[data-home='v2'] .adeck .adeck__card[data-k='important']:not(:has(.adeck__img))::after {
+    background: url("assets/icon/an-important.svg") center / 44px no-repeat, linear-gradient(108deg, rgba(233, 51, 83, .1) 1.5%, rgba(250, 97, 64, .12) 96.9%);
+  }
 }
 /* THE FOOT ROW · node 753:21034 (25 Sep 2026): the head is gone, so the
    stack opens 16 under the band's top, and 16 under the stack a 17px row
@@ -7855,27 +7874,30 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
      heads, 14 → 13 names, 12 → 11 meta), which at 360–400 wide read as tiny;
      that ruling is reversed. Names and body go back to the artboard's sizes,
      and no text on a phone sits under 12 except the 10–11 uppercase chips.
-     The search INPUT keeps 16 — under 16 iOS zooms the page on focus. */
+     The search INPUT keeps 16 — under 16 iOS zooms the page on focus.
+     (5 Oct 2026: "mobile view become show big … based on the Mobile
+     Guidelines; when I change to tab it has Tablet Guidelines".) THE PHONE
+     SCALE, one step under the tablet's where the tablet's was too big for a
+     390 column and never under 12: section heads 16 (iOS Callout / M3 Title
+     Medium), their links 14, card titles 16, names 15/14, body 13–14, meta
+     12–13. Taps stay 44 (HIG). From 744 up none of this applies. */
   :root[data-home='v2'] .greeting__name, :root[data-home='v2'] .greeting__wave { font-size: 24px; letter-spacing: -.24px; }
   :root[data-home='v2'] .greeting__word { font-size: 15px; }
   :root[data-home='v2'] :is(.search__hint-lead, .search__cycle) { font-size: 16px; }
-  :root[data-home='v2'] :is(#favTitle, .fav__title, .fav__edit, .obs-head__title, .kins__pick-t, .kins__title, .section-head__title) { font-size: 17px; }
-  :root[data-home='v2'] :is(.obs-head__all, .kins__all, .section-head--home .link-btn) { font-size: 15px; }
-  :root[data-home='v2'] .fav__name { font-size: 16px; }
+  :root[data-home='v2'] :is(#favTitle, .fav__title, .fav__edit, .obs-head__title, .kins__pick-t, .kins__title, .section-head__title) { font-size: 16px; }
+  :root[data-home='v2'] :is(.obs-head__all, .kins__all, .section-head--home .link-btn) { font-size: 14px; }
+  :root[data-home='v2'] .fav__name { font-size: 15px; }
   :root[data-home='v2'] .fav__meta { font-size: 13px; }
-  :root[data-home='v2'] .adeck__chip { font-size: 11px; }
-  :root[data-home='v2'] .adeck__hl { font-size: 17px; }
-  :root[data-home='v2'] .adeck__desc { font-size: 14px; }
-  :root[data-home='v2'] .adeck__meta span { font-size: 13px; }
-  :root[data-home='v2'] .obs__title { font-size: 17px; }
-  :root[data-home='v2'] .obs__aaid { font-size: 15px; }
+  /* the announcement card's phone sizes are its own (.adeck, phone card) */
+  :root[data-home='v2'] .obs__title { font-size: 16px; }
+  :root[data-home='v2'] .obs__aaid { font-size: 14px; }
   :root[data-home='v2'] :is(.obs__aname, .obs__note, .obs__by) { font-size: 13px; }
   :root[data-home='v2'] :is(.obs__date, .obs__tags span, .obs__count b) { font-size: 12px; }
-  :root[data-home='v2'] :is(.kins__name, .kins__txt b) { font-size: 15px; }
+  :root[data-home='v2'] :is(.kins__name, .kins__txt b) { font-size: 14px; }
   :root[data-home='v2'] .kins__txt small { font-size: 12px; }
   :root[data-home='v2'] .kins__tab { font-size: 13px; }
   :root[data-home='v2'] :is(.kins__n, .l-v2pd__n) { font-size: 16px; }
-  :root[data-home='v2'] :is(.l-v2an__title, #moduleGrid .card[data-variant='species.stats'] .c-head__text) { font-size: 15px; }
+  :root[data-home='v2'] :is(.l-v2an__title, #moduleGrid .card[data-variant='species.stats'] .c-head__text) { font-size: 14px; }
   /* the doors' own 16/14/18 sit at #moduleGrid .card[…] .l-door__name — the
      id in the list lifts this rule to meet them */
   :root[data-home='v2'] #moduleGrid .card .card__band .l-door__name, :root[data-home='v2'] #moduleGrid .card[data-layout] .l-door__name { font-size: 16px; letter-spacing: 0; }
@@ -45002,11 +45024,11 @@ function phoneCard(b, k) {
   }
 }
 /* where a card behind the front one sits: tablet, 16 out to the right and 10
-   down; phone, tucked under the front card's foot, 12 down and 6% narrower,
+   down; phone, tucked under the front card's foot, 10 down and 6% narrower,
    so the pile shows beneath it. k = 1 is the full peek, 0 the front. */
 const PHONE = matchMedia('(max-width: 743px)')
 const peekAt = (k) => {
-  const p = PHONE.matches ? { x: 0, y: 12, sx: .06, sy: .06 } : { x: 16, y: 10, sx: .0624, sy: .0935 }
+  const p = PHONE.matches ? { x: 0, y: 10, sx: .06, sy: .06 } : { x: 16, y: 10, sx: .0624, sy: .0935 }
   return `translate(${p.x * k}px, ${p.y * k}px) scale(${1 - p.sx * k}, ${1 - p.sy * k})`
 }
 
