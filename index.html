@@ -453,6 +453,8 @@
   /* V2's Pending Actions as a pinboard (owner, 29 Sep 2026: "implement this
      only in live V2", pending-sticky-variants-2 · 8) — cork, finely pricked */
   --g-v2-cork:       radial-gradient(rgba(0, 0, 0, .06) 1px, transparent 1.5px) 0 0 / 7px 7px, #C9A57A;
+  /* …and since 5 Oct 2026 one sticky note: TertiaryContainer paper (mockups/pending-sticky.html · 1) */
+  --g-v2-sticky:     linear-gradient(180deg, #FFE6DC 0%, #FFD6C7 100%);
   /* the node's gradientTransform puts the yellow stop 105% BEFORE the box's
      start along its 116.87° line — the card is the orange with a faint yellow
      lift at its top-left, not a yellow bottom-right */
@@ -7929,6 +7931,46 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
    darker rim; the notes are paper in four colours, a pin each */
 :root[data-home='v2'] #moduleGrid .card[data-layout='v2-board'] { padding: 12px; box-shadow: inset 0 0 0 5px #9C7A52, 0 8px 16px -8px rgba(60, 40, 10, .5); }
 .l-v2bd { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; color: rgb(62, 52, 20); }
+/* PENDING ACTIONS AS ONE STICKY NOTE (5 Oct 2026) · mockups/pending-sticky.html · 1:
+   the card is the note — no padding of its own, the paper is its ground
+   (--g-v2-sticky), the tape a dark tertiary strip on its top edge (owner:
+   "the top sticky tab a different colour, like a dark Tertiary") */
+:root[data-home='v2'] #moduleGrid .card[data-layout='v2-sticky'] { container-type: size; padding: 0; box-shadow: 0 1px 1px rgba(0, 0, 0, .05), 0 8px 18px -10px rgba(120, 50, 20, .35); }
+.l-v2sn { position: relative; box-sizing: border-box; display: flex; flex-direction: column; width: 100%; height: 100%; min-height: 0; padding: 28px 18px 16px; color: #3B2420; }
+.l-v2sn__tape { position: absolute; top: 0; left: 50%; width: 108px; height: 20px; translate: -50% 0; background: #C9472B; opacity: .9; box-shadow: 0 1px 2px rgba(80, 20, 0, .2); }
+.l-v2sn__head { flex: none; display: flex; align-items: center; gap: 9px; }
+.l-v2sn__ico { flex: none; width: 21px; height: 21px; }
+.l-v2sn__head b { font-size: clamp(19px, 3.8cqh, 24px); font-weight: 700; letter-spacing: -.01em; }
+.l-v2sn__head > span { margin-left: auto; font-size: 12.5px; color: #7A5048; white-space: nowrap; }
+.l-v2sn__head strong { font-family: 'DM Sans', var(--font); font-size: 16px; font-weight: 700; color: #3B2420; }
+.l-v2sn__rows { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 6px; margin-top: 14px; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; touch-action: pan-y; }
+.l-v2sn__rows::-webkit-scrollbar { display: none; }
+.l-v2sn__row { flex: 1 1 0; display: flex; align-items: center; gap: 10px; min-height: 30px; max-height: 84px; padding: 0 12px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, .7);
+  font-family: inherit; color: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .15s ease; }
+.l-v2sn__row:active { transform: scale(.98); }
+.l-v2sn__row:focus-visible { outline: 2px solid #C9472B; outline-offset: 1px; }
+.l-v2sn__box { flex: none; width: 15px; height: 15px; border: 1.6px solid currentColor; border-radius: 4px; opacity: .55; }
+.l-v2sn__t { flex: 1; min-width: 0; font-size: clamp(14.5px, 3cqh, 18px); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.l-v2sn__row b { font-family: 'DM Sans', var(--font); font-size: clamp(15px, 3.3cqh, 20px); font-weight: 700; font-variant-numeric: tabular-nums; }
+.l-v2sn__row em { flex: none; padding: 2px 6px; border-radius: 4px; background: #D7263D; color: #fff; font-style: normal; font-size: 9.5px; font-weight: 700; letter-spacing: .06em; }
+.l-v2sn__row.is-late b { color: #D7263D; }
+.l-v2sn__s { flex: none; font-size: 9.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #7A5048; }
+.l-v2sn__curl { position: absolute; right: 0; bottom: 0; width: 30px; height: 30px; border-top-left-radius: 6px; pointer-events: none;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, .07) 50%, rgba(255, 255, 255, .6) 64%); }
+.l-v2sn__none { margin: auto; font-size: 14px; font-weight: 600; color: #7A5048; }
+/* a short card (the phone's 243, or a smaller size): tighter rows, one column */
+@container (max-height: 300px) {
+  .l-v2sn { padding: 18px 12px 10px; }
+  .l-v2sn__head b { font-size: 16px; }
+  .l-v2sn__ico { width: 17px; height: 17px; }
+  .l-v2sn__head strong { font-size: 14px; }
+  .l-v2sn__rows { gap: 4px; margin-top: 8px; }
+  .l-v2sn__row { min-height: 26px; padding: 0 10px; gap: 8px; border-radius: 8px; }
+  .l-v2sn__t { font-size: 13.5px; }
+  .l-v2sn__row b { font-size: 14px; }
+  .l-v2sn__box { width: 13px; height: 13px; }
+  .l-v2sn__tape { width: 88px; height: 12px; }
+}
 .l-v2bd__head { flex: none; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 4px 6px 0; }
 .l-v2bd__head b { font-size: 14px; font-weight: 700; color: #3A2A12; }
 .l-v2bd__head span { font-size: 11px; font-weight: 500; color: rgba(58, 42, 18, .75); white-space: nowrap; }
@@ -19597,7 +19639,7 @@ const LAYOUT_FILL = {
   photo: 'image',
   health: 'solid', insight: 'solid',
   door: 'solid', compact: 'solid', actions: 'solid', stat: 'solid',
-  'v2-animals': 'solid', 'v2-pending': 'solid', 'v2-board': 'solid', 'v2-stat': 'solid',
+  'v2-animals': 'solid', 'v2-pending': 'solid', 'v2-board': 'solid', 'v2-sticky': 'solid', 'v2-stat': 'solid',
   metrics: 'solid', chart: 'solid', queue: 'solid', status: 'solid',
   progress: 'solid', timeline: 'solid', recent: 'solid',
   ring: 'solid', arc: 'solid', flow: 'solid', attention: 'solid',
@@ -21539,7 +21581,11 @@ const VARIANTS = [
     /* THE PINBOARD (owner, 29 Sep 2026, on pending-sticky-variants-2 · 8:
        "this idea is good; if there are more I can scroll down" — then
        "implement this only in live V2"): the same jobs, a pinned note each */
-    layout: 'v2-board', purpose: 'ACT', gradient: '--g-v2-cork', passive: true,
+    /* ONE STICKY NOTE (owner, 5 Oct 2026, picking mockups/pending-sticky.html
+       · 1 "The reference" on TertiaryContainer paper with soft tiles, "the top
+       sticky tab a dark tertiary colour — implement in live"): the jobs as a
+       list on one note; the pinboard (layout v2-board) is kept, unused */
+    layout: 'v2-sticky', purpose: 'ACT', gradient: '--g-v2-sticky', passive: true,
     supportedSizes: ['medium', 'tall', 'xtall', 'large'], defaultSize: 'xtall', priority: 'secondary',
     data: {
       title: 'Pending Actions',
@@ -21551,13 +21597,20 @@ const VARIANTS = [
         /* no subtext under Sexing — owner, 29 Sep 2026 */
         { key: 'sexing',      label: 'Sexing',           area: 'records', page: 'species/sexing',        icon: 'pa-sexing.svg',    sub: '',                   n: 31 },
         { key: 'microchip',   label: 'Microchipping',    area: 'records', page: 'species/microchipping', icon: 'pa-chip.svg',      sub: 'mammals & reptiles to chip', n: 57 },
+        /* TRANSFERS IS SAMPLE (owner, 5 Oct 2026: "one more, Transfer pending"):
+           the dump keeps the year's completed transfers (v5db flows) and no
+           table of pending ones, so the count is those, per site, and the row
+           says SAMPLE */
+        { key: 'transfer',    label: 'Transfers',        area: 'records', page: 'transfers',             icon: 'pa-chip.svg',      sub: '', n: 16, sample: true },
       ],
     },
     scopedData() {
       const db = __req('js/data/v5db.js')
       if (!db.on()) return this.data
       const at = __req('js/state/reportScope.js').get()
-      return { ...this.data, parts: this.data.parts.map((p) => { const f = db.pending(p.key, at); return { ...p, n: f.total, raised: f.raised } }) }
+      return { ...this.data, parts: this.data.parts.map((p) => {
+        if (p.sample) return { ...p, n: db.sitesIn(at).reduce((t, id) => t + (db.V5DB.flows[id]?.transfers?.total || 0), 0) }
+        const f = db.pending(p.key, at); return { ...p, n: f.total, raised: f.raised } }) }
     },
   },
   {
@@ -32549,6 +32602,17 @@ const BEHAVIOUR = {
     document.addEventListener('pointerdown', outside)
     apply()
   },
+  'v2-sticky': (el, variant, data) => {
+    for (const b of el.querySelectorAll('.l-v2sn__row')) {
+      b.addEventListener('pointerdown', (e) => e.stopPropagation())
+      b.addEventListener('click', (e) => {
+        e.stopPropagation()
+        const p = data.parts.find((x) => x.key === b.dataset.key)
+        if (p) openPending({ ...p, n: Number(b.dataset.n), filter: { raised: 'all', area: 'all' } })
+      })
+    }
+    el.querySelector('.l-v2sn__rows')?.addEventListener('pointerdown', (e) => e.stopPropagation())
+  },
   'v2-board': (el, variant, data) => {
     for (const b of el.querySelectorAll('.l-v2bd__note')) {
       b.addEventListener('pointerdown', (e) => e.stopPropagation())
@@ -32880,6 +32944,28 @@ const LAYOUTS = {
      written only on the two counts that are overdue doses. The board scrolls
      inside the card when the notes outgrow it. BEHAVIOUR['v2-board'] opens a
      note's page, as a row of the list did. ── */
+  /* ── V2 · PENDING ACTIONS AS ONE STICKY NOTE (5 Oct 2026) — the card is the
+     note: TertiaryContainer paper, a strip of dark-tertiary tape on its top
+     edge, the heart-pulse head with the open total, then a soft tile per job
+     (checkbox · job · count; OVERDUE on the two overdue doses, SAMPLE on
+     Transfers), the corner curling up. A job at zero is left off. The rows
+     share the card's height; BEHAVIOUR['v2-sticky'] opens a row's page. ── */
+  'v2-sticky': (mod, variant, data) => {
+    const ORDER = ['sexing', 'microchip', 'necropsy', 'transfer', 'admin', 'deworming', 'vaccination']
+    const parts = (data.parts || []).filter((p) => (p.n || 0) > 0).sort((a, b) => ORDER.indexOf(a.key) - ORDER.indexOf(b.key))
+    const total = parts.reduce((t, p) => t + (p.n || 0), 0)
+    const HEART = '<svg class="l-v2sn__ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.2.3.6.3.8 0 .7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.2C19.5 16.4 12 21 12 21zm-4.6-9h2.2l1-2.2 1.9 4.4 1.2-2.2h2.9v-1.4h-3.7l-.5 1-1.9-4.4-1.8 3.4H7.4z"/></svg>'
+    return `<span class="l-v2sn"><span class="l-v2sn__tape" aria-hidden="true"></span>` +
+      `<span class="l-v2sn__head">${HEART}<b>Pending</b><span><strong>${fmtN(total)}</strong> open</span></span>` +
+      `<span class="l-v2sn__rows">` + parts.map((p) => {
+        const n = p.n || 0, late = /overdue/.test(p.sub || '')
+        return `<button type="button" class="l-v2sn__row${late ? ' is-late' : ''}" data-key="${esc(p.key)}" data-n="${n}" aria-label="${esc(p.label)}, ${n}${late ? ' overdue' : ' pending'}${p.sample ? ', sample data' : ''}. Open ${esc(p.label)}">` +
+          `<span class="l-v2sn__box" aria-hidden="true"></span><span class="l-v2sn__t">${esc(p.label)}</span>` +
+          (p.sample ? `<span class="l-v2sn__s">Sample</span>` : '') + (late ? `<em>OVERDUE</em>` : '') + `<b>${fmtN(n)}</b></button>`
+      }).join('') +
+      (parts.length ? '' : `<span class="l-v2sn__none">Nothing pending</span>`) +
+      `</span><span class="l-v2sn__curl" aria-hidden="true"></span></span>`
+  },
   'v2-board': (mod, variant, data) => {
     /* NOTHING WAITING, NO NOTE (owner, 29 Sep 2026: "if it's not there,
        don't show") — a job at zero is left off the board */
