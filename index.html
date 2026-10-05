@@ -50059,11 +50059,14 @@ function healthStrip(after) {
       `<button type="button" class="hstrip__label"${t} aria-label="${f.total} ${r.verb === 'born' ? 'births' : 'deaths'} in the last ${HS_DAYS} days">${GLYPH[r.cls]}<span>${when} ${r.word}</span></button>` +
       f.rows.slice(0, HS_TOP).map((s) => item(r.cls, ` data-sp="${e(s.name)}"${t}`, db.photoOf(s.name) || 'assets/img/species.jpg', s.name, s.count, `${s.name}, ${s.count} ${r.verb}`)).join('') + `</div>`
   }
+  /* THE LABEL IS SAID ONCE (owner, 5 Oct 2026: "why are you repeating the
+     main label again — show all sites, then come again"). It stands fixed
+     in the pin beside the LIVE mark; only the sites travel on the tape, all
+     four and then round again, with no label between the rounds. */
   const audit = (copy) => {
-    const t = copy ? ' tabindex="-1"' : '', A = hsAudit()
+    const t = copy ? ' tabindex="-1"' : ''
     return `<div class="hstrip__run hstrip__run--audit" data-k="audit">` +
-      `<button type="button" class="hstrip__label"${t} data-tip aria-label="Animal audit score ${A.score}%">${GLYPH.audit}<span>ANIMAL AUDIT SCORE <b>${A.score}%</b></span></button>` +
-      A.rows.map(([n, p]) => item('audit', ` data-tip${t}`, 'assets/img/hs-audit.jpg', n, `${p}%`, `${n}, audit ${p}%`)).join('') + `</div>`
+      hsAudit().rows.map(([n, p]) => item('audit', ` data-tip${t}`, 'assets/img/hs-audit.jpg', n, `${p}%`, `${n}, audit ${p}%`)).join('') + `</div>`
   }
   /* one short run cannot fill a wide lane, and the wrap needs each set at
      least a lane wide — so a set repeats the run until it is (copies after
@@ -50075,8 +50078,10 @@ function healthStrip(after) {
       `<div class="hstrip__lane"><div class="hstrip__tape">${set(false)}${set(true)}</div></div>` +
       `<span class="hstrip__cap" data-k="audit" aria-hidden="true"><span class="hstrip__live">` +
         `<img class="hstrip__live-on" src="assets/icon/hs-live.gif" alt=""><img class="hstrip__live-still" src="assets/icon/hs-live-still.png" alt=""></span></span>` +
-      `<span class="hstrip__pin" hidden></span>`
+      `<span class="hstrip__pin" data-k="audit"><button type="button" class="hstrip__label is-stuck" data-tip aria-label="Animal audit score ${hsAudit().score}%">${GLYPH.audit}<span>ANIMAL AUDIT SCORE <b>${hsAudit().score}%</b></span></button></span>`
     lane = strip.querySelector('.hstrip__lane'); sets = strip.querySelectorAll('.hstrip__set'); cap = strip.querySelector('.hstrip__cap'); pin = strip.querySelector('.hstrip__pin'); pinKey = ''
+    /* the first site starts clear of the fixed label, not under it */
+    strip.querySelector('.hstrip__tape').style.paddingLeft = pin.offsetLeft + pin.offsetWidth - lane.offsetLeft + 'px'
     x = 0; lane.scrollLeft = 0; bind(); tint()
   }
   /* the drift: our own float, since scrollLeft rounds; a user's scroll is read back into it */
@@ -50093,6 +50098,7 @@ function healthStrip(after) {
      sticky, the natality, mortality & audit icons don't show"), folding it
      away the moment it pins. The cap takes the tint of the run beneath it. */
   const tint = () => {
+    if (!lane.querySelector('.hstrip__label')) return   /* the label is fixed: nothing to pin or push */
     const edge = lane.getBoundingClientRect().left + cap.offsetWidth
     let cur = null, next = null
     for (const b of lane.querySelectorAll('.hstrip__label')) { if (b.getBoundingClientRect().left < edge - .5) cur = b; else { next = b; break } }
