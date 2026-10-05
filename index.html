@@ -7379,7 +7379,7 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
    the brief. Site reports, the clock and the notes filter are not in the
    frame and do not draw here. */
 :root[data-home='v2'] body { background: #fff; }
-:root[data-home='v2'] :is(.life-band, .clock, .v2seg, .avatar-btn__badge, .hero__veil, .obs__glow) { display: none; }
+:root[data-home='v2'] :is(.life-band, .clock, .v2seg, .avatar-btn__badge, .hero__veil, .obs__glow, .obs__flat-txt) { display: none; }   /* the kind word off the coloured cards (owner, 5 Oct 2026: "remove that animal text") */
 :root[data-home='v2'] :is(.fav__title, .obs-head__title, .section-head--home .section-head__title, #obsTitle, #reportsTitle, #modulesTitle) {
   font-size: 16px; font-weight: 500; letter-spacing: 0; line-height: normal; color: var(--c-on-surface-var, #44544A);
 }
@@ -7572,8 +7572,8 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
    it can be dotted — the details page shows them. The animal id / site
    plate: make it a flat colour"). So: the date beside the title; the tags
    on one line ending in "…"; the plate a solid colour (no blur), inset from
-   the card's edges; likes before comments, and the bookmark back; the kind
-   ("ENCLOSURE") on the coloured cards. Height follows the content; the rail
+   the card's edges; likes before comments, and the bookmark back. The kind word
+   ("ANIMAL", "ENCLOSURE") stays off the coloured cards. Height follows the content; the rail
    stretches every card to the tallest. */
 :root[data-home='v2'] .obs { --obs-w: 290px; height: auto;
   border-radius: 12px; box-shadow: none; border: .5px solid rgba(0, 0, 0, .05); }
@@ -7589,8 +7589,6 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 :root[data-home='v2'] .obs__thumb { border-radius: 6px; }
 :root[data-home='v2'] .obs__ident { gap: 4px; }
 :root[data-home='v2'] :is(.obs__aaid, .obs__aname, .obs__more) { color: var(--c-on-secondary-ctr, #1F415B); line-height: normal; }
-:root[data-home='v2'] .obs__flat-txt { top: 48px; }
-:root[data-home='v2'] .obs__kind { font-size: 12px; letter-spacing: .12em; opacity: .9; }
 :root[data-home='v2'] .obs__aaid { font-size: 14px; font-weight: 500; letter-spacing: .1px; }
 :root[data-home='v2'] .obs__aname { font-size: 12px; font-weight: 400; }
 :root[data-home='v2'] .obs__more { margin-left: 4px; font-size: 14px; font-weight: 500; letter-spacing: .1px; }
