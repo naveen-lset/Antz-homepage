@@ -3977,9 +3977,19 @@ body.is-report { overflow: hidden; }
 /* V2's My animals cards: the sex tag in the top-right corner, in the species
    page's own tag colours (.mpage[data-view='species'] .mp-sex), and the
    species on one line under the AAID (5 Oct 2026) */
-.fav__sex { position: absolute; z-index: 1; top: 8px; right: 8px; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 6px;
-  font-size: 11px; font-weight: 600; line-height: 24px; text-align: center; color: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .18); }
-.fav__sex[data-s='m'] { background: #00D6C9; } .fav__sex[data-s='f'] { background: #FC917A; } .fav__sex[data-s='u'] { background: #F07187; }
+/* THE GENDER COLOUR CODE (owner, 5 Oct 2026, a swatch of five tags): a
+   tint with its own ink — M aqua, F coral, UD blush, ID grey-teal, G a
+   solid blue with white — sampled off the swatch. One set, on every
+   animal-photo tag: these cards and the module pages' .mp-sex. */
+:root { --sx-m-bg: #BDEDEA; --sx-m: #1F415B; --sx-f-bg: #EECCC0; --sx-f: #E5603E; --sx-u-bg: #F4E6E7; --sx-u: #D63A50;
+  --sx-i-bg: #E0EBE9; --sx-i: #2D505A; --sx-g-bg: #4EACD2; --sx-g: #FFFFFF; }
+.fav__sex { position: absolute; z-index: 1; top: 8px; right: 8px; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 6px;
+  font-size: 12px; font-weight: 500; line-height: 24px; text-align: center; }
+:is(.fav__sex, .mp-sex)[data-s='m'] { background: var(--sx-m-bg); color: var(--sx-m); }
+:is(.fav__sex, .mp-sex)[data-s='f'] { background: var(--sx-f-bg); color: var(--sx-f); }
+:is(.fav__sex, .mp-sex)[data-s='u'] { background: var(--sx-u-bg); color: var(--sx-u); }
+:is(.fav__sex, .mp-sex)[data-s='i'] { background: var(--sx-i-bg); color: var(--sx-i); }
+:is(.fav__sex, .mp-sex)[data-s='g'] { background: var(--sx-g-bg); color: var(--sx-g); }
 .fav__meta--sp { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* V2's My animals sheet (Favourites.js mountAnimals, 5 Oct 2026) */
 .fan__sec { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 16px; }
@@ -4673,7 +4683,7 @@ body.is-mpage { overflow: hidden; }
 .mp-thumb.is-icon { background: #E6EEF2; color: var(--mp-primary); }
 .mp-mark { width: 60%; height: 60%; background: rgba(46, 110, 86, .45); -webkit-mask: url("assets/icon/v2-mark.svg") center / contain no-repeat; mask: url("assets/icon/v2-mark.svg") center / contain no-repeat; }
 .mp-sex { position: absolute; top: 4px; left: 4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 5px; font-size: 10px; font-weight: 700; font-style: normal; line-height: 18px; text-align: center; color: #fff; }
-.mp-sex[data-s='m'] { background: #1A9A9A; } .mp-sex[data-s='f'] { background: #E8603C; } .mp-sex[data-s='u'] { background: #5B8FB0; }
+/* .mp-sex colours: the gender colour code, with .fav__sex (5 Oct 2026) */
 .mp-chips, .mp-summary__tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .mp-chip, .mp-tag, .mp-pri, .mp-dose, .mp-over { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; font-style: normal; line-height: 16px; white-space: nowrap; }
 .mp-chip { background: #EEF3F1; color: var(--mp-text); }
@@ -5216,7 +5226,7 @@ a.sr-tr, button.sr-tr { cursor: pointer; }
 .mpage[data-view='species'] .sr-animal .mp-thumb { width: 75px; height: 75px; border-radius: 8px; background: #E8F4F2; }
 .mpage[data-view='species'] .is-xl .sr-animal .mp-thumb { width: 94px; height: 94px; }
 .mpage[data-view='species'] .sr-animal .mp-sex { top: 4px; left: 4px; min-width: 24px; height: 24px; padding: 0 4px; border-radius: 8px; font-size: 10px; font-weight: 600; line-height: 24px; }
-.mpage[data-view='species'] .mp-sex[data-s='m'] { background: #00D6C9; } .mpage[data-view='species'] .mp-sex[data-s='f'] { background: #FC917A; } .mpage[data-view='species'] .mp-sex[data-s='u'] { background: #F07187; }
+.mpage[data-view='species'] .mp-sex[data-s] { font-weight: 500; }   /* colours: the gender colour code (.fav__sex) */
 .mpage[data-view='species'] .sr-animal .mp-sex.is-dead { min-width: 44px; padding: 0; border-radius: 0; background: url('assets/icon/sr-mortality-badge.svg') center / 44px 24px no-repeat; font-size: 0; }
 .sr-animal__txt { display: flex; flex-direction: column; min-width: 0; }
 .sr-animal__txt b { font-size: 16px; font-weight: 600; line-height: 24px; color: var(--sr-teal); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -45532,7 +45542,7 @@ function thumb(name, sexIx, { big = false, done = false } = {}) {
   const src = photo(name)
   return `<span class="mp-thumb${big ? ' is-big' : ''}${done ? ' is-done' : ''}">` +
     (done ? I.check : src ? `<img src="${src}" alt="" loading="lazy" decoding="async"${ddA(name)}>` : dood(name)) +
-    (sexIx != null ? `<em class="mp-sex" data-s="${SEX[sexIx][1]}">${SEX[sexIx][0]}</em>` : '') + `</span>`
+    (sexIx != null ? `<em class="mp-sex" data-s="${SEX[sexIx][1]}">${SEX[sexIx][1] === 'u' ? 'UD' : SEX[sexIx][0]}</em>` : '') + `</span>`
 }
 /* ONE CARD SHAPE (clean-up, 29 Sep 2026): the photo; the name with any
    priority beside it; AAID and Latin name on one secondary line; the facts on
