@@ -4391,7 +4391,11 @@ body.is-report { overflow: hidden; }
    panel's corners, the like in the card's corner. Its own layout for phones
    is still to be chosen. Both are one fixed height on every card, as the
    deck needs. */
-.adeck__card { --adeck-h: 268px; height: var(--adeck-h); }
+/* (later the same day: "the height was too much, reduce it; description 4
+   lines max") — 232 is the old text's own column with a fourth body line:
+   12 + chip 36 + 12 + title 39 + 8 + body 80 + 8 + byline 23 + 12 = 230 */
+.adeck__card { --adeck-h: 232px; height: var(--adeck-h); }
+@media (min-width: 744px) { .adeck__desc { -webkit-line-clamp: 4; } }
 .adeck__img { width: min(calc((var(--adeck-h) - 24px) * var(--ar, 1.5)), 50%); }
 .adeck__like {
   position: absolute; right: 24px; bottom: 24px; z-index: 1; pointer-events: auto;
