@@ -455,9 +455,9 @@
      only in live V2", pending-sticky-variants-2 · 8) — cork, finely pricked */
   --g-v2-cork:       radial-gradient(rgba(0, 0, 0, .06) 1px, transparent 1.5px) 0 0 / 7px 7px, #C9A57A;
   /* …and since 5 Oct 2026 one sticky note: TertiaryContainer paper (mockups/pending-sticky.html · 1) */
-  /* the OVERDUE colour (owner, 5 Oct 2026: "background make Overdue background
-     colour") — mockups/pending-sticky.html's Error solid paper */
-  --g-v2-sticky:     linear-gradient(117deg, #FF6883 0%, #E93353 100%);
+  /* (5 Oct 2026: the Error solid paper was tried and reverted the same day —
+     "revert the background colour") */
+  --g-v2-sticky:     linear-gradient(180deg, #FFE6DC 0%, #FFD6C7 100%);
   /* the node's gradientTransform puts the yellow stop 105% BEFORE the box's
      start along its 116.87° line — the card is the orange with a faint yellow
      lift at its top-left, not a yellow bottom-right */
@@ -8028,14 +8028,8 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 .l-v2sn__curl { position: absolute; right: 0; bottom: 0; width: 30px; height: 30px; border-top-left-radius: 6px; pointer-events: none;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, .07) 50%, rgba(255, 255, 255, .6) 64%); }
 .l-v2sn__none { margin: auto; font-size: 14px; font-weight: 600; color: #7A5048; }
-/* ON THE OVERDUE PAPER (5 Oct 2026): the head goes white, the rows go near
-   white so the jobs and the red OVERDUE stay legible, and with the tape gone
-   the head comes up to the note's own top padding */
+/* with the tape gone (5 Oct 2026) the head comes up to the note's own top padding */
 .l-v2sn { padding-top: 18px; }
-.l-v2sn__head { color: #fff; }
-.l-v2sn__row { background: rgba(255, 255, 255, .94); }
-.l-v2sn__none { color: #fff; }
-.l-v2sn__curl { background: linear-gradient(135deg, rgba(0, 0, 0, 0) 50%, rgba(80, 0, 20, .18) 50%, rgba(255, 255, 255, .45) 64%); }
 /* a short card (the phone's 243, or a smaller size): tighter rows, one column */
 @container (max-height: 300px) {
   .l-v2sn { padding: 18px 12px 10px; }
