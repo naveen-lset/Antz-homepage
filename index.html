@@ -8022,7 +8022,6 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 .l-v2sn__row:focus-visible { outline: 2px solid #C9472B; outline-offset: 1px; }
 .l-v2sn__t { flex: 1; min-width: 0; font-size: clamp(14.5px, 3cqh, 18px); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .l-v2sn__row b { font-family: 'DM Sans', var(--font); font-size: clamp(15px, 3.3cqh, 20px); font-weight: 700; font-variant-numeric: tabular-nums; }
-.l-v2sn__row em { flex: none; padding: 2px 6px; border-radius: 4px; background: #D7263D; color: #fff; font-style: normal; font-size: 9.5px; font-weight: 700; letter-spacing: .06em; }
 .l-v2sn__row.is-late b { color: #D7263D; }
 .l-v2sn__s { flex: none; font-size: 9.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #7A5048; }
 .l-v2sn__curl { position: absolute; right: 0; bottom: 0; width: 30px; height: 30px; border-top-left-radius: 6px; pointer-events: none;
@@ -33031,18 +33030,20 @@ const LAYOUTS = {
        Vaccination, Necropsy pending"), then the register's backlog */
     const ORDER = ['deworming', 'vaccination', 'necropsy', 'admin', 'sexing', 'microchip', 'transfer']
     const parts = (data.parts || []).filter((p) => (p.n || 0) > 0).sort((a, b) => ORDER.indexOf(a.key) - ORDER.indexOf(b.key))
-    const HEART = '<svg class="l-v2sn__ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.2.3.6.3.8 0 .7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.2C19.5 16.4 12 21 12 21zm-4.6-9h2.2l1-2.2 1.9 4.4 1.2-2.2h2.9v-1.4h-3.7l-.5 1-1.9-4.4-1.8 3.4H7.4z"/></svg>'
+    /* a clock, the pending glyph (owner, 5 Oct 2026: "icon has to be clock pending icon") — Material's filled watch_later */
+    const CLOCK = '<svg class="l-v2sn__ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"/></svg>'
     /* no tape and no checkboxes (owner, 5 Oct 2026: "remove the checkbox,
        remove top tape") */
     return `<span class="l-v2sn">` +
       /* no open total in the head (same day: "remove the overall open") */
-      `<span class="l-v2sn__head">${HEART}<b>Pending</b></span>` +
+      `<span class="l-v2sn__head">${CLOCK}<b>Pending</b></span>` +
       `<span class="l-v2sn__rows">` + parts.map((p) => {
         const n = p.n || 0, late = /overdue/.test(p.sub || '')
         /* Transfers is still sample data (see its part), but the row no longer says so — owner, same day */
         return `<button type="button" class="l-v2sn__row${late ? ' is-late' : ''}" data-key="${esc(p.key)}" data-n="${n}" aria-label="${esc(p.label)}, ${n}${late ? ' overdue' : ' pending'}. Open ${esc(p.label)}">` +
           `<span class="l-v2sn__t">${esc(p.label)}</span>` +
-          (late ? `<em>OVERDUE</em>` : '') + `<b>${fmtN(n)}</b></button>`
+          /* no OVERDUE tag (owner, same day: "remove that overdue"); an overdue count stays red */
+          `<b>${fmtN(n)}</b></button>`
       }).join('') +
       (parts.length ? '' : `<span class="l-v2sn__none">Nothing pending</span>`) +
       `</span><span class="l-v2sn__curl" aria-hidden="true"></span></span>`
