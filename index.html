@@ -4418,15 +4418,59 @@ body.is-report { overflow: hidden; }
 .adeck__card { --adeck-h: 232px; height: var(--adeck-h); }
 @media (min-width: 744px) { .adeck__desc { -webkit-line-clamp: 4; } }
 .adeck__img { width: min(calc((var(--adeck-h) - 24px) * var(--ar, 1.5)), 50%); }
+/* the phone card's own rows: not drawn on the tablet card */
+:is(.adeck__state, .adeck__by, .adeck__more, .adeck__att, .adeck__n) { display: none; }
+/* PHONE, under 744 — THE APP'S OWN CARD, STOOD UP (owner, 5 Oct 2026, two
+   screenshots of the phone app: "if view changes to Mobile, Announcement card
+   become like this. Also I want to know that under some cards are there").
+   One white card at r24: the chip (its word in the type's colour, spaced
+   capitals), the gradient title, the author line, three lines of body and
+   Read More where they are cut, the attachments line, then the photograph
+   taking all that is left of the box. The box stays one height on every card
+   — the deck needs it — so a short post gives its room to the picture. The
+   pile shows UNDER the card: the two behind are 12 and 24 lower and 6% and
+   12% narrower about the foot, so two white edges stand below the front one
+   on a faint mint each, so they read as cards and not as a shadow (the
+   drag's peekAt in AnnouncementDeck.js uses the same numbers).
+   Every rule carries `.adeck` so it outranks the V2 phone type sizes. */
 @media (max-width: 743px) {
-  .adeck__card { --adeck-h: 236px; padding: 4px; border-radius: 20px; }
-  .adeck__body { padding: 16px; gap: 10px; border-radius: 16px 0 0 16px; background: linear-gradient(-72deg, rgba(0, 175, 214, .1) 3.9%, rgba(55, 189, 105, .1) 108%); }
-  .adeck__card:not(:has(.adeck__img)) .adeck__body { border-radius: 16px; }
-  .adeck__card[data-k='important'] .adeck__body { background: linear-gradient(108deg, rgba(233, 51, 83, .1) 1.5%, rgba(250, 97, 64, .1) 96.9%); }
-  .adeck__hl { line-height: 21px; }
-  .adeck__desc { line-height: 20px; }
-  .adeck__meta { font-size: 14px; font-weight: 500; }
-  .adeck__img { width: min(calc((var(--adeck-h) - 8px) * var(--ar, 1.5)), 40%); border-radius: 0 16px 16px 0; }
+  :root[data-home='v2'] .adeck .adeck__stack { margin-bottom: 24px; }
+  :root[data-home='v2'] .adeck .adeck__card {
+    --adeck-h: min(calc(296px + 58vw), 660px);
+    width: 100%; flex-direction: column; gap: 14px; padding: 16px; border-radius: 24px;
+    box-shadow: 0 2px 12px rgba(31, 65, 91, .08); transform-origin: 50% 100%;
+  }
+  :root[data-home='v2'] .adeck .adeck__card[data-i='1'] { transform: translateY(12px) scale(.94); background: #F6FAF9; box-shadow: 0 2px 10px rgba(31, 65, 91, .08); }
+  :root[data-home='v2'] .adeck .adeck__card[data-i='2'],
+  :root[data-home='v2'] .adeck .adeck__card[data-i='3'] { transform: translateY(24px) scale(.88); background: #EDF4F2; box-shadow: 0 2px 8px rgba(31, 65, 91, .07); }
+  /* the deepest cards are only an edge: their contents stay hidden, or the
+     third card's photograph shows under the second as a finger lifts it
+     (the leaver is data-i 3 while it flies, so it is excepted) */
+  :root[data-home='v2'] .adeck .adeck__card:is([data-i='2'], [data-i='3']):not(.is-flying) > * { visibility: hidden; }
+  :root[data-home='v2'] .adeck .adeck__body { flex: none; gap: 14px; padding: 0; }
+  :root[data-home='v2'] .adeck .adeck__chip { height: 40px; gap: 10px; padding: 2px 18px 2px 2px; font-size: 13px; font-weight: 500; letter-spacing: 1.4px; color: #37BD69; background: rgba(55, 189, 105, .1); }
+  :root[data-home='v2'] .adeck .adeck__chip img { width: 36px; height: 36px; }
+  :root[data-home='v2'] .adeck .adeck__card[data-k='important'] .adeck__chip { color: #E93353; background: rgba(233, 51, 83, .1); }
+  :root[data-home='v2'] .adeck .adeck__state { display: block; position: absolute; top: 20px; right: 16px; padding: 7px 12px; border-radius: 6px; background: #D9434F; font-size: 13px; font-weight: 500; line-height: normal; letter-spacing: .8px; color: #fff; }
+  :root[data-home='v2'] .adeck .adeck__text { gap: 10px; }
+  :root[data-home='v2'] .adeck .adeck__hl { font-size: 22px; font-weight: 600; line-height: 28px; letter-spacing: -.2px; -webkit-line-clamp: 2; }
+  :root[data-home='v2'] .adeck .adeck__card[data-state='cancelled'] .adeck__hl { text-decoration: line-through; text-decoration-thickness: 2px; }
+  :root[data-home='v2'] .adeck .adeck__card[data-state='cancelled'][data-k='important'] .adeck__hl { text-decoration-color: #E04D5C; }
+  :root[data-home='v2'] .adeck .adeck__card[data-state='cancelled']:not([data-k='important']) .adeck__hl { text-decoration-color: #4FB98A; }
+  :root[data-home='v2'] .adeck .adeck__by { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; font-size: 15px; font-weight: 400; line-height: 20px; color: #7A8684; white-space: nowrap; }
+  :root[data-home='v2'] .adeck .adeck__by > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  :root[data-home='v2'] .adeck .adeck__by > span:first-of-type { flex: none; max-width: 60%; }
+  :root[data-home='v2'] .adeck .adeck__by b { flex: none; font-size: 10px; font-weight: 400; }
+  :root[data-home='v2'] .adeck .adeck__av { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #E1F9ED, #CFF5F3); font-size: 12px; font-weight: 600; font-style: normal; color: #1F515B; }
+  :root[data-home='v2'] .adeck .adeck__desc { font-size: 15px; line-height: 21px; color: #1C1B1F; -webkit-line-clamp: 3; }
+  :root[data-home='v2'] .adeck .adeck__text.is-cut .adeck__more { display: block; margin-top: -4px; font-size: 15px; font-weight: 400; line-height: 21px; color: #2E9FCF; }
+  :root[data-home='v2'] .adeck .adeck__att { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; font-size: 14px; line-height: 20px; color: #7A8684; white-space: pre; }
+  :root[data-home='v2'] .adeck .adeck__att svg { flex: none; }
+  :root[data-home='v2'] .adeck .adeck__att span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  :root[data-home='v2'] .adeck .adeck__meta { display: none; }
+  :root[data-home='v2'] .adeck .adeck__img { flex: 1 1 0; min-height: 0; width: auto; align-self: stretch; border-radius: 16px; }
+  :root[data-home='v2'] .adeck .adeck__n { display: inline-flex; align-items: center; gap: 4px; position: absolute; top: 12px; right: 12px; height: 30px; padding: 0 12px 0 10px; border-radius: 100px; background: rgba(28, 27, 31, .72); font-size: 15px; font-weight: 600; line-height: 1; color: #fff; }
+  /* a post with no photograph: the text keeps the top, the space under it stays white */
 }
 /* THE FOOT ROW · node 753:21034 (25 Sep 2026): the head is gone, so the
    stack opens 16 under the band's top, and 16 under the stack a 17px row
@@ -44924,6 +44968,48 @@ const CHIP_ICON = { fact: 'assets/icon/an-announce.svg', important: 'assets/icon
    "by • date" in the footer, and a 180px photograph filling the card's height.
    The node has no prev/next, no counter and no side index: a reader swipes,
    or uses the arrow keys on the front card. */
+/* THE PHONE CARD (owner, 5 Oct 2026: two screenshots of the phone app's
+   Announcements — "if view changes to Mobile, Announcement card become like
+   this"). Under 744 the card stands up: chip, title, an author line with a
+   disc, the body cut at three lines with Read More when it is cut, a line
+   counting the post's attachments, and the photograph filling what is left of
+   the fixed box, a +N on it when the post has more pictures. The attachments
+   and the pictures are the post's own (feed.js EXTRA, the same the feed page
+   lists); nothing is counted that the post does not carry. A cancelled post
+   (`cancelled: true`) wears the app's CANCELED plate and a struck title. */
+const CLIP = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7v9.5a3 3 0 0 0 6 0V6a4.5 4.5 0 0 0-9 0v10.5a6 6 0 0 0 12 0V7"/></svg>'
+const PICS = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M22 16V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2Zm-11-4 2.03 2.71L16 11l4 5H8l3-4ZM2 6v14a2 2 0 0 0 2 2h14v-2H4V6H2Z"/></svg>'
+const initials = (n) => String(n || '').replace(/^Dr\.?\s+/, '').split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase()
+const plural = (n, one) => `${n} ${one}${n === 1 ? '' : 's'}`
+function phoneCard(b, k) {
+  let x = {}
+  try { x = __req('js/data/feed.js').extra(b.id) || {} } catch (e) {}
+  const pics = x.images?.length || (b.image ? 1 : 0)
+  const files = x.files || []
+  const n = (kinds) => files.filter((f) => kinds.includes(f.kind)).length
+  const parts = [
+    pics && plural(pics, 'Image'),
+    n(['pdf', 'doc', 'sheet']) && plural(n(['pdf', 'doc', 'sheet']), 'Document'),
+    n(['video']) && plural(n(['video']), 'Video'),
+    n(['audio']) && `${n(['audio'])} Audio`,
+  ].filter(Boolean)
+  const who = k === 'fact' ? b.species : b.by
+  const when = k === 'fact' ? b.latin : String(b.date || '').replace(/\s+2026$/, '')
+  return {
+    by: `<div class="adeck__by">${k === 'fact' ? '' : `<i class="adeck__av">${esc(initials(who))}</i>`}<span>${esc(who || '')}</span>${when ? `<b aria-hidden="true">•</b><span>${esc(when)}</span>` : ''}</div>`,
+    att: parts.length ? `<div class="adeck__att">${CLIP}<span>${parts.map(esc).join(',  ')}</span></div>` : '',
+    more: pics > 1 ? `<span class="adeck__n">${PICS}+${pics - 1}</span>` : '',
+  }
+}
+/* where a card behind the front one sits: tablet, 16 out to the right and 10
+   down; phone, tucked under the front card's foot, 12 down and 6% narrower,
+   so the pile shows beneath it. k = 1 is the full peek, 0 the front. */
+const PHONE = matchMedia('(max-width: 743px)')
+const peekAt = (k) => {
+  const p = PHONE.matches ? { x: 0, y: 12, sx: .06, sy: .06 } : { x: 16, y: 10, sx: .0624, sy: .0935 }
+  return `translate(${p.x * k}px, ${p.y * k}px) scale(${1 - p.sx * k}, ${1 - p.sy * k})`
+}
+
 function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
   if (!root || !items.length) return null
   const kindOf = (b) => (b.kind === 'fact' ? 'fact' : b.tone === 'important' ? 'important' : 'announcement')
@@ -44939,11 +45025,15 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
       const meta = k === 'fact'
         ? `<span>${esc(b.species || '')}</span><span> • ${esc(b.latin || '')}</span>`
         : `<span>${esc(b.by || '')}</span>${b.date ? `<span> • ${esc(b.date)}</span>` : ''}`
-      return `<article class="adeck__card" data-k="${k}" data-ai="${i}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${items.length}: ${esc(b.title)}">` +
+      /* the phone card's extra rows (phoneCard below); hidden from 744 up */
+      const ph = phoneCard(b, k)
+      return `<article class="adeck__card" data-k="${k}" data-ai="${i}"${b.cancelled ? ' data-state="cancelled"' : ''} role="group" aria-roledescription="slide" aria-label="${i + 1} of ${items.length}: ${esc(b.title)}${b.cancelled ? ' (cancelled)' : ''}">` +
+        (b.cancelled ? `<span class="adeck__state">CANCELED</span>` : '') +
         `<div class="adeck__body"><span class="adeck__chip"><img src="${CHIP_ICON[k]}" alt="" width="32" height="32">${CHIP[k]}</span>` +
-        `<div class="adeck__text"><h3 class="adeck__hl">${esc(b.title)}</h3><p class="adeck__desc">${esc(b.body)}</p>` +
+        `<div class="adeck__text"><h3 class="adeck__hl">${esc(b.title)}</h3>${ph.by}<p class="adeck__desc">${esc(b.body)}</p>` +
+        `<span class="adeck__more" aria-hidden="true">Read More</span>${ph.att}` +
         `<div class="adeck__meta">${meta}</div></div></div>` +
-        (b.image ? `<div class="adeck__img"><img src="${esc(b.image)}" alt="" decoding="async" style="object-position:${esc(b.imagePos || '50% 50%')}"></div>` : '') +
+        (b.image ? `<div class="adeck__img"><img src="${esc(b.image)}" alt="" decoding="async" style="object-position:${esc(b.imagePos || '50% 50%')}">${ph.more}</div>` : '') +
         `</article>`
     }).join('') + `</div>` +
     `<div class="adeck__foot"><div class="adeck__dots" aria-hidden="true">${items.map(() => '<i></i>').join('')}</div>` +
@@ -45060,7 +45150,7 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
     const w = stack.clientWidth, p = card(order[order.length - 1]), c = dg.c
     const x = Math.min(0, -w * 1.1 + dx * 1.25), k = Math.min(1, dx / (w * .6))
     if (p && p !== c) { p.style.transition = 'none'; p.style.zIndex = '4'; p.style.opacity = '1'; p.style.transform = `translateX(${x}px) rotate(${(-6 * x / (-w * 1.1)).toFixed(2)}deg)` }
-    c.style.transform = `translate(${16 * k}px, ${10 * k}px) scale(${1 - .0624 * k}, ${1 - .0935 * k})`
+    c.style.transform = peekAt(k)
   }
   stack.addEventListener('pointermove', (e) => {
     if (!dg || e.pointerId !== dg.pid) return
@@ -45075,7 +45165,7 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
     clearPull(card(order[order.length - 1]) === dg.c ? null : card(order[order.length - 1]))
     dg.c.style.transform = `translateX(${dx}px) rotate(${dx * .02}deg)`
     const k = Math.min(1, Math.abs(dx) / (stack.clientWidth * .5))
-    if (n) { n.style.transition = 'none'; n.style.transform = `translate(${16 - 16 * k}px, ${10 - 10 * k}px) scale(${.9376 + .0624 * k}, ${.9065 + .0935 * k})` }
+    if (n) { n.style.transition = 'none'; n.style.transform = peekAt(1 - k) }
   })
   const drop = () => {
     if (!dg) return
@@ -45122,6 +45212,10 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
       e.preventDefault(); openFront(c)
     })
   }
+
+  /* Read More shows only where the body was actually cut (phone card) */
+  const clamped = () => { for (const d of stack.querySelectorAll('.adeck__desc')) d.parentElement.classList.toggle('is-cut', d.scrollHeight > d.clientHeight + 1) }
+  clamped(); addEventListener('resize', clamped); document.fonts?.ready.then(clamped)
 
   paint()
   return { root, next, prev, goTo }
