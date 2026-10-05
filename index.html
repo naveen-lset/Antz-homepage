@@ -36607,7 +36607,10 @@ function createWeatherSky({ tone = 'light' } = {}) {
     const w = band.clientWidth, h = band.clientHeight
     if (!w || !h) return
     const P = { ...P0, clear: P0.dark && !S.night && k !== 'storm' ? .88 : 0, spots: spotsFor(band) }
-    root.dataset.skyTone = P.dark ? 'dark' : 'light'
+    /* the review build's Plain header (review.css) hides this sky behind a
+       pale still picture, so its ink stays dark whatever the weather */
+    const plain = root.dataset.review && root.dataset.hdrStyle !== 'climate'
+    root.dataset.skyTone = P.dark && !plain ? 'dark' : 'light'
     readout(S)
     /* the readout has moved the words; measure the patches again */
     P.spots = spotsFor(band)
@@ -36638,6 +36641,8 @@ function createWeatherSky({ tone = 'light' } = {}) {
 
   const ro = new ResizeObserver(place)
   for (const el of [document.querySelector('.home-header'), document.getElementById('favSpecies')]) if (el) ro.observe(el)
+  /* Plain ⇄ Climate from the profile drawer: redraw, so the ink follows */
+  new MutationObserver(() => { if (key) show(key, false) }).observe(root, { attributes: true, attributeFilter: ['data-hdr-style'] })
   addEventListener('resize', place)
   place()
   return {

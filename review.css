@@ -7,23 +7,18 @@
 /* HEADER STYLE (owner, 30 Sep 2026: "in profile give me option Header Style
    Climate / Plain background, user can select"): PLAIN is the default and is
    the still radial below; CLIMATE (`data-hdr-style="climate"`, set from the
-   profile menu and kept in localStorage 'rv-hdr') lifts these three rules and
+   profile menu and kept in localStorage 'rv-hdr') lifts these two rules and
    the app's live weather sky shows through, as on the main V2.
 
-   HEADER · 816:3 "Weather Sky" — a still cream-to-mint radial with grain in
-   place of the live sky. The node's SVG radial is centred at (386.5, -249) on
-   744×437 with radii 415.78 × 686 and stops #FBF8D9 41.763% → #D2F7DF 100%;
-   the stops are the SAMPLED render (#EEECCF / #C9EAD5), because the node's
-   grain darkens both by ~5% and the render is the target. Kept in percentages
-   so the ellipse scales with the band from phone to desktop. */
+   HEADER · 881:1154 "Weather Sky" (owner, 5 Oct 2026: "header background
+   take as PNG then add"). The node exported at 2× as one picture —
+   assets/img/header-sky.png, 1488×874 for the 744×437 artboard: a pale
+   #FBFBFB→#E6F6F5 radial from above the top edge, with the node's grain
+   baked in — so no CSS gradient or noise is drawn over it. It covers the
+   band from the top centre, so the radial's peak stays over the middle at
+   every width. (It replaces 816:3's cream-to-mint radial.) */
 :root[data-review]:not([data-hdr-style='climate']) .wsky {
-  background:
-    radial-gradient(55.88% 157% at 51.95% -57%, #EEECCF 41.763%, #C9EAD5 100%);
-}
-:root[data-review]:not([data-hdr-style='climate']) .wsky::after {
-  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: .14; mix-blend-mode: overlay;
+  background: #E6F6F5 url("assets/img/header-sky.png") center top / cover no-repeat;
 }
 :root[data-review]:not([data-hdr-style='climate']) .wsky__scene { display: none; }
 
