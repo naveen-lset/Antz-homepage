@@ -4442,9 +4442,13 @@ body.is-report { overflow: hidden; }
      type scale (iOS Headline 17 for the title, Body 14, Footnote 13, a 11
      capital chip; 12 is the floor of 30 Sep) and the photograph at 2 : 1 of
      the card's inner width, so the box is 240 + 50vw — 435 at 390. */
-  :root[data-home='v2'] .adeck .adeck__stack { margin-bottom: 20px; }
+  /* the pile reaches 20 under the front card; the dots stand a further 20
+     clear of it (owner, same day: "the slider part needs some gap from the
+     cards"). All 40 is the foot's: two margins of 20 collapse into one */
+  :root[data-home='v2'] .adeck .adeck__stack { margin-bottom: 0; }
+  :root[data-home='v2'] .adeck .adeck__foot { margin-top: 40px; }
   :root[data-home='v2'] .adeck .adeck__card {
-    --adeck-h: min(calc(240px + 50vw), 540px);
+    --adeck-h: min(calc(236px + 50vw), 536px);
     width: 100%; flex-direction: column; gap: 10px; padding: 14px; border-radius: 20px;
     box-shadow: 0 2px 12px rgba(31, 65, 91, .08); transform-origin: 50% 100%;
   }
@@ -4456,12 +4460,14 @@ body.is-report { overflow: hidden; }
      (the leaver is data-i 3 while it flies, so it is excepted) */
   :root[data-home='v2'] .adeck .adeck__card:is([data-i='2'], [data-i='3']):not(.is-flying) > * { visibility: hidden; }
   :root[data-home='v2'] .adeck .adeck__body { flex: none; gap: 10px; padding: 0; }
-  :root[data-home='v2'] .adeck .adeck__chip { height: 30px; gap: 8px; padding: 2px 12px 2px 2px; font-size: 11px; font-weight: 600; letter-spacing: 1px; color: #2FA85C; background: rgba(55, 189, 105, .1); }
+  :root[data-home='v2'] .adeck .adeck__chip { height: 30px; gap: 8px; padding: 2px 12px 2px 2px; font-size: 12px; font-weight: 400; letter-spacing: 1px; color: #2FA85C; background: rgba(55, 189, 105, .1); }
   :root[data-home='v2'] .adeck .adeck__chip img { width: 26px; height: 26px; }
   :root[data-home='v2'] .adeck .adeck__card[data-k='important'] .adeck__chip { color: #E93353; background: rgba(233, 51, 83, .1); }
   :root[data-home='v2'] .adeck .adeck__state { display: block; position: absolute; top: 16px; right: 14px; padding: 5px 8px; border-radius: 6px; background: #D9434F; font-size: 11px; font-weight: 600; line-height: normal; letter-spacing: .6px; color: #fff; }
   :root[data-home='v2'] .adeck .adeck__text { gap: 8px; }
-  :root[data-home='v2'] .adeck .adeck__hl { font-size: 17px; font-weight: 600; line-height: 22px; letter-spacing: -.1px; -webkit-line-clamp: 2; }
+  /* the owner's sizes (5 Oct 2026, on the deployed card: "Announcement label
+     should be 12px Regular, heading should be 14px Medium") */
+  :root[data-home='v2'] .adeck .adeck__hl { font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: 0; -webkit-line-clamp: 2; }
   :root[data-home='v2'] .adeck .adeck__card[data-state='cancelled'] .adeck__hl { text-decoration: line-through; text-decoration-thickness: 1.5px; }
   :root[data-home='v2'] .adeck .adeck__card[data-state='cancelled'][data-k='important'] .adeck__hl { text-decoration-color: #E04D5C; }
   :root[data-home='v2'] .adeck .adeck__card[data-state='cancelled']:not([data-k='important']) .adeck__hl { text-decoration-color: #4FB98A; }
