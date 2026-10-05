@@ -7629,10 +7629,9 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 .kins__txt b { font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; color: var(--c-on-surface-var, #44544A); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kins__txt small { font-size: 10px; font-weight: 400; line-height: 16px; color: var(--c-neutral-2, #7A8684); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kins__n { flex: none; font-family: 'DM Sans', var(--font); font-size: 16px; font-weight: 600; line-height: normal; font-variation-settings: 'opsz' 14; font-variant-numeric: tabular-nums; color: var(--c-on-surface-var, #44544A); text-align: center; white-space: nowrap; }
-/* THE TILES (5 Oct 2026): a grid, not a rail — five across from 900, three
-   on the 744 artboard, two on a phone (the fifth spans both) — each in its
+/* THE TILES (5 Oct 2026): a grid, not a rail — each in its
    card's own head colour: glyph, name, total, and what the total covers */
-.kins__rail.kins__tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; overflow: visible; scroll-snap-type: none; }
+.kins__rail.kins__tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; overflow: visible; scroll-snap-type: none; }
 .kins__tile { box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 124px; padding: 16px 12px;
   border: 0; border-radius: 12px; background: var(--k-head); color: #fff; font: inherit; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent;
   transition: transform 160ms ease; }
@@ -7643,11 +7642,7 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 .kins__tname { font-size: 14px; font-weight: 500; line-height: 18px; letter-spacing: .1px; }
 .kins__total { font-family: 'DM Sans', var(--font); font-size: 32px; font-weight: 600; line-height: 36px; font-variant-numeric: tabular-nums; }
 .kins__when { font-size: 12px; line-height: 16px; opacity: .85; }
-@media (max-width: 899px) { .kins__rail.kins__tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 599px) {
-  .kins__rail.kins__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .kins__tile:last-child:nth-child(odd) { grid-column: 1 / -1; }
-}
+/* two tiles since 5 Oct 2026 (Natality, Mortality): side by side at every width */
 /* the species sheet: the card's list, the body scrolls it */
 .ksx .kins__list--sheet { overflow: visible; gap: 8px; padding: 4px 0 8px; }
 .ksx .kins__row { padding-bottom: 10px; }
@@ -49998,9 +49993,8 @@ const KI_RANGES = [
 const KI_CARDS = [
   { k: 'natality', icon: 'ki-natality-w.svg', w: 13.461, h: 18.154, name: 'Natality', sep: ' - ', flow: 'natality', none: 'No births' },
   { k: 'mortality', icon: 'ki-mortality-w.svg', w: 18, h: 8.379, name: 'Mortality', sep: ' - ', flow: 'mortality', none: 'No deaths' },
-  { k: 'vaccination', icon: 'ki-mortality-w.svg', w: 18, h: 8.379, name: 'Vaccination Pending', sep: ' -', pending: 'vaccination', none: 'No vaccinations overdue' },
-  { k: 'deworming', icon: 'ki-mortality-w.svg', w: 18, h: 8.379, name: 'Deworming Pending', sep: ' -', pending: 'deworming', none: 'No dewormings overdue' },
-  { k: 'admin', icon: 'ki-mortality-w.svg', w: 18, h: 8.379, name: 'Administration Medicine', sep: ' -', flow: 'admin', none: 'No medicine courses running' },
+  /* Vaccination Pending, Deworming Pending and Administration Medicine are off
+     the band (owner, 5 Oct 2026) — the overdue doses live on the Pending note */
 ]
 function keyInsights(after) {
   if (!after) return
