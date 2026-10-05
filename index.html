@@ -7945,7 +7945,9 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 .l-v2sn__head strong { font-family: 'DM Sans', var(--font); font-size: 16px; font-weight: 700; color: #3B2420; }
 .l-v2sn__rows { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 6px; margin-top: 14px; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; touch-action: pan-y; }
 .l-v2sn__rows::-webkit-scrollbar { display: none; }
-.l-v2sn__row { flex: 1 1 0; display: flex; align-items: center; gap: 10px; min-height: 30px; max-height: 84px; padding: 0 12px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, .7);
+/* rows share the note's height down to 52px; past that the list scrolls
+   (owner: "if more things come, it becomes a scroll") */
+.l-v2sn__row { flex: 1 0 52px; display: flex; align-items: center; gap: 10px; min-height: 52px; max-height: 84px; padding: 0 12px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, .7);
   font-family: inherit; color: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .15s ease; }
 .l-v2sn__row:active { transform: scale(.98); }
 .l-v2sn__row:focus-visible { outline: 2px solid #C9472B; outline-offset: 1px; }
@@ -7965,7 +7967,7 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
   .l-v2sn__ico { width: 17px; height: 17px; }
   .l-v2sn__head strong { font-size: 14px; }
   .l-v2sn__rows { gap: 4px; margin-top: 8px; }
-  .l-v2sn__row { min-height: 26px; padding: 0 10px; gap: 8px; border-radius: 8px; }
+  .l-v2sn__row { flex-basis: 27px; min-height: 27px; padding: 0 10px; gap: 8px; border-radius: 8px; }
   .l-v2sn__t { font-size: 13.5px; }
   .l-v2sn__row b { font-size: 14px; }
   .l-v2sn__box { width: 13px; height: 13px; }
@@ -32946,22 +32948,25 @@ const LAYOUTS = {
      note's page, as a row of the list did. ── */
   /* ── V2 · PENDING ACTIONS AS ONE STICKY NOTE (5 Oct 2026) — the card is the
      note: TertiaryContainer paper, a strip of dark-tertiary tape on its top
-     edge, the heart-pulse head with the open total, then a soft tile per job
-     (checkbox · job · count; OVERDUE on the two overdue doses, SAMPLE on
-     Transfers), the corner curling up. A job at zero is left off. The rows
+     edge, the heart-pulse head, then a soft tile per job
+     (checkbox · job · count; OVERDUE on the two overdue doses), the corner
+     curling up; past six jobs the list scrolls. A job at zero is left off. The rows
      share the card's height; BEHAVIOUR['v2-sticky'] opens a row's page. ── */
   'v2-sticky': (mod, variant, data) => {
-    const ORDER = ['sexing', 'microchip', 'necropsy', 'transfer', 'admin', 'deworming', 'vaccination']
+    /* the urgent three lead (owner, 5 Oct 2026: "on the top Deworming,
+       Vaccination, Necropsy pending"), then the register's backlog */
+    const ORDER = ['deworming', 'vaccination', 'necropsy', 'admin', 'sexing', 'microchip', 'transfer']
     const parts = (data.parts || []).filter((p) => (p.n || 0) > 0).sort((a, b) => ORDER.indexOf(a.key) - ORDER.indexOf(b.key))
-    const total = parts.reduce((t, p) => t + (p.n || 0), 0)
     const HEART = '<svg class="l-v2sn__ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.2.3.6.3.8 0 .7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.2C19.5 16.4 12 21 12 21zm-4.6-9h2.2l1-2.2 1.9 4.4 1.2-2.2h2.9v-1.4h-3.7l-.5 1-1.9-4.4-1.8 3.4H7.4z"/></svg>'
     return `<span class="l-v2sn"><span class="l-v2sn__tape" aria-hidden="true"></span>` +
-      `<span class="l-v2sn__head">${HEART}<b>Pending</b><span><strong>${fmtN(total)}</strong> open</span></span>` +
+      /* no open total in the head (same day: "remove the overall open") */
+      `<span class="l-v2sn__head">${HEART}<b>Pending</b></span>` +
       `<span class="l-v2sn__rows">` + parts.map((p) => {
         const n = p.n || 0, late = /overdue/.test(p.sub || '')
-        return `<button type="button" class="l-v2sn__row${late ? ' is-late' : ''}" data-key="${esc(p.key)}" data-n="${n}" aria-label="${esc(p.label)}, ${n}${late ? ' overdue' : ' pending'}${p.sample ? ', sample data' : ''}. Open ${esc(p.label)}">` +
+        /* Transfers is still sample data (see its part), but the row no longer says so — owner, same day */
+        return `<button type="button" class="l-v2sn__row${late ? ' is-late' : ''}" data-key="${esc(p.key)}" data-n="${n}" aria-label="${esc(p.label)}, ${n}${late ? ' overdue' : ' pending'}. Open ${esc(p.label)}">` +
           `<span class="l-v2sn__box" aria-hidden="true"></span><span class="l-v2sn__t">${esc(p.label)}</span>` +
-          (p.sample ? `<span class="l-v2sn__s">Sample</span>` : '') + (late ? `<em>OVERDUE</em>` : '') + `<b>${fmtN(n)}</b></button>`
+          (late ? `<em>OVERDUE</em>` : '') + `<b>${fmtN(n)}</b></button>`
       }).join('') +
       (parts.length ? '' : `<span class="l-v2sn__none">Nothing pending</span>`) +
       `</span><span class="l-v2sn__curl" aria-hidden="true"></span></span>`
