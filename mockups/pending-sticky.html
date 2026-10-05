@@ -162,6 +162,29 @@ h2 { margin: 44px 0 6px; font-size: 18px; font-weight: 600; }
 .all figcaption { font-size: 13px; font-weight: 600; color: #44544A; }
 .all .pa { width: 340px; height: 464px; cursor: pointer; }
 .all .pa.is-on { outline: 3px solid #1F415B; outline-offset: 4px; }
+/* PAPER COLOURS (owner, 5 Oct 2026: "colour I'm not liking"): one switch
+   for every version — the note's paper, its second note, tape and accent —
+   each taken from the app's own palette. "As drawn" keeps each version's
+   own colours. */
+.paper { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 6px; }
+.paper > span { font-size: 13px; font-weight: 600; color: #44544A; margin-right: 4px; }
+.paper button { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 6px; border: 0; border-radius: 10px; background: rgba(0,0,0,.05); font: inherit; font-size: 13px; color: #44544A; cursor: pointer; }
+.paper button i { width: 24px; height: 24px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.paper button[aria-pressed='true'] { background: #1F415B; color: #fff; }
+body[data-paper] .pa { background: var(--p1) !important; }
+body[data-paper] .pa .v4x, body[data-paper] .v4 .over { background: var(--p2) !important; }
+body[data-paper] .tape { background: var(--tape) !important; }
+body[data-paper] .rule { background: var(--acc) !important; }
+body[data-paper] .v3 .bar i { background: var(--bar) !important; }
+body[data-paper] .v3 .late .bar i { background: var(--red) !important; }
+body[data-paper] .v5 .note::before { background: var(--acc) !important; }
+body[data-paper] .v5 .perf { background: color-mix(in srgb, var(--p1) 80%, #000 6%) !important; }
+body[data-paper='mint']  { --p1: linear-gradient(180deg, #EEF8F3 0%, #E1F1E8 100%); --p2: linear-gradient(180deg, #FFE9E4, #FFDCD5); --tape: rgba(255,255,255,.75); --acc: #8CC7AA; --bar: #3E8E5C; }
+body[data-paper='white'] { --p1: linear-gradient(180deg, #FFFFFF 0%, #F7F9F8 100%); --p2: linear-gradient(180deg, #FFF1EE, #FFE6E0); --tape: rgba(0,175,214,.22); --acc: #C9D6D0; --bar: #1F415B; }
+body[data-paper='cream'] { --p1: linear-gradient(180deg, #FFFCF3 0%, #FBF4E2 100%); --p2: linear-gradient(180deg, #FFEDE6, #FDE1D7); --tape: rgba(140,200,184,.55); --acc: #E3CFA6; --bar: #8A6D3B; }
+body[data-paper='sky']   { --p1: linear-gradient(180deg, #EEF7FC 0%, #E1EFF8 100%); --p2: linear-gradient(180deg, #FFE9E4, #FFDCD5); --tape: rgba(255,255,255,.8); --acc: #9CC6DE; --bar: #3F7FA6; }
+body[data-paper='teal']  { --p1: linear-gradient(180deg, #E9F7F6 0%, #D9F1EF 100%); --p2: linear-gradient(180deg, #FFE9E4, #FFDCD5); --tape: rgba(255,255,255,.75); --acc: #7FCFC9; --bar: #24BAB2; }
+body[data-paper='sage']  { --p1: linear-gradient(180deg, #F1F4F1 0%, #E4EAE5 100%); --p2: linear-gradient(180deg, #FBEAE5, #F6DDD6); --tape: rgba(255,255,255,.7); --acc: #B4C2B9; --bar: #5E7A69; }
 .foot { margin-top: 40px; color: #44544A; font-size: 13px; max-width: 820px; }
 </style>
 </head>
@@ -171,6 +194,7 @@ h2 { margin: 44px 0 6px; font-size: 18px; font-weight: 600; }
   <p class="lede">The corkboard becomes <b>one sticky note with a ruled list</b>, and the note <b>is the card</b>: it fills Pending Actions’ own slot on the home grid, with the grid’s 12px corners, and nothing hangs outside it. Each version is drawn at the three sizes the slot really has: <b>744</b> (340 × 464, your screenshot), <b>1024</b> (374 × 640) and the <b>phone</b> (358 × 243, so the rows tighten). Five jobs, today’s counts for All sites. In every version, <b>tapping a row opens that job’s page</b>, as the pinned notes do now.</p>
 
   <div class="pick" id="pick" role="group" aria-label="Version"></div>
+  <div class="paper" id="paper" role="group" aria-label="Paper colour"><span>Paper colour</span></div>
   <p class="premise" id="premise"></p>
 
   <div class="screens">
@@ -246,6 +270,18 @@ document.getElementById('all').innerHTML = V.map((v, k) => `<figure><figcaption>
 document.getElementById('pick').addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) show(+b.dataset.i) })
 document.getElementById('all').addEventListener('click', (e) => { const p = e.target.closest('.pa[data-i]'); if (p) { show(+p.dataset.i); scrollTo({ top: 0, behavior: 'smooth' }) } })
 show(at)
+const PAPERS = [['', 'As drawn', 'linear-gradient(135deg,#FCEFA8 0 33%,#FFD4CD 33% 66%,#CDEDD6 66%)'], ['mint', 'ANTZ mint', '#E1F1E8'], ['white', 'Clean white', '#FFFFFF'],
+  ['cream', 'Cream', '#FBF4E2'], ['sky', 'Sky', '#E1EFF8'], ['teal', 'Teal', '#D9F1EF'], ['sage', 'Sage grey', '#E4EAE5']]
+const paperBox = document.getElementById('paper')
+paperBox.insertAdjacentHTML('beforeend', PAPERS.map(([k, n, c]) => `<button type="button" data-p="${k}"><i style="background:${c}"></i>${n}</button>`).join(''))
+function paper(k) {
+  if (k) document.body.dataset.paper = k; else delete document.body.dataset.paper
+  paperBox.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.p === k)))
+  try { localStorage.setItem('pa-paper', k) } catch {}
+}
+paperBox.addEventListener('click', (e) => { const b = e.target.closest('[data-p]'); if (b) paper(b.dataset.p) })
+let p0 = ''; try { p0 = localStorage.getItem('pa-paper') || '' } catch {}
+paper(PAPERS.some(([k]) => k === p0) ? p0 : '')
 </script>
 </body>
 </html>
