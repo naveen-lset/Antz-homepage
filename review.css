@@ -78,6 +78,23 @@
 :root[data-review][data-home='v2'].v2-tabs-stuck .site-tabs--v2 .site-tabs__menu,
 :root[data-review][data-home='v2'].v2-tabs-stuck .site-tabs--v2 .site-tabs__tab:not([aria-selected='true']) { background: rgba(255, 255, 255, .6); }
 
+/* SCROLLED, PLAIN HEADER · 886:1155 "Home Header" (owner, 5 Oct 2026: "when I
+   scroll this kind background has to come"). The stuck bar is no longer clear
+   glass: it carries the header's own sky — 886:1263 is the same 744×437
+   "Weather Sky" as 881:1154, pixel for pixel, so it is the same PNG, laid from
+   the top centre at the same `cover` the resting band uses, and the bar reads
+   as the top of the header that stayed. Opaque, so nothing blurs and the node
+   draws no rule or shadow at its foot. The chips go to the node's
+   rgba(0,0,0,.07). Climate keeps the glass over its live sky. */
+:root[data-review]:not([data-hdr-style='climate'])[data-home='v2'] .search-row::before,
+:root[data-review]:not([data-hdr-style='climate'])[data-home='v2'].v2-tabs-stuck .site-tabs--v2::before {
+  background: #E6F6F5 url("assets/img/header-sky.png") center top / cover no-repeat;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  border-bottom: 0; box-shadow: none;
+}
+:root[data-review]:not([data-hdr-style='climate'])[data-home='v2'].v2-tabs-stuck .site-tabs--v2 .site-tabs__menu,
+:root[data-review]:not([data-hdr-style='climate'])[data-home='v2'].v2-tabs-stuck .site-tabs--v2 .site-tabs__tab:not([aria-selected='true']) { background: rgba(0, 0, 0, .07); }
+
 /* SITES, AT REST · room above the chips (owner, 30 Sep 2026: "top padding
    need here"). 12 over the chips, 4 under, so the strip stands 60 and the
    chips no longer touch the band above. */
