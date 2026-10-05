@@ -51,6 +51,7 @@
 -->
 <html lang="en">
 <head>
+<script>try{var nl=new URLSearchParams(location.search).get('notelines');if(/^[1-9]$/.test(nl||''))document.documentElement.style.setProperty('--obs-lines',nl)}catch(e){}</script>
 <script>document.documentElement.dataset.review='1';document.documentElement.dataset.profileDrawer='1';try{var u=new URL(location.href);if(u.searchParams.get('v')!=='2'){u.searchParams.set('v','2');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}try{if(localStorage.getItem('rv-hdr')==='climate')document.documentElement.dataset.hdrStyle='climate'}catch(e){}window.__rvHdr=function(v){var r=document.documentElement;if(v==='climate')r.dataset.hdrStyle='climate';else delete r.dataset.hdrStyle;try{localStorage.setItem('rv-hdr',v)}catch(e){}dispatchEvent(new Event('resize'))};</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7755,7 +7756,7 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10px; line-height: 16px; color: var(--c-neutral-2, #7A8684); }
 :root[data-home='v2'] .obs__tags span[aria-hidden] { margin: 0 6px 0 0; font-size: 14px; vertical-align: -1px; }
 :root[data-home='v2'] .obs__tags span:not([aria-hidden]) { margin-right: 8px; }
-:root[data-home='v2'] .obs__note { margin-top: 8px; font-size: 12px; line-height: 18px; -webkit-line-clamp: 3; }  /* owner, 29 Sep 2026: "3 line max" — the popup shows the rest */
+:root[data-home='v2'] .obs__note { margin-top: 8px; font-size: 12px; line-height: 18px; -webkit-line-clamp: var(--obs-lines, 3); }  /* owner, 29 Sep 2026: "3 line max" — the popup shows the rest. 5 Oct: "make it 3, 6, 5 lines and show" — ?notelines=5 or 6 previews the others; 3 stays until one is picked */
 :root[data-home='v2'] .obs__date { flex: none; font-family: var(--font); font-size: 12px; font-weight: 400; line-height: normal; color: var(--c-neutral-2, #7A8684); }
 :root[data-home='v2'] .obs__actions { gap: 10px; padding: 12px; border-top: .5px solid rgba(0, 0, 0, .05); font-size: 12px; line-height: normal; }
 :root[data-home='v2'] .obs__who { gap: 4px; }
