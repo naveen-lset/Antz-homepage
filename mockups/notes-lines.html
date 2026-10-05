@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Note Description Lines</title>
+<!-- Observation Notes, the description at 3, 5 and 6 lines (owner, 5 Oct 2026:
+     "In the one view I want to see all card variations"). Each frame is the
+     live app at a phone's 390 width with ?notelines=N, scrolled to the notes
+     band, so the cards are the real ones, not a redraw. -->
+<style>
+  :root { --bg: #EFF5F2; --ink: #1F415B; --mute: #7A8684; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 40px; background: var(--bg); font: 14px/1.4 Inter, system-ui, sans-serif; color: var(--ink); }
+  h1 { margin: 0 0 4px; font-size: 20px; font-weight: 600; }
+  p.lead { margin: 0 0 20px; color: var(--mute); }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+  figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  figcaption { display: flex; align-items: baseline; gap: 8px; font-size: 15px; font-weight: 600; }
+  figcaption small { font-size: 12px; font-weight: 400; color: var(--mute); }
+  .phone { width: 390px; max-width: calc(100vw - 32px); height: 720px; border-radius: 28px; overflow: hidden; background: #fff; box-shadow: 0 0 0 8px #1C1B1F, 0 18px 40px rgba(16, 45, 52, .25); }
+  iframe { display: block; width: 390px; height: 100%; border: 0; }
+  a { color: #006D35; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Observation Notes — description lines</h1>
+<p class="lead">The same cards at 3, 5 and 6 lines, at a phone's 390 width. Swipe the rail inside a frame to see the other notes.</p>
+<div class="row">
+  <figure><figcaption>3 lines <small>now</small></figcaption><div class="phone"><iframe data-n="3" title="3 lines"></iframe></div><a href="../index.html?v=2&notelines=3" target="_blank">open alone</a></figure>
+  <figure><figcaption>5 lines</figcaption><div class="phone"><iframe data-n="5" title="5 lines"></iframe></div><a href="../index.html?v=2&notelines=5" target="_blank">open alone</a></figure>
+  <figure><figcaption>6 lines</figcaption><div class="phone"><iframe data-n="6" title="6 lines"></iframe></div><a href="../index.html?v=2&notelines=6" target="_blank">open alone</a></figure>
+</div>
+<script>
+  for (const f of document.querySelectorAll('iframe')) {
+    f.src = `../index.html?v=2&notelines=${f.dataset.n}`
+    /* once the app has built the band, bring it to the top of the frame, under the sticky bar */
+    f.addEventListener('load', () => {
+      let tries = 0
+      const go = () => {
+        const w = f.contentWindow, d = w.document, band = d.querySelector('.obs-band')
+        if (!band || !band.offsetHeight) { if (tries++ < 40) setTimeout(go, 150); return }
+        /* the floating dock and Top button sit over the cards in a short frame:
+           anything fixed to the lower half of the frame is put away */
+        for (const e of d.body.querySelectorAll('*')) {
+          const cs = w.getComputedStyle(e)
+          if (cs.position === 'fixed' && e.getBoundingClientRect().top > w.innerHeight / 2) e.style.setProperty('display', 'none', 'important')
+        }
+        w.scrollTo(0, band.getBoundingClientRect().top + w.scrollY - 140)
+      }
+      /* again once late images and the deck have settled, so all three frames land alike */
+      go(); setTimeout(go, 1500); setTimeout(go, 3000)
+    })
+  }
+</script>
+</body>
+</html>
