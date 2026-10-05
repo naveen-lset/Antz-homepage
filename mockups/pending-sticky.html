@@ -5,35 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pending Actions · sticky note variations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* MOCKUP ONLY (5 Oct 2026) — not loaded by the app. Six ways to draw V2's
-   Pending Actions as ONE sticky note with line items, after the owner's
-   reference, each drawn AS the card in its real slot of the home grid
-   (owner: "it has to match inside these containers"). The slot sizes and
-   the grids around them are measured off the app at 1024, 744 and 390:
+/* MOCKUP ONLY (5 Oct 2026) — not loaded by the app. V2's Pending Actions as
+   ONE sticky note with line items, drawn AS the card in its real slot of
+   the home grid, measured off the app:
      1024 · 5 cols of 179, rows 203, gap 16 → the card is 374 × 640
      744  · 4 cols of 162, rows 144, gap 16 → the card is 340 × 464
      390  · 2 cols of 173, rows 115, gap 12 → the card is 358 × 243
-   The note IS the card: the grid's 12px corners, edge to edge, nothing
-   tilted out of it; tape, pin and curl stay inside. Rows size themselves
-   off the card's height (container queries), so the phone's 243 holds all
-   five jobs. Counts: the home's own, All sites. */
-:root { --ink: #3A2F1A; --ink-soft: #6B5D45; --rule: rgba(58, 47, 26, .15); --red: #C2412D; --page: #EFF5F2; }
+   Round 3 (owner, same day: "it's pending, so use Error / Tertiary colours;
+   add Transfer pending; remove the lines; some other way to tell the rows
+   apart"): every paper is from MD3_Antz Error (#E93353) and Tertiary
+   (#FA6140) — washes, containers, and two solid ones in white ink; a sixth
+   job, Transfers; no ruled lines — the rows are told apart by one of four
+   row styles, switchable. Legal pad is gone: it was its lines. */
+:root { --page: #EFF5F2; --err: #E93353; --ter: #FA6140; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--page); color: #1F415B; font: 14px/1.4 Inter, system-ui, sans-serif; }
 .wrap { max-width: 1240px; margin: 0 auto; padding: 32px 16px 72px; }
 h1 { margin: 0 0 6px; font-size: 24px; font-weight: 600; }
 h2 { margin: 44px 0 6px; font-size: 18px; font-weight: 600; }
-.lede { margin: 0 0 20px; max-width: 820px; color: #44544A; }
+.lede { margin: 0 0 16px; max-width: 840px; color: #44544A; }
 .lede b { color: #1F415B; }
-/* the picker */
-.pick { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; background: var(--page); }
-.pick button { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: rgba(0, 0, 0, .05); font: inherit; font-weight: 500; color: #44544A; cursor: pointer; }
-.pick button b { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 0, 0, .08); font-size: 12px; }
-.pick button[aria-pressed='true'] { background: #1F415B; color: #fff; }
-.pick button[aria-pressed='true'] b { background: rgba(255, 255, 255, .2); }
-.premise { margin: 4px 0 20px; max-width: 820px; color: #44544A; min-height: 40px; }
+/* the switches */
+.bar { position: sticky; top: 0; z-index: 5; padding: 10px 0 8px; background: var(--page); display: flex; flex-direction: column; gap: 8px; }
+.sw { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.sw > span { width: 92px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #7A8684; }
+.sw button { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 0; border-radius: 10px; background: rgba(0, 0, 0, .05); font: inherit; font-size: 13px; font-weight: 500; color: #44544A; cursor: pointer; }
+.sw button b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: rgba(0, 0, 0, .08); font-size: 11px; }
+.sw button i { width: 22px; height: 22px; margin-left: -6px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08); }
+.sw button[aria-pressed='true'] { background: #1F415B; color: #fff; }
+.sw button[aria-pressed='true'] b { background: rgba(255, 255, 255, .2); }
+.premise { margin: 8px 0 18px; max-width: 840px; color: #44544A; min-height: 40px; }
 .premise b { color: #1F415B; }
 /* the three screens */
 .screens { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
@@ -45,116 +48,120 @@ h2 { margin: 44px 0 6px; font-size: 18px; font-weight: 600; }
 .g--1024 { grid-template-columns: repeat(5, 179px); grid-auto-rows: 203px; gap: 16px; }
 .g--744  { grid-template-columns: repeat(4, 162px); grid-auto-rows: 144px; gap: 16px; }
 .g--390  { grid-template-columns: repeat(2, 173px); grid-auto-rows: 115px; gap: 12px; }
-/* the neighbours: the home's tiles, near enough to judge the note among them */
 .t { position: relative; border-radius: 12px; overflow: hidden; color: #fff; font-size: 15px; font-weight: 500; display: flex; align-items: flex-end; padding: 14px; background-size: cover; background-position: center; }
 .t::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.28)); }
 .t span { position: relative; }
-.t--med  { background-image: linear-gradient(135deg, #7DB892, #3E8E5C); }
-.t--hou  { background-image: linear-gradient(135deg, #7F9BA3, #4E6E79); }
-.t--adm  { background-image: linear-gradient(135deg, #B4C2B9, #95A79C); }
-.t--mor  { background-image: linear-gradient(135deg, #F2A48F, #E9806A); }
-.t--usr  { background-image: linear-gradient(135deg, #46636F, #2F4A56); }
-.t--sec  { background-image: linear-gradient(135deg, #9AA3A0, #7B8784); }
-.t--egg  { background-image: linear-gradient(135deg, #7FD3E6, #4EB5D2); }
-.t--ani  { background-image: linear-gradient(135deg, #F0A27E, #E7806A); }
-.t--sp   { background-image: url('../assets/img/species-cheetahs.jpg'); }
-.t--hos  { background-image: url('../assets/img/hospital.jpg'); }
-.t--diet { background-image: url('../assets/img/diet-kitchen.jpg'); }
+.t--med { background-image: linear-gradient(135deg, #7DB892, #3E8E5C); } .t--hou { background-image: linear-gradient(135deg, #7F9BA3, #4E6E79); }
+.t--adm { background-image: linear-gradient(135deg, #B4C2B9, #95A79C); } .t--mor { background-image: linear-gradient(135deg, #F2A48F, #E9806A); }
+.t--usr { background-image: linear-gradient(135deg, #46636F, #2F4A56); } .t--sec { background-image: linear-gradient(135deg, #9AA3A0, #7B8784); }
+.t--egg { background-image: linear-gradient(135deg, #7FD3E6, #4EB5D2); } .t--ani { background-image: linear-gradient(135deg, #F0A27E, #E7806A); }
+.t--sp { background-image: url('../assets/img/species-cheetahs.jpg'); } .t--hos { background-image: url('../assets/img/hospital.jpg'); } .t--diet { background-image: url('../assets/img/diet-kitchen.jpg'); }
+
+/* ══ PAPERS — Error and Tertiary only ═══════════════════════════════════ */
+body { --paper: linear-gradient(108deg, #FCE2E7 0%, #FEE9E4 100%); --paper2: #fff; --ink: #3B2420; --soft: #7A5048; --late: #D7263D; --tape: rgba(250, 97, 64, .28); --accent: #FA6140; --chip: rgba(255, 255, 255, .7); }
+body[data-paper='tc']   { --paper: linear-gradient(180deg, #FFE6DC 0%, #FFD6C7 100%); --paper2: #FFF4EF; --tape: rgba(255, 255, 255, .7); --accent: #FA6140; }
+body[data-paper='ec']   { --paper: linear-gradient(180deg, #FFE8E8 0%, #FFD3D3 100%); --paper2: #FFF3F3; --tape: rgba(255, 255, 255, .7); --accent: #E93353; }
+body[data-paper='peach']{ --paper: linear-gradient(160deg, #FFF1EA 0%, #FFD9C8 100%); --paper2: #FFFFFF; --tape: rgba(233, 51, 83, .22); --accent: #FA6140; }
+body[data-paper='solid-t'] { --paper: linear-gradient(117deg, #FB9984 6%, #FA6140 94%); --paper2: rgba(255, 255, 255, .92); --ink: #fff; --soft: rgba(255, 255, 255, .85); --late: #fff; --tape: rgba(255, 255, 255, .35); --accent: #fff; --chip: rgba(255, 255, 255, .22); }
+body[data-paper='solid-e'] { --paper: linear-gradient(117deg, #FF6883 6%, #E93353 94%); --paper2: rgba(255, 255, 255, .92); --ink: #fff; --soft: rgba(255, 255, 255, .85); --late: #fff; --tape: rgba(255, 255, 255, .35); --accent: #fff; --chip: rgba(255, 255, 255, .22); }
 
 /* ══ THE NOTE — it is the card ══════════════════════════════════════════ */
-.pa { position: relative; container-type: size; border-radius: 12px; overflow: hidden; color: var(--ink); }
-.note { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 28px 20px 16px; }
+.pa { position: relative; container-type: size; border-radius: 12px; overflow: hidden; background: var(--paper); color: var(--ink); }
+.note { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 28px 18px 16px; }
 .note__head { flex: none; display: flex; align-items: center; gap: 9px; }
 .note__head h3 { margin: 0; font-size: clamp(19px, 3.8cqh, 24px); font-weight: 700; letter-spacing: -.01em; }
 .ico { flex: none; width: 21px; height: 21px; }
-.open { margin-left: auto; font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; }
+.open { margin-left: auto; font-size: 12.5px; color: var(--soft); white-space: nowrap; }
 .open b { font-size: 16px; color: var(--ink); font-weight: 700; }
-.rows { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; }
-/* the lines share the note's height: a taller card gets roomier lines and
-   a larger hand, never blank paper under the list */
-.rows { flex: 1 1 auto; min-height: 0; }
-.row { flex: 1 1 0; display: flex; align-items: center; gap: 11px; min-height: 28px; max-height: 96px; border-bottom: 1px solid var(--rule); cursor: pointer; }
-.row:hover { background: rgba(255, 255, 255, .28); }
-.box { flex: none; width: 15px; height: 15px; border: 1.6px solid rgba(58, 47, 26, .5); border-radius: 3px; }
-.row__t { flex: 1; min-width: 0; font-size: clamp(15px, 3.1cqh, 19px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.row__n { font-weight: 700; font-size: clamp(15.5px, 3.4cqh, 21px); font-variant-numeric: tabular-nums; }
-.tag { font-size: 9.5px; font-weight: 700; letter-spacing: .08em; color: var(--red); }
-.late .row__n { color: var(--red); }
-.rule { flex: none; height: 2px; margin-top: 14px; background: #E8A890; border-radius: 1px; }
-/* tape, pin and curl — inside the card's edges */
-.tape { position: absolute; top: 0; left: 50%; width: 112px; height: 20px; transform: translateX(-50%); background: rgba(140, 200, 184, .75); }
-.pin { position: absolute; top: 9px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #F08A7A, #C9483A 70%); box-shadow: 0 2px 3px rgba(0, 0, 0, .25); }
+.rows { flex: 1 1 auto; min-height: 0; list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.row { position: relative; flex: 1 1 0; display: flex; align-items: center; gap: 10px; min-height: 28px; max-height: 84px; padding: 0 12px; border-radius: 10px; cursor: pointer; transition: transform .15s ease; }
+.row:active { transform: scale(.98); }
+.box { flex: none; width: 15px; height: 15px; border: 1.6px solid currentColor; border-radius: 4px; opacity: .55; }
+.row__t { flex: 1; min-width: 0; font-size: clamp(14.5px, 3cqh, 18px); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row__n { font-weight: 700; font-size: clamp(15px, 3.3cqh, 20px); font-variant-numeric: tabular-nums; }
+.row__s { font-size: 9.5px; font-weight: 600; letter-spacing: .04em; color: var(--soft); text-transform: uppercase; }
+.tag { padding: 2px 6px; border-radius: 4px; background: var(--late); color: #fff; font-size: 9.5px; font-weight: 700; letter-spacing: .06em; }
+body[data-paper^='solid'] .tag { background: #fff; color: #E93353; }
+.late .row__n { color: var(--late); }
+.tape { position: absolute; top: 0; left: 50%; width: 108px; height: 20px; transform: translateX(-50%); background: var(--tape); }
+.pin { position: absolute; top: 9px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #FFD3D3 30%, #E93353 75%); box-shadow: 0 2px 3px rgba(0, 0, 0, .25); }
 .curl { position: absolute; right: 0; bottom: 0; width: 30px; height: 30px; background: linear-gradient(135deg, rgba(0,0,0,0) 50%, rgba(0,0,0,.07) 50%, rgba(255,255,255,.6) 64%); border-top-left-radius: 6px; }
 
-/* the phone's 243: the same note, tighter */
+/* ══ ROW STYLES — how rows are told apart without lines ═════════════════ */
+/* soft tiles: each job on its own tile */
+body[data-rows='pill'] .row { background: var(--chip); }
+/* alternate bands: every other job on a band of tint */
+body[data-rows='zebra'] .rows { gap: 0; }
+body[data-rows='zebra'] .row:nth-child(odd) { background: var(--chip); }
+/* count chips: no band at all — the count wears a chip, overdue ones solid */
+body[data-rows='chip'] .row { padding: 0 2px; }
+body[data-rows='chip'] .row__n { min-width: 64px; padding: 3px 10px; border-radius: 999px; background: var(--chip); text-align: center; }
+body[data-rows='chip'] .late .row__n { background: var(--late); color: #fff; }
+body[data-paper^='solid'][data-rows='chip'] .late .row__n { background: #fff; color: #E93353; }
+/* side stripe: a coloured bar leads each job — its area's colour */
+body[data-rows='stripe'] .row { padding-left: 16px; background: none; }
+body[data-rows='stripe'] .row::before { content: ''; position: absolute; left: 0; top: 18%; bottom: 18%; width: 4px; border-radius: 2px; background: var(--c, var(--accent)); }
+body[data-rows='stripe'] .late::before { background: var(--late); }
+
+/* the phone's 243: the same note, the jobs in two columns */
 @container (max-height: 300px) {
-  .note { padding: 18px 14px 10px; }
+  .note { padding: 18px 12px 12px; }
   .note__head h3 { font-size: 15px; }
   .ico { width: 17px; height: 17px; }
   .open b { font-size: 14px; }
-  .rows { margin-top: 6px; flex: none; }
-  .row { flex: none; height: 34px; gap: 9px; }
-  .row__t { font-size: 13.5px; }
-  .row__n { font-size: 14px; }
-  .rule { margin-top: 8px; }
-  .tape { height: 12px; width: 90px; }
+  .rows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 6px; margin-top: 8px; }
+  .row { max-height: none; min-height: 0; padding: 0 8px; gap: 6px; }
+  .row__t { font-size: 12.5px; }
+  .row__n { font-size: 13.5px; }
+  .box, .tag, .row__s { display: none; }
+  .tape { height: 12px; width: 88px; }
   .pin { top: 5px; width: 11px; height: 11px; margin-left: -5.5px; }
-  .tag { display: none; }
+  body[data-rows='chip'] .row__n { min-width: 0; padding: 2px 7px; }
+  body[data-rows='zebra'] .rows { gap: 6px; }
+  body[data-rows='zebra'] .row { background: var(--chip); }
+  body[data-rows='stripe'] .row { padding-left: 10px; }
 }
 
-/* 1 · the reference */
-.v1 { background: linear-gradient(180deg, #FFF6C7 0%, #FBEDA3 100%); }
 /* 2 · overdue first */
-.v2 { background: linear-gradient(180deg, #FFE5E1 0%, #FFD4CD 100%); }
-.v2 .sep { flex: none; margin: 12px 0 0; padding-bottom: 5px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: var(--ink-soft); border-bottom: 1.5px dashed rgba(58, 47, 26, .25); }
+.v2 .sep { flex: none; margin: 14px 0 6px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: var(--soft); }
+.v2 .sep:first-of-type { color: var(--late); }
 .v2 .rows { margin-top: 0; }
-.v2 .rows--late { flex: 2 1 0; } .v2 .rows:not(.rows--late) { flex: 3 1 0; }
-@container (max-height: 300px) { .v2 .sep { display: none; } .v2 .rows--late { margin-top: 6px; } .v2 .rows--late .row:last-child { border-bottom: 1.5px dashed rgba(58, 47, 26, .3); } }
+.v2 .rows--late { flex: 2 1 0; } .v2 .rows--todo { flex: 4 1 0; }
+.v2 .rows--all { display: none; }
+@container (max-height: 300px) {
+  .v2 .rows--late, .v2 .rows--todo, .v2 .sep { display: none; }
+  .v2 .rows--all { display: grid; margin-top: 8px; }
+}
 /* 3 · share bars */
-.v3 { background: linear-gradient(180deg, #DFF5E5 0%, #CDEDD6 100%); }
-.v3 .tape { background: rgba(246, 204, 128, .78); }
 .v3 .row { flex-wrap: wrap; align-content: center; row-gap: 5px; }
-.v3 .bar { flex-basis: 100%; height: 5px; margin-left: 26px; border-radius: 3px; background: rgba(58, 47, 26, .08); overflow: hidden; }
-.v3 .bar i { display: block; height: 100%; border-radius: 3px; background: #4E8A72; }
-.v3 .late .bar i { background: var(--red); }
-.v3 .row { min-height: 34px; }
-@container (max-height: 300px) { .v3 .row { flex: none; height: 37px; row-gap: 3px; } .v3 .bar { height: 3px; margin-left: 24px; } .v3 .note { padding-bottom: 6px; } }
-/* 4 · two notes: backlog, and the overdue two on a note stuck over its corner */
-.v4 { background: linear-gradient(180deg, #FFF6C7 0%, #FBEDA3 100%); }
-.v4 .over { position: absolute; right: 12px; bottom: 12px; width: 62%; padding: 20px 14px 8px; background: linear-gradient(180deg, #FFDCD5, #FFCBC2); border-radius: 4px; box-shadow: 0 1px 1px rgba(0,0,0,.06), 0 8px 16px -8px rgba(80, 40, 20, .4); transform: rotate(-1.5deg); }
-.v4 .note { padding-bottom: calc(12px + 38% ); }
-.v4 .over .rows { flex: none; } .v4 .over .row { flex: none; }
-.v4 .over h4 { margin: 0 0 4px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: var(--red); }
-.v4 .over .row { height: 38px; }
+.v3 .bar { flex-basis: 100%; height: 5px; margin-left: 25px; border-radius: 3px; background: rgba(0, 0, 0, .07); overflow: hidden; }
+body[data-paper^='solid'] .v3 .bar { background: rgba(255, 255, 255, .25); }
+.v3 .bar i { display: block; height: 100%; border-radius: 3px; background: var(--accent); }
+.v3 .late .bar i { background: var(--late); }
+@container (max-height: 300px) { .v3 .bar { margin-left: 0; height: 3px; } .v3 .row { row-gap: 3px; } }
+/* 4 · two notes */
+.v4 .note { padding-bottom: calc(12px + 36%); }
+.v4 .over { position: absolute; right: 12px; bottom: 12px; width: 64%; padding: 20px 12px 10px; background: var(--paper2); color: #3B2420; border-radius: 6px; box-shadow: 0 1px 1px rgba(0,0,0,.06), 0 8px 16px -8px rgba(80, 30, 20, .45); transform: rotate(-1.5deg); }
+.v4 .over h4 { margin: 0 0 6px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: #D7263D; }
+.v4 .over .rows { flex: none; margin: 0; gap: 4px; }
+.v4 .over .row { flex: none; height: 36px; background: rgba(233, 51, 83, .08); }
+.v4 .over .row__n { color: #D7263D; }
 .v4 .over .row__t { font-size: 14px; }
 @container (max-height: 300px) {
-  .v4 .note { right: 46%; padding-bottom: 10px; }
-  .v4 .over { top: 14px; right: 12px; bottom: 14px; width: calc(46% - 14px); padding: 18px 10px 6px; transform: rotate(1.2deg); }
-  .v4 .over .row { height: 30px; }
-  .v4 .over .row__t { font-size: 12.5px; }
-  .v4 .note .row__t { font-size: 13px; }
+  .v4 .note { right: 46%; padding-bottom: 12px; }
+  .v4 .note .rows { grid-template-columns: 1fr; }
+  .v4 .over { top: 14px; right: 12px; bottom: 14px; width: calc(46% - 14px); padding: 18px 8px 6px; transform: rotate(1.2deg); }
+  .v4 .over .rows { display: flex; }
+  .v4 .over .row { height: 34px; }
+  .v4 .over .row__t { font-size: 12px; }
 }
-/* 5 · legal pad, filled in by hand */
-.v5 { background: #FFF4B5; }
-.v5 .note { padding-left: 50px; }
-.v5 .note::before { content: ''; position: absolute; top: 0; bottom: 0; left: 38px; width: 1.5px; background: rgba(214, 90, 80, .55); }
-.v5 .perf { position: absolute; top: 0; left: 0; right: 0; height: 14px; background: #ECDB8C; border-bottom: 2px dotted rgba(58, 47, 26, .22); }
-.v5 .rows .row { border-bottom: 1px solid rgba(80, 130, 190, .35); }
-.v5 .row__n { font-family: Caveat, cursive; font-size: clamp(24px, 5cqh, 32px); font-weight: 700; color: #2B4C8C; line-height: 1; }
-.v5 .late .row__n { color: var(--red); }
-.v5 .box { border-radius: 50%; }
-.v5 .fill { flex: 1; background-image: repeating-linear-gradient(180deg, transparent 0 calc(clamp(28px, 9.6cqh, 56px) - 1px), rgba(80, 130, 190, .35) calc(clamp(28px, 9.6cqh, 56px) - 1px) clamp(28px, 9.6cqh, 56px)); }
-@container (max-height: 300px) { .v5 .note { padding-left: 40px; } .v5 .note::before { left: 30px; } .v5 .perf { height: 9px; } .v5 .row__n { font-size: 21px; } .v5 .fill { background-image: none; } }
-/* 6 · index tabs: the total leads, colour says the area */
-.v6 { background: linear-gradient(180deg, #ECE6FF 0%, #E0D8FA 100%); }
-.v6 .note { padding-right: 34px; }
-.v6 .row { position: relative; }
-.v6 .row::after { content: ''; position: absolute; right: -34px; top: 18%; bottom: 18%; width: 12px; border-radius: 6px 0 0 6px; background: var(--c); }
-.v6 .big { flex: none; margin: 6px 0 0; font-size: clamp(26px, 7.4cqh, 46px); font-weight: 700; line-height: 1.05; letter-spacing: -.02em; }
-.v6 .big small { font-size: 13px; font-weight: 500; color: var(--ink-soft); letter-spacing: 0; }
-.v6 .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
-.v6 .open { display: none; }
-@container (max-height: 300px) { .v6 .big { display: none; } .v6 .open { display: inline; } .v6 .note { padding-right: 24px; } .v6 .row::after { right: -24px; width: 9px; } }
+/* 5 · index tabs */
+.v5 .note { padding-right: 32px; }
+.v5 .row::after { content: ''; position: absolute; right: -32px; top: 16%; bottom: 16%; width: 12px; border-radius: 6px 0 0 6px; background: var(--c); }
+.v5 .big { flex: none; margin: 6px 0 0; font-size: clamp(26px, 7.4cqh, 46px); font-weight: 700; line-height: 1.05; letter-spacing: -.02em; }
+.v5 .big small { font-size: 13px; font-weight: 500; color: var(--soft); letter-spacing: 0; }
+.v5 .open { display: none; }
+@container (max-height: 300px) { .v5 .big { display: none; } .v5 .open { display: inline; } .v5 .note { padding-right: 22px; } .v5 .row::after { right: -22px; width: 8px; } }
 
 /* every note at the 744 slot, side by side */
 .all { display: flex; flex-wrap: wrap; gap: 24px; }
@@ -162,39 +169,19 @@ h2 { margin: 44px 0 6px; font-size: 18px; font-weight: 600; }
 .all figcaption { font-size: 13px; font-weight: 600; color: #44544A; }
 .all .pa { width: 340px; height: 464px; cursor: pointer; }
 .all .pa.is-on { outline: 3px solid #1F415B; outline-offset: 4px; }
-/* PAPER COLOURS (owner, 5 Oct 2026: "colour I'm not liking"): one switch
-   for every version — the note's paper, its second note, tape and accent —
-   each taken from the app's own palette. "As drawn" keeps each version's
-   own colours. */
-.paper { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 6px; }
-.paper > span { font-size: 13px; font-weight: 600; color: #44544A; margin-right: 4px; }
-.paper button { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 6px; border: 0; border-radius: 10px; background: rgba(0,0,0,.05); font: inherit; font-size: 13px; color: #44544A; cursor: pointer; }
-.paper button i { width: 24px; height: 24px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
-.paper button[aria-pressed='true'] { background: #1F415B; color: #fff; }
-body[data-paper] .pa { background: var(--p1) !important; }
-body[data-paper] .pa .v4x, body[data-paper] .v4 .over { background: var(--p2) !important; }
-body[data-paper] .tape { background: var(--tape) !important; }
-body[data-paper] .rule { background: var(--acc) !important; }
-body[data-paper] .v3 .bar i { background: var(--bar) !important; }
-body[data-paper] .v3 .late .bar i { background: var(--red) !important; }
-body[data-paper] .v5 .note::before { background: var(--acc) !important; }
-body[data-paper] .v5 .perf { background: color-mix(in srgb, var(--p1) 80%, #000 6%) !important; }
-body[data-paper='mint']  { --p1: linear-gradient(180deg, #EEF8F3 0%, #E1F1E8 100%); --p2: linear-gradient(180deg, #FFE9E4, #FFDCD5); --tape: rgba(255,255,255,.75); --acc: #8CC7AA; --bar: #3E8E5C; }
-body[data-paper='white'] { --p1: linear-gradient(180deg, #FFFFFF 0%, #F7F9F8 100%); --p2: linear-gradient(180deg, #FFF1EE, #FFE6E0); --tape: rgba(0,175,214,.22); --acc: #C9D6D0; --bar: #1F415B; }
-body[data-paper='cream'] { --p1: linear-gradient(180deg, #FFFCF3 0%, #FBF4E2 100%); --p2: linear-gradient(180deg, #FFEDE6, #FDE1D7); --tape: rgba(140,200,184,.55); --acc: #E3CFA6; --bar: #8A6D3B; }
-body[data-paper='sky']   { --p1: linear-gradient(180deg, #EEF7FC 0%, #E1EFF8 100%); --p2: linear-gradient(180deg, #FFE9E4, #FFDCD5); --tape: rgba(255,255,255,.8); --acc: #9CC6DE; --bar: #3F7FA6; }
-body[data-paper='teal']  { --p1: linear-gradient(180deg, #E9F7F6 0%, #D9F1EF 100%); --p2: linear-gradient(180deg, #FFE9E4, #FFDCD5); --tape: rgba(255,255,255,.75); --acc: #7FCFC9; --bar: #24BAB2; }
-body[data-paper='sage']  { --p1: linear-gradient(180deg, #F1F4F1 0%, #E4EAE5 100%); --p2: linear-gradient(180deg, #FBEAE5, #F6DDD6); --tape: rgba(255,255,255,.7); --acc: #B4C2B9; --bar: #5E7A69; }
-.foot { margin-top: 40px; color: #44544A; font-size: 13px; max-width: 820px; }
+.foot { margin-top: 40px; color: #44544A; font-size: 13px; max-width: 840px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Pending Actions · sticky note</h1>
-  <p class="lede">The corkboard becomes <b>one sticky note with a ruled list</b>, and the note <b>is the card</b>: it fills Pending Actions’ own slot on the home grid, with the grid’s 12px corners, and nothing hangs outside it. Each version is drawn at the three sizes the slot really has: <b>744</b> (340 × 464, your screenshot), <b>1024</b> (374 × 640) and the <b>phone</b> (358 × 243, so the rows tighten). Five jobs, today’s counts for All sites. In every version, <b>tapping a row opens that job’s page</b>, as the pinned notes do now.</p>
+  <p class="lede">One sticky note that <b>is the card</b>, in Pending Actions’ real slot at <b>744</b> (340 × 464), <b>1024</b> (374 × 640) and the <b>phone</b> (358 × 243, where the six jobs go into two columns). This round: the papers are all from the app’s <b>Error</b> and <b>Tertiary</b> colours, <b>Transfers</b> is the sixth job, and there are <b>no ruled lines</b>; the rows are told apart by a row style instead. Pick a version, a paper and a row style. In every version, <b>tapping a row opens that job’s page</b>.</p>
 
-  <div class="pick" id="pick" role="group" aria-label="Version"></div>
-  <div class="paper" id="paper" role="group" aria-label="Paper colour"><span>Paper colour</span></div>
+  <div class="bar">
+    <div class="sw" id="pick" role="group" aria-label="Version"><span>Version</span></div>
+    <div class="sw" id="paper" role="group" aria-label="Paper"><span>Paper</span></div>
+    <div class="sw" id="rowsw" role="group" aria-label="Row style"><span>Rows</span></div>
+  </div>
   <p class="premise" id="premise"></p>
 
   <div class="screens">
@@ -206,11 +193,11 @@ body[data-paper='sage']  { --p1: linear-gradient(180deg, #F1F4F1 0%, #E4EAE5 100
       <div class="frame"><div class="g g--1024" id="g1024"></div></div></div>
   </div>
 
-  <h2>All six at the 744 slot</h2>
-  <p class="lede">Tap one to see it in the grids above.</p>
+  <h2>All five at the 744 slot</h2>
+  <p class="lede">In the paper and row style chosen above. Tap one to see it in the grids.</p>
   <div class="all" id="all"></div>
 
-  <p class="foot">Mockup only, not in the app. Pick one (or a mix, e.g. 1’s look with 2’s overdue-first order) and it replaces the corkboard on V2’s home, at all three sizes as drawn here. Counts follow the site chips, as they do now.</p>
+  <p class="foot">Mockup only, not in the app. <b>Transfers · 16 is sample data</b>: the database has the year’s completed transfers (16, at Crimson Frosted and Clearspring) but no table of pending ones. The other five counts are today’s, All sites; on the home they follow the site chips.</p>
 </div>
 
 <script>
@@ -218,32 +205,39 @@ const JOBS = [
   { t: 'Sexing', n: 28532, c: '#7FC7A0' },
   { t: 'Microchipping', n: 20302, c: '#7FC7A0' },
   { t: 'Necropsy reports', n: 14296, c: '#F2B66B' },
-  { t: 'Deworming', n: 319, late: true, c: '#E8806F' },
-  { t: 'Vaccinations', n: 143, late: true, c: '#E8806F' },
+  { t: 'Transfers', n: 16, c: '#7FB7D6', sample: true },
+  { t: 'Deworming', n: 319, late: true, c: '#E93353' },
+  { t: 'Vaccinations', n: 143, late: true, c: '#E93353' },
 ]
 const TOTAL = JOBS.reduce((a, j) => a + j.n, 0)
 const LATE = JOBS.filter((j) => j.late), TODO = JOBS.filter((j) => !j.late)
+const ORDERED = [...LATE, ...TODO]
 const f = (n) => n.toLocaleString('en-IN')
 const HEART = '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.2.3.6.3.8 0 .7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.2C19.5 16.4 12 21 12 21zm-4.6-9h2.2l1-2.2 1.9 4.4 1.2-2.2h2.9v-1.4h-3.7l-.5 1-1.9-4.4-1.8 3.4H7.4z"/></svg>'
-const row = (j, { tag = false, extra = '', lead = '<span class="box"></span>' } = {}) =>
-  `<li class="row${j.late ? ' late' : ''}">${lead}<span class="row__t">${j.t}</span>${tag && j.late ? '<span class="tag">OVERDUE</span>' : ''}${extra}<span class="row__n">${f(j.n)}</span></li>`
-const head = (open = true) => `<div class="note__head">${HEART}<h3>Pending</h3>${open ? `<span class="open"><b>${f(TOTAL)}</b> open</span>` : ''}</div>`
+const row = (j, { tag = false, after = '', lead = '<span class="box"></span>' } = {}) =>
+  `<li class="row${j.late ? ' late' : ''}" style="--c:${j.c}">${lead}<span class="row__t">${j.t}</span>${j.sample ? '<span class="row__s">sample</span>' : ''}${tag && j.late ? '<span class="tag">OVERDUE</span>' : ''}<span class="row__n">${f(j.n)}</span>${after}</li>`
+const head = () => `<div class="note__head">${HEART}<h3>Pending</h3><span class="open"><b>${f(TOTAL)}</b> open</span></div>`
 
 const V = [
-  { name: 'The reference', premise: '<b>Your screenshot, as drawn.</b> Pale yellow, a strip of mint tape on the top edge, a red rule under the head, checkbox · job · count on ruled lines, the corner curling up. Overdue jobs say “OVERDUE” beside a red count.',
-    note: () => `<div class="note"><span class="tape"></span>${head()}<div class="rule"></div><ul class="rows">${JOBS.map((j) => row(j, { tag: true })).join('')}</ul></div><span class="curl"></span>`, cls: 'v1' },
-  { name: 'Overdue first', premise: '<b>What is late is read first.</b> A blush note, pinned. Deworming and Vaccinations on top in red under “OVERDUE”; the backlog under “TO DO”. On the phone the two headings go and a dashed line keeps them apart.',
-    note: () => `<div class="note"><span class="pin"></span>${head()}<div class="sep">OVERDUE</div><ul class="rows rows--late">${LATE.map((j) => row(j)).join('')}</ul><div class="sep">TO DO</div><ul class="rows">${TODO.map((j) => row(j)).join('')}</ul></div>`, cls: 'v2' },
-  { name: 'Share bars', premise: '<b>How big each job is, at a glance.</b> A mint note. Under each line a thin bar shows its share of the 63,592; overdue bars are red. Sexing’s 45% is plain before a number is read.',
-    note: () => `<div class="note"><span class="tape"></span>${head()}<ul class="rows">${JOBS.map((j) => row(j, { extra: '' }).replace('</li>', `<span class="bar"><i style="width:${Math.max(1.5, j.n / TOTAL * 100).toFixed(1)}%"></i></span></li>`)).join('')}</ul></div>`, cls: 'v3' },
-  { name: 'Two notes', premise: '<b>Backlog and overdue are different work.</b> The yellow note lists the backlog; a small pink note stuck on its lower corner holds only the overdue two (462). On the phone the pink note sits beside the list.',
-    note: () => `<div class="note"><span class="tape"></span>${head()}<div class="rule"></div><ul class="rows">${TODO.map((j) => row(j)).join('')}</ul></div>` +
-      `<div class="over"><span class="pin"></span><h4>OVERDUE · ${f(LATE.reduce((a, j) => a + j.n, 0))}</h4><ul class="rows" style="margin:0">${LATE.map((j) => row(j)).join('')}</ul></div>`, cls: 'v4' },
-  { name: 'Legal pad', premise: '<b>A keeper’s pad, filled in by hand.</b> Yellow legal paper torn at the top, blue rules carried down the empty part of the page, the red margin; the counts written in pen, red when overdue.',
-    note: () => `<span class="perf"></span><div class="note">${head()}<ul class="rows">${JOBS.map((j) => row(j, { lead: '<span class="box"></span>' })).join('')}</ul></div>`, cls: 'v5' },
-  { name: 'Index tabs', premise: '<b>The total leads; colour says the area.</b> A lilac note with 63,592 big at the top, each line keyed by a dot matching a tab on the note’s right edge (records green, post-mortem amber, medical red). On the phone the total moves into the head.',
-    note: () => `<div class="note">${head(true)}<div class="big">${f(TOTAL)} <small>open</small></div><ul class="rows">${JOBS.map((j) => row(j, { tag: true, lead: `<span class="dot" style="background:${j.c}"></span>` }).replace('<li class="row', `<li style="--c:${j.c}" class="row`)).join('')}</ul></div>`, cls: 'v6' },
+  { name: 'The reference', cls: 'v1', premise: '<b>Your screenshot’s layout.</b> Tape on the top edge, the heart-pulse head with the open total, then checkbox · job · count for all six, the corner curling up. Overdue jobs carry a solid OVERDUE tag and a red count.',
+    note: () => `<div class="note"><span class="tape"></span>${head()}<ul class="rows">${JOBS.map((j) => row(j, { tag: true })).join('')}</ul></div><span class="curl"></span>` },
+  { name: 'Overdue first', cls: 'v2', premise: '<b>What is late is read first.</b> Pinned. Deworming and Vaccinations on top under “OVERDUE”, the four others under “TO DO”. On the phone the headings go and the overdue two lead the grid.',
+    note: () => `<div class="note"><span class="pin"></span>${head()}<div class="sep">OVERDUE</div><ul class="rows rows--late">${LATE.map((j) => row(j)).join('')}</ul><div class="sep">TO DO</div><ul class="rows rows--todo">${TODO.map((j) => row(j)).join('')}</ul><ul class="rows rows--all">${ORDERED.map((j) => row(j)).join('')}</ul></div>` },
+  { name: 'Share bars', cls: 'v3', premise: '<b>How big each job is, at a glance.</b> Under each job a thin bar shows its share of the open total; overdue bars are red. Sexing’s 45% is plain before a number is read.',
+    note: () => `<div class="note"><span class="tape"></span>${head()}<ul class="rows">${JOBS.map((j) => row(j, { after: `<span class="bar"><i style="width:${Math.max(1.5, j.n / TOTAL * 100).toFixed(1)}%"></i></span>` })).join('')}</ul></div>` },
+  { name: 'Two notes', cls: 'v4', premise: '<b>Backlog and overdue are different work.</b> The note lists the four backlog jobs; a small white note stuck on its lower corner holds only the overdue two (462). On the phone the small note sits beside the list.',
+    note: () => `<div class="note"><span class="tape"></span>${head()}<ul class="rows">${TODO.map((j) => row(j)).join('')}</ul></div>` +
+      `<div class="over"><span class="pin"></span><h4>OVERDUE · ${f(LATE.reduce((a, j) => a + j.n, 0))}</h4><ul class="rows">${LATE.map((j) => row(j)).join('')}</ul></div>` },
+  { name: 'Index tabs', cls: 'v5', premise: '<b>The total leads; colour says the area.</b> The open total big at the top, then each job keyed by a dot that matches a tab on the note’s right edge: records green, post-mortem amber, transfers blue, medical red. On the phone the total moves into the head.',
+    note: () => `<div class="note">${head()}<div class="big">${f(TOTAL)} <small>open</small></div><ul class="rows">${JOBS.map((j) => row(j, { tag: true, lead: `<span class="box" style="border-radius:50%;background:${j.c};border-color:${j.c};opacity:1;width:10px;height:10px"></span>` })).join('')}</ul></div>` },
 ]
+const PAPERS = [
+  ['', 'Error → Tertiary wash', 'linear-gradient(108deg,#FCE2E7,#FEE9E4)'],
+  ['tc', 'Tertiary container', '#FFD6C7'], ['ec', 'Error container', '#FFD3D3'], ['peach', 'Peach', 'linear-gradient(160deg,#FFF1EA,#FFD9C8)'],
+  ['solid-t', 'Tertiary solid', 'linear-gradient(117deg,#FB9984,#FA6140)'], ['solid-e', 'Error solid', 'linear-gradient(117deg,#FF6883,#E93353)'],
+]
+const ROWS = [['pill', 'Soft tiles'], ['zebra', 'Alternate bands'], ['chip', 'Count chips'], ['stripe', 'Side stripe']]
+
 const pa = (v, style = '') => `<div class="pa ${v.cls}"${style}>${v.note()}</div>`
 const T = (cls, name, style) => `<div class="t ${cls}" style="${style}"><span>${name}</span></div>`
 const GRIDS = {
@@ -257,31 +251,30 @@ const GRIDS = {
   g390: (v) => T('t--med', 'Medical', '') + T('t--hou', 'Housing', '') + T('t--sp', 'Species Management', 'grid-column:span 2') +
     T('t--hos', 'Hospital', 'grid-column:span 2') + pa(v, ' style="grid-column:span 2;grid-row:span 2"') + T('t--diet', 'Diet & Kitchen', 'grid-column:span 2'),
 }
-let at = 0
-try { at = Math.min(V.length - 1, Math.max(0, +localStorage.getItem('pa-mock') || 0)) } catch {}
-function show(i) {
-  at = i; try { localStorage.setItem('pa-mock', i) } catch {}
-  document.getElementById('pick').innerHTML = V.map((v, k) => `<button type="button" data-i="${k}" aria-pressed="${k === i}"><b>${k + 1}</b>${v.name}</button>`).join('')
-  document.getElementById('premise').innerHTML = V[i].premise
-  for (const id in GRIDS) document.getElementById(id).innerHTML = GRIDS[id](V[i])
-  document.querySelectorAll('.all .pa').forEach((p, k) => p.classList.toggle('is-on', k === i))
+const store = (k, v) => { try { localStorage.setItem(k, v) } catch {} }
+const load = (k) => { try { return localStorage.getItem(k) } catch { return null } }
+const S = { v: Math.min(V.length - 1, Math.max(0, +load('pa3-v') || 0)), p: load('pa3-p') ?? '', r: load('pa3-r') || 'pill' }
+if (!PAPERS.some(([k]) => k === S.p)) S.p = ''
+if (!ROWS.some(([k]) => k === S.r)) S.r = 'pill'
+
+const sw = (id, items, on) => { const el = document.getElementById(id), lab = el.querySelector('span').outerHTML
+  el.innerHTML = lab + items.map(([k, html]) => `<button type="button" data-k="${k}" aria-pressed="${k === on}">${html}</button>`).join('') }
+function draw() {
+  if (S.p) document.body.dataset.paper = S.p; else delete document.body.dataset.paper
+  document.body.dataset.rows = S.r
+  sw('pick', V.map((v, k) => [String(k), `<b>${k + 1}</b>${v.name}`]), String(S.v))
+  sw('paper', PAPERS.map(([k, n, c]) => [k, `<i style="background:${c}"></i>${n}`]), S.p)
+  sw('rowsw', ROWS.map(([k, n]) => [k, n]), S.r)
+  document.getElementById('premise').innerHTML = V[S.v].premise
+  for (const id in GRIDS) document.getElementById(id).innerHTML = GRIDS[id](V[S.v])
+  document.getElementById('all').innerHTML = V.map((v, k) => `<figure><figcaption>${k + 1} · ${v.name}</figcaption>${pa(v, ` data-i="${k}"`).replace('class="pa', `class="pa${k === S.v ? ' is-on' : ''}`)}</figure>`).join('')
+  store('pa3-v', S.v); store('pa3-p', S.p); store('pa3-r', S.r)
 }
-document.getElementById('all').innerHTML = V.map((v, k) => `<figure><figcaption>${k + 1} · ${v.name}</figcaption>${pa(v, ` data-i="${k}"`)}</figure>`).join('')
-document.getElementById('pick').addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) show(+b.dataset.i) })
-document.getElementById('all').addEventListener('click', (e) => { const p = e.target.closest('.pa[data-i]'); if (p) { show(+p.dataset.i); scrollTo({ top: 0, behavior: 'smooth' }) } })
-show(at)
-const PAPERS = [['', 'As drawn', 'linear-gradient(135deg,#FCEFA8 0 33%,#FFD4CD 33% 66%,#CDEDD6 66%)'], ['mint', 'ANTZ mint', '#E1F1E8'], ['white', 'Clean white', '#FFFFFF'],
-  ['cream', 'Cream', '#FBF4E2'], ['sky', 'Sky', '#E1EFF8'], ['teal', 'Teal', '#D9F1EF'], ['sage', 'Sage grey', '#E4EAE5']]
-const paperBox = document.getElementById('paper')
-paperBox.insertAdjacentHTML('beforeend', PAPERS.map(([k, n, c]) => `<button type="button" data-p="${k}"><i style="background:${c}"></i>${n}</button>`).join(''))
-function paper(k) {
-  if (k) document.body.dataset.paper = k; else delete document.body.dataset.paper
-  paperBox.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.p === k)))
-  try { localStorage.setItem('pa-paper', k) } catch {}
-}
-paperBox.addEventListener('click', (e) => { const b = e.target.closest('[data-p]'); if (b) paper(b.dataset.p) })
-let p0 = ''; try { p0 = localStorage.getItem('pa-paper') || '' } catch {}
-paper(PAPERS.some(([k]) => k === p0) ? p0 : '')
+document.getElementById('pick').addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) { S.v = +b.dataset.k; draw() } })
+document.getElementById('paper').addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) { S.p = b.dataset.k; draw() } })
+document.getElementById('rowsw').addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) { S.r = b.dataset.k; draw() } })
+document.getElementById('all').addEventListener('click', (e) => { const p = e.target.closest('.pa[data-i]'); if (p) { S.v = +p.dataset.i; draw(); scrollTo({ top: 0, behavior: 'smooth' }) } })
+draw()
 </script>
 </body>
 </html>
