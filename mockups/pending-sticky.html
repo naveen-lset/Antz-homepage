@@ -5,137 +5,247 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pending Actions · sticky note variations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
 /* MOCKUP ONLY (5 Oct 2026) — not loaded by the app. Six ways to draw V2's
    Pending Actions as ONE sticky note with line items, after the owner's
-   reference (a yellow note, tape, a ruled list: checkbox · job · count).
-   Same five jobs and the live counts the home shows today (All sites). */
-:root {
-  --ink: #3A2F1A; --ink-soft: #6B5D45; --rule: rgba(58, 47, 26, .16); --red: #C2412D;
-  --page: #EFF5F2;
-}
+   reference, each drawn AS the card in its real slot of the home grid
+   (owner: "it has to match inside these containers"). The slot sizes and
+   the grids around them are measured off the app at 1024, 744 and 390:
+     1024 · 5 cols of 179, rows 203, gap 16 → the card is 374 × 640
+     744  · 4 cols of 162, rows 144, gap 16 → the card is 340 × 464
+     390  · 2 cols of 173, rows 115, gap 12 → the card is 358 × 243
+   The note IS the card: the grid's 12px corners, edge to edge, nothing
+   tilted out of it; tape, pin and curl stay inside. Rows size themselves
+   off the card's height (container queries), so the phone's 243 holds all
+   five jobs. Counts: the home's own, All sites. */
+:root { --ink: #3A2F1A; --ink-soft: #6B5D45; --rule: rgba(58, 47, 26, .15); --red: #C2412D; --page: #EFF5F2; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--page); color: #1F415B; font: 14px/1.4 Inter, system-ui, sans-serif; }
-.wrap { max-width: 1180px; margin: 0 auto; padding: 32px 16px 64px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 32px 16px 72px; }
 h1 { margin: 0 0 6px; font-size: 24px; font-weight: 600; }
-.lede { margin: 0 0 28px; max-width: 760px; color: #44544A; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 40px 28px; }
-.v { display: flex; flex-direction: column; gap: 14px; }
-.v__h { display: flex; align-items: baseline; gap: 8px; font-weight: 600; font-size: 15px; }
-.v__h span { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #1F415B; color: #fff; font-size: 12px; }
-.v__p { margin: 0; color: #44544A; font-size: 13px; }
-.v__p b { color: #1F415B; font-weight: 600; }
-/* the card's slot on the home grid at 1024 (Pending Actions, xtall) */
-.slot { position: relative; height: 470px; padding: 18px 14px; border-radius: 16px; background: #fff; box-shadow: 0 2px 10px rgba(76, 78, 100, .05); display: flex; align-items: center; justify-content: center; }
+h2 { margin: 44px 0 6px; font-size: 18px; font-weight: 600; }
+.lede { margin: 0 0 20px; max-width: 820px; color: #44544A; }
+.lede b { color: #1F415B; }
+/* the picker */
+.pick { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; background: var(--page); }
+.pick button { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: rgba(0, 0, 0, .05); font: inherit; font-weight: 500; color: #44544A; cursor: pointer; }
+.pick button b { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 0, 0, .08); font-size: 12px; }
+.pick button[aria-pressed='true'] { background: #1F415B; color: #fff; }
+.pick button[aria-pressed='true'] b { background: rgba(255, 255, 255, .2); }
+.premise { margin: 4px 0 20px; max-width: 820px; color: #44544A; min-height: 40px; }
+.premise b { color: #1F415B; }
+/* the three screens */
+.screens { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+.screen { display: flex; flex-direction: column; gap: 10px; }
+.screen__h { font-size: 13px; font-weight: 600; color: #44544A; }
+.screen__h small { font-weight: 400; color: #7A8684; }
+.frame { padding: 24px; border-radius: 20px; background: #fff; box-shadow: 0 2px 14px rgba(31, 65, 91, .06); overflow: hidden; }
+.g { display: grid; }
+.g--1024 { grid-template-columns: repeat(5, 179px); grid-auto-rows: 203px; gap: 16px; }
+.g--744  { grid-template-columns: repeat(4, 162px); grid-auto-rows: 144px; gap: 16px; }
+.g--390  { grid-template-columns: repeat(2, 173px); grid-auto-rows: 115px; gap: 12px; }
+/* the neighbours: the home's tiles, near enough to judge the note among them */
+.t { position: relative; border-radius: 12px; overflow: hidden; color: #fff; font-size: 15px; font-weight: 500; display: flex; align-items: flex-end; padding: 14px; background-size: cover; background-position: center; }
+.t::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.28)); }
+.t span { position: relative; }
+.t--med  { background-image: linear-gradient(135deg, #7DB892, #3E8E5C); }
+.t--hou  { background-image: linear-gradient(135deg, #7F9BA3, #4E6E79); }
+.t--adm  { background-image: linear-gradient(135deg, #B4C2B9, #95A79C); }
+.t--mor  { background-image: linear-gradient(135deg, #F2A48F, #E9806A); }
+.t--usr  { background-image: linear-gradient(135deg, #46636F, #2F4A56); }
+.t--sec  { background-image: linear-gradient(135deg, #9AA3A0, #7B8784); }
+.t--egg  { background-image: linear-gradient(135deg, #7FD3E6, #4EB5D2); }
+.t--ani  { background-image: linear-gradient(135deg, #F0A27E, #E7806A); }
+.t--sp   { background-image: url('../assets/img/species-cheetahs.jpg'); }
+.t--hos  { background-image: url('../assets/img/hospital.jpg'); }
+.t--diet { background-image: url('../assets/img/diet-kitchen.jpg'); }
 
-/* ── the note, shared ── */
-.note { position: relative; width: 100%; height: 100%; padding: 30px 22px 22px; color: var(--ink);
-  box-shadow: 0 1px 1px rgba(0,0,0,.06), 0 10px 22px -10px rgba(80, 60, 20, .35); display: flex; flex-direction: column; }
-.note__head { display: flex; align-items: center; gap: 10px; }
-.note__head h3 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
-.note__head .ico { width: 22px; height: 22px; flex: none; }
-.note__open { margin-left: auto; font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
-.note__open b { font-size: 17px; color: var(--ink); font-weight: 700; }
-.rows { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; }
-.row { display: flex; align-items: center; gap: 12px; min-height: 50px; border-bottom: 1px solid var(--rule); cursor: pointer; }
-.row:hover { background: rgba(255,255,255,.25); }
-.box { flex: none; width: 16px; height: 16px; border: 1.6px solid rgba(58,47,26,.55); border-radius: 3px; }
-.row__t { flex: 1; font-size: 15.5px; }
-.row__n { font-weight: 700; font-size: 16px; font-variant-numeric: tabular-nums; }
-.tag { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--red); }
-.fold { position: absolute; right: 0; bottom: 0; width: 34px; height: 34px; background: linear-gradient(135deg, rgba(0,0,0,0) 50%, rgba(0,0,0,.08) 50%, rgba(255,255,255,.55) 62%); border-top-left-radius: 6px; }
-.tape { position: absolute; top: -12px; left: 50%; width: 120px; height: 28px; transform: translateX(-50%) rotate(-1.5deg); background: rgba(150, 205, 190, .72); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
-.pin { position: absolute; top: -8px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #F08A7A, #C9483A 70%); box-shadow: 0 3px 4px rgba(0,0,0,.25); }
+/* ══ THE NOTE — it is the card ══════════════════════════════════════════ */
+.pa { position: relative; container-type: size; border-radius: 12px; overflow: hidden; color: var(--ink); }
+.note { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 28px 20px 16px; }
+.note__head { flex: none; display: flex; align-items: center; gap: 9px; }
+.note__head h3 { margin: 0; font-size: clamp(19px, 3.8cqh, 24px); font-weight: 700; letter-spacing: -.01em; }
+.ico { flex: none; width: 21px; height: 21px; }
+.open { margin-left: auto; font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; }
+.open b { font-size: 16px; color: var(--ink); font-weight: 700; }
+.rows { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; }
+/* the lines share the note's height: a taller card gets roomier lines and
+   a larger hand, never blank paper under the list */
+.rows { flex: 1 1 auto; min-height: 0; }
+.row { flex: 1 1 0; display: flex; align-items: center; gap: 11px; min-height: 28px; max-height: 96px; border-bottom: 1px solid var(--rule); cursor: pointer; }
+.row:hover { background: rgba(255, 255, 255, .28); }
+.box { flex: none; width: 15px; height: 15px; border: 1.6px solid rgba(58, 47, 26, .5); border-radius: 3px; }
+.row__t { flex: 1; min-width: 0; font-size: clamp(15px, 3.1cqh, 19px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row__n { font-weight: 700; font-size: clamp(15.5px, 3.4cqh, 21px); font-variant-numeric: tabular-nums; }
+.tag { font-size: 9.5px; font-weight: 700; letter-spacing: .08em; color: var(--red); }
+.late .row__n { color: var(--red); }
+.rule { flex: none; height: 2px; margin-top: 14px; background: #E8A890; border-radius: 1px; }
+/* tape, pin and curl — inside the card's edges */
+.tape { position: absolute; top: 0; left: 50%; width: 112px; height: 20px; transform: translateX(-50%); background: rgba(140, 200, 184, .75); }
+.pin { position: absolute; top: 9px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #F08A7A, #C9483A 70%); box-shadow: 0 2px 3px rgba(0, 0, 0, .25); }
+.curl { position: absolute; right: 0; bottom: 0; width: 30px; height: 30px; background: linear-gradient(135deg, rgba(0,0,0,0) 50%, rgba(0,0,0,.07) 50%, rgba(255,255,255,.6) 64%); border-top-left-radius: 6px; }
 
-/* 1 · the reference, faithful */
-.n1 { background: linear-gradient(180deg, #FFF6C7 0%, #FCEFA8 100%); transform: rotate(-.8deg); }
-.n1 .note__rule { height: 2px; margin-top: 16px; background: #E8A890; border-radius: 1px; }
+/* the phone's 243: the same note, tighter */
+@container (max-height: 300px) {
+  .note { padding: 18px 14px 10px; }
+  .note__head h3 { font-size: 15px; }
+  .ico { width: 17px; height: 17px; }
+  .open b { font-size: 14px; }
+  .rows { margin-top: 6px; flex: none; }
+  .row { flex: none; height: 34px; gap: 9px; }
+  .row__t { font-size: 13.5px; }
+  .row__n { font-size: 14px; }
+  .rule { margin-top: 8px; }
+  .tape { height: 12px; width: 90px; }
+  .pin { top: 5px; width: 11px; height: 11px; margin-left: -5.5px; }
+  .tag { display: none; }
+}
 
+/* 1 · the reference */
+.v1 { background: linear-gradient(180deg, #FFF6C7 0%, #FBEDA3 100%); }
 /* 2 · overdue first */
-.n2 { background: linear-gradient(180deg, #FFE3E0 0%, #FFD3CD 100%); transform: rotate(.6deg); }
-.n2 .row.is-late .row__t, .n2 .row.is-late .row__n { color: var(--red); }
-.n2 .sep { margin: 14px 0 2px; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--ink-soft); border-bottom: 1.5px dashed rgba(58,47,26,.25); padding-bottom: 6px; }
-.n2 .rows { margin-top: 6px; }
-
+.v2 { background: linear-gradient(180deg, #FFE5E1 0%, #FFD4CD 100%); }
+.v2 .sep { flex: none; margin: 12px 0 0; padding-bottom: 5px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: var(--ink-soft); border-bottom: 1.5px dashed rgba(58, 47, 26, .25); }
+.v2 .rows { margin-top: 0; }
+.v2 .rows--late { flex: 2 1 0; } .v2 .rows:not(.rows--late) { flex: 3 1 0; }
+@container (max-height: 300px) { .v2 .sep { display: none; } .v2 .rows--late { margin-top: 6px; } .v2 .rows--late .row:last-child { border-bottom: 1.5px dashed rgba(58, 47, 26, .3); } }
 /* 3 · share bars */
-.n3 { background: linear-gradient(180deg, #DDF4E3 0%, #CDEDD6 100%); transform: rotate(-.4deg); }
-.n3 .row { flex-wrap: wrap; row-gap: 6px; padding: 10px 0; min-height: 0; }
-.n3 .bar { flex-basis: 100%; height: 5px; margin-left: 28px; border-radius: 3px; background: rgba(58,47,26,.08); overflow: hidden; }
-.n3 .bar i { display: block; height: 100%; border-radius: 3px; background: #4E8A72; }
-.n3 .row.is-late .bar i { background: var(--red); }
+.v3 { background: linear-gradient(180deg, #DFF5E5 0%, #CDEDD6 100%); }
+.v3 .tape { background: rgba(246, 204, 128, .78); }
+.v3 .row { flex-wrap: wrap; align-content: center; row-gap: 5px; }
+.v3 .bar { flex-basis: 100%; height: 5px; margin-left: 26px; border-radius: 3px; background: rgba(58, 47, 26, .08); overflow: hidden; }
+.v3 .bar i { display: block; height: 100%; border-radius: 3px; background: #4E8A72; }
+.v3 .late .bar i { background: var(--red); }
+.v3 .row { min-height: 34px; }
+@container (max-height: 300px) { .v3 .row { flex: none; height: 37px; row-gap: 3px; } .v3 .bar { height: 3px; margin-left: 24px; } .v3 .note { padding-bottom: 6px; } }
+/* 4 · two notes: backlog, and the overdue two on a note stuck over its corner */
+.v4 { background: linear-gradient(180deg, #FFF6C7 0%, #FBEDA3 100%); }
+.v4 .over { position: absolute; right: 12px; bottom: 12px; width: 62%; padding: 20px 14px 8px; background: linear-gradient(180deg, #FFDCD5, #FFCBC2); border-radius: 4px; box-shadow: 0 1px 1px rgba(0,0,0,.06), 0 8px 16px -8px rgba(80, 40, 20, .4); transform: rotate(-1.5deg); }
+.v4 .note { padding-bottom: calc(12px + 38% ); }
+.v4 .over .rows { flex: none; } .v4 .over .row { flex: none; }
+.v4 .over h4 { margin: 0 0 4px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: var(--red); }
+.v4 .over .row { height: 38px; }
+.v4 .over .row__t { font-size: 14px; }
+@container (max-height: 300px) {
+  .v4 .note { right: 46%; padding-bottom: 10px; }
+  .v4 .over { top: 14px; right: 12px; bottom: 14px; width: calc(46% - 14px); padding: 18px 10px 6px; transform: rotate(1.2deg); }
+  .v4 .over .row { height: 30px; }
+  .v4 .over .row__t { font-size: 12.5px; }
+  .v4 .note .row__t { font-size: 13px; }
+}
+/* 5 · legal pad, filled in by hand */
+.v5 { background: #FFF4B5; }
+.v5 .note { padding-left: 50px; }
+.v5 .note::before { content: ''; position: absolute; top: 0; bottom: 0; left: 38px; width: 1.5px; background: rgba(214, 90, 80, .55); }
+.v5 .perf { position: absolute; top: 0; left: 0; right: 0; height: 14px; background: #ECDB8C; border-bottom: 2px dotted rgba(58, 47, 26, .22); }
+.v5 .rows .row { border-bottom: 1px solid rgba(80, 130, 190, .35); }
+.v5 .row__n { font-family: Caveat, cursive; font-size: clamp(24px, 5cqh, 32px); font-weight: 700; color: #2B4C8C; line-height: 1; }
+.v5 .late .row__n { color: var(--red); }
+.v5 .box { border-radius: 50%; }
+.v5 .fill { flex: 1; background-image: repeating-linear-gradient(180deg, transparent 0 calc(clamp(28px, 9.6cqh, 56px) - 1px), rgba(80, 130, 190, .35) calc(clamp(28px, 9.6cqh, 56px) - 1px) clamp(28px, 9.6cqh, 56px)); }
+@container (max-height: 300px) { .v5 .note { padding-left: 40px; } .v5 .note::before { left: 30px; } .v5 .perf { height: 9px; } .v5 .row__n { font-size: 21px; } .v5 .fill { background-image: none; } }
+/* 6 · index tabs: the total leads, colour says the area */
+.v6 { background: linear-gradient(180deg, #ECE6FF 0%, #E0D8FA 100%); }
+.v6 .note { padding-right: 34px; }
+.v6 .row { position: relative; }
+.v6 .row::after { content: ''; position: absolute; right: -34px; top: 18%; bottom: 18%; width: 12px; border-radius: 6px 0 0 6px; background: var(--c); }
+.v6 .big { flex: none; margin: 6px 0 0; font-size: clamp(26px, 7.4cqh, 46px); font-weight: 700; line-height: 1.05; letter-spacing: -.02em; }
+.v6 .big small { font-size: 13px; font-weight: 500; color: var(--ink-soft); letter-spacing: 0; }
+.v6 .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+.v6 .open { display: none; }
+@container (max-height: 300px) { .v6 .big { display: none; } .v6 .open { display: inline; } .v6 .note { padding-right: 24px; } .v6 .row::after { right: -24px; width: 9px; } }
 
-/* 4 · two notes */
-.n4wrap { position: relative; width: 100%; height: 100%; }
-.n4 { background: linear-gradient(180deg, #FFF6C7 0%, #FCEFA8 100%); height: 80%; transform: rotate(-1deg); }
-.n4b { position: absolute; right: -6px; bottom: -8px; width: 66%; height: auto; padding: 22px 16px 14px; background: linear-gradient(180deg, #FFD9D3, #FFC9C0); transform: rotate(3deg); }
-.n4b h4 { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--red); }
-.n4b .row { min-height: 40px; }
-.n4b .row__t { font-size: 14px; }
-
-/* 5 · legal pad, written by hand */
-.n5 { background: #FFF4B8; background-image: repeating-linear-gradient(180deg, transparent 0 49px, rgba(80,130,190,.35) 49px 50px); background-position: 0 104px; padding-left: 56px; transform: rotate(.5deg); }
-.n5::before { content: ''; position: absolute; top: 0; bottom: 0; left: 44px; width: 1.5px; background: rgba(214, 90, 80, .6); }
-.n5 .perf { position: absolute; top: 0; left: 0; right: 0; height: 18px; background: #E9D98A; border-bottom: 2px dotted rgba(58,47,26,.25); }
-.n5 .row { border-bottom: 0; min-height: 50px; }
-.n5 .row__n { font-family: Caveat, cursive; font-size: 26px; font-weight: 700; color: #2B4C8C; }
-.n5 .row.is-late .row__n { color: var(--red); }
-.n5 .box { border-radius: 50%; }
-.n5 .rows { margin-top: 18px; }
-
-/* 6 · index tabs, one colour per area */
-.n6 { background: linear-gradient(180deg, #ECE6FF 0%, #E0D8FA 100%); transform: rotate(-.6deg); padding-right: 34px; }
-.n6 .tabs { position: absolute; right: -14px; top: 70px; display: flex; flex-direction: column; gap: 8px; }
-.n6 .tabs i { display: block; width: 22px; height: 46px; border-radius: 0 6px 6px 0; box-shadow: 1px 1px 2px rgba(0,0,0,.12); }
-.n6 .big { margin: 6px 0 4px; font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -.02em; }
-.n6 .big small { font-size: 14px; font-weight: 500; color: var(--ink-soft); letter-spacing: 0; }
-.n6 .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
-.note__head + .big + .rows { margin-top: 10px; }
-
-.foot { margin-top: 40px; color: #44544A; font-size: 13px; max-width: 760px; }
-@media (max-width: 420px) { .grid { grid-template-columns: 1fr; } }
+/* every note at the 744 slot, side by side */
+.all { display: flex; flex-wrap: wrap; gap: 24px; }
+.all figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.all figcaption { font-size: 13px; font-weight: 600; color: #44544A; }
+.all .pa { width: 340px; height: 464px; cursor: pointer; }
+.all .pa.is-on { outline: 3px solid #1F415B; outline-offset: 4px; }
+.foot { margin-top: 40px; color: #44544A; font-size: 13px; max-width: 820px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Pending Actions · sticky note</h1>
-  <p class="lede">The corkboard of five pinned notes becomes <b>one sticky note with a ruled list</b>, after your reference. Same five jobs, today’s counts for All sites (63,592 open). Each card is drawn at the size of its slot on the home grid at 1024. In every version, <b>tapping a row opens that job’s page</b>, as the pinned notes do now.</p>
+  <p class="lede">The corkboard becomes <b>one sticky note with a ruled list</b>, and the note <b>is the card</b>: it fills Pending Actions’ own slot on the home grid, with the grid’s 12px corners, and nothing hangs outside it. Each version is drawn at the three sizes the slot really has: <b>744</b> (340 × 464, your screenshot), <b>1024</b> (374 × 640) and the <b>phone</b> (358 × 243, so the rows tighten). Five jobs, today’s counts for All sites. In every version, <b>tapping a row opens that job’s page</b>, as the pinned notes do now.</p>
 
-  <div class="grid" id="grid"></div>
+  <div class="pick" id="pick" role="group" aria-label="Version"></div>
+  <p class="premise" id="premise"></p>
 
-  <p class="foot">Mockup only, not in the app. Pick one (or mix: e.g. 1’s look with 2’s overdue-first order) and it replaces the corkboard on V2’s home. Counts follow the site chips, as they do now.</p>
+  <div class="screens">
+    <div class="screen"><div class="screen__h">Tablet · 744 <small>(your screenshot)</small></div>
+      <div class="frame"><div class="g g--744" id="g744"></div></div></div>
+    <div class="screen"><div class="screen__h">Phone · 390</div>
+      <div class="frame"><div class="g g--390" id="g390"></div></div></div>
+    <div class="screen"><div class="screen__h">Tablet landscape · 1024</div>
+      <div class="frame"><div class="g g--1024" id="g1024"></div></div></div>
+  </div>
+
+  <h2>All six at the 744 slot</h2>
+  <p class="lede">Tap one to see it in the grids above.</p>
+  <div class="all" id="all"></div>
+
+  <p class="foot">Mockup only, not in the app. Pick one (or a mix, e.g. 1’s look with 2’s overdue-first order) and it replaces the corkboard on V2’s home, at all three sizes as drawn here. Counts follow the site chips, as they do now.</p>
 </div>
 
 <script>
 const JOBS = [
-  { t: 'Sexing', n: 28532 },
-  { t: 'Microchipping', n: 20302 },
-  { t: 'Necropsy reports', n: 14296 },
-  { t: 'Deworming', n: 319, late: true },
-  { t: 'Vaccinations', n: 143, late: true },
+  { t: 'Sexing', n: 28532, c: '#7FC7A0' },
+  { t: 'Microchipping', n: 20302, c: '#7FC7A0' },
+  { t: 'Necropsy reports', n: 14296, c: '#F2B66B' },
+  { t: 'Deworming', n: 319, late: true, c: '#E8806F' },
+  { t: 'Vaccinations', n: 143, late: true, c: '#E8806F' },
 ]
 const TOTAL = JOBS.reduce((a, j) => a + j.n, 0)
+const LATE = JOBS.filter((j) => j.late), TODO = JOBS.filter((j) => !j.late)
 const f = (n) => n.toLocaleString('en-IN')
 const HEART = '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.2.3.6.3.8 0 .7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.2C19.5 16.4 12 21 12 21zm-4.6-9h2.2l1-2.2 1.9 4.4 1.2-2.2h2.9v-1.4h-3.7l-.5 1-1.9-4.4-1.8 3.4H7.4z"/></svg>'
-const row = (j, extra = '') => `<li class="row${j.late ? ' is-late' : ''}"><span class="box"></span><span class="row__t">${j.t}</span>${extra}<span class="row__n">${f(j.n)}</span></li>`
-const head = (title = 'Pending') => `<div class="note__head">${HEART}<h3>${title}</h3><span class="note__open"><b>${f(TOTAL)}</b> open</span></div>`
+const row = (j, { tag = false, extra = '', lead = '<span class="box"></span>' } = {}) =>
+  `<li class="row${j.late ? ' late' : ''}">${lead}<span class="row__t">${j.t}</span>${tag && j.late ? '<span class="tag">OVERDUE</span>' : ''}${extra}<span class="row__n">${f(j.n)}</span></li>`
+const head = (open = true) => `<div class="note__head">${HEART}<h3>Pending</h3>${open ? `<span class="open"><b>${f(TOTAL)}</b> open</span>` : ''}</div>`
 
 const V = [
-  { name: 'The reference', premise: '<b>Your screenshot, as drawn.</b> Pale yellow, a strip of mint tape, a red rule under the head, checkbox · job · count on ruled lines, the corner curling up. Overdue jobs say so only in their count’s place.',
-    html: `<div class="note n1"><span class="tape"></span>${head()}<div class="note__rule"></div><ul class="rows">${JOBS.map((j) => row(j, j.late ? '<span class="tag">OVERDUE</span>' : '')).join('')}</ul><span class="fold"></span></div>` },
-  { name: 'Overdue first', premise: '<b>What is late is read first.</b> A blush note, pinned. Deworming and Vaccinations sit on top in red under “OVERDUE”; the backlog follows under “TO DO”, biggest first.',
-    html: `<div class="note n2"><span class="pin"></span>${head()}<div class="sep">OVERDUE</div><ul class="rows">${JOBS.filter((j) => j.late).map((j) => row(j)).join('')}</ul><div class="sep">TO DO</div><ul class="rows">${JOBS.filter((j) => !j.late).map((j) => row(j)).join('')}</ul></div>` },
-  { name: 'With share bars', premise: '<b>How big each job is, at a glance.</b> A mint note. Under every line a pencil bar shows its share of the 63,592; the overdue bars are red. Sexing’s 45% is obvious before any number is read.',
-    html: `<div class="note n3"><span class="tape" style="background:rgba(245,200,120,.7)"></span>${head()}<ul class="rows">${JOBS.map((j) => `<li class="row${j.late ? ' is-late' : ''}"><span class="box"></span><span class="row__t">${j.t}</span><span class="row__n">${f(j.n)}</span><span class="bar"><i style="width:${Math.max(1.5, j.n / TOTAL * 100).toFixed(1)}%"></i></span></li>`).join('')}</ul></div>` },
-  { name: 'Two notes', premise: '<b>Backlog and overdue are different kinds of work.</b> The yellow note lists the backlog; a smaller pink note is stuck over its corner with just the overdue two. Tap either note’s row to open it.',
-    html: `<div class="n4wrap"><div class="note n4"><span class="tape"></span>${head()}<div class="note__rule" style="height:2px;margin-top:16px;background:#E8A890"></div><ul class="rows">${JOBS.filter((j) => !j.late).map((j) => row(j)).join('')}</ul></div><div class="note n4b"><span class="pin"></span><h4>OVERDUE · ${f(JOBS.filter((j) => j.late).reduce((a, j) => a + j.n, 0))}</h4><ul class="rows">${JOBS.filter((j) => j.late).map((j) => row(j)).join('')}</ul></div></div>` },
-  { name: 'Legal pad', premise: '<b>A keeper’s pad, filled in by hand.</b> Yellow legal paper torn off at the top, blue rules, the red margin line; the counts are written in pen (blue, red when overdue). The most “paper” of the six.',
-    html: `<div class="note n5"><span class="perf"></span>${head()}<ul class="rows">${JOBS.map((j) => row(j)).join('')}</ul></div>` },
-  { name: 'Index tabs', premise: '<b>The total leads; colour says the area.</b> A lilac note with the open total big at the top, then the list, each line keyed by a dot that matches an index tab on the note’s edge (records green, post-mortem amber, medical red).',
-    html: `<div class="note n6"><span class="tabs"><i style="background:#7FC7A0"></i><i style="background:#7FC7A0"></i><i style="background:#F2B66B"></i><i style="background:#E8806F"></i><i style="background:#E8806F"></i></span><div class="note__head">${HEART}<h3>Pending</h3></div><div class="big">${f(TOTAL)} <small>open</small></div><ul class="rows">${JOBS.map((j, i) => `<li class="row"><span class="dot" style="background:${['#7FC7A0','#7FC7A0','#F2B66B','#E8806F','#E8806F'][i]}"></span><span class="row__t">${j.t}</span>${j.late ? '<span class="tag">OVERDUE</span>' : ''}<span class="row__n">${f(j.n)}</span></li>`).join('')}</ul></div>` },
+  { name: 'The reference', premise: '<b>Your screenshot, as drawn.</b> Pale yellow, a strip of mint tape on the top edge, a red rule under the head, checkbox · job · count on ruled lines, the corner curling up. Overdue jobs say “OVERDUE” beside a red count.',
+    note: () => `<div class="note"><span class="tape"></span>${head()}<div class="rule"></div><ul class="rows">${JOBS.map((j) => row(j, { tag: true })).join('')}</ul></div><span class="curl"></span>`, cls: 'v1' },
+  { name: 'Overdue first', premise: '<b>What is late is read first.</b> A blush note, pinned. Deworming and Vaccinations on top in red under “OVERDUE”; the backlog under “TO DO”. On the phone the two headings go and a dashed line keeps them apart.',
+    note: () => `<div class="note"><span class="pin"></span>${head()}<div class="sep">OVERDUE</div><ul class="rows rows--late">${LATE.map((j) => row(j)).join('')}</ul><div class="sep">TO DO</div><ul class="rows">${TODO.map((j) => row(j)).join('')}</ul></div>`, cls: 'v2' },
+  { name: 'Share bars', premise: '<b>How big each job is, at a glance.</b> A mint note. Under each line a thin bar shows its share of the 63,592; overdue bars are red. Sexing’s 45% is plain before a number is read.',
+    note: () => `<div class="note"><span class="tape"></span>${head()}<ul class="rows">${JOBS.map((j) => row(j, { extra: '' }).replace('</li>', `<span class="bar"><i style="width:${Math.max(1.5, j.n / TOTAL * 100).toFixed(1)}%"></i></span></li>`)).join('')}</ul></div>`, cls: 'v3' },
+  { name: 'Two notes', premise: '<b>Backlog and overdue are different work.</b> The yellow note lists the backlog; a small pink note stuck on its lower corner holds only the overdue two (462). On the phone the pink note sits beside the list.',
+    note: () => `<div class="note"><span class="tape"></span>${head()}<div class="rule"></div><ul class="rows">${TODO.map((j) => row(j)).join('')}</ul></div>` +
+      `<div class="over"><span class="pin"></span><h4>OVERDUE · ${f(LATE.reduce((a, j) => a + j.n, 0))}</h4><ul class="rows" style="margin:0">${LATE.map((j) => row(j)).join('')}</ul></div>`, cls: 'v4' },
+  { name: 'Legal pad', premise: '<b>A keeper’s pad, filled in by hand.</b> Yellow legal paper torn at the top, blue rules carried down the empty part of the page, the red margin; the counts written in pen, red when overdue.',
+    note: () => `<span class="perf"></span><div class="note">${head()}<ul class="rows">${JOBS.map((j) => row(j, { lead: '<span class="box"></span>' })).join('')}</ul></div>`, cls: 'v5' },
+  { name: 'Index tabs', premise: '<b>The total leads; colour says the area.</b> A lilac note with 63,592 big at the top, each line keyed by a dot matching a tab on the note’s right edge (records green, post-mortem amber, medical red). On the phone the total moves into the head.',
+    note: () => `<div class="note">${head(true)}<div class="big">${f(TOTAL)} <small>open</small></div><ul class="rows">${JOBS.map((j) => row(j, { tag: true, lead: `<span class="dot" style="background:${j.c}"></span>` }).replace('<li class="row', `<li style="--c:${j.c}" class="row`)).join('')}</ul></div>`, cls: 'v6' },
 ]
-document.getElementById('grid').innerHTML = V.map((v, i) =>
-  `<section class="v"><div class="v__h"><span>${i + 1}</span>${v.name}</div><div class="slot">${v.html}</div><p class="v__p">${v.premise}</p></section>`).join('')
+const pa = (v, style = '') => `<div class="pa ${v.cls}"${style}>${v.note()}</div>`
+const T = (cls, name, style) => `<div class="t ${cls}" style="${style}"><span>${name}</span></div>`
+const GRIDS = {
+  g744: (v) => T('t--med', 'Medical', '') + T('t--hou', 'Housing', '') + T('t--sp', 'Species Management', 'grid-column:span 2') +
+    T('t--hos', 'Hospital', 'grid-column:span 2') + pa(v, ' style="grid-column:3 / span 2;grid-row:2 / span 3"') +
+    T('t--diet', 'Diet & Kitchen', 'grid-column:1 / span 2') + T('t--adm', 'Administer', 'grid-column:1') + T('t--mor', 'Mortality', 'grid-column:2'),
+  g1024: (v) => T('t--med', 'Medical', '') + T('t--hou', 'Housing', '') + T('t--sp', 'Species Management', 'grid-column:span 2') + T('t--adm', 'Administer', '') +
+    T('t--hos', 'Hospital', 'grid-column:1 / span 2') + pa(v, ' style="grid-column:3 / span 2;grid-row:2 / span 3"') + T('t--mor', 'Mortality', 'grid-column:5') +
+    T('t--diet', 'Diet & Kitchen', 'grid-column:1 / span 2') + T('t--usr', 'Users', 'grid-column:5') +
+    T('t--sec', 'Security', 'grid-column:1') + T('t--egg', 'Eggs', 'grid-column:2') + T('t--ani', 'Animals', 'grid-column:5'),
+  g390: (v) => T('t--med', 'Medical', '') + T('t--hou', 'Housing', '') + T('t--sp', 'Species Management', 'grid-column:span 2') +
+    T('t--hos', 'Hospital', 'grid-column:span 2') + pa(v, ' style="grid-column:span 2;grid-row:span 2"') + T('t--diet', 'Diet & Kitchen', 'grid-column:span 2'),
+}
+let at = 0
+try { at = Math.min(V.length - 1, Math.max(0, +localStorage.getItem('pa-mock') || 0)) } catch {}
+function show(i) {
+  at = i; try { localStorage.setItem('pa-mock', i) } catch {}
+  document.getElementById('pick').innerHTML = V.map((v, k) => `<button type="button" data-i="${k}" aria-pressed="${k === i}"><b>${k + 1}</b>${v.name}</button>`).join('')
+  document.getElementById('premise').innerHTML = V[i].premise
+  for (const id in GRIDS) document.getElementById(id).innerHTML = GRIDS[id](V[i])
+  document.querySelectorAll('.all .pa').forEach((p, k) => p.classList.toggle('is-on', k === i))
+}
+document.getElementById('all').innerHTML = V.map((v, k) => `<figure><figcaption>${k + 1} · ${v.name}</figcaption>${pa(v, ` data-i="${k}"`)}</figure>`).join('')
+document.getElementById('pick').addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) show(+b.dataset.i) })
+document.getElementById('all').addEventListener('click', (e) => { const p = e.target.closest('.pa[data-i]'); if (p) { show(+p.dataset.i); scrollTo({ top: 0, behavior: 'smooth' }) } })
+show(at)
 </script>
 </body>
 </html>
