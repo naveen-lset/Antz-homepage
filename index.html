@@ -455,7 +455,9 @@
      only in live V2", pending-sticky-variants-2 · 8) — cork, finely pricked */
   --g-v2-cork:       radial-gradient(rgba(0, 0, 0, .06) 1px, transparent 1.5px) 0 0 / 7px 7px, #C9A57A;
   /* …and since 5 Oct 2026 one sticky note: TertiaryContainer paper (mockups/pending-sticky.html · 1) */
-  --g-v2-sticky:     linear-gradient(180deg, #FFE6DC 0%, #FFD6C7 100%);
+  /* the OVERDUE colour (owner, 5 Oct 2026: "background make Overdue background
+     colour") — mockups/pending-sticky.html's Error solid paper */
+  --g-v2-sticky:     linear-gradient(117deg, #FF6883 0%, #E93353 100%);
   /* the node's gradientTransform puts the yellow stop 105% BEFORE the box's
      start along its 116.87° line — the card is the orange with a faint yellow
      lift at its top-left, not a yellow bottom-right */
@@ -7756,7 +7758,7 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10px; line-height: 16px; color: var(--c-neutral-2, #7A8684); }
 :root[data-home='v2'] .obs__tags span[aria-hidden] { margin: 0 6px 0 0; font-size: 14px; vertical-align: -1px; }
 :root[data-home='v2'] .obs__tags span:not([aria-hidden]) { margin-right: 8px; }
-:root[data-home='v2'] .obs__note { margin-top: 8px; font-size: 12px; line-height: 18px; -webkit-line-clamp: var(--obs-lines, 3); }  /* owner, 29 Sep 2026: "3 line max" — the popup shows the rest. 5 Oct: "make it 3, 6, 5 lines and show" — ?notelines=5 or 6 previews the others; 3 stays until one is picked */
+:root[data-home='v2'] .obs__note { margin-top: 8px; font-size: 12px; line-height: 18px; -webkit-line-clamp: var(--obs-lines, 4); }  /* owner, 29 Sep 2026: "3 line max"; 5 Oct, after comparing 3, 5 and 6 (mockups/notes-lines.html): "description make it 4 lines max". The popup shows the rest; ?notelines=N still previews another count */
 :root[data-home='v2'] .obs__date { flex: none; font-family: var(--font); font-size: 12px; font-weight: 400; line-height: normal; color: var(--c-neutral-2, #7A8684); }
 :root[data-home='v2'] .obs__actions { gap: 10px; padding: 12px; border-top: .5px solid rgba(0, 0, 0, .05); font-size: 12px; line-height: normal; }
 :root[data-home='v2'] .obs__who { gap: 4px; }
@@ -8005,7 +8007,6 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
    "the top sticky tab a different colour, like a dark Tertiary") */
 :root[data-home='v2'] #moduleGrid .card[data-layout='v2-sticky'] { container-type: size; padding: 0; box-shadow: 0 1px 1px rgba(0, 0, 0, .05), 0 8px 18px -10px rgba(120, 50, 20, .35); }
 .l-v2sn { position: relative; box-sizing: border-box; display: flex; flex-direction: column; width: 100%; height: 100%; min-height: 0; padding: 28px 18px 16px; color: #3B2420; }
-.l-v2sn__tape { position: absolute; top: 0; left: 50%; width: 108px; height: 20px; translate: -50% 0; background: #C9472B; opacity: .9; box-shadow: 0 1px 2px rgba(80, 20, 0, .2); }
 .l-v2sn__head { flex: none; display: flex; align-items: center; gap: 9px; }
 .l-v2sn__ico { flex: none; width: 21px; height: 21px; }
 .l-v2sn__head b { font-size: clamp(19px, 3.8cqh, 24px); font-weight: 700; letter-spacing: -.01em; }
@@ -8019,7 +8020,6 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
   font-family: inherit; color: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .15s ease; }
 .l-v2sn__row:active { transform: scale(.98); }
 .l-v2sn__row:focus-visible { outline: 2px solid #C9472B; outline-offset: 1px; }
-.l-v2sn__box { flex: none; width: 15px; height: 15px; border: 1.6px solid currentColor; border-radius: 4px; opacity: .55; }
 .l-v2sn__t { flex: 1; min-width: 0; font-size: clamp(14.5px, 3cqh, 18px); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .l-v2sn__row b { font-family: 'DM Sans', var(--font); font-size: clamp(15px, 3.3cqh, 20px); font-weight: 700; font-variant-numeric: tabular-nums; }
 .l-v2sn__row em { flex: none; padding: 2px 6px; border-radius: 4px; background: #D7263D; color: #fff; font-style: normal; font-size: 9.5px; font-weight: 700; letter-spacing: .06em; }
@@ -8028,6 +8028,14 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 .l-v2sn__curl { position: absolute; right: 0; bottom: 0; width: 30px; height: 30px; border-top-left-radius: 6px; pointer-events: none;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, .07) 50%, rgba(255, 255, 255, .6) 64%); }
 .l-v2sn__none { margin: auto; font-size: 14px; font-weight: 600; color: #7A5048; }
+/* ON THE OVERDUE PAPER (5 Oct 2026): the head goes white, the rows go near
+   white so the jobs and the red OVERDUE stay legible, and with the tape gone
+   the head comes up to the note's own top padding */
+.l-v2sn { padding-top: 18px; }
+.l-v2sn__head { color: #fff; }
+.l-v2sn__row { background: rgba(255, 255, 255, .94); }
+.l-v2sn__none { color: #fff; }
+.l-v2sn__curl { background: linear-gradient(135deg, rgba(0, 0, 0, 0) 50%, rgba(80, 0, 20, .18) 50%, rgba(255, 255, 255, .45) 64%); }
 /* a short card (the phone's 243, or a smaller size): tighter rows, one column */
 @container (max-height: 300px) {
   .l-v2sn { padding: 18px 12px 10px; }
@@ -8038,8 +8046,6 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
   .l-v2sn__row { flex-basis: 27px; min-height: 27px; padding: 0 10px; gap: 8px; border-radius: 8px; }
   .l-v2sn__t { font-size: 13.5px; }
   .l-v2sn__row b { font-size: 14px; }
-  .l-v2sn__box { width: 13px; height: 13px; }
-  .l-v2sn__tape { width: 88px; height: 12px; }
 }
 .l-v2bd__head { flex: none; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 4px 6px 0; }
 .l-v2bd__head b { font-size: 14px; font-weight: 700; color: #3A2A12; }
@@ -33026,14 +33032,16 @@ const LAYOUTS = {
     const ORDER = ['deworming', 'vaccination', 'necropsy', 'admin', 'sexing', 'microchip', 'transfer']
     const parts = (data.parts || []).filter((p) => (p.n || 0) > 0).sort((a, b) => ORDER.indexOf(a.key) - ORDER.indexOf(b.key))
     const HEART = '<svg class="l-v2sn__ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.2.3.6.3.8 0 .7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.2C19.5 16.4 12 21 12 21zm-4.6-9h2.2l1-2.2 1.9 4.4 1.2-2.2h2.9v-1.4h-3.7l-.5 1-1.9-4.4-1.8 3.4H7.4z"/></svg>'
-    return `<span class="l-v2sn"><span class="l-v2sn__tape" aria-hidden="true"></span>` +
+    /* no tape and no checkboxes (owner, 5 Oct 2026: "remove the checkbox,
+       remove top tape") */
+    return `<span class="l-v2sn">` +
       /* no open total in the head (same day: "remove the overall open") */
       `<span class="l-v2sn__head">${HEART}<b>Pending</b></span>` +
       `<span class="l-v2sn__rows">` + parts.map((p) => {
         const n = p.n || 0, late = /overdue/.test(p.sub || '')
         /* Transfers is still sample data (see its part), but the row no longer says so — owner, same day */
         return `<button type="button" class="l-v2sn__row${late ? ' is-late' : ''}" data-key="${esc(p.key)}" data-n="${n}" aria-label="${esc(p.label)}, ${n}${late ? ' overdue' : ' pending'}. Open ${esc(p.label)}">` +
-          `<span class="l-v2sn__box" aria-hidden="true"></span><span class="l-v2sn__t">${esc(p.label)}</span>` +
+          `<span class="l-v2sn__t">${esc(p.label)}</span>` +
           (late ? `<em>OVERDUE</em>` : '') + `<b>${fmtN(n)}</b></button>`
       }).join('') +
       (parts.length ? '' : `<span class="l-v2sn__none">Nothing pending</span>`) +
@@ -44362,9 +44370,8 @@ function renderCard(o) {
           `<span class="obs__ico"><img src="assets/icon/obs-comment.svg" alt=""></span>` +
           `<span class="obs__count"><b>${esc(o.comments ?? 0)}</b></span>` +
           `<span class="sr-only">Comments</span></button>` +
-        `<button type="button" class="obs__act obs__act--save" data-act="save" aria-pressed="false">` +
-          `<span class="obs__ico"><img src="assets/icon/obs-bookmark.svg" alt=""></span>` +
-          `<span class="sr-only">Save this observation</span></button>` +
+        /* no bookmark on the card (owner, 5 Oct 2026: "remove bookmark"); the
+           feed page keeps its Save */
       `</div>` +
     `</div>`
   return el
