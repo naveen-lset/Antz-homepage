@@ -4384,11 +4384,12 @@ body.is-report { overflow: hidden; }
    12 of padding, the text on white at its old sizes (title 16, body 14,
    byline 12), the photograph inset at 6px corners — now 268 tall instead of
    210, and the photo as wide as its own ratio makes it at that height (up to
-   half the card) instead of a fixed 180. The like sits on the photo's corner.
+   half the card) instead of a fixed 180. No like button on either card
+   (owner, same day: "remove thumbs-up from announcements").
    PHONE, under 744 — the reference card (two screenshots, same day): a 4px
    white ring round a panel in a 10% wash of the type's gradient (green for an
    announcement, red for important), the photograph flush right at the
-   panel's corners, the like in the card's corner. Its own layout for phones
+   panel's corners. Its own layout for phones
    is still to be chosen. Both are one fixed height on every card, as the
    deck needs. */
 /* (later the same day: "the height was too much, reduce it; description 4
@@ -4397,29 +4398,15 @@ body.is-report { overflow: hidden; }
 .adeck__card { --adeck-h: 232px; height: var(--adeck-h); }
 @media (min-width: 744px) { .adeck__desc { -webkit-line-clamp: 4; } }
 .adeck__img { width: min(calc((var(--adeck-h) - 24px) * var(--ar, 1.5)), 50%); }
-.adeck__like {
-  position: absolute; right: 24px; bottom: 24px; z-index: 1; pointer-events: auto;
-  width: 52px; height: 52px; padding: 0; border: 0; border-radius: 18px; display: grid; place-items: center;
-  background: rgba(255, 255, 255, .25); box-shadow: 0 1.6px 13px 0 rgba(0, 0, 0, .05);
-  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: pointer;
-}
-.adeck__card:not(:has(.adeck__img)) .adeck__like { background: rgba(0, 0, 0, .04); }
-.adeck__card:not(:has(.adeck__img)) .adeck__body { padding-right: 76px; }   /* the like's corner, kept clear of the text */
-.adeck__like img { display: block; width: 24px; height: 24px; }
-.adeck__like:active { transform: scale(.96); }
-.adeck__card:not([data-i='0']) .adeck__like { pointer-events: none; }
 @media (max-width: 743px) {
   .adeck__card { --adeck-h: 236px; padding: 4px; border-radius: 20px; }
   .adeck__body { padding: 16px; gap: 10px; border-radius: 16px 0 0 16px; background: linear-gradient(-72deg, rgba(0, 175, 214, .1) 3.9%, rgba(55, 189, 105, .1) 108%); }
-  .adeck__card:not(:has(.adeck__img)) .adeck__body { border-radius: 16px; padding-right: 68px; }
+  .adeck__card:not(:has(.adeck__img)) .adeck__body { border-radius: 16px; }
   .adeck__card[data-k='important'] .adeck__body { background: linear-gradient(108deg, rgba(233, 51, 83, .1) 1.5%, rgba(250, 97, 64, .1) 96.9%); }
   .adeck__hl { line-height: 21px; }
   .adeck__desc { line-height: 20px; }
   .adeck__meta { font-size: 14px; font-weight: 500; }
   .adeck__img { width: min(calc((var(--adeck-h) - 8px) * var(--ar, 1.5)), 40%); border-radius: 0 16px 16px 0; }
-  .adeck__like { right: 12px; bottom: 12px; width: 44px; height: 44px; border-radius: 14px; }
-  .adeck__card:not(:has(.adeck__img)) .adeck__like { background: rgba(255, 255, 255, .6); }
-  .adeck__like img { width: 20px; height: 20px; }
 }
 /* THE FOOT ROW · node 753:21034 (25 Sep 2026): the head is gone, so the
    stack opens 16 under the band's top, and 16 under the stack a 17px row
@@ -44744,8 +44731,6 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
         `<div class="adeck__text"><h3 class="adeck__hl">${esc(b.title)}</h3><p class="adeck__desc">${esc(b.body)}</p>` +
         `<div class="adeck__meta">${meta}</div></div></div>` +
         (b.image ? `<div class="adeck__img"><img src="${esc(b.image)}" alt="" decoding="async" style="object-position:${esc(b.imagePos || '50% 50%')}"></div>` : '') +
-        /* the reference card's like (owner, 5 Oct 2026), on the card's corner — over the photo or the panel */
-        `<button type="button" class="adeck__like" aria-pressed="false" aria-label="Like this announcement" tabindex="-1"><img src="assets/icon/ann-like.svg" alt=""></button>` +
         `</article>`
     }).join('') + `</div>` +
     `<div class="adeck__foot"><div class="adeck__dots" aria-hidden="true">${items.map(() => '<i></i>').join('')}</div>` +
@@ -44763,23 +44748,14 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
     const set = () => { if (im.naturalWidth) im.parentElement.style.setProperty('--ar', (im.naturalWidth / im.naturalHeight).toFixed(4)) }
     im.complete ? set() : im.addEventListener('load', set, { once: true })
   }
-  /* the like: local, the observation cards' spring and burst; it is not a tap on the card */
-  const { pop, burst } = __req('js/lib/reactions.js')
-  stack.addEventListener('click', (e) => {
-    const b = e.target.closest('.adeck__like'); if (!b) return
-    e.stopPropagation()
-    const on = b.getAttribute('aria-pressed') !== 'true'
-    b.setAttribute('aria-pressed', String(on))
-    pop(b.querySelector('img'), on)
-    if (on) burst(b, { colour: 'var(--c-white)', radius: 22, n: 6 })
-  }, true)
+
 
   /* the dwell runs on this element; restarting its animation marks a new front
      card's dwell beginning (see .adeck__dwell in the stylesheet) */
   const dwell = stack.querySelector('.adeck__dwell')
   const restartDwell = () => { dwell.style.animation = 'none'; void dwell.offsetWidth; dwell.style.animation = '' }
   function paint() {
-    order.forEach((ai, pos) => { const c = card(ai), p = Math.min(pos, 3); c.dataset.i = p; c.setAttribute('aria-hidden', String(pos !== 0)); c.tabIndex = pos === 0 ? 0 : -1; c.querySelector('.adeck__like').tabIndex = pos === 0 ? 0 : -1 })
+    order.forEach((ai, pos) => { const c = card(ai), p = Math.min(pos, 3); c.dataset.i = p; c.setAttribute('aria-hidden', String(pos !== 0)); c.tabIndex = pos === 0 ? 0 : -1 })
     const f = order[0]
     root.querySelectorAll('.adeck__dots i').forEach((d, i) => d.classList.toggle('on', i === f))
     restartDwell()
@@ -44857,7 +44833,7 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
      from the node's peek (16px out, 10 down, .9376 × .9065) to the front */
   let dg = null, dragAt = 0
   stack.addEventListener('pointerdown', (e) => {
-    const c = e.target.closest('.adeck__card'); if (!c || c.dataset.i !== '0' || e.button > 0 || e.target.closest('.adeck__like')) return
+    const c = e.target.closest('.adeck__card'); if (!c || c.dataset.i !== '0' || e.button > 0) return
     dg = { c, x0: e.clientX, y0: e.clientY, t0: performance.now(), dx: 0, on: false, pid: e.pointerId }
   })
   /* LEFT TO RIGHT BRINGS THE LAST CARD BACK (owner, 25 Sep 2026: "left to
@@ -44929,7 +44905,7 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
     })
     stack.addEventListener('keydown', (e) => {
       const c = e.target.closest?.('.adeck__card')
-      if (!c || c.dataset.i !== '0' || (e.key !== 'Enter' && e.key !== ' ') || e.target.closest('.adeck__like')) return
+      if (!c || c.dataset.i !== '0' || (e.key !== 'Enter' && e.key !== ' ')) return
       e.preventDefault(); openFront(c)
     })
   }
