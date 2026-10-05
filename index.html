@@ -3934,6 +3934,7 @@ body.is-report { overflow: hidden; }
   font: inherit; font-size: 16px; font-weight: 500; line-height: 20px; color: var(--c-action-ink); cursor: pointer;
 }
 .fav__edit::after { content: ''; position: absolute; inset: -10px -12px; }
+.fav__edit[hidden] { display: none !important; }   /* over the V2 rule's inline-flex */
 .fav__rail {
   --fav-w: 148px; --fav-h: 184px;
   display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none;
@@ -43184,6 +43185,11 @@ function mountAnimals(root) {
   const draw = () => {
     const fav = favAnimals(), seen = seenAnimals(), mine = fav.length > 0, list = mine ? fav : seen
     title.textContent = mine || !seen.length ? 'My animals' : 'Recently viewed'
+    /* the pencil edits favourites, so it is there only over them (owner,
+       5 Oct 2026: "if Recently viewed, no need to show Edit; if Favourite
+       animals, the edit option is there"); Find animals at the rail's end
+       still starts a list */
+    edit.hidden = !(mine || !seen.length)
     edit.setAttribute('aria-label', 'Edit my animals')
     rail.innerHTML = list.map(aCard).join('') +
       `<div class="fav__item" role="listitem"><button type="button" class="fav__card fav__card--add" data-browse>` +
@@ -50490,10 +50496,14 @@ function healthStrip(after) {
   /* THE LABEL IS SAID ONCE (owner, 5 Oct 2026: "why are you repeating the
      main label again — show all sites, then come again"). It stands fixed
      in the pin beside the LIVE mark; only the sites travel on the tape, all
-     four and then round again, with no label between the rounds. */
-  const audit = (copy) => {
+     four and then round again, with no label between the rounds.
+     (Later the same day: "Animal Audit scroll also, no need to stick".) The
+     label rides the tape now, once at the head of each round, and scrolls
+     away with the sites; nothing is pinned. */
+  const audit = (copy, head) => {
     const t = copy ? ' tabindex="-1"' : ''
     return `<div class="hstrip__run hstrip__run--audit" data-k="audit">` +
+      (head ? `<button type="button" class="hstrip__label" data-tip${t} aria-label="Animal audit score ${hsAudit().score}%">${GLYPH.audit}<span>ANIMAL AUDIT SCORE <b>${hsAudit().score}%</b></span></button>` : '') +
       hsAudit().rows.map(([n, p]) => item('audit', ` data-tip${t}`, 'assets/img/hs-audit.jpg', n, `${p}%`, `${n}, audit ${p}%`)).join('') + `</div>`
   }
   /* one short run cannot fill a wide lane, and the wrap needs each set at
@@ -50501,15 +50511,14 @@ function healthStrip(after) {
      the first are hidden from the keyboard and from readers) */
   let reps = 1
   const render = () => {
-    const set = (copy) => `<div class="hstrip__set"${copy ? ' aria-hidden="true"' : ''}>${Array.from({ length: reps }, (_, i) => audit(copy || i > 0)).join('')}</div>`
+    const set = (copy) => `<div class="hstrip__set"${copy ? ' aria-hidden="true"' : ''}>${Array.from({ length: reps }, (_, i) => audit(copy || i > 0, i === 0)).join('')}</div>`
     strip.innerHTML =
       `<div class="hstrip__lane"><div class="hstrip__tape">${set(false)}${set(true)}</div></div>` +
       `<span class="hstrip__cap" data-k="audit" aria-hidden="true"><span class="hstrip__live">` +
-        `<img class="hstrip__live-on" src="assets/icon/hs-live.gif" alt=""><img class="hstrip__live-still" src="assets/icon/hs-live-still.png" alt=""></span></span>` +
-      `<span class="hstrip__pin" data-k="audit"><button type="button" class="hstrip__label is-stuck" data-tip aria-label="Animal audit score ${hsAudit().score}%">${GLYPH.audit}<span>ANIMAL AUDIT SCORE <b>${hsAudit().score}%</b></span></button></span>`
-    lane = strip.querySelector('.hstrip__lane'); sets = strip.querySelectorAll('.hstrip__set'); cap = strip.querySelector('.hstrip__cap'); pin = strip.querySelector('.hstrip__pin'); pinKey = ''
-    /* the first site starts clear of the fixed label, not under it */
-    strip.querySelector('.hstrip__tape').style.paddingLeft = pin.offsetLeft + pin.offsetWidth - lane.offsetLeft + 'px'
+        `<img class="hstrip__live-on" src="assets/icon/hs-live.gif" alt=""><img class="hstrip__live-still" src="assets/icon/hs-live-still.png" alt=""></span></span>`
+    lane = strip.querySelector('.hstrip__lane'); sets = strip.querySelectorAll('.hstrip__set'); cap = strip.querySelector('.hstrip__cap'); pin = null; pinKey = ''
+    /* the label starts clear of the LIVE mark, not under it */
+    strip.querySelector('.hstrip__tape').style.paddingLeft = cap.offsetLeft + cap.offsetWidth - lane.offsetLeft + 'px'
     x = 0; lane.scrollLeft = 0; bind(); tint()
   }
   /* the drift: our own float, since scrollLeft rounds; a user's scroll is read back into it */
@@ -50526,7 +50535,7 @@ function healthStrip(after) {
      sticky, the natality, mortality & audit icons don't show"), folding it
      away the moment it pins. The cap takes the tint of the run beneath it. */
   const tint = () => {
-    if (!lane.querySelector('.hstrip__label')) return   /* the label is fixed: nothing to pin or push */
+    if (!pin) return   /* no pin: the label scrolls with the tape (5 Oct 2026) */
     const edge = lane.getBoundingClientRect().left + cap.offsetWidth
     let cur = null, next = null
     for (const b of lane.querySelectorAll('.hstrip__label')) { if (b.getBoundingClientRect().left < edge - .5) cur = b; else { next = b; break } }
