@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pending Actions · sticky note variations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* MOCKUP ONLY (5 Oct 2026) — not loaded by the app. Six ways to draw V2's
+   Pending Actions as ONE sticky note with line items, after the owner's
+   reference (a yellow note, tape, a ruled list: checkbox · job · count).
+   Same five jobs and the live counts the home shows today (All sites). */
+:root {
+  --ink: #3A2F1A; --ink-soft: #6B5D45; --rule: rgba(58, 47, 26, .16); --red: #C2412D;
+  --page: #EFF5F2;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: #1F415B; font: 14px/1.4 Inter, system-ui, sans-serif; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { margin: 0 0 6px; font-size: 24px; font-weight: 600; }
+.lede { margin: 0 0 28px; max-width: 760px; color: #44544A; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 40px 28px; }
+.v { display: flex; flex-direction: column; gap: 14px; }
+.v__h { display: flex; align-items: baseline; gap: 8px; font-weight: 600; font-size: 15px; }
+.v__h span { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #1F415B; color: #fff; font-size: 12px; }
+.v__p { margin: 0; color: #44544A; font-size: 13px; }
+.v__p b { color: #1F415B; font-weight: 600; }
+/* the card's slot on the home grid at 1024 (Pending Actions, xtall) */
+.slot { position: relative; height: 470px; padding: 18px 14px; border-radius: 16px; background: #fff; box-shadow: 0 2px 10px rgba(76, 78, 100, .05); display: flex; align-items: center; justify-content: center; }
+
+/* ── the note, shared ── */
+.note { position: relative; width: 100%; height: 100%; padding: 30px 22px 22px; color: var(--ink);
+  box-shadow: 0 1px 1px rgba(0,0,0,.06), 0 10px 22px -10px rgba(80, 60, 20, .35); display: flex; flex-direction: column; }
+.note__head { display: flex; align-items: center; gap: 10px; }
+.note__head h3 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+.note__head .ico { width: 22px; height: 22px; flex: none; }
+.note__open { margin-left: auto; font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
+.note__open b { font-size: 17px; color: var(--ink); font-weight: 700; }
+.rows { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; gap: 12px; min-height: 50px; border-bottom: 1px solid var(--rule); cursor: pointer; }
+.row:hover { background: rgba(255,255,255,.25); }
+.box { flex: none; width: 16px; height: 16px; border: 1.6px solid rgba(58,47,26,.55); border-radius: 3px; }
+.row__t { flex: 1; font-size: 15.5px; }
+.row__n { font-weight: 700; font-size: 16px; font-variant-numeric: tabular-nums; }
+.tag { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--red); }
+.fold { position: absolute; right: 0; bottom: 0; width: 34px; height: 34px; background: linear-gradient(135deg, rgba(0,0,0,0) 50%, rgba(0,0,0,.08) 50%, rgba(255,255,255,.55) 62%); border-top-left-radius: 6px; }
+.tape { position: absolute; top: -12px; left: 50%; width: 120px; height: 28px; transform: translateX(-50%) rotate(-1.5deg); background: rgba(150, 205, 190, .72); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.pin { position: absolute; top: -8px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #F08A7A, #C9483A 70%); box-shadow: 0 3px 4px rgba(0,0,0,.25); }
+
+/* 1 · the reference, faithful */
+.n1 { background: linear-gradient(180deg, #FFF6C7 0%, #FCEFA8 100%); transform: rotate(-.8deg); }
+.n1 .note__rule { height: 2px; margin-top: 16px; background: #E8A890; border-radius: 1px; }
+
+/* 2 · overdue first */
+.n2 { background: linear-gradient(180deg, #FFE3E0 0%, #FFD3CD 100%); transform: rotate(.6deg); }
+.n2 .row.is-late .row__t, .n2 .row.is-late .row__n { color: var(--red); }
+.n2 .sep { margin: 14px 0 2px; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--ink-soft); border-bottom: 1.5px dashed rgba(58,47,26,.25); padding-bottom: 6px; }
+.n2 .rows { margin-top: 6px; }
+
+/* 3 · share bars */
+.n3 { background: linear-gradient(180deg, #DDF4E3 0%, #CDEDD6 100%); transform: rotate(-.4deg); }
+.n3 .row { flex-wrap: wrap; row-gap: 6px; padding: 10px 0; min-height: 0; }
+.n3 .bar { flex-basis: 100%; height: 5px; margin-left: 28px; border-radius: 3px; background: rgba(58,47,26,.08); overflow: hidden; }
+.n3 .bar i { display: block; height: 100%; border-radius: 3px; background: #4E8A72; }
+.n3 .row.is-late .bar i { background: var(--red); }
+
+/* 4 · two notes */
+.n4wrap { position: relative; width: 100%; height: 100%; }
+.n4 { background: linear-gradient(180deg, #FFF6C7 0%, #FCEFA8 100%); height: 80%; transform: rotate(-1deg); }
+.n4b { position: absolute; right: -6px; bottom: -8px; width: 66%; height: auto; padding: 22px 16px 14px; background: linear-gradient(180deg, #FFD9D3, #FFC9C0); transform: rotate(3deg); }
+.n4b h4 { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--red); }
+.n4b .row { min-height: 40px; }
+.n4b .row__t { font-size: 14px; }
+
+/* 5 · legal pad, written by hand */
+.n5 { background: #FFF4B8; background-image: repeating-linear-gradient(180deg, transparent 0 49px, rgba(80,130,190,.35) 49px 50px); background-position: 0 104px; padding-left: 56px; transform: rotate(.5deg); }
+.n5::before { content: ''; position: absolute; top: 0; bottom: 0; left: 44px; width: 1.5px; background: rgba(214, 90, 80, .6); }
+.n5 .perf { position: absolute; top: 0; left: 0; right: 0; height: 18px; background: #E9D98A; border-bottom: 2px dotted rgba(58,47,26,.25); }
+.n5 .row { border-bottom: 0; min-height: 50px; }
+.n5 .row__n { font-family: Caveat, cursive; font-size: 26px; font-weight: 700; color: #2B4C8C; }
+.n5 .row.is-late .row__n { color: var(--red); }
+.n5 .box { border-radius: 50%; }
+.n5 .rows { margin-top: 18px; }
+
+/* 6 · index tabs, one colour per area */
+.n6 { background: linear-gradient(180deg, #ECE6FF 0%, #E0D8FA 100%); transform: rotate(-.6deg); padding-right: 34px; }
+.n6 .tabs { position: absolute; right: -14px; top: 70px; display: flex; flex-direction: column; gap: 8px; }
+.n6 .tabs i { display: block; width: 22px; height: 46px; border-radius: 0 6px 6px 0; box-shadow: 1px 1px 2px rgba(0,0,0,.12); }
+.n6 .big { margin: 6px 0 4px; font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -.02em; }
+.n6 .big small { font-size: 14px; font-weight: 500; color: var(--ink-soft); letter-spacing: 0; }
+.n6 .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+.note__head + .big + .rows { margin-top: 10px; }
+
+.foot { margin-top: 40px; color: #44544A; font-size: 13px; max-width: 760px; }
+@media (max-width: 420px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Pending Actions · sticky note</h1>
+  <p class="lede">The corkboard of five pinned notes becomes <b>one sticky note with a ruled list</b>, after your reference. Same five jobs, today’s counts for All sites (63,592 open). Each card is drawn at the size of its slot on the home grid at 1024. In every version, <b>tapping a row opens that job’s page</b>, as the pinned notes do now.</p>
+
+  <div class="grid" id="grid"></div>
+
+  <p class="foot">Mockup only, not in the app. Pick one (or mix: e.g. 1’s look with 2’s overdue-first order) and it replaces the corkboard on V2’s home. Counts follow the site chips, as they do now.</p>
+</div>
+
+<script>
+const JOBS = [
+  { t: 'Sexing', n: 28532 },
+  { t: 'Microchipping', n: 20302 },
+  { t: 'Necropsy reports', n: 14296 },
+  { t: 'Deworming', n: 319, late: true },
+  { t: 'Vaccinations', n: 143, late: true },
+]
+const TOTAL = JOBS.reduce((a, j) => a + j.n, 0)
+const f = (n) => n.toLocaleString('en-IN')
+const HEART = '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.2.3.6.3.8 0 .7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.2C19.5 16.4 12 21 12 21zm-4.6-9h2.2l1-2.2 1.9 4.4 1.2-2.2h2.9v-1.4h-3.7l-.5 1-1.9-4.4-1.8 3.4H7.4z"/></svg>'
+const row = (j, extra = '') => `<li class="row${j.late ? ' is-late' : ''}"><span class="box"></span><span class="row__t">${j.t}</span>${extra}<span class="row__n">${f(j.n)}</span></li>`
+const head = (title = 'Pending') => `<div class="note__head">${HEART}<h3>${title}</h3><span class="note__open"><b>${f(TOTAL)}</b> open</span></div>`
+
+const V = [
+  { name: 'The reference', premise: '<b>Your screenshot, as drawn.</b> Pale yellow, a strip of mint tape, a red rule under the head, checkbox · job · count on ruled lines, the corner curling up. Overdue jobs say so only in their count’s place.',
+    html: `<div class="note n1"><span class="tape"></span>${head()}<div class="note__rule"></div><ul class="rows">${JOBS.map((j) => row(j, j.late ? '<span class="tag">OVERDUE</span>' : '')).join('')}</ul><span class="fold"></span></div>` },
+  { name: 'Overdue first', premise: '<b>What is late is read first.</b> A blush note, pinned. Deworming and Vaccinations sit on top in red under “OVERDUE”; the backlog follows under “TO DO”, biggest first.',
+    html: `<div class="note n2"><span class="pin"></span>${head()}<div class="sep">OVERDUE</div><ul class="rows">${JOBS.filter((j) => j.late).map((j) => row(j)).join('')}</ul><div class="sep">TO DO</div><ul class="rows">${JOBS.filter((j) => !j.late).map((j) => row(j)).join('')}</ul></div>` },
+  { name: 'With share bars', premise: '<b>How big each job is, at a glance.</b> A mint note. Under every line a pencil bar shows its share of the 63,592; the overdue bars are red. Sexing’s 45% is obvious before any number is read.',
+    html: `<div class="note n3"><span class="tape" style="background:rgba(245,200,120,.7)"></span>${head()}<ul class="rows">${JOBS.map((j) => `<li class="row${j.late ? ' is-late' : ''}"><span class="box"></span><span class="row__t">${j.t}</span><span class="row__n">${f(j.n)}</span><span class="bar"><i style="width:${Math.max(1.5, j.n / TOTAL * 100).toFixed(1)}%"></i></span></li>`).join('')}</ul></div>` },
+  { name: 'Two notes', premise: '<b>Backlog and overdue are different kinds of work.</b> The yellow note lists the backlog; a smaller pink note is stuck over its corner with just the overdue two. Tap either note’s row to open it.',
+    html: `<div class="n4wrap"><div class="note n4"><span class="tape"></span>${head()}<div class="note__rule" style="height:2px;margin-top:16px;background:#E8A890"></div><ul class="rows">${JOBS.filter((j) => !j.late).map((j) => row(j)).join('')}</ul></div><div class="note n4b"><span class="pin"></span><h4>OVERDUE · ${f(JOBS.filter((j) => j.late).reduce((a, j) => a + j.n, 0))}</h4><ul class="rows">${JOBS.filter((j) => j.late).map((j) => row(j)).join('')}</ul></div></div>` },
+  { name: 'Legal pad', premise: '<b>A keeper’s pad, filled in by hand.</b> Yellow legal paper torn off at the top, blue rules, the red margin line; the counts are written in pen (blue, red when overdue). The most “paper” of the six.',
+    html: `<div class="note n5"><span class="perf"></span>${head()}<ul class="rows">${JOBS.map((j) => row(j)).join('')}</ul></div>` },
+  { name: 'Index tabs', premise: '<b>The total leads; colour says the area.</b> A lilac note with the open total big at the top, then the list, each line keyed by a dot that matches an index tab on the note’s edge (records green, post-mortem amber, medical red).',
+    html: `<div class="note n6"><span class="tabs"><i style="background:#7FC7A0"></i><i style="background:#7FC7A0"></i><i style="background:#F2B66B"></i><i style="background:#E8806F"></i><i style="background:#E8806F"></i></span><div class="note__head">${HEART}<h3>Pending</h3></div><div class="big">${f(TOTAL)} <small>open</small></div><ul class="rows">${JOBS.map((j, i) => `<li class="row"><span class="dot" style="background:${['#7FC7A0','#7FC7A0','#F2B66B','#E8806F','#E8806F'][i]}"></span><span class="row__t">${j.t}</span>${j.late ? '<span class="tag">OVERDUE</span>' : ''}<span class="row__n">${f(j.n)}</span></li>`).join('')}</ul></div>` },
+]
+document.getElementById('grid').innerHTML = V.map((v, i) =>
+  `<section class="v"><div class="v__h"><span>${i + 1}</span>${v.name}</div><div class="slot">${v.html}</div><p class="v__p">${v.premise}</p></section>`).join('')
+</script>
+</body>
+</html>
