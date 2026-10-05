@@ -3974,6 +3974,13 @@ body.is-report { overflow: hidden; }
   .fav__rail { --fav-w: 124px; --fav-h: 156px; gap: 10px; }
   .fav__name { font-size: 14px; }
 }
+/* V2's My animals cards: the sex tag in the top-right corner, in the species
+   page's own tag colours (.mpage[data-view='species'] .mp-sex), and the
+   species on one line under the AAID (5 Oct 2026) */
+.fav__sex { position: absolute; z-index: 1; top: 8px; right: 8px; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 6px;
+  font-size: 11px; font-weight: 600; line-height: 24px; text-align: center; color: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .18); }
+.fav__sex[data-s='m'] { background: #00D6C9; } .fav__sex[data-s='f'] { background: #FC917A; } .fav__sex[data-s='u'] { background: #F07187; }
+.fav__meta--sp { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* V2's My animals sheet (Favourites.js mountAnimals, 5 Oct 2026) */
 .fan__sec { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 16px; }
 .fan__sec h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; color: var(--c-on-surface-var, #44544A); }
@@ -42857,7 +42864,8 @@ const A_SEED = [
   { aaid: 172277, sp: 'Russet Whipsnake', sex: 2, encl: 'Cedar Ridge Habitat' },
   { aaid: 169095, sp: 'Marbled Phantom Saki', sex: 1, encl: 'Ivy Marsh Terrarium' },
 ]
-const SEX_A = ['Male', 'Female', 'Unsexed']
+const SEX_A = ['Male', 'Female', 'Undetermined']
+const SEX_TAG = [['M', 'm'], ['F', 'f'], ['UD', 'u']]
 const readA = (k, seed) => {
   try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return Array.isArray(v) ? v.filter((r) => r && r.aaid && r.sp) : [...(seed || [])] }
   catch (_) { return [...(seed || [])] }
@@ -42884,7 +42892,10 @@ function mountAnimals(root) {
   const aCard = (r) =>
     `<div class="fav__item" role="listitem"><button type="button" class="fav__card" data-aaid="${r.aaid}" data-sp="${esc(r.sp)}" aria-label="${esc(r.sp)}, AAID ${r.aaid}">` +
       `<img class="fav__img" src="${img(r)}" alt="" loading="lazy" decoding="async">` +
-      `<span class="fav__txt"><b class="fav__name">${esc(r.sp)}</b><small class="fav__meta">AAID ${r.aaid} · ${SEX_A[r.sex] || 'Unsexed'}</small></span>` +
+      /* the sex as the species page tags an animal photo, in the corner (owner,
+         5 Oct 2026); the AAID leads, the species under it on one line */
+      `<span class="fav__sex" data-s="${SEX_TAG[r.sex]?.[1] || 'u'}" title="${SEX_A[r.sex] || 'Undetermined'}">${SEX_TAG[r.sex]?.[0] || 'UD'}</span>` +
+      `<span class="fav__txt"><b class="fav__name">AAID ${r.aaid}</b><small class="fav__meta fav__meta--sp">${esc(r.sp)}</small></span>` +
     `</button></div>`
   const draw = () => {
     const fav = favAnimals(), seen = seenAnimals(), mine = fav.length > 0, list = mine ? fav : seen
