@@ -7593,13 +7593,13 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 .kins__rail { display: flex; gap: 12px; margin: 0 -16px; padding: 0 16px; overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: 16px; scrollbar-width: none; overscroll-behavior-x: contain; }
 .kins__rail::-webkit-scrollbar { display: none; }
 .kins__card { position: relative; flex: none; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; width: 297px; height: 430px; border-radius: 12px; overflow: clip; scroll-snap-align: start; }
-.kins__card[data-k='natality'] { --k-ink: #24BAB2;
+:is(.kins__card, .kins__tile, .ksx)[data-k='natality'] { --k-ink: #24BAB2;
   --k-head: linear-gradient(117.72deg, rgb(92, 214, 206) 6%, rgb(84, 210, 202) 15.8%, rgb(76, 206, 198) 25.6%, rgb(68, 202, 194) 35.3%, rgb(60, 198, 190) 45.1%, rgb(52, 194, 186) 54.9%, rgb(44, 190, 182) 64.7%, rgb(36, 186, 178) 74.4%, rgb(36, 186, 178) 84.2%, rgb(36, 186, 178) 94%); }
-.kins__card[data-k='mortality'] { --k-ink: #FB8066;
+:is(.kins__card, .kins__tile, .ksx)[data-k='mortality'] { --k-ink: #FB8066;
   --k-head: linear-gradient(117.46deg, rgb(251, 153, 132) 6%, rgb(251, 149, 128) 15.8%, rgb(251, 146, 123) 25.6%, rgb(251, 143, 119) 35.3%, rgb(251, 139, 115) 45.1%, rgb(251, 135, 111) 54.9%, rgb(251, 132, 107) 64.7%, rgb(251, 128, 102) 74.4%, rgb(251, 128, 102) 84.2%, rgb(251, 128, 102) 94%); }
-.kins__card[data-k='vaccination'] { --k-ink: #FB4364; --k-head: linear-gradient(117.46deg, rgb(255, 104, 131) 6%, rgb(251, 67, 100) 94%); }
-.kins__card[data-k='deworming'] { --k-ink: #006D35; --k-head: linear-gradient(117.46deg, rgb(0, 141, 68) 6%, rgb(0, 109, 53) 94%); }
-.kins__card[data-k='admin'] { --k-ink: #839D8D; --k-head: linear-gradient(117.46deg, rgb(131, 157, 141) 6%, rgb(168, 176, 171) 94%); }
+:is(.kins__card, .kins__tile, .ksx)[data-k='vaccination'] { --k-ink: #FB4364; --k-head: linear-gradient(117.46deg, rgb(255, 104, 131) 6%, rgb(251, 67, 100) 94%); }
+:is(.kins__card, .kins__tile, .ksx)[data-k='deworming'] { --k-ink: #006D35; --k-head: linear-gradient(117.46deg, rgb(0, 141, 68) 6%, rgb(0, 109, 53) 94%); }
+:is(.kins__card, .kins__tile, .ksx)[data-k='admin'] { --k-ink: #839D8D; --k-head: linear-gradient(117.46deg, rgb(131, 157, 141) 6%, rgb(168, 176, 171) 94%); }
 .kins__cap { flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 12px; border: 0; background: var(--k-head); font: inherit; color: #fff; text-align: left; cursor: pointer; }
 .kins__cap:focus-visible { outline: 2px solid #fff; outline-offset: -4px; border-radius: 12px 12px 0 0; }
 .kins__cap-l { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -7627,6 +7627,30 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 .kins__txt b { font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; color: var(--c-on-surface-var, #44544A); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kins__txt small { font-size: 10px; font-weight: 400; line-height: 16px; color: var(--c-neutral-2, #7A8684); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kins__n { flex: none; font-family: 'DM Sans', var(--font); font-size: 16px; font-weight: 600; line-height: normal; font-variation-settings: 'opsz' 14; font-variant-numeric: tabular-nums; color: var(--c-on-surface-var, #44544A); text-align: center; white-space: nowrap; }
+/* THE TILES (5 Oct 2026): a grid, not a rail — five across from 900, three
+   on the 744 artboard, two on a phone (the fifth spans both) — each in its
+   card's own head colour: glyph, name, total, and what the total covers */
+.kins__rail.kins__tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; overflow: visible; scroll-snap-type: none; }
+.kins__tile { box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 140px; padding: 16px 12px;
+  border: 0; border-radius: 12px; background: var(--k-head); color: #fff; font: inherit; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform 160ms ease; }
+.kins__tile:active { transform: scale(.97); }
+.kins__tile:focus-visible { outline: 2px solid var(--k-ink); outline-offset: 3px; }
+.kins__tile .kins__mark { margin-bottom: 2px; }
+.kins__tile:not([data-k='natality']) .kins__mark img { rotate: 44.67deg; }
+.kins__tname { font-size: 14px; font-weight: 500; line-height: 18px; letter-spacing: .1px; }
+.kins__total { font-family: 'DM Sans', var(--font); font-size: 32px; font-weight: 600; line-height: 36px; font-variant-numeric: tabular-nums; }
+.kins__when { font-size: 12px; line-height: 16px; opacity: .85; }
+@media (max-width: 899px) { .kins__rail.kins__tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 599px) {
+  .kins__rail.kins__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kins__tile:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+/* the species sheet: the card's list, the body scrolls it */
+.ksx .kins__list--sheet { overflow: visible; gap: 8px; padding: 4px 0 8px; }
+.ksx .kins__row { padding-bottom: 10px; }
+.ksx .kins__av { width: 40px; height: 40px; }
+.ksx .gsx-sheet__foot { display: flex; justify-content: flex-end; }
 .kins__thumb { position: absolute; right: 0; top: 0; width: 3px; height: 52px; border-radius: 2px 0 0 2px; background: #D9D9D9; pointer-events: none; opacity: 0; transition: opacity 200ms ease; }
 .kins__card.is-scrollable .kins__thumb { opacity: 1; }
 /* NOTE CARDS FOLLOW THE REFERENCE CARD (owner, 5 Oct 2026, with a screenshot
@@ -49857,11 +49881,18 @@ function arrive(sections) {
    the export (ki-calendar.svg) is black at 40%, and no filter could make that
    OnSurfaceVariant (owner, 1 Oct 2026: "Custom icon also make onsurface variant") */
 const KI_CAL = '<svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true"><path d="M14.168 3.30469H13.5352V2.25H12.4805V3.30469H5.51953V2.25H4.46484V3.30469H3.83203C2.9597 3.30469 2.25 4.01439 2.25 4.88672V14.168C2.25 15.0403 2.9597 15.75 3.83203 15.75H11.3337L15.75 11.1638V4.88672C15.75 4.01439 15.0403 3.30469 14.168 3.30469ZM11.6367 13.9148V12.0059C11.6367 11.7151 11.8733 11.4785 12.1641 11.4785H13.9827L11.6367 13.9148ZM14.6953 10.4238H12.1641C11.2917 10.4238 10.582 11.1335 10.582 12.0059V14.6953H3.83203C3.54125 14.6953 3.30469 14.4587 3.30469 14.168V7.20703H14.6953V10.4238ZM14.6953 6.15234H3.30469V4.88672C3.30469 4.59594 3.54125 4.35937 3.83203 4.35937H4.46484V5.41406H5.51953V4.35937H12.4805V5.41406H13.5352V4.35937H14.168C14.4587 4.35937 14.6953 4.59594 14.6953 4.88672V6.15234Z"/></svg>'
+/* THREE RANGES, TILES, A SHEET (owner, 5 Oct 2026: "Date filters 7D, 30D,
+   30+. Don't want the table like this — make it container based: Mortality
+   in the centre, the total number under it, by the date filter; a tap opens
+   a bottom sheet with the species-wise list"). 7D and 30D count back from
+   the database's today; 30+ is everything past them — every day the data
+   carries (`all`). Today, 6M and the custom calendar are gone. Each card is
+   now a tile in its own colour: its glyph, its name, its total and what the
+   total covers; a tap opens the species list it used to scroll inside it. */
 const KI_RANGES = [
-  { id: 'today', label: 'Today', days: 1 },
-  { id: 'w', label: 'W', days: 7, name: 'Last 7 days' },
-  { id: 'm', label: 'M', days: 30, name: 'Last 30 days' },
-  { id: '6m', label: '6M', days: 182, name: 'Last 6 months' },
+  { id: '7d', label: '7D', days: 7, name: 'Last 7 days' },
+  { id: '30d', label: '30D', days: 30, name: 'Last 30 days' },
+  { id: '30p', label: '30+', all: true, name: 'More than 30 days — all the data' },
 ]
 /* THE CARDS (same day: "remove External Transfers & Food Wastage — instead
    put Vaccination pending, Deworming, Administration"): Natality and
@@ -49900,23 +49931,25 @@ function keyInsights(after) {
   const rowsOf = (f) => ({ total: f.total, rows: f.rows.map((r) => { const s = db.species(r.name) || {}; return { common: r.name, klass: s.klass, iucn: s.iucn, photo: db.photoOf(r.name), count: r.count } }) })
   /* the pick: a preset, or a custom first day as days ago (`from`) */
   const KEY = 'antz.insights.range'
-  let pick = { id: 'today', from: 0, to: 0 }
-  try {
-    const v = localStorage.getItem(KEY) || ''
-    const p = KI_RANGES.find((r) => r.id === v), m = /^custom:(\d+)(?::(\d+))?$/.exec(v)
-    if (p) pick = { id: p.id, from: p.days - 1, to: 0 }
-    else if (m) { const from = Math.min(db.EV_DAYS - 1, Number(m[1])); pick = { id: 'custom', from, to: Math.min(from, Number(m[2] || 0)) } }
-  } catch {}
+  const pickOf = (r) => ({ id: r.id, from: r.all ? db.EV_DAYS - 1 : r.days - 1, to: 0 })
+  let pick = pickOf(KI_RANGES[0])
+  try { const p = KI_RANGES.find((r) => r.id === localStorage.getItem(KEY)); if (p) pick = pickOf(p) } catch {}
   const days = () => pick.from - pick.to + 1
   const dbToday = () => new Date(`${db.V5DB.today}T00:00:00`)
   const dayOf = (ago) => { const d = dbToday(); d.setDate(d.getDate() - ago); return d }
   const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
   const span = () => (pick.from === pick.to ? fmt(dayOf(pick.from)) : `${fmt(dayOf(pick.from))} – ${fmt(dayOf(pick.to))}`)
-  const since = () => pick.id === 'today' ? 'today' : pick.id === 'custom' ? span() : `in the last ${days()} days`
+  const since = () => pick.id === '30p' ? `since ${fmt(dayOf(pick.from))}` : `in the last ${days()} days`
+  const caption = (c) => c.pending ? 'Overdue now' : pick.id === '30p' ? `Since ${fmt(dayOf(pick.from))}` : `Last ${days()} days`
   const read = (c) => {
     if (db.on()) return rowsOf(c.pending ? db.pending(c.pending, scope()) : db.range(c.flow, pick.from, pick.to, scope()))
     return c.flow === 'natality' || c.flow === 'mortality' ? summarise(c.flow, days()) : { total: 0, rows: [] }
   }
+  const tile = ({ c, d }) =>
+    `<button type="button" class="kins__tile" data-k="${c.k}" role="listitem" aria-haspopup="dialog" aria-label="${e(`${c.name}: ${d.total}, ${caption(c).toLowerCase()}. Show species`)}">` +
+      `<span class="kins__mark"><img src="assets/icon/${c.icon}" alt="" width="${c.w}" height="${c.h}"></span>` +
+      `<span class="kins__tname">${e(c.name)}</span><b class="kins__total">${e(d.total)}</b>` +
+      `<small class="kins__when">${e(caption(c))}</small></button>`
   const card = ({ c, d }) => {
     const name = `${c.name}${c.sep}${d.total}`
     const when = c.pending ? 'overdue today' : since()
@@ -49933,16 +49966,12 @@ function keyInsights(after) {
   const rule = `<span class="kins__rule" aria-hidden="true"><img src="assets/icon/ki-divider.svg" alt="" width="16" height="1"></span>`
   const band = document.createElement('section')
   band.className = 'kins'; band.id = 'keyInsights'; band.setAttribute('aria-labelledby', 'kinsTitle')
-  const [tToday, tW, tM, t6M] = KI_RANGES.map(tab)
   band.innerHTML =
     `<div class="kins__head"><h2 class="kins__title" id="kinsTitle">Key Insights</h2>` +
-      /* the node's own order, rules included: Today W M ǀ 6M ǀ calendar */
-      `<div class="kins__filter" role="group" aria-label="Insights range">${tToday}${tW}${tM}${rule}${t6M}${rule}` +
-        `<button type="button" class="kins__tab kins__tab--cal" data-r="custom" aria-pressed="false" aria-haspopup="dialog" aria-label="Custom range">${KI_CAL}<span class="kins__span"></span></button>` +
-        `</div></div>` +
-    `<div class="kins__rail" role="list"></div>`
+      `<div class="kins__filter" role="group" aria-label="Insights range">${KI_RANGES.map(tab).join('')}</div></div>` +
+    `<div class="kins__rail kins__tiles" role="list"></div>`
   after.after(band)
-  const rail = band.querySelector('.kins__rail'), tabs = [...band.querySelectorAll('.kins__tab')], cal = band.querySelector('.kins__tab--cal')
+  const rail = band.querySelector('.kins__rail'), tabs = [...band.querySelectorAll('.kins__tab')]
   /* the thumb: 52 tall, riding the list's own height, placed off its scroll */
   const thumbs = () => rail.querySelectorAll('.kins__card').forEach((cd) => {
     const list = cd.querySelector('.kins__list'), thumb = cd.querySelector('.kins__thumb')
@@ -49960,26 +49989,48 @@ function keyInsights(after) {
   const render = () => {
     band.dataset.range = pick.id; band.dataset.days = String(days())
     tabs.forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.r === pick.id)))
-    const custom = pick.id === 'custom'
-    cal.querySelector('.kins__span').textContent = custom ? span() : ''
-    cal.classList.toggle('has-span', custom)
-    cal.setAttribute('aria-label', custom ? `Custom range, ${span()}` : 'Custom range')
-    /* AN EMPTY CARD GOES LAST (owner, 29 Sep 2026: "if it is not show it in
-       the last"): the cards with rows keep the node's order, and one with
-       nothing in the range steps to the end of the rail, still there */
-    const all = KI_CARDS.map((c) => ({ c, d: read(c) }))
-    rail.innerHTML = [...all.filter((x) => x.d.rows.length), ...all.filter((x) => !x.d.rows.length)].map(card).join('')
-    rail.scrollLeft = 0
-    thumbs()
+    /* the tiles keep the node's order — a zero is a number worth seeing here */
+    shown = KI_CARDS.map((c) => ({ c, d: read(c) }))
+    rail.innerHTML = shown.map(tile).join('')
+    if (ks && ks.isOpen && ks.k) fillSheet(ks.k)
   }
-  const save = () => { try { localStorage.setItem(KEY, pick.id === 'custom' ? `custom:${pick.from}:${pick.to}` : pick.id) } catch {} }
-  addEventListener('resize', () => rail.querySelectorAll('.kins__card').forEach((cd) => cd._place?.()))
+  let shown = []
+  const save = () => { try { localStorage.setItem(KEY, pick.id) } catch {} }
   band.querySelector('.kins__filter').addEventListener('click', (ev) => {
     const t = ev.target.closest('.kins__tab'); if (!t) return
-    if (t === cal) { openRange(); return }
-    const r = KI_RANGES.find((x) => x.id === t.dataset.r)
-    pick = { id: r.id, from: r.days - 1, to: 0 }; save(); render()
+    pick = pickOf(KI_RANGES.find((x) => x.id === t.dataset.r)); save(); render()
   })
+
+  /* THE SPECIES SHEET: a tile's list, species-wise — every row opens that
+     species on the card's own tab; the foot opens the card's report on the
+     same range. GlobalSearch's sheet; the page behind held still. */
+  let ks = null
+  function fillSheet(k) {
+    const x = shown.find((y) => y.c.k === k); if (!x) return
+    const { c, d } = x
+    ks.k = k
+    ks.el.dataset.k = k
+    ks.el.querySelector('.gsx-sheet__title').textContent = c.name
+    ks.el.querySelector('.gsx-sheet__note').textContent = `${d.total} · ${caption(c)}`
+    ks.body.innerHTML = `<ul class="kins__list kins__list--sheet" aria-label="${e(`${c.name}, ${caption(c)}`)}">` +
+      (d.rows.length ? d.rows.map((r) => speciesRow(r, c.k)).join('') : `<li class="kins__none">${e(c.none)} ${e(c.pending ? 'today' : since())}</li>`) + `</ul>`
+  }
+  function openSheetK(k) {
+    if (!ks) {
+      ks = __req('js/components/GlobalSearch.js').createSheet({ title: 'Key Insights', note: ' ', className: 'ksx', draggable: true })
+      ks.foot.innerHTML = `<button type="button" class="gsx-btn gsx-btn--go ksx__all">View all ›</button>`
+      ks.body.addEventListener('click', (ev) => { const li = ev.target.closest('.kins__row[data-sp]'); if (li) { ks.close(); openRow(li) } })
+      ks.body.addEventListener('keydown', (ev) => { const li = ev.target.closest('.kins__row[data-sp]'); if (li && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); ks.close(); openRow(li) } })
+      ks.foot.addEventListener('click', () => {
+        const MP = __req('js/components/ModulePages.js'), to = MP.INSIGHT_TO[ks.k] || 'species'
+        ks.close(); MP.go(to === 'natality' || to === 'deaths' ? `${to}?days=${days()}` : to)
+      })
+    }
+    fillSheet(k)
+    lockR(true)
+    ks.show(() => { lockR(false); ks.k = null })
+  }
+  rail.addEventListener('click', (ev) => { const t = ev.target.closest('.kins__tile'); if (t) openSheetK(t.dataset.k) })
 
   /* CUSTOM · A RANGE CALENDAR IN A BOTTOM SHEET (owner, 1 Oct 2026: "Custom
      also has to work, so make proper UI"). It was a hidden <input type=date>
@@ -50063,13 +50114,6 @@ function keyInsights(after) {
     const [tb, q] = (TAB_OF[li.dataset.k] || '').split('?')
     __req('js/components/ModulePages.js').go(`species/${encodeURIComponent(li.dataset.sp)}${tb ? `/${tb}` : ''}${q ? `?${q}` : ''}`)
   }
-  rail.addEventListener('click', (ev) => { const li = ev.target.closest('.kins__row[data-sp]'); if (li) openRow(li) })
-  rail.addEventListener('keydown', (ev) => { const li = ev.target.closest('.kins__row[data-sp]'); if (li && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); openRow(li) } })
-  rail.addEventListener('click', (ev) => {
-    const b = ev.target.closest('.kins__open'); if (!b) return
-    const MP = __req('js/components/ModulePages.js'), to = MP.INSIGHT_TO[b.dataset.k] || 'species'
-    MP.go(to === 'natality' || to === 'deaths' ? `${to}?days=${days()}` : to)   /* the page opens on the card's own range */
-  })
   render()
   /* a change of site (V2's site tabs) recounts every card */
   __req('js/state/reportScope.js').subscribe(() => { if (band.isConnected) render() })
