@@ -3974,6 +3974,25 @@ body.is-report { overflow: hidden; }
   .fav__rail { --fav-w: 124px; --fav-h: 156px; gap: 10px; }
   .fav__name { font-size: 14px; }
 }
+/* V2's My animals sheet (Favourites.js mountAnimals, 5 Oct 2026) */
+.fan__sec { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 16px; }
+.fan__sec h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; color: var(--c-on-surface-var, #44544A); }
+.fan__sec h3 span { margin-left: 4px; font-family: var(--font-num); font-weight: 500; opacity: .7; }
+.fan__row { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(0, 0, 0, .06); }
+.fan__open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 10px 0; border: 0; background: none; font: inherit; text-align: left; color: inherit; cursor: pointer; }
+.fan__open img { flex: none; width: 48px; height: 48px; border-radius: 12px; object-fit: cover; background: var(--petrol-050, #E6F0EF); }
+.fan__open span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fan__open b { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fan__open small { font-size: 13px; color: var(--c-on-surface-var, #44544A); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fan__star { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: #8A968F; cursor: pointer; }
+.fan__star[aria-pressed='true'] { color: #E8A317; }
+.fan__star svg { width: 24px; height: 24px; fill: currentColor; }
+.fan__none { margin: 4px 0; font-size: 14px; color: var(--c-on-surface-var, #44544A); }
+.fan-sheet .gsx-sheet__foot { display: flex; gap: 10px; justify-content: flex-end; }
+.fan__clear:disabled { opacity: .45; cursor: default; }
+.mp-favbtn { display: inline-flex; align-items: center; gap: 6px; }
+.mp-favbtn svg { width: 20px; height: 20px; fill: currentColor; }
+.mp-favbtn[aria-pressed='true'] svg { color: #E8A317; }
 
 /* ── the picker sheet · V5 (owner, 25 Sep 2026: "combine these two", from
    mockups/my-species-picker.html) ── GlobalSearch's sheet, a little wider
@@ -42770,8 +42789,114 @@ const curve = (name, fallback) => {
   return v && CSS.supports('transition-timing-function', v) ? v : fallback
 }
 
+/* ── MY ANIMALS, ELSE RECENTLY VIEWED · V2 (owner, 5 Oct 2026: "favourite
+   Animals has to show. If they don't have, show Recently viewed animals") ──
+   V2's band holds ANIMALS, not species. An animal is favourited by the star
+   on its sheet (ModulePages.js, the species page's animal list), and every
+   sheet opened is remembered as viewed. While any animal is favourited the
+   band is "My animals"; with none it is "Recently viewed", newest first. A
+   card opens that animal's sheet on its species page; the pencil opens both
+   lists, where a star adds or removes and the viewed list can be cleared.
+   Kept in this browser, like the species rail. The viewed list is seeded
+   the first time with one real animal of each seed species, so a first
+   visit is not empty; clearing it leaves it empty. */
+const A_FAV = 'antz.home.animals.fav', A_SEEN = 'antz.home.animals.seen', SEEN_MAX = 12
+const A_SEED = [
+  { aaid: 190317, sp: 'Slate Pangolin', sex: 1, encl: 'Ridge Path Enclosure' },
+  { aaid: 143944, sp: 'Glacial Egret', sex: 2, encl: 'Thistle Spring Den' },
+  { aaid: 172277, sp: 'Russet Whipsnake', sex: 2, encl: 'Cedar Ridge Habitat' },
+  { aaid: 169095, sp: 'Marbled Phantom Saki', sex: 1, encl: 'Ivy Marsh Terrarium' },
+]
+const SEX_A = ['Male', 'Female', 'Unsexed']
+const readA = (k, seed) => {
+  try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return Array.isArray(v) ? v.filter((r) => r && r.aaid && r.sp) : [...(seed || [])] }
+  catch (_) { return [...(seed || [])] }
+}
+const writeA = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch (_) {} }
+const favAnimals = () => readA(A_FAV)
+const seenAnimals = () => readA(A_SEEN, A_SEED)
+const isFavAnimal = (aaid) => favAnimals().some((r) => r.aaid === +aaid)
+const animalsChanged = () => dispatchEvent(new CustomEvent('antz:animals'))
+function setFavAnimal(rec, on) {
+  const rest = favAnimals().filter((r) => r.aaid !== rec.aaid)
+  writeA(A_FAV, on ? [rec, ...rest] : rest); animalsChanged()
+}
+function sawAnimal(rec) {
+  writeA(A_SEEN, [rec, ...seenAnimals().filter((r) => r.aaid !== rec.aaid)].slice(0, SEEN_MAX)); animalsChanged()
+}
+const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2L9.19 8.62L2 9.24l5.45 4.73L5.82 21z"/></svg>'
+const STAR_O = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 15.39l-3.76 2.27l.99-4.28l-3.32-2.88l4.38-.37L12 6.09l1.71 4.04l4.38.37l-3.32 2.88l.99 4.28M22 9.24l-7.19-.61L12 2L9.19 8.63L2 9.24l5.45 4.73L5.82 21L12 17.27L18.18 21l-1.64-7.03z"/></svg>'
+
+function mountAnimals(root) {
+  const title = root.querySelector('.fav__title'), rail = root.querySelector('.fav__rail'), edit = root.querySelector('.fav__edit')
+  const pages = () => __req('js/components/ModulePages.js')
+  const img = (r) => esc(r.img || photo(r.sp))
+  const aCard = (r) =>
+    `<div class="fav__item" role="listitem"><button type="button" class="fav__card" data-aaid="${r.aaid}" data-sp="${esc(r.sp)}" aria-label="${esc(r.sp)}, AAID ${r.aaid}">` +
+      `<img class="fav__img" src="${img(r)}" alt="" loading="lazy" decoding="async">` +
+      `<span class="fav__txt"><b class="fav__name">${esc(r.sp)}</b><small class="fav__meta">AAID ${r.aaid} · ${SEX_A[r.sex] || 'Unsexed'}</small></span>` +
+    `</button></div>`
+  const draw = () => {
+    const fav = favAnimals(), seen = seenAnimals(), mine = fav.length > 0, list = mine ? fav : seen
+    title.textContent = mine || !seen.length ? 'My animals' : 'Recently viewed'
+    edit.setAttribute('aria-label', 'Edit my animals')
+    rail.innerHTML = list.map(aCard).join('') +
+      `<div class="fav__item" role="listitem"><button type="button" class="fav__card fav__card--add" data-browse>` +
+        `<span class="fav__plus" aria-hidden="true">${icon('plus')}</span>` +
+        `<b class="fav__name">${list.length ? 'Find animals' : 'Find an animal'}</b></button></div>`
+  }
+  const openAnimal = (r) => pages().go(`species/${encodeURIComponent(r.sp)}/population?aaid=${r.aaid}`)
+
+  /* the pencil: both lists in one sheet; a star moves an animal in or out of
+     My animals, a row opens it, and the viewed list can be cleared */
+  let sh = null
+  const row = (r, on) =>
+    `<div class="fan__row"><button type="button" class="fan__open" data-aaid="${r.aaid}">` +
+      `<img src="${img(r)}" alt="" loading="lazy" decoding="async">` +
+      `<span><b>${esc(r.sp)}</b><small>AAID ${r.aaid} · ${SEX_A[r.sex] || 'Unsexed'}${r.encl ? ` · ${esc(r.encl)}` : ''}</small></span></button>` +
+      `<button type="button" class="fan__star" data-star="${r.aaid}" aria-pressed="${on}" aria-label="${on ? 'Remove from' : 'Add to'} My animals">${on ? STAR : STAR_O}</button></div>`
+  const fill = () => {
+    const fav = favAnimals(), seen = seenAnimals()
+    sh.body.innerHTML =
+      `<section class="fan__sec"><h3>My animals <span>${fav.length}</span></h3>` +
+        (fav.length ? fav.map((r) => row(r, true)).join('') : `<p class="fan__none">Tap the star on an animal to keep it on your home.</p>`) + `</section>` +
+      `<section class="fan__sec"><h3>Recently viewed <span>${seen.length}</span></h3>` +
+        (seen.length ? seen.map((r) => row(r, isFavAnimal(r.aaid))).join('') : `<p class="fan__none">Animals you open show up here.</p>`) + `</section>`
+    sh.foot.querySelector('[data-clear]').disabled = !seen.length
+  }
+  const all = () => { const m = new Map(); for (const r of [...seenAnimals(), ...favAnimals()]) m.set(r.aaid, r); return m }
+  function openSheet() {
+    if (!sh) {
+      sh = __req('js/components/GlobalSearch.js').createSheet({ title: 'My animals', note: 'Star an animal to keep it on your home', className: 'fan-sheet', draggable: true })
+      sh.foot.innerHTML = `<button type="button" class="gsx-btn fan__clear" data-clear>Clear recently viewed</button><button type="button" class="gsx-btn gsx-btn--go" data-done>Done</button>`
+      sh.body.addEventListener('click', (e) => {
+        const st = e.target.closest('[data-star]'), op = e.target.closest('.fan__open')
+        if (st) { const r = all().get(+st.dataset.star); if (r) setFavAnimal(r, st.getAttribute('aria-pressed') !== 'true') }
+        else if (op) { const r = all().get(+op.dataset.aaid); if (r) { sh.close(); openAnimal(r) } }
+      })
+      sh.foot.addEventListener('click', (e) => {
+        if (e.target.closest('[data-clear]')) { writeA(A_SEEN, []); animalsChanged() }
+        else if (e.target.closest('[data-done]')) sh.close()
+      })
+    }
+    fill()
+    sh.show()
+  }
+  rail.addEventListener('click', (e) => {
+    const b = e.target.closest('.fav__card'); if (!b) return
+    if (b.hasAttribute('data-browse')) { pages().go('species'); return }
+    const r = all().get(+b.dataset.aaid); if (r) openAnimal(r)
+  })
+  edit.addEventListener('click', openSheet)
+  addEventListener('antz:animals', () => { draw(); if (sh && sh.body.isConnected && sh.body.closest('.gsx-sheet:not([hidden])')) fill() })
+  draw()
+  root.hidden = false
+  return root
+}
+
 function mount({ root, onOpen } = {}) {
   if (!root || !hasV4Top()) return null
+  if (isV2() && DB.on()) return mountAnimals(root)
   /* V2 names it as V5 does (page feedback, 28 Sep 2026: "Make label My
      favorites"), in V5's spelling; it stays where V2's frame puts it */
   if (isV2()) root.querySelector('.fav__title').textContent = 'My species'   /* capital F, same day */
@@ -43105,6 +43230,9 @@ const canFavourite = (name) => hasV4Top() && catalogue().some((s) => s.name === 
 __x.mount = mount
 __x.isFavourite = isFavourite
 __x.canFavourite = canFavourite
+__x.isFavAnimal = isFavAnimal
+__x.setFavAnimal = setFavAnimal
+__x.sawAnimal = sawAnimal
 });
 
 __def('js/components/Necropsy.js', function (__x, __req) {
@@ -45747,12 +45875,25 @@ function srHero(name, s, h) {
 }
 
 function animalSheet(name, a) {
+  /* V2's home band (Favourites.js): this animal is now recently viewed, and
+     the star keeps it under My animals (owner, 5 Oct 2026) */
+  const F = favs(), rec = { aaid: a[0], sp: name, sex: a[1], encl: a[3] || '', img: photo(name) || '' }
+  F?.sawAnimal?.(rec)
+  const starBtn = (on) => `<button type="button" class="mp-btn is-ghost mp-favbtn" data-favanimal aria-pressed="${on}">${mdi(on ? MDI.star : MDI.starO)}<span>${on ? 'In My animals' : 'Add to My animals'}</span></button>`
   sheet({ title: `AAID ${a[0]}`, html:
     `<div class="mp-spbar">${thumb(name, a[1])}<span><b>${esc(name)}</b><i>${esc(latin(name))}</i></span></div>` +
     kv('Record', [['Sex', SEX[a[1]][2]], ['Age', esc(age(a[4]) || 'No birth date')], ['Born', a[4] ? fmtDate(a[4]) : '—'], ['In the collection since', a[5] ? fmtDate(a[5]) : '—'],
       ['Site', esc(DB.sites[a[2]]?.name || '—')], ['Enclosure', esc(a[3] || '—')], ['Microchip', a[6] ? '<em class="mp-ok">Chipped</em>' : '<em class="mp-warn">Not chipped</em>']]),
-    foot: a[3] ? `<button type="button" class="mp-btn is-ghost" data-close>Close</button><button type="button" class="mp-btn" data-mates>Who shares ${esc(a[3])}</button>` : '',
-    onClick(e, shut) { if (e.target.closest('[data-mates]')) { shut(); go(spGo(name, 'population', `encl=${encodeURIComponent(a[3])}`), { replace: true }) } } })
+    foot: (F?.setFavAnimal ? starBtn(F.isFavAnimal(a[0])) : `<button type="button" class="mp-btn is-ghost" data-close>Close</button>`) + (a[3] ? `<button type="button" class="mp-btn" data-mates>Who shares ${esc(a[3])}</button>` : ''),
+    onClick(e, shut) {
+      const fb = e.target.closest('[data-favanimal]')
+      if (fb) {
+        const on = fb.getAttribute('aria-pressed') !== 'true'
+        F.setFavAnimal(rec, on); fb.outerHTML = starBtn(on)
+        toast(on ? `AAID ${a[0]} added to My animals` : `AAID ${a[0]} removed from My animals`)
+        return
+      }
+      if (e.target.closest('[data-mates]')) { shut(); go(spGo(name, 'population', `encl=${encodeURIComponent(a[3])}`), { replace: true }) } } })
 }
 function tabMenu(name, tabsOn, tab) {
   sheet({ title: name, html: `<div class="mp-menu">` + tabsOn.map(([k, l]) => `<button type="button" class="mp-menu__row sr-menurow" data-k="${k}" aria-current="${k === tab}"><span class="mp-menu__ico">${tabIcon(k)}</span><span>${esc(l)}</span>${I.chev}</button>`).join('') + `</div>`,
@@ -46144,6 +46285,13 @@ function speciesPage(name, tab, q) {
      text" (it read "Species Management") */
   return { title: 'Species Details', view: 'species', right: siteButton(), group: `sp:${name}`, html: srHero(name, s, h) + nav + `<div class="sr-content">${content}</div>`, mount(root) {
     requestAnimationFrame(() => drawLines(root))
+    /* ?aaid= (a card on V2's home band): open that animal's sheet once, and
+       drop the parameter so a redraw does not open it again */
+    if (q?.aaid) {
+      const a = (DB.animals[name] || []).find((x) => x[0] === +q.aaid)
+      history.replaceState(null, '', `#m/${spGo(name, tab)}`)
+      if (a) requestAnimationFrame(() => animalSheet(name, a))
+    }
     /* the tab bar brings the open tab into view, as the reference's does */
     { const a = root.querySelector('.sr-tab[aria-current="page"]'), bar = a?.parentElement
       if (a && bar && a.offsetLeft + a.offsetWidth > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = a.offsetLeft + a.offsetWidth - bar.clientWidth + 6 }
@@ -49869,13 +50017,23 @@ const HS_DAYS = 7, HS_TOP = 5, HS_SPEED = 40
    strip would be empty; HS_DAYS = 1 brings the node's words back. A label or
    a species opens the week's sheet; the audit run is the node's own
    placeholder (the dump has no audit table) and says so when tapped. */
-const HS_AUDIT = { score: 68, rows: [['Gagva', 11], ['74 Acre', 50]] }   /* the node's placeholders */
+/* AUDIT ONLY, EVERY SITE (owner, 5 Oct 2026: "Tickers has to show only
+   audit, remove natality & mortality. In Audit show all sites"). The tape is
+   one run: the audit score, then each of V5DB's four sites with its own
+   score, whichever site the chips are on. The dump has no audit table, so
+   the per-site figures are SAMPLE numbers; the headline is their mean. */
+const HS_AUDIT_SITES = { 'bg-safari': 72, 'bg-zoo': 64, 'hg-field': 81, 'ms-rescue': 55 }
+const hsAudit = () => {
+  const db = __req('js/data/v5db.js')
+  const rows = db.V5DB.sites.map((x) => [x.short || x.name, HS_AUDIT_SITES[x.id] ?? 0])
+  return { score: Math.round(rows.reduce((a, [, p]) => a + p, 0) / (rows.length || 1)), rows }
+}
 function healthStrip(after) {
   if (!after) return
   const db = __req('js/data/v5db.js'), scope = () => __req('js/state/reportScope.js').get()
   const e = (v) => String(v ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]))
   const strip = document.createElement('nav')
-  strip.className = 'hstrip'; strip.id = 'healthStrip'; strip.setAttribute('aria-label', 'This week at a glance')
+  strip.className = 'hstrip'; strip.id = 'healthStrip'; strip.setAttribute('aria-label', 'Animal audit score, every site')
   /* the node's word (owner, 1 Oct 2026: "make the text Week's to Today"); the
      figures stay the last HS_DAYS days, which is what the sheet counts */
   const when = 'TODAY’S'
@@ -49902,17 +50060,20 @@ function healthStrip(after) {
       f.rows.slice(0, HS_TOP).map((s) => item(r.cls, ` data-sp="${e(s.name)}"${t}`, db.photoOf(s.name) || 'assets/img/species.jpg', s.name, s.count, `${s.name}, ${s.count} ${r.verb}`)).join('') + `</div>`
   }
   const audit = (copy) => {
-    const t = copy ? ' tabindex="-1"' : ''
+    const t = copy ? ' tabindex="-1"' : '', A = hsAudit()
     return `<div class="hstrip__run hstrip__run--audit" data-k="audit">` +
-      `<button type="button" class="hstrip__label"${t} data-tip aria-label="Animal audit score ${HS_AUDIT.score}%">${GLYPH.audit}<span>ANIMAL AUDIT SCORE <b>${HS_AUDIT.score}%</b></span></button>` +
-      HS_AUDIT.rows.map(([n, p]) => item('audit', ` data-tip${t}`, 'assets/img/hs-audit.jpg', n, `${p}%`, `${n}, audit ${p}%`)).join('') + `</div>`
+      `<button type="button" class="hstrip__label"${t} data-tip aria-label="Animal audit score ${A.score}%">${GLYPH.audit}<span>ANIMAL AUDIT SCORE <b>${A.score}%</b></span></button>` +
+      A.rows.map(([n, p]) => item('audit', ` data-tip${t}`, 'assets/img/hs-audit.jpg', n, `${p}%`, `${n}, audit ${p}%`)).join('') + `</div>`
   }
+  /* one short run cannot fill a wide lane, and the wrap needs each set at
+     least a lane wide — so a set repeats the run until it is (copies after
+     the first are hidden from the keyboard and from readers) */
+  let reps = 1
   const render = () => {
-    const flows = RUNS.map((r) => (db.on() ? db.windowed(r.k, HS_DAYS, scope()) : { total: 0, rows: [] }))
-    const set = (copy) => `<div class="hstrip__set"${copy ? ' aria-hidden="true"' : ''}>${RUNS.map((r, i) => run(r, flows[i], copy)).join('')}${audit(copy)}</div>`
+    const set = (copy) => `<div class="hstrip__set"${copy ? ' aria-hidden="true"' : ''}>${Array.from({ length: reps }, (_, i) => audit(copy || i > 0)).join('')}</div>`
     strip.innerHTML =
       `<div class="hstrip__lane"><div class="hstrip__tape">${set(false)}${set(true)}</div></div>` +
-      `<span class="hstrip__cap" data-k="natality" aria-hidden="true"><span class="hstrip__live">` +
+      `<span class="hstrip__cap" data-k="audit" aria-hidden="true"><span class="hstrip__live">` +
         `<img class="hstrip__live-on" src="assets/icon/hs-live.gif" alt=""><img class="hstrip__live-still" src="assets/icon/hs-live-still.png" alt=""></span></span>` +
       `<span class="hstrip__pin" hidden></span>`
     lane = strip.querySelector('.hstrip__lane'); sets = strip.querySelectorAll('.hstrip__set'); cap = strip.querySelector('.hstrip__cap'); pin = strip.querySelector('.hstrip__pin'); pinKey = ''
@@ -50072,8 +50233,13 @@ function healthStrip(after) {
   })
   render()
   after.after(strip)
-  /* a change of site recounts the week */
-  __req('js/state/reportScope.js').subscribe(() => { if (strip.isConnected) render() })
+  /* every site, so a change of site does not redraw it; a lane wider than a set adds a repeat */
+  const fill = () => {
+    if (!strip.isConnected || !sets[0]) return
+    const need = Math.max(1, Math.ceil(lane.clientWidth / Math.max(1, sets[0].offsetWidth / reps)))
+    if (need > reps) { reps = need; render() }
+  }
+  requestAnimationFrame(fill); addEventListener('resize', fill)
   return strip
 }
 
@@ -51942,8 +52108,8 @@ if (PAGE_VERSION === '1' || hasV4Top()) {
   if (isV2()) { if (!isV6()) __req('js/components/WeatherSky.js').mountWeatherSky() }
   /* V2 · every segmented toggle glides to its pick (1 Oct 2026) — glide.js */
   if (isV2()) __req('js/lib/glide.js').startGlide()
-  /* V2 · a scrolled rail softens at its edges (1 Oct 2026) — edgeFade.js */
-  if (isV2()) __req('js/lib/edgeFade.js').startEdgeFade()
+  /* V2 · rails no longer blur or fade at their edges (owner, 5 Oct 2026:
+     "Remove the left & right side blur") — edgeFade.js is kept, unstarted */
   else createHeroBanners({ root: document.getElementById('heroStage'), items: hasV4Top() ? HOME_BANNERS_V4 : HOME_BANNERS })
 
   /* the rail between the announcements and the modules, node 196:7243 */
