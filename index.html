@@ -7631,7 +7631,7 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
    on the 744 artboard, two on a phone (the fifth spans both) — each in its
    card's own head colour: glyph, name, total, and what the total covers */
 .kins__rail.kins__tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; overflow: visible; scroll-snap-type: none; }
-.kins__tile { box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 140px; padding: 16px 12px;
+.kins__tile { box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 124px; padding: 16px 12px;
   border: 0; border-radius: 12px; background: var(--k-head); color: #fff; font: inherit; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent;
   transition: transform 160ms ease; }
 .kins__tile:active { transform: scale(.97); }
@@ -49948,8 +49948,8 @@ function keyInsights(after) {
   const tile = ({ c, d }) =>
     `<button type="button" class="kins__tile" data-k="${c.k}" role="listitem" aria-haspopup="dialog" aria-label="${e(`${c.name}: ${d.total}, ${caption(c).toLowerCase()}. Show species`)}">` +
       `<span class="kins__mark"><img src="assets/icon/${c.icon}" alt="" width="${c.w}" height="${c.h}"></span>` +
-      `<span class="kins__tname">${e(c.name)}</span><b class="kins__total">${e(d.total)}</b>` +
-      `<small class="kins__when">${e(caption(c))}</small></button>`
+      /* no caption under the total (owner, 5 Oct 2026: "remove last 7 days, overdue now and all") — the range tabs say it */
+      `<span class="kins__tname">${e(c.name)}</span><b class="kins__total">${e(d.total)}</b></button>`
   const card = ({ c, d }) => {
     const name = `${c.name}${c.sep}${d.total}`
     const when = c.pending ? 'overdue today' : since()
