@@ -8030,7 +8030,19 @@ body.v2ctx-open .v2ctx-menu { transform: none; opacity: 1; pointer-events: auto;
 .l-v2sn__none { margin: auto; font-size: 14px; font-weight: 600; color: #7A5048; }
 /* with the tape gone (5 Oct 2026) the head comes up to the note's own top padding */
 .l-v2sn { padding-top: 18px; }
-/* a short card (the phone's 243, or a smaller size): tighter rows, one column */
+/* a middle card (the phone's 370, three rows of its grid since 5 Oct 2026):
+   44 rows — the HIG's tap height — 6 apart, the text with room above and
+   below it; 16 + head 22 + 12 + 6 × 44 + 5 × 6 + 14 = 358 */
+@container (min-height: 301px) and (max-height: 420px) {
+  .l-v2sn { padding: 16px 14px 14px; }
+  .l-v2sn__head b { font-size: 18px; }
+  .l-v2sn__ico { width: 18px; height: 18px; }
+  .l-v2sn__rows { gap: 6px; margin-top: 12px; }
+  .l-v2sn__row { flex-basis: 44px; min-height: 44px; padding: 0 14px; border-radius: 10px; }
+  .l-v2sn__t { font-size: 14.5px; }
+  .l-v2sn__row b { font-size: 16px; }
+}
+/* a short card (the phone's old 243, or a smaller size): tighter rows, one column */
 @container (max-height: 300px) {
   .l-v2sn { padding: 18px 12px 10px; }
   .l-v2sn__head b { font-size: 16px; }
@@ -19312,8 +19324,11 @@ const SPAN_TABLE = {
      that name it in `supportedSizes` can be set to it. */
   /* 2 columns is a phone: one 179-wide column three rows tall cut every
      row's text, so there it takes the same area as the full width at two
-     rows (owner's iPhone, 29 Sep 2026). */
-  xtall:  { 2: [2, 2], 4: [2, 3], 5: [2, 3], 8: [2, 3], 12: [3, 3] },
+     rows (owner's iPhone, 29 Sep 2026). Then the full width at THREE rows
+     (5 Oct 2026, the Pending note: "see here it's hugging, make it
+     properly"): at two the six jobs had 27px each and touched their own
+     text. Pending Actions is the only card V2 sets at this size. */
+  xtall:  { 2: [2, 3], 4: [2, 3], 5: [2, 3], 8: [2, 3], 12: [3, 3] },
   /* THE FULL WIDTH AT ONE ROW · added 17 Sep for node 506:12894. `full` is
      four columns and TWO rows; the promo banner is four and ONE — 696x144,
      the hero's own footprint. Nothing before it needed a band that wide and
