@@ -352,3 +352,122 @@
   box-shadow: 0 6px 16px -6px rgba(0, 109, 53, .55), inset 0 1px 0 rgba(255, 255, 255, .22);
 }
 :root[data-review] body.is-editing .qa-edit > .link-btn--done:hover { background: #005C2D; filter: none; }
+
+/* ══ V2 ON A PHONE, AS FIGMA 903:2 "Home · Mobile (5 Oct)" DRAWS IT ════════
+   Owner, 6 Oct 2026: "only for Mobile do it like the design — no more
+   compliment in design & font, spacing". Every number below is the node's
+   (get_design_context, 903:5 · 903:48 · 907:1257 · 907:1492 · 907:1686 ·
+   907:2307 · 903:511); nothing from 744 up changes. It supersedes the
+   earlier phone rulings where they disagree — the 20/13 greeting, the 12/14
+   announcement chip and head with Read More, the 44 site chips at r12, the
+   band gaps of 12. `html` + [data-review] lift each rule over the app's
+   phone block and the style blocks that load after this sheet.
+   The grid's order and its two insight cards are V2_PHONE_LAYOUT and the
+   `v2-ki` layout in index.html; the Key Insights band and the Command Centre
+   banner are not drawn on a phone. */
+@media (max-width: 743px) {
+  /* ── header · 903:5: 20 16 16, 10 apart; avatar 32; 12 Regular #7A8684 over
+     16 Medium #1F415B, 4 between; 21° 16 Medium #4A5550; the bell bare ── */
+  html:root[data-review][data-home='v2'] .home-header { padding: 20px 16px 16px; gap: 10px; }
+  html:root[data-review][data-home='v2'] .home-header .header-actions #avatarBtn { width: 32px; height: 32px; }
+  html:root[data-review][data-home='v2'] .greeting { gap: 4px; }
+  html:root[data-review][data-home='v2'] .greeting__word { font-size: 12px; font-weight: 400; line-height: 15px; color: #7A8684; }
+  html:root[data-review][data-home='v2'] :is(.greeting__name, #greetName) { font-size: 16px; font-weight: 500; line-height: normal; letter-spacing: 0; color: #1F415B; }
+  html:root[data-review][data-home='v2'] .greeting__wave { font-size: 20px; font-weight: 600; letter-spacing: -.2px; margin-left: 2.4px; }
+  html:root[data-review][data-home='v2'] .header-actions .wx { gap: 0 4px; }
+  html:root[data-review][data-home='v2'] .header-actions .wx__t { font-size: 16px; font-weight: 500; line-height: normal; color: #4A5550; }
+  html:root[data-review][data-home='v2'] .header-actions .icon-btn--bell { background: none; box-shadow: none; }
+  /* the search bar · 903:26: 60 tall, the field 8 off the header and 8 over
+     the favourites — the row keeps its 10 of sticky glass and gives back 2 */
+  html:root[data-review][data-home='v2'] .search-row { margin-top: -2px; margin-bottom: -2px; }
+  /* 903:28: the placeholder 14 Regular #7A8684, 12 after the 20 glyph — 16 + 20 + 12 in.
+     Only the drawn hint; the input keeps 16 so iOS does not zoom on focus */
+  html:root[data-review][data-home='v2'] .search__hint { left: 48px; max-width: calc(100% - 64px); font-size: 14px; }
+  html:root[data-review][data-home='v2'] :is(.search__hint-lead, .search__cycle) { font-size: 14px; }
+
+  /* ── Recently viewed · 903:48: 16 over, 20 under, 12 under the head; 132 × 158
+     cards 8 apart at r12; AAID:n 14 Medium, the species 12 at 90% ── */
+  html:root[data-review][data-home='v2'] .fav-band:not([hidden]) { padding-top: 16px; padding-bottom: 20px; gap: 12px; }
+  html:root[data-review][data-home='v2'] .fav__head { height: 19px; }
+  html:root[data-review][data-home='v2'] .fav__rail { gap: 8px; }
+  html:root[data-review][data-home='v2'] .fav__card { width: 132px; flex-basis: 132px; height: 158px; padding: 12px; border-radius: 12px; }
+  html:root[data-review][data-home='v2'] .fav__txt { gap: 2px; }
+  html:root[data-review][data-home='v2'] .fav__name { font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; }
+  html:root[data-review][data-home='v2'] .fav__idsep { font-size: 0; }
+  html:root[data-review][data-home='v2'] .fav__idsep::before { content: ':'; font-size: 14px; }
+  html:root[data-review][data-home='v2'] .fav__meta { font-size: 12px; font-weight: 400; line-height: normal; opacity: .9; }
+  html:root[data-review][data-home='v2'] .fav__sex { top: 8px; right: 9px; }
+
+  /* ── the audit ticker · 907:1257: 16 under the favourites, 42 tall at r12,
+     a .5 #FFE86E edge on rgba(252,244,174,.5); "AUDIT SCORE 68%" 12/600; a
+     site 12 Regular #44544A with its figure 12/600 #250E01, 8 to the photo,
+     13 to the rule ── */
+  html:root[data-review][data-home='v2'] .hstrip { margin-top: 16px; border-radius: 12px; box-shadow: inset 0 0 0 .5px #FFE86E; }
+  html:root[data-review][data-home='v2'] .hstrip__lane { height: 42px; border-radius: 12px; }
+  html:root[data-review][data-home='v2'] .hstrip__lead { display: none; }
+  html:root[data-review][data-home='v2'] .hstrip__it { gap: 8px; padding-right: 13px; }
+  html:root[data-review][data-home='v2'] .hstrip__txt { font-size: 12px; font-weight: 400; color: #44544A; }
+  html:root[data-review][data-home='v2'] .hstrip__txt b { font-size: 12px; font-weight: 600; color: #250E01; }
+
+  /* ── Announcements · 907:1492: 16 under the ticker, 16 12 12 inside, the card
+     r10 and 431 tall, 32 to the dots; chip 10 Medium #2FA85C; the head
+     16/22; byline 12; body 14/19 #44544A, three lines, no Read More; the
+     attachments 12; the photo r10 ── */
+  html:root[data-review][data-home='v2'] .hstrip + .adeck,
+  html:root[data-review][data-home='v2'] .adeck { margin-top: 16px; padding: 16px 12px 12px; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__foot { margin-top: 32px; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__card { --adeck-h: 431px; border-radius: 10px; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__body { gap: 12px; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__text { gap: 4px; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__chip { height: auto; padding: 2px 12px 2px 2px; border-radius: 15px; font-size: 10px; font-weight: 500; letter-spacing: 0; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__hl { font-size: 16px; font-weight: 500; line-height: 22px; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__by { height: 28px; padding-top: 4px; gap: 6px; font-size: 12px; line-height: normal; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__av { width: 24px; height: 24px; font-weight: 500; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__desc { font-size: 14px; line-height: 19px; color: #44544A; -webkit-line-clamp: 3; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__text .adeck__more { display: none; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__att { height: 22px; padding-top: 4px; gap: 6px; font-size: 12px; line-height: normal; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__att :is(img, svg) { width: 16px; height: 16px; }
+  html:root[data-review][data-home='v2'] .adeck .adeck__img { border-radius: 10px; }
+
+  /* ── the sites · 907:1686: 16 under the band, 20 over the chips, no foot; the
+     menu a 44 pill and the chips stadia 12 16, 14 Medium — the lit one on
+     #1F515B, the rest on rgba(0,0,0,.07) in #44544A ── */
+  html:root[data-review][data-home='v2'] .site-tabs--v2 { height: 61px; margin-top: 16px; padding-top: 20px; padding-bottom: 0; gap: 8px; }
+  html:root[data-review][data-home='v2']:not(.v2-tabs-stuck) .site-tabs--v2 { background: linear-gradient(0deg, #fff 0%, #fff 82.449%, #F7F9F9 100%); }
+  html:root[data-review][data-home='v2'] .site-tabs--v2 .site-tabs__track { gap: 8px; }
+  html:root[data-review][data-home='v2'] .site-tabs--v2 .site-tabs__menu { width: 44px; height: 41px; padding: 0; border-radius: 100px; background: rgba(0, 0, 0, .07); }
+  html:root[data-review][data-home='v2'] .site-tabs--v2 .site-tabs__menu svg { width: 24px; height: 24px; }
+  html:root[data-review][data-home='v2'] .site-tabs--v2 .site-tabs__tab { height: 41px; padding: 0 16px; border-radius: 100px; font-size: 14px; font-weight: 500; letter-spacing: .1px; background: rgba(0, 0, 0, .07); color: #44544A; }
+  html:root[data-review][data-home='v2'] .site-tabs--v2 .site-tabs__tab[aria-selected='true'] { padding: 0 16px; border-radius: 100px; background: #1F515B; color: #fff; }
+
+  /* ── Observation Notes · 907:2307: 16 under the sites, 20 12 12 inside, 16
+     under the head; 290 cards 8 apart; the title 16 Medium; the tags 12 with
+     no lead bullet; the note 12/17; the author 12 ── */
+  html:root[data-review][data-home='v2'] .obs-band { margin-top: 16px; padding: 20px 0 12px; }
+  html:root[data-review][data-home='v2'] .obs-band .obs-head { margin: 0 10px 16px 12px; }
+  html:root[data-review][data-home='v2'] .obs-rail { gap: 8px; padding: 0 12px; scroll-padding-left: 12px; }
+  html:root[data-review][data-home='v2'] .obs { height: 411px; }  /* the rail's 411; the body takes the rest */
+  html:root[data-review][data-home='v2'] .obs__body { gap: 4px; }
+  html:root[data-review][data-home='v2'] .obs__title { font-weight: 500; }
+  html:root[data-review][data-home='v2'] .obs__tags { margin-top: 0; padding-bottom: 9px; font-size: 12px; }
+  html:root[data-review][data-home='v2'] .obs__tags span { font-size: 12px; }
+  html:root[data-review][data-home='v2'] .obs__tags span[aria-hidden] { margin: 0 4px 0 0; font-size: 14px; }
+  html:root[data-review][data-home='v2'] .obs__tags span[aria-hidden]:first-child { display: none; }
+  html:root[data-review][data-home='v2'] .obs__tags span:not([aria-hidden]) { margin-right: 6px; }
+  html:root[data-review][data-home='v2'] .obs__note { margin-top: 0; padding-top: 4px; font-size: 12px; line-height: 17px; }
+  html:root[data-review][data-home='v2'] .obs__by { font-size: 12px; }
+  html:root[data-review][data-home='v2'] .obs__acts { gap: 14px; }
+
+  /* ── Modules · 903:511: 16 under the notes, 16 over the head, 12 under it;
+     no Key Insights band and no banner — the tiles are in the grid ── */
+  html:root[data-review][data-home='v2'] .kins { display: none; }
+  html:root[data-review][data-home='v2'] .hero--estate { display: none; }
+  html:root[data-review][data-home='v2'] .modules-band { margin-top: 16px; padding-top: 16px; }
+  /* the node's own corners: Users, Security and Diet & Kitchen at 16 */
+  html:root[data-review][data-home='v2'] #moduleGrid .card:is([data-variant='users.default'], [data-variant='security.default'], [data-variant='diet.photo']) { border-radius: 16px; }
+
+  /* ── an insight card · 907:2723 / 907:2775: 12 16 inside; the mark and name
+     (14 Medium, 6 apart) left, the segment right — 42 tabs on a white 50%
+     track, 12 Regular #44544A, the lit one white; the count DM Sans 44/36 ── */
+  html:root[data-review][data-home='v2'] #moduleGrid .card[data-layout='v2-ki'] { padding: 12px 16px; border-radius: 12px; }
+}
