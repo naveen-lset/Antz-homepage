@@ -404,6 +404,27 @@
      13 to the rule ── */
   html:root[data-review][data-home='v2'] .hstrip { margin-top: 16px; border-radius: 12px; box-shadow: inset 0 0 0 .5px #FFE86E; }
   html:root[data-review][data-home='v2'] .hstrip__lane { height: 42px; border-radius: 12px; }
+  /* THE OUTLINE RUNS (owner, 6 Oct 2026: "here outline has to animate" — the
+     running light, picked over a pulse and a one-off draw). The .5 #FFE86E
+     edge is drawn ABOVE the cap now (the cap had hidden it at the left), and
+     a short warm streak laps it every 3s, like the LIVE signal beside it.
+     Masked to a 1.5 ring so it never touches the words; still for reduced
+     motion. */
+  html:root[data-review][data-home='v2'] .hstrip__cap { border-radius: 12px 0 0 12px; }
+  html:root[data-review][data-home='v2'] .hstrip { box-shadow: none; }
+  html:root[data-review][data-home='v2'] .hstrip::before,
+  html:root[data-review][data-home='v2'] .hstrip::after {
+    content: ''; position: absolute; inset: 0; z-index: 4; border-radius: inherit; pointer-events: none;
+  }
+  html:root[data-review][data-home='v2'] .hstrip::before { box-shadow: inset 0 0 0 .5px #FFE86E; }
+  html:root[data-review][data-home='v2'] .hstrip::after {
+    padding: 1.5px;
+    background: conic-gradient(from var(--hs-run), transparent 0deg, transparent 290deg, rgba(255, 214, 51, .55) 320deg, #F5A300 350deg, #FFF3B0 356deg, transparent 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    animation: hs-run 3s linear infinite;
+  }
   html:root[data-review][data-home='v2'] .hstrip__lead { display: none; }
   html:root[data-review][data-home='v2'] .hstrip__it { gap: 8px; padding-right: 13px; }
   html:root[data-review][data-home='v2'] .hstrip__txt { font-size: 12px; font-weight: 400; color: #44544A; }
@@ -470,4 +491,11 @@
      (14 Medium, 6 apart) left, the segment right — 42 tabs on a white 50%
      track, 12 Regular #44544A, the lit one white; the count DM Sans 44/36 ── */
   html:root[data-review][data-home='v2'] #moduleGrid .card[data-layout='v2-ki'] { padding: 12px 16px; border-radius: 12px; }
+}
+
+/* the ticker's running outline (phone block above) */
+@property --hs-run { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes hs-run { to { --hs-run: 360deg; } }
+@media (prefers-reduced-motion: reduce) {
+  html:root[data-review][data-home='v2'] .hstrip::after { animation: none; opacity: 0; }
 }
