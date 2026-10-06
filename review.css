@@ -481,7 +481,6 @@
 
   /* ── Modules · 903:511: 16 under the notes, 16 over the head, 12 under it;
      no Key Insights band and no banner — the tiles are in the grid ── */
-  html:root[data-review][data-home='v2'] .kins { display: none; }
   html:root[data-review][data-home='v2'] .hero--estate { display: none; }
   html:root[data-review][data-home='v2'] .modules-band { margin-top: 16px; padding-top: 16px; }
   /* the node's own corners: Users, Security and Diet & Kitchen at 16 */
@@ -499,3 +498,9 @@
 @media (prefers-reduced-motion: reduce) {
   html:root[data-review][data-home='v2'] .hstrip::after { animation: none; opacity: 0; }
 }
+
+/* NO KEY INSIGHTS BAND AT ANY WIDTH (owner, 6 Oct 2026, of the tablet: "remove
+   the Key Insights, and the same way it has to come under Modules"). Its
+   tiles are the grid's `v2-ki` cards; the band stays built, unseen, because
+   its species sheet is the one a card opens. */
+html:root[data-review][data-home='v2'] .kins { display: none; }

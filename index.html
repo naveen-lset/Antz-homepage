@@ -22705,6 +22705,12 @@ const V2_LAYOUT = [
   { variantId: 'medical.default',    size: 'small'  },
   { variantId: 'housing.default',    size: 'small'  },
   { variantId: 'species.stats',      size: 'medium' },
+  /* KEY INSIGHTS COMES INTO THE GRID ON THE TABLET TOO (owner, 6 Oct 2026:
+     "for tablet remove the Key Insights, and the same way it has to come
+     under Modules") — the phone's two 2×1 cards (903:2). Four columns pack
+     with no hole: Natality beside Hospital, then Pending with Diet, the four
+     smalls, and Mortality beside Eggs and the Animals count at the foot */
+  { variantId: 'insight.natality',   size: 'medium' },
   { variantId: 'hospital.photo',     size: 'medium' },
   /* 29 Sep 2026: Key Insights left the grid ("in the modules section
      remove Key Insights" — the band above carries it), and the Animals list
@@ -22719,6 +22725,7 @@ const V2_LAYOUT = [
   { variantId: 'mortality.default',  size: 'small'  },
   { variantId: 'users.default',      size: 'small'  },
   { variantId: 'security.default',   size: 'small'  },
+  { variantId: 'insight.mortality',  size: 'medium' },
   /* …and back again at the END (29 Sep evening, "in the Empty place u can
      add Eggs & new animal Widgets"): last in the list, first-fit drops them
      into the two cells the taller card left open */
@@ -22728,7 +22735,7 @@ const V2_LAYOUT = [
 /* THE V2 SEED HAS A NUMBER OF ITS OWN, as V4's does: a v2r grid saved from an
    older seed — the 280:3521 page, or the V4 list V2 borrowed on 24 Sep — is
    dropped for this one rather than kept for ever. */
-const V2_SEED = 6
+const V2_SEED = 7   /* 7: the insight cards (6 Oct 2026) */
 
 /* V2 ON A PHONE · Figma 903:2 "Home · Mobile (5 Oct)", its Module Grid
    (903:533) row by row — two columns of 173 in rows of 115.3, 12 apart:
