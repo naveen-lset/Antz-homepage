@@ -392,10 +392,10 @@
   html:root[data-review][data-home='v2'] .fav__rail { gap: 8px; }
   html:root[data-review][data-home='v2'] .fav__card { width: 132px; flex-basis: 132px; height: 158px; padding: 12px; border-radius: 12px; }
   html:root[data-review][data-home='v2'] .fav__txt { gap: 2px; }
-  html:root[data-review][data-home='v2'] .fav__name { font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; }
+  html:root[data-review][data-home='v2'] .fav__name { font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; text-shadow: none; }
   html:root[data-review][data-home='v2'] .fav__idsep { font-size: 0; }
   html:root[data-review][data-home='v2'] .fav__idsep::before { content: ':'; font-size: 14px; }
-  html:root[data-review][data-home='v2'] .fav__meta { font-size: 12px; font-weight: 400; line-height: normal; opacity: .9; }
+  html:root[data-review][data-home='v2'] .fav__meta { font-family: Inter, var(--font); font-size: 12px; font-weight: 400; line-height: normal; letter-spacing: 0; opacity: .9; }  /* 907:1185 is Inter Regular (Antz_Subtext_Regular), not the figures' DM Sans; the name has no shadow */
   html:root[data-review][data-home='v2'] .fav__sex { top: 8px; right: 9px; }
 
   /* ── the audit ticker · 907:1257: 16 under the favourites, 42 tall at r12,
