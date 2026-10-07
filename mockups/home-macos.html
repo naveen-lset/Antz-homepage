@@ -229,18 +229,23 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 
 /* ── dock ── */
 /* every icon carries its name under it; no magnification — this is ANTZ's bar, not a copy of the Mac's */
-.dock { position: fixed; z-index: 800; left: 50%; bottom: 8px; transform: translateX(-50%); display: flex; align-items: flex-start; gap: 2px; padding: 8px 8px 6px; border-radius: 24px;
-  background: rgba(255,255,255,.76); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.6), 0 10px 30px rgba(0,0,0,.22); }
-.di { position: relative; flex: none; width: 66px; display: flex; flex-direction: column; align-items: center; gap: 7px; }
-.di .ic { width: 50px; height: 50px; transition: transform .22s var(--spring); }
-.di:hover .ic { transform: translateY(-3px) scale(1.06); }
+/* the Dock: a white bar like the cards; flat icons in one size, a soft highlight on hover, names in quiet ink */
+.dock { position: fixed; z-index: 800; left: 50%; bottom: 10px; transform: translateX(-50%); display: flex; align-items: flex-start; gap: 2px; padding: 8px; border-radius: 18px;
+  background: #fff; box-shadow: 0 1px 2px rgba(16,32,40,.08), 0 18px 44px rgba(0,0,0,.38); }
+.di { position: relative; flex: none; width: 68px; padding: 6px 0 5px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: background .15s; }
+.di:hover { background: #F3F6F5; }
+.di:active { background: #EAF0EE; }
+.di .ic { width: 44px; height: 44px; border-radius: 12px; box-shadow: 0 1px 2px rgba(16,32,40,.14); transition: transform .22s var(--spring); }
+.di .ic::before { display: none; }
+.di:hover .ic { transform: translateY(-1px); }
 .dragging .di:hover .ic { transform: none; }
-.dl { max-width: 64px; font-size: 11px; font-weight: 500; line-height: 13px; color: #1D2B33; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.di.run::before { content: ''; position: absolute; top: 52px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: rgba(20,20,20,.7); }
+.dl { max-width: 64px; font-size: 11px; font-weight: 500; line-height: 13px; color: #54636A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.di:hover .dl, .di.run .dl { color: #1D2B33; }
+.di.run::before { content: ''; position: absolute; top: 51.5px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: #1F515B; }
 .di.gap { opacity: 0; }
 .di.new .ic { animation: dIn .45s var(--spring); }
 @keyframes dIn { from { transform: scale(.3); opacity: 0; } }
-.dock hr { flex: none; width: 1px; height: 46px; margin: 2px 5px 0; border: 0; background: rgba(0,0,0,.16); }
+.dock hr { flex: none; width: 1px; height: 40px; margin: 12px 6px 0; border: 0; background: #E6ECEA; }
 
 /* an icon: a rounded square, the module's gradient or photo, its glyph in white */
 .ic { position: relative; display: grid; place-items: center; border-radius: 23%; background: #6B7F78 center / cover; box-shadow: 0 2px 6px rgba(0,0,0,.18), inset 0 0 0 .5px rgba(255,255,255,.35); overflow: hidden; }
@@ -613,13 +618,14 @@ const HOME = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3.2 2.8 11h2.7v9
 const GRID = '<svg viewBox="0 0 24 24" fill="#fff">' + [5, 12, 19].map((x) => [5, 12, 19].map((y) => `<circle cx="${x}" cy="${y}" r="2.4"/>`).join('')).join('') + '</svg>'
 const PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>'
 const MAG = (c = '#2A3640') => `<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.4"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/></svg>`
-const icon = (id) => {
+const icon = (id, flat) => {   /* flat: the module's gradient, never its photo — the Dock wants one icon style */
   if (id === 'home') return `<span class="ic" style="background:#1F415B">${HOME}</span>`
-  if (id === 'lib') return `<span class="ic" style="background:linear-gradient(160deg,#8FD3E8,#3A8FB7)">${GRID}</span>`
+  if (id === 'lib') return `<span class="ic" style="background:#EEF2F1">${GRID.replace('#fff', '#1F515B')}</span>`
   if (id === 'qa') return `<span class="ic" style="background:linear-gradient(160deg,#FF8A6E,#F0583A)">${PLUS}</span>`
-  if (id === 'spot') return `<span class="ic" style="background:#F4F6F6">${MAG()}</span>`
+  if (id === 'spot') return `<span class="ic" style="background:#EEF2F1">${MAG('#1F515B')}</span>`
   const m = M[id]
-  return `<span class="ic${m.photo ? ' ph' : ''}" style="background-image:${m.photo ? `url(${P + m.photo})` : m.bg}"><img src="${I + m.icon}" alt=""></span>`
+  const ph = m.photo && !flat
+  return `<span class="ic${ph ? ' ph' : ''}" style="background-image:${ph ? `url(${P + m.photo})` : m.bg}"><img src="${I + m.icon}" alt=""></span>`
 }
 const nameOf = (id) => ({ home: 'Home', lib: 'All Modules', qa: 'Quick Actions', spot: 'Search' }[id] || M[id].name)
 const labelOf = (id) => ({ home: 'Home', lib: 'More', qa: 'Create', spot: 'Search' }[id] || SHORT[id] || M[id].name)
@@ -633,7 +639,7 @@ const saveDock = () => store.set('antz.mac.dock', pins)
 const running = new Set()
 const dock = $('#dock')
 let gapAt = -1, drag = null, fresh = null
-const di = (id, pin) => `<button class="di${running.has(id) ? ' run' : ''}${id === fresh ? ' new' : ''}" data-id="${id}"${pin ? ' data-pin="1"' : ''} title="${esc(nameOf(id))}" aria-label="${esc(nameOf(id))}">${icon(id)}<span class="dl">${esc(labelOf(id))}</span></button>`
+const di = (id, pin) => `<button class="di${running.has(id) ? ' run' : ''}${id === fresh ? ' new' : ''}" data-id="${id}"${pin ? ' data-pin="1"' : ''} title="${esc(nameOf(id))}" aria-label="${esc(nameOf(id))}">${icon(id, true)}<span class="dl">${esc(labelOf(id))}</span></button>`
 function renderDock() {
   const items = [...pins]
   if (gapAt >= 0) items.splice(gapAt, 0, '__gap')
