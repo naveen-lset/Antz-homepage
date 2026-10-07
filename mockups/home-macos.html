@@ -60,12 +60,12 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 .menu .dim { opacity: .4; pointer-events: none; }
 
 /* ── widgets ── */
-.wgs { position: fixed; z-index: 2; top: 40px; left: 16px; width: 344px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; transition: opacity .3s, transform .4s var(--ease); }
+.wgs { position: fixed; z-index: 2; top: 32px; left: 8px; width: 360px; padding: 8px 8px 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; transition: opacity .3s, transform .4s var(--ease); }
 .wgs.hide { opacity: 0; transform: translateX(-30px); pointer-events: none; }
 .wg { position: relative; border-radius: 22px; padding: 14px; color: #1D2B33; text-align: left; }
 .wg h6 { margin: 0 0 8px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; color: #54636A; }
 .wg h6 button { font-size: 12px; font-weight: 600; color: #54636A; }
-.wg.s { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.wg.s { height: 150px; display: flex; flex-direction: column; justify-content: space-between; }
 .wg.m { grid-column: span 2; }
 .big { font-size: 42px; font-weight: 300; line-height: 1; letter-spacing: -1px; }
 .wg small { font-size: 12px; color: #54636A; }
@@ -78,24 +78,92 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 .flip { display: flex; gap: 4px; font-size: 11px; font-weight: 600; color: #54636A; }
 .flip button { padding: 2px 6px; border-radius: 5px; }
 .flip button[aria-pressed='true'] { background: rgba(0,0,0,.08); color: #1D2B33; }
-.ring { width: 64px; height: 64px; }
-.aud__sites { display: grid; gap: 3px; font-size: 11.5px; color: #44544A; }
-.aud__sites span { display: flex; justify-content: space-between; }
-.pl { display: grid; gap: 6px; }
-.pl button { display: flex; align-items: center; gap: 8px; font-size: 12.5px; text-align: left; padding: 1px 0; }
-.pl button:hover span { text-decoration: underline; }
-.pl i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
-.pl b { margin-left: auto; font: 600 13px var(--num); font-variant-numeric: tabular-nums; }
+.wgs { max-height: calc(100vh - 32px); overflow-y: auto; scrollbar-width: none; }
+/* the desktop's free area starts right of the widgets: the Dock and the Modules panel centre in it, not on the screen */
+:root { --free: calc(50% + 188px); }
+.wh { display: flex; align-items: center; gap: 8px; color: #1D2B33; font-size: 13px; font-weight: 600; }
+.ic.sm { width: 26px; height: 26px; border-radius: 8px; flex: none; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.wg h6 .meta { font-size: 11.5px; font-weight: 500; color: #6B7A80; }
+/* audit: one score, every site against the 80% target */
+.aud { cursor: pointer; }
+.aud__b { display: grid; grid-template-columns: 84px 1fr; gap: 16px; align-items: center; margin-top: 2px; }
+.ring { width: 84px; height: 84px; }
+.aud__rows { display: grid; gap: 5px; }
+.ar { display: grid; grid-template-columns: 1fr auto; row-gap: 3px; font-size: 12px; color: #33434A; }
+.ar b { font: 600 12.5px var(--num); font-variant-numeric: tabular-nums; }
+.ar i { grid-column: 1 / -1; position: relative; height: 5px; border-radius: 3px; background: rgba(0,0,0,.07); overflow: hidden; }
+.ar i em { position: absolute; inset: 0 auto 0 0; border-radius: 3px; width: 0; transition: width 1s var(--ease) .5s; }
+.ar i::after { content: ''; position: absolute; top: -1px; bottom: -1px; left: 80%; width: 1.5px; background: rgba(29,43,51,.35); }
+.aud__f { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,.07); font-size: 11.5px; color: #6B7A80; }
+.aud__f .pill { padding: 2px 8px; border-radius: 10px; background: rgba(226,85,58,.14); color: #C2412A; font-weight: 600; }
+.aud__f .tgt { margin-left: auto; display: flex; align-items: center; gap: 5px; }
+.aud__f .tgt::before { content: ''; width: 1.5px; height: 10px; background: rgba(29,43,51,.35); }
+/* pending: the share by urgency, then each queue — most urgent first */
+.pbar { display: flex; gap: 2px; height: 8px; border-radius: 4px; overflow: hidden; margin: 2px 0 7px; }
+.pbar i { min-width: 8px; transform-origin: 0 50%; animation: grow .9s var(--ease) .4s both; }
+@keyframes grow { from { transform: scaleX(0); } }
+.plg { display: flex; gap: 12px; font-size: 11px; color: #54636A; margin-bottom: 6px; }
+.plg span { display: flex; align-items: center; gap: 5px; }
+.plg span::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.plg b { font: 600 11.5px var(--num); color: #1D2B33; }
+.pl { display: grid; }
+.pr { display: grid; grid-template-columns: 26px 1fr auto 10px; align-items: center; gap: 10px; padding: 5px 4px; margin: 0 -4px; border-radius: 10px; text-align: left; transition: background .15s; }
+.pr + .pr { box-shadow: 0 -1px 0 rgba(0,0,0,.06); }
+.pr:hover { background: rgba(255,255,255,.55); box-shadow: none; }
+.pr:hover + .pr { box-shadow: none; }
+.pr__t { min-width: 0; display: grid; font-size: 13px; color: #1D2B33; }
+.pr__t small { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #6B7A80; }
+.pr__t small i { width: 6px; height: 6px; border-radius: 50%; }
+.pr b { font: 600 14px var(--num); font-variant-numeric: tabular-nums; color: #1D2B33; }
+.pr b.hot { color: #D2462C; }
+.pr svg { width: 10px; height: 10px; opacity: 0; transition: opacity .15s, transform .15s; }
+.pr:hover svg { opacity: .6; transform: translateX(2px); }
+/* favourites: three on the widget, the other ninety-seven a click away */
 .fg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 8px; }
 .fa { position: relative; display: grid; gap: 5px; justify-items: center; font-size: 11px; color: #33434A; }
 .fa img { width: 62px; height: 62px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,.2), 0 0 0 2px rgba(255,255,255,.8); transition: transform .2s var(--spring); }
 .fa:hover img { transform: scale(1.07); }
 .fa > span:last-child { max-width: 74px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fa__x { position: absolute; z-index: 1; top: -4px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #8E9A9E; color: #fff; font-size: 13px; line-height: 20px; display: none; }
-.editing .fa__x { display: block; }
-.editing .fa img { animation: jig .28s ease-in-out infinite alternate; }
-@keyframes jig { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }
-.fa--add div { width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; font-size: 26px; color: #54636A; background: rgba(255,255,255,.45); box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.12); }
+.fa--more .stk { position: relative; width: 62px; height: 62px; border-radius: 50%; background: rgba(255,255,255,.5); box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.08); display: grid; place-items: center; transition: transform .2s var(--spring); }
+.fa--more:hover .stk { transform: scale(1.07); }
+.stk img { position: absolute; width: 26px; height: 26px; box-shadow: 0 0 0 1.5px #fff; }
+.stk img:nth-child(1) { top: 7px; left: 9px; } .stk img:nth-child(2) { top: 7px; right: 9px; } .stk img:nth-child(3) { bottom: 6px; left: 18px; }
+.stk b { position: absolute; z-index: 1; right: -4px; bottom: -2px; padding: 1px 6px; border-radius: 9px; background: #1F515B; color: #fff; font: 600 11px/16px var(--num); box-shadow: 0 0 0 2px rgba(255,255,255,.9); }
+.see { display: flex; align-items: center; gap: 3px; color: #1F515B !important; }
+
+/* ── the favourites panel: all of them, searchable, three pinned to the widget ── */
+.fp { position: fixed; z-index: 860; top: 40px; left: 372px; bottom: 116px; width: 580px; display: flex; flex-direction: column; border-radius: 26px; padding: 18px 20px 0;
+  background: rgba(240,247,246,.78); -webkit-backdrop-filter: blur(40px) saturate(190%); backdrop-filter: blur(40px) saturate(190%);
+  box-shadow: 0 30px 80px rgba(0,0,0,.32), inset 0 0 0 .5px rgba(255,255,255,.8);
+  transform-origin: 0 var(--oy, 80%); transform: scale(.6) translateX(-30px); opacity: 0; pointer-events: none; transition: transform .36s var(--spring), opacity .2s; }
+.fp.open { transform: none; opacity: 1; pointer-events: auto; }
+.fp__h { display: flex; align-items: center; gap: 10px; }
+.fp__h h2 { margin: 0; font-size: 20px; font-weight: 600; color: #1D2B33; }
+.fp__h span { font-size: 13px; color: #6B7A80; }
+.fp__x { margin-left: auto; width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,.06); font-size: 16px; color: #44544A; }
+.fp__x:hover { background: rgba(0,0,0,.1); }
+.fp__q { margin-top: 12px; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,.7); }
+.fp__q input { flex: 1; border: 0; background: none; outline: 0; font-size: 14px; color: #1D2B33; }
+.fp__f { display: flex; align-items: center; gap: 6px; margin: 10px 0 0; padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,.08); }
+.fp__f button { height: 28px; padding: 0 11px; border-radius: 9px; background: rgba(255,255,255,.6); font-size: 12.5px; color: #54636A; }
+.fp__f button em { font-style: normal; opacity: .6; margin-left: 3px; }
+.fp__f button[aria-pressed='true'] { background: #1F515B; color: #fff; }
+.fp__f select { margin-left: auto; height: 28px; padding: 0 8px; border: 0; border-radius: 9px; background: rgba(255,255,255,.6); font: 12.5px var(--font); color: #44544A; outline: 0; }
+.fp__body { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 2px 20px; margin: 0 -4px; }
+.fp__sec { display: flex; justify-content: space-between; margin: 14px 4px 10px; font-size: 11.5px; font-weight: 600; letter-spacing: .3px; text-transform: uppercase; color: #6B7A80; }
+.fp__sec span { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.fp__grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px 6px; }
+.an { position: relative; display: grid; justify-items: center; gap: 2px; text-align: center; font-size: 11.5px; color: #1D2B33; animation: tileIn .3s var(--spring) both; }
+.an img { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; margin-bottom: 4px; box-shadow: 0 2px 6px rgba(0,0,0,.18), 0 0 0 2px rgba(255,255,255,.85); transition: transform .18s var(--spring); }
+.an:hover img { transform: scale(1.07); }
+.an > span { max-width: 84px; line-height: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.an small { font: 10.5px var(--num); color: #7A8684; }
+.an__pin { position: absolute; top: -3px; left: calc(50% + 16px); width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); opacity: 0; transform: scale(.7); transition: opacity .15s, transform .2s var(--spring); }
+.an__pin svg { width: 12px; height: 12px; }
+.an:hover .an__pin, .an__pin.on { opacity: 1; transform: none; }
+.an__pin.on { background: #1F515B; }
+.an__dot { position: absolute; top: 44px; left: calc(50% - 26px); width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 2px #fff; }
+.fp__none { grid-column: 1 / -1; padding: 30px 0; text-align: center; color: #6B7A80; font-size: 13px; }
 
 /* ── notifications (returning users) ── */
 .nc { position: fixed; z-index: 700; top: 40px; right: 14px; width: 356px; display: grid; gap: 12px; transition: transform .45s var(--ease), opacity .3s; }
@@ -128,17 +196,19 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 .stack__list small { display: block; color: #7A8684; font-size: 11.5px; }
 
 /* ── dock ── */
-.dock { position: fixed; z-index: 800; left: 50%; bottom: 8px; transform: translateX(-50%); display: flex; align-items: flex-end; gap: 6px; padding: 6px 8px; border-radius: 22px; height: 68px;
-  background: rgba(255,255,255,.3); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.55), 0 10px 30px rgba(0,0,0,.22); }
-.di { position: relative; flex: none; width: 52px; height: 52px; transition: width .1s ease-out, height .1s ease-out; }
-.dock.calm .di { transition: width .25s var(--ease), height .25s var(--ease); }
-.di .ic { width: 100%; height: 100%; }
-.di::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 14px); left: 50%; transform: translateX(-50%); padding: 4px 10px; border-radius: 6px; background: rgba(40,40,40,.82); color: #fff; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .12s; }
-.di:hover::after { opacity: 1; }
-.dragging .di::after { opacity: 0 !important; }
-.di.run::before { content: ''; position: absolute; bottom: -5px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: rgba(20,20,20,.75); }
+/* every icon carries its name under it; no magnification — this is ANTZ's bar, not a copy of the Mac's */
+.dock { position: fixed; z-index: 800; left: var(--free); bottom: 8px; transform: translateX(-50%); display: flex; align-items: flex-start; gap: 2px; padding: 8px 8px 6px; border-radius: 24px;
+  background: rgba(255,255,255,.5); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.6), 0 10px 30px rgba(0,0,0,.22); }
+.di { position: relative; flex: none; width: 66px; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.di .ic { width: 50px; height: 50px; transition: transform .22s var(--spring); }
+.di:hover .ic { transform: translateY(-3px) scale(1.06); }
+.dragging .di:hover .ic { transform: none; }
+.dl { max-width: 64px; font-size: 11px; font-weight: 500; line-height: 13px; color: #1D2B33; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.di.run::before { content: ''; position: absolute; top: 52px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: rgba(20,20,20,.7); }
 .di.gap { opacity: 0; }
-.dock hr { align-self: center; flex: none; width: 1px; height: 44px; margin: 0 4px; border: 0; background: rgba(0,0,0,.18); }
+.di.new .ic { animation: dIn .45s var(--spring); }
+@keyframes dIn { from { transform: scale(.3); opacity: 0; } }
+.dock hr { flex: none; width: 1px; height: 46px; margin: 2px 5px 0; border: 0; background: rgba(0,0,0,.16); }
 
 /* an icon: a rounded square, the module's gradient or photo, its glyph in white */
 .ic { position: relative; display: grid; place-items: center; border-radius: 23%; background: #6B7F78 center / cover; box-shadow: 0 2px 6px rgba(0,0,0,.18), inset 0 0 0 .5px rgba(255,255,255,.35); overflow: hidden; }
@@ -157,7 +227,7 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 @keyframes poof { from { transform: scale(.4); opacity: 1; } to { transform: scale(1.8); opacity: 0; } }
 
 /* ── the Modules panel: the App Library ── */
-.lib { position: fixed; z-index: 850; left: 50%; bottom: 92px; width: 740px; max-height: calc(100vh - 140px); display: flex; flex-direction: column; border-radius: 30px; padding: 22px 26px 24px;
+.lib { position: fixed; z-index: 850; left: var(--free); bottom: 110px; width: 740px; max-height: calc(100vh - 140px); display: flex; flex-direction: column; border-radius: 30px; padding: 22px 26px 24px;
   background: rgba(236,246,250,.66); -webkit-backdrop-filter: blur(40px) saturate(190%); backdrop-filter: blur(40px) saturate(190%);
   box-shadow: 0 30px 80px rgba(0,0,0,.35), inset 0 0 0 .5px rgba(255,255,255,.8);
   transform-origin: var(--ox, 50%) 100%; transform: translateX(-50%) scale(.2); opacity: 0; pointer-events: none; transition: transform .38s var(--spring), opacity .2s; }
@@ -185,6 +255,22 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 .tile__b.in { background: #8E9A9E; }
 .tile__dot { position: absolute; top: 67px; width: 4px; height: 4px; border-radius: 50%; background: rgba(20,20,20,.6); }
 .lib__none { grid-column: 1 / -1; padding: 30px 0; text-align: center; color: #6B7A84; }
+.lib__count { font-size: 13px; color: #6B7A84; }
+.lib__pick { margin-left: auto; height: 32px; padding: 0 14px; border-radius: 16px; background: rgba(255,255,255,.65); font-size: 13px; font-weight: 600; color: #1F515B; display: flex; align-items: center; gap: 6px; }
+.lib__pick:hover { background: #fff; }
+.lib__pick.pri { background: #1F515B; color: #fff; }
+.lib__pick + .lib__more { margin-left: 0; }
+.lib__reset { height: 32px; padding: 0 12px; border-radius: 16px; font-size: 13px; color: #54636A; display: none; }
+.lib.sel .lib__reset { display: block; }
+.lib.sel .lib__more { display: none; }
+/* choosing the Dock: every tile wears a check; a tap toggles it instead of opening */
+.tile__ck { position: absolute; top: -5px; left: calc(50% + 20px); z-index: 2; width: 24px; height: 24px; border-radius: 50%; display: none; place-items: center; background: rgba(255,255,255,.85); box-shadow: inset 0 0 0 2px rgba(31,81,91,.35), 0 1px 4px rgba(0,0,0,.15); transition: background .15s, transform .2s var(--spring); }
+.tile__ck svg { width: 13px; height: 13px; opacity: 0; }
+.lib.sel .tile__ck { display: grid; }
+.lib.sel .tile__b, .lib.sel .tile__dot { display: none; }
+.tile.on .tile__ck { background: #1F515B; box-shadow: 0 2px 6px rgba(0,0,0,.25); transform: scale(1.05); }
+.tile.on .tile__ck svg { opacity: 1; }
+.lib.sel .tile:not(.on) .ic { opacity: .72; filter: saturate(.7); }
 
 /* ── windows ── */
 .win { position: fixed; z-index: 10; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; background: #F7F9F8;
@@ -306,7 +392,7 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 .tip button { margin-top: 8px; padding: 4px 10px; border-radius: 7px; background: rgba(255,255,255,.18); color: #fff; font-size: 12px; font-weight: 600; }
 .pulse { animation: pulse 1.6s ease-out 1.6s 3; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,.9); } 100% { box-shadow: 0 0 0 16px rgba(255,255,255,0); } }
-.toast { position: fixed; z-index: 1200; left: 50%; bottom: 100px; transform: translate(-50%, 20px); padding: 10px 16px; border-radius: 12px; background: rgba(30,40,46,.9); color: #fff; font-size: 13px; opacity: 0; transition: opacity .2s, transform .3s var(--spring); pointer-events: none; }
+.toast { position: fixed; z-index: 1200; left: var(--free); bottom: 116px; transform: translate(-50%, 20px); padding: 10px 16px; border-radius: 12px; background: rgba(30,40,46,.9); color: #fff; font-size: 13px; opacity: 0; transition: opacity .2s, transform .3s var(--spring); pointer-events: none; }
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 </style>
@@ -341,16 +427,22 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
     <div><div class="today__n" id="todayN">192</div><small id="todayL">deaths recorded</small></div>
     <div class="seg" role="group" aria-label="Range"><button data-r="7d" aria-pressed="true">7D</button><button data-r="30d" aria-pressed="false">30D</button><button data-r="30p" aria-pressed="false">30+</button></div>
   </section>
-  <section class="wg m glass" style="display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center">
-    <svg class="ring" viewBox="0 0 64 64" role="img" aria-label="Audit score 68%"><circle cx="32" cy="32" r="27" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="7"/><circle id="ringArc" cx="32" cy="32" r="27" fill="none" stroke="#FA6140" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 170" transform="rotate(-90 32 32)" style="transition:stroke-dasharray 1.2s cubic-bezier(.32,.72,0,1) .6s"/><text x="32" y="37" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="15" fill="#250E01">68%</text></svg>
-    <div><h6 style="margin-bottom:6px">Audit score</h6><div class="aud__sites" id="audSites"></div></div>
+  <section class="wg m glass aud" id="wgAud" title="Open Audit">
+    <h6><span class="wh" id="audHead">Audit score</span><span class="meta">All sites · 4</span></h6>
+    <div class="aud__b">
+      <svg class="ring" viewBox="0 0 64 64" role="img" aria-label="Audit score 68%"><circle cx="32" cy="32" r="27" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="6"/><circle id="ringArc" cx="32" cy="32" r="27" fill="none" stroke="#E8A317" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 170" transform="rotate(-90 32 32)" style="transition:stroke-dasharray 1.2s cubic-bezier(.32,.72,0,1) .6s"/><text x="32" y="33" text-anchor="middle" font-family="DM Sans" font-weight="600" font-size="16" fill="#1D2B33">68%</text><text x="32" y="43" text-anchor="middle" font-family="Inter" font-size="6.5" fill="#6B7A80">average</text></svg>
+      <div class="aud__rows" id="audSites"></div>
+    </div>
+    <div class="aud__f" id="audFoot"></div>
   </section>
   <section class="wg m glass">
-    <h6>Pending Actions <span id="pendTot"></span></h6>
+    <h6><span class="wh">Pending Actions</span><span class="meta" id="pendTot"></span></h6>
+    <div class="pbar" id="pbar"></div>
+    <div class="plg" id="plg"></div>
     <div class="pl" id="pend"></div>
   </section>
   <section class="wg m glass" id="wgFav">
-    <h6>My Favourite Animals <button id="favEdit">Edit</button></h6>
+    <h6><span class="wh">My Favourite Animals <span class="meta" id="favN"></span></span><button class="see" id="favAll">See all <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="m3 1.5 2.5 2.5L3 6.5"/></svg></button></h6>
     <div class="fg" id="favs"></div>
   </section>
 </aside>
@@ -361,12 +453,21 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 <section class="lib" id="lib" role="dialog" aria-label="Modules">
   <div class="lib__h">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3 4.5 16.5M12 3l7.5 13.5M7 12h10M3 20.5h4M17 20.5h4M8.6 20.5 12 14l3.4 6.5"/></svg>
-    <h2>Modules</h2>
+    <h2 id="libT">Modules</h2><span class="lib__count" id="libCount"></span>
+    <button class="lib__reset" id="libReset">Reset</button>
+    <button class="lib__pick" id="libPick">Choose for Dock</button>
     <button class="lib__more" id="libMore" aria-label="More">···</button>
   </div>
   <label class="lib__search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7A84" stroke-width="2.2"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/></svg><input id="libQ" placeholder="Search modules" autocomplete="off"></label>
   <div class="lib__cats" id="libCats"></div>
   <div style="overflow:auto;min-height:0"><div id="libBody"></div></div>
+</section>
+
+<section class="fp" id="fp" role="dialog" aria-label="My Favourite Animals">
+  <div class="fp__h"><h2>My Favourite Animals</h2><span id="fpN"></span><button class="fp__x" id="fpX" aria-label="Close">×</button></div>
+  <label class="fp__q"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7A84" stroke-width="2.2"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/></svg><input id="fpQ" placeholder="Search by name, species or AAID" autocomplete="off"></label>
+  <div class="fp__f"><span id="fpCls" style="display:flex;gap:6px"></span><select id="fpSite" aria-label="Site"></select></div>
+  <div class="fp__body" id="fpBody"></div>
 </section>
 
 <div class="spot" id="spot" role="dialog" aria-label="Search"><input id="spotQ" placeholder="Search ANTZ — modules, animals, sites, notes" autocomplete="off"><div class="spot__r" id="spotR"></div></div>
@@ -408,15 +509,33 @@ const MODS = [
 const CATS = [['all', 'All'], ['animals', 'Animals'], ['health', 'Health & Care'], ['places', 'Places'], ['operations', 'Operations'], ['people', 'People']]
 const M = Object.fromEntries(MODS.map((m) => [m.id, m]))
 const SITES = [['All sites', 8, '#1F415B'], ['Crimson Frosted', 2, '#2FA85C', 72], ['Clearspring', 2, '#00AFD6', 64], ['Hollowpine', 2, '#E07A00', 81], ['Foxglen', 2, '#8A5CD6', 55]]
+/* the Dock's labels: a module's name, cut to what fits under a 50px icon */
+const SHORT = { species: 'Species', diet: 'Diet', insights: 'Insights', communication: 'Comms', followup: 'Follow Up', fetal: 'Fetal Death' }
+/* a hundred favourites. The first four are the app's (anonymised names, as the V5 dump has them);
+   the other ninety-six are made up on the same pattern, over the 22 species photos we have */
 const FAVS = [
-  { id: '190317', sp: 'Slate Pangolin', sex: 'F', img: 'species/sambar.jpg' },
-  { id: '143944', sp: 'Glacial Egret', sex: 'UD', img: 'species/sarus-crane.jpg' },
-  { id: '172277', sp: 'Russet Whipsnake', sex: 'UD', img: 'species/indian-rock-python.jpg' },
-  { id: '169095', sp: 'Marbled Phantom Saki', sex: 'F', img: 'species/sloth-bear.jpg' },
+  { id: '190317', sp: 'Slate Pangolin', sex: 'F', img: 'species/sambar.jpg', cls: 'mammal' },
+  { id: '143944', sp: 'Glacial Egret', sex: 'UD', img: 'species/sarus-crane.jpg', cls: 'bird' },
+  { id: '172277', sp: 'Russet Whipsnake', sex: 'UD', img: 'species/indian-rock-python.jpg', cls: 'reptile' },
+  { id: '169095', sp: 'Marbled Phantom Saki', sex: 'F', img: 'species/sloth-bear.jpg', cls: 'mammal' },
 ]
+{
+  const PH = [['asiatic-lion', 'mammal'], ['black-kite', 'bird'], ['indian-star-tortoise', 'reptile'], ['barasingha', 'mammal'], ['hill-myna', 'bird'], ['bengal-tiger', 'mammal'], ['giant-forest-scorpion', 'other'], ['blackbuck', 'mammal'], ['indian-peafowl', 'bird'], ['bonnet-macaque', 'mammal'], ['indian-rock-python', 'reptile'], ['chital', 'mammal'], ['rose-ringed-parakeet', 'bird'], ['gaur', 'mammal'], ['cinereous-vulture', 'bird'], ['indian-leopard', 'mammal'], ['nilgai', 'mammal'], ['sarus-crane', 'bird'], ['rhesus-macaque', 'mammal'], ['sambar', 'mammal'], ['sloth-bear', 'mammal'], ['sumatran-orangutan', 'mammal']]
+  const NOUN = { mammal: ['Civet', 'Muntjac', 'Langur', 'Marten', 'Serow', 'Gazelle', 'Tamarin', 'Bushbuck', 'Pangolin', 'Binturong', 'Goral'], bird: ['Hornbill', 'Ibis', 'Barbet', 'Lory', 'Pitta', 'Egret', 'Kite', 'Myna'], reptile: ['Monitor', 'Gecko', 'Krait', 'Skink', 'Tortoise', 'Whipsnake'], other: ['Scorpion', 'Tarantula', 'Mantis'] }
+  const ADJ = ['Amber', 'Ashen', 'Cobalt', 'Dusky', 'Ember', 'Fern', 'Gilded', 'Hazel', 'Ivory', 'Jade', 'Kohl', 'Lunar', 'Mossy', 'Night', 'Ochre', 'Pale', 'Quill', 'Rust', 'Sable', 'Tawny', 'Umber', 'Velvet', 'Willow', 'Zinc', 'Copper', 'Frost', 'Golden', 'Indigo', 'Misty', 'Pearl', 'Saffron']
+  for (let i = 4; i < 100; i++) {
+    const [ph, cls] = PH[(i * 5) % PH.length], nouns = NOUN[cls]
+    FAVS.push({ id: String(100000 + ((i * 7919 + 1237) % 89999)), sp: `${ADJ[(i * 7) % ADJ.length]} ${nouns[(i * 3) % nouns.length]}`, sex: ['F', 'M', 'UD', 'M', 'F'][i % 5], img: `species/${ph}.jpg`, cls })
+  }
+  FAVS.forEach((f, i) => { f.site = ['Crimson Frosted', 'Clearspring', 'Hollowpine', 'Foxglen'][i % 4]; f.care = i % 11 === 3 ? 'medical' : i % 17 === 5 ? 'transfer' : '' })
+}
+const CLS = [['all', 'All'], ['mammal', 'Mammals'], ['bird', 'Birds'], ['reptile', 'Reptiles'], ['other', 'Others']]
+const CARE = { medical: ['#E2553A', 'Under treatment'], transfer: ['#E8A317', 'Transfer pending'] }
 const SEX = { F: ['#EECCC0', '#E5603E', 'Female'], M: ['#CFE9F5', '#1C7FB0', 'Male'], UD: ['#F4E6E7', '#D63A50', 'Undetermined'] }
 const KI = { natality: { '7d': '76', '30d': '321', '30p': '2,350' }, mortality: { '7d': '192', '30d': '1,009', '30p': '6,825' } }
-const PEND = [['Sexing', 28532, '#37BD69', 'species'], ['Microchipping', 20302, '#37BD69', 'species'], ['Necropsy reports', 14296, '#E8A317', 'mortality'], ['Deworming', 319, '#E2553A', 'medical'], ['Vaccinations', 143, '#E2553A', 'medical'], ['Transfer pending', 16, '#E8A317', 'housing']]
+/* most urgent first: the overdue doses, then what waits on someone, then the routine backlog */
+const PEND = [['Deworming', 319, 'overdue', 'medical'], ['Vaccinations', 143, 'overdue', 'medical'], ['Necropsy reports', 14296, 'waiting', 'mortality'], ['Transfer pending', 16, 'waiting', 'housing'], ['Sexing', 28532, 'routine', 'species'], ['Microchipping', 20302, 'routine', 'species']]
+const URG = { overdue: ['#E2553A', 'Overdue'], waiting: ['#E8A317', 'Awaiting'], routine: ['#37BD69', 'Routine'] }
 const ANN = [
   { k: 'announcement', chip: 'ANNOUNCEMENT', hl: 'Zara and Kian, our leopard cubs, go on exhibit from Monday', by: 'Emerson Vance', d: '24 Aug', desc: 'After twelve weeks in the den the two Persian leopard cubs have passed their final health check and will be out in the main habitat from Monday morning. Please keep the service path behind the exhibit closed between 09:00 and 11:00 while they get used to the space.', img: 'hero-leopard.jpg' },
   { k: 'important', chip: 'IMPORTANT', hl: 'Please follow all safety protocols carefully to ensure smooth and secure daily operations', by: 'Vantara admin', d: '26 Aug', desc: 'This is an important reminder regarding the strict adherence to all established guidelines, protocols, and regulations across every section and enclosure. Report any hazard to your section head at once, wear your issued PPE in every holding area, and never enter a night house alone.' },
@@ -468,35 +587,46 @@ const icon = (id) => {
   const m = M[id]
   return `<span class="ic${m.photo ? ' ph' : ''}" style="background-image:${m.photo ? `url(${P + m.photo})` : m.bg}"><img src="${I + m.icon}" alt=""></span>`
 }
-const nameOf = (id) => ({ home: 'Home', lib: 'Modules', qa: 'Quick Actions', spot: 'Search' }[id] || M[id].name)
+const nameOf = (id) => ({ home: 'Home', lib: 'All Modules', qa: 'Quick Actions', spot: 'Search' }[id] || M[id].name)
+const labelOf = (id) => ({ home: 'Home', lib: 'More', qa: 'Create', spot: 'Search' }[id] || SHORT[id] || M[id].name)
+const dockIc = (id) => $(`.di[data-id="${id}"] .ic`)
 
-/* ── the Dock: Home and Modules, the user's modules, then Quick Actions and Search ── */
+/* ── the Dock: Home, the modules the user chose, More (every module), then Create and Search ── */
 const DEF_DOCK = ['medical', 'housing', 'species', 'hospital', 'diet', 'mortality', 'eggs', 'users', 'security']
-let pins = store.get('antz.mac.dock', DEF_DOCK).filter((id) => M[id])
+const DOCK_MAX = 12
+let pins = store.get('antz.mac.dock', DEF_DOCK).filter((id) => M[id]).slice(0, DOCK_MAX)
 const saveDock = () => store.set('antz.mac.dock', pins)
 const running = new Set()
 const dock = $('#dock')
-let gapAt = -1, drag = null, magOn = store.get('antz.mac.mag', true)
-const di = (id, pin) => `<button class="di${running.has(id) ? ' run' : ''}" data-id="${id}"${pin ? ' data-pin="1"' : ''} data-tip="${esc(nameOf(id))}" aria-label="${esc(nameOf(id))}">${icon(id)}</button>`
+let gapAt = -1, drag = null, fresh = null
+const di = (id, pin) => `<button class="di${running.has(id) ? ' run' : ''}${id === fresh ? ' new' : ''}" data-id="${id}"${pin ? ' data-pin="1"' : ''} title="${esc(nameOf(id))}" aria-label="${esc(nameOf(id))}">${icon(id)}<span class="dl">${esc(labelOf(id))}</span></button>`
 function renderDock() {
   const items = [...pins]
   if (gapAt >= 0) items.splice(gapAt, 0, '__gap')
-  dock.innerHTML = ['home', 'lib'].map((id) => di(id)).join('') + '<hr>' +
-    items.map((id) => id === '__gap' ? '<span class="di gap"></span>' : di(id, true)).join('') + '<hr>' +
+  dock.innerHTML = di('home') + '<hr>' +
+    items.map((id) => id === '__gap' ? '<span class="di gap"></span>' : di(id, true)).join('') + di('lib') + '<hr>' +
     ['qa', 'spot'].map((id) => di(id)).join('')
+  fresh = null
   wins.get('home')?.el._side?.()
 }
-
-/* the magnification: each icon grows with its nearness to the pointer, as the real Dock does */
-dock.addEventListener('mousemove', (e) => {
-  if (!magOn || drag) return
-  dock.classList.remove('calm')
-  $$('.di', dock).forEach((b) => {
-    const r = b.getBoundingClientRect(), d = Math.abs(e.clientX - (r.left + r.width / 2)), k = Math.max(0, 1 - d / 150)
-    b.style.width = b.style.height = 52 + 30 * Math.sin(k * Math.PI / 2) ** 2 + 'px'
-  })
+/* one place that adds or takes a module, so the cap and the toasts agree everywhere */
+function togglePin(id, at) {
+  if (pins.includes(id)) { pins = pins.filter((p) => p !== id); toast(`${nameOf(id)} removed from your Dock`) }
+  else if (pins.length >= DOCK_MAX) { toast(`Your Dock holds ${DOCK_MAX} — take one out first`); return false }
+  else { at == null ? pins.push(id) : pins.splice(at, 0, id); fresh = id; toast(`${nameOf(id)} added to your Dock`) }
+  saveDock(); renderDock(); if ($('#lib').classList.contains('open')) renderLib()
+  return true
+}
+dock.addEventListener('contextmenu', (e) => {
+  e.preventDefault()
+  const b = e.target.closest('.di[data-pin]')
+  openMenu([
+    ...(b ? [[`Remove ${nameOf(b.dataset.id)} from Dock`, () => togglePin(b.dataset.id)], '-'] : []),
+    ['Choose Dock modules…', () => openLib(null, true)],
+    ['Reset the Dock', resetDock],
+  ], null, { x: e.clientX, y: e.clientY })
 })
-dock.addEventListener('mouseleave', () => { dock.classList.add('calm'); $$('.di', dock).forEach((b) => (b.style.width = b.style.height = '')) })
+function resetDock() { pins = [...DEF_DOCK]; saveDock(); renderDock(); if ($('#lib').classList.contains('open')) renderLib(); toast('Dock reset') }
 
 /* a click opens; a drag reorders, or leaves the Dock and goes */
 dock.addEventListener('pointerdown', (e) => {
@@ -507,14 +637,16 @@ dock.addEventListener('pointerdown', (e) => {
   addEventListener('pointermove', move); addEventListener('pointerup', up)
 })
 function clickDock(id, b) {
+  const ic = b.querySelector('.ic')
   if (id === 'lib') return toggleLib(b)
-  if (id === 'qa') return toggleQA(b)
+  if (id === 'qa') return toggleQA(ic)
   if (id === 'spot') return openSpot()
-  closeLib(); openWin(id, b)
+  closeLib(); openWin(id, ic)
 }
 function startDrag(id, from, ev) {
+  if (from === 'lib' && !pins.includes(id) && pins.length >= DOCK_MAX) { toast(`Your Dock holds ${DOCK_MAX} — take one out first`); return }
   closeQA(); drag = { id, from }
-  document.body.classList.add('dragging'); dock.classList.add('calm'); $$('.di', dock).forEach((b) => (b.style.width = b.style.height = ''))
+  document.body.classList.add('dragging')
   if (from === 'dock') pins = pins.filter((p) => p !== id)
   if (from === 'lib') $('#lib').classList.add('faint')
   const g = document.createElement('div'); g.className = 'ghost'; g.innerHTML = icon(id) + '<em>Remove</em>'; document.body.append(g); drag.g = g
@@ -537,60 +669,73 @@ function endDrag(ev) {
   removeEventListener('pointermove', onDrag)
   const { id, from, g } = drag, at = gapAt
   gapAt = -1; g.remove(); drag = null; document.body.classList.remove('dragging'); $('#lib').classList.remove('faint')
-  if (at >= 0) { pins.splice(at, 0, id); if (from === 'lib') toast(`${nameOf(id)} added to your Dock`) }
+  if (at >= 0) { pins.splice(at, 0, id); if (from === 'lib') { fresh = id; toast(`${nameOf(id)} added to your Dock`) } }
   else if (from === 'dock') { const p = document.createElement('div'); p.className = 'poof'; p.style.left = ev.clientX + 'px'; p.style.top = ev.clientY + 'px'; document.body.append(p); setTimeout(() => p.remove(), 500); toast(`${nameOf(id)} removed from your Dock`) }
   saveDock(); renderDock(); if ($('#lib').classList.contains('open')) renderLib()
 }
 
-/* ── the Modules panel: the App Library ── */
-let cat = 'all', recent = store.get('antz.mac.recent', ['species', 'medical', 'mortality', 'housing', 'natality', 'eggs'])
-$('#libCats').innerHTML = CATS.map(([k, l]) => `<button data-c="${k}" aria-pressed="${k === cat}">${l}</button>`).join('')
+/* ── the Modules panel: every module, by category; and the place to choose the Dock's ── */
+let cat = 'all', picking = false
+const CK = '<svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 6.2 2.3 2.3 4.7-5"/></svg>'
+const drawCats = () => ($('#libCats').innerHTML = CATS.map(([k, l]) => `<button data-c="${k}" aria-pressed="${k === cat}">${l}</button>`).join(''))
+drawCats()
 $('#libCats').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; cat = b.dataset.c; $$('#libCats button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); renderLib() })
 $('#libQ').addEventListener('input', renderLib)
-const tile = (m, i) => { const inD = pins.includes(m.id)
-  return `<div class="tile" data-id="${m.id}" style="animation-delay:${Math.min(i, 20) * 18}ms" role="button" tabindex="0" title="${esc(m.blurb)}">` +
+let tileN = 0
+const tile = (m) => { const inD = pins.includes(m.id), i = tileN++
+  return `<div class="tile${inD ? ' on' : ''}" data-id="${m.id}" style="animation-delay:${Math.min(i, 24) * 14}ms" role="button" tabindex="0" title="${esc(m.blurb)}"${picking ? ` aria-pressed="${inD}"` : ''}>` +
   `<button class="tile__b${inD ? ' in' : ''}" data-dock="${m.id}" aria-label="${inD ? 'Remove from' : 'Add to'} Dock">${inD ? '–' : '+'}</button>` +
+  `<span class="tile__ck" aria-hidden="true">${CK}</span>` +
   `${icon(m.id)}${inD ? '<i class="tile__dot"></i>' : ''}<span>${esc(m.name)}</span></div>` }
 function renderLib() {
-  const q = $('#libQ').value.trim().toLowerCase()
+  const q = $('#libQ').value.trim().toLowerCase(); tileN = 0
   const list = MODS.filter((m) => (cat === 'all' || m.cat === cat) && (!q || (m.name + ' ' + m.blurb).toLowerCase().includes(q)))
-  const top = !q && cat === 'all' ? recent.map((id) => M[id]).filter(Boolean).slice(0, 6) : []
-  $('#libBody').innerHTML =
-    (top.length ? `<div class="lib__sec">Recently opened</div><div class="lib__grid">${top.map(tile).join('')}</div><div class="lib__rule"></div>` : '') +
-    `<div class="lib__sec">${q ? `Results for “${esc(q)}”` : cat === 'all' ? 'All modules' : CATS.find((c) => c[0] === cat)[1]}</div>` +
-    `<div class="lib__grid">${list.length ? list.map(tile).join('') : '<div class="lib__none">No module matches.</div>'}</div>`
+  const grid = (ms) => `<div class="lib__grid">${ms.map(tile).join('')}</div>`
+  /* All, unsearched: every module, a section per category, so nothing hides behind a tab */
+  $('#libBody').innerHTML = !list.length ? '<div class="lib__grid"><div class="lib__none">No module matches.</div></div>'
+    : !q && cat === 'all' ? CATS.slice(1).map(([k, l]) => { const ms = list.filter((m) => m.cat === k); return ms.length ? `<div class="lib__sec">${l}</div>${grid(ms)}` : '' }).join('')
+    : `<div class="lib__sec">${q ? `Results for “${esc(q)}”` : CATS.find((c) => c[0] === cat)[1]}</div>${grid(list)}`
+  $('#libT').textContent = picking ? 'Choose your Dock' : 'All Modules'
+  $('#libCount').textContent = picking ? `${pins.length} of ${DOCK_MAX} chosen` : `${MODS.length} modules`
+  $('#libPick').textContent = picking ? 'Done' : 'Choose for Dock'
+  $('#libPick').classList.toggle('pri', picking)
+  $('#lib').classList.toggle('sel', picking)
 }
+function setPicking(on) { picking = on; renderLib() }
+$('#libPick').addEventListener('click', () => setPicking(!picking))
+$('#libReset').addEventListener('click', resetDock)
 $('#libBody').addEventListener('click', (e) => {
+  const t = e.target.closest('.tile'); if (!t || t._dragged) return
+  if (picking) { togglePin(t.dataset.id); return }
   const b = e.target.closest('.tile__b')
-  if (b) { e.stopPropagation(); const id = b.dataset.dock
-    if (pins.includes(id)) { pins = pins.filter((p) => p !== id); toast(`${nameOf(id)} removed from your Dock`) } else { pins.push(id); toast(`${nameOf(id)} added to your Dock`) }
-    saveDock(); renderDock(); renderLib(); return }
-  const t = e.target.closest('.tile'); if (t && !t._dragged) { const ic = t.querySelector('.ic'); closeLib(); openWin(t.dataset.id, ic) }
+  if (b) { e.stopPropagation(); togglePin(b.dataset.dock); return }
+  const ic = t.querySelector('.ic'); closeLib(); openWin(t.dataset.id, ic)
 })
 $('#libBody').addEventListener('pointerdown', (e) => {
-  const t = e.target.closest('.tile'); if (!t || e.target.closest('.tile__b')) return
+  const t = e.target.closest('.tile'); if (!t || picking || e.target.closest('.tile__b')) return
   const x0 = e.clientX, y0 = e.clientY; t._dragged = false
   const mv = (ev) => { if (Math.hypot(ev.clientX - x0, ev.clientY - y0) > 8) { cleanup(); t._dragged = true; startDrag(t.dataset.id, 'lib', ev) } }
   const cleanup = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', cleanup) }
   addEventListener('pointermove', mv); addEventListener('pointerup', cleanup)
 })
 $('#libMore').addEventListener('click', (e) => openMenu([
-  ['Reset the Dock', () => { pins = [...DEF_DOCK]; saveDock(); renderDock(); renderLib(); toast('Dock reset') }],
-  ['Put every module in the Dock', () => { pins = MODS.map((m) => m.id); saveDock(); renderDock(); renderLib() }],
+  ['Choose Dock modules', () => setPicking(true)],
+  ['Reset the Dock', resetDock],
 ], e.currentTarget))
 function toggleLib(b) { $('#lib').classList.contains('open') ? closeLib() : openLib(b) }
-function openLib(b) {
-  closeQA(); renderLib()
-  const lib = $('#lib'), r = (b || $('.di[data-id=lib]')).getBoundingClientRect(), L = innerWidth / 2 - 370
+/* More always opens on every module — never on a category or a search left from last time */
+function openLib(b, pick = false) {
+  closeQA(); closeFp(); cat = 'all'; picking = pick; $('#libQ').value = ''; drawCats(); renderLib()
+  const lib = $('#lib'), r = (b || $('.di[data-id=lib]')).getBoundingClientRect(), L = innerWidth / 2 + 188 - 370
   lib.style.setProperty('--ox', `${r.left + r.width / 2 - L}px`); lib.classList.add('open'); setTimeout(() => $('#libQ').focus({ preventScroll: true }), 200)
 }
-function closeLib() { $('#lib').classList.remove('open'); $('#libQ').value = '' }
+function closeLib() { $('#lib').classList.remove('open'); $('#libQ').value = ''; picking = false }
 
 /* ── windows: out of the Dock icon, back into it ── */
 const wins = new Map()
 let z = 20, cascade = 0
 function openWin(id, fromEl) {
-  if (id !== 'home') { recent = [id, ...recent.filter((r) => r !== id)].slice(0, 6); store.set('antz.mac.recent', recent) }
+  closeFp()
   let w = wins.get(id)
   if (w) { if (w.min) restore(w, fromEl); focus(w); return w }
   const el = document.createElement('section'); el.className = 'win'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', nameOf(id))
@@ -604,8 +749,8 @@ function openWin(id, fromEl) {
   $('#wins').append(el)
   w = { id, el, min: false, zoom: null }; wins.set(id, w); running.add(id); renderDock()
   $('#nc').classList.add('away')   /* the banners clear once there is work on screen; the menu bar brings them back */
-  if ($('.tip')) { $('.tip').remove(); store.set('antz.mac.tip', true) }
-  wire(w); focus(w); fly(el, fromEl || $(`.di[data-id="${id}"]`), true)
+  if ($('.tip')) { $('.tip').remove(); store.set('antz.mac.tip2', true) }
+  wire(w); focus(w); fly(el, fromEl || dockIc(id), true)
   return w
 }
 /* the flight: a FLIP from the icon's box to the window's */
@@ -619,9 +764,9 @@ function fly(el, from, opening, done) {
   setTimeout(() => { el.classList.remove('anim'); done && done() }, 440)
 }
 function focus(w) { wins.forEach((x) => x.el.classList.toggle('act', x === w)); w.el.style.zIndex = ++z }
-function closeWin(w) { fly(w.el, $(`.di[data-id="${w.id}"]`), false, () => w.el.remove()); wins.delete(w.id); running.delete(w.id); renderDock() }
-function minWin(w) { w.min = true; fly(w.el, $(`.di[data-id="${w.id}"]`), false, () => (w.el.style.visibility = 'hidden')) }
-function restore(w, from) { w.min = false; w.el.style.visibility = ''; fly(w.el, from || $(`.di[data-id="${w.id}"]`), true) }
+function closeWin(w) { fly(w.el, dockIc(w.id), false, () => w.el.remove()); wins.delete(w.id); running.delete(w.id); renderDock() }
+function minWin(w) { w.min = true; fly(w.el, dockIc(w.id), false, () => (w.el.style.visibility = 'hidden')) }
+function restore(w, from) { w.min = false; w.el.style.visibility = ''; fly(w.el, from || dockIc(w.id), true) }
 function zoomWin(w) {
   const s = w.el.style; w.el.classList.add('anim')
   if (w.zoom) { Object.assign(s, w.zoom); w.zoom = null } else { w.zoom = { left: s.left, top: s.top, width: s.width, height: s.height }; Object.assign(s, { left: '8px', top: '36px', width: innerWidth - 16 + 'px', height: innerHeight - 124 + 'px' }) }
@@ -703,31 +848,85 @@ $('#wgToday').addEventListener('click', (e) => {
   if (f) { tT = f.dataset.t; $$('.flip button').forEach((b) => b.setAttribute('aria-pressed', String(b === f))); today() }
   if (r) { tR = r.dataset.r; $$('#wgToday .seg button').forEach((b) => b.setAttribute('aria-pressed', String(b === r))); today() }
 })
-$('#audSites').innerHTML = SITES.slice(1).map(([n, , , a]) => `<span><span>${n}</span><b style="color:${a < 60 ? '#E2553A' : '#1D2B33'}">${a}%</b></span>`).join('')
-setTimeout(() => $('#ringArc').setAttribute('stroke-dasharray', `${(.68 * 169.6).toFixed(1)} 170`), 50)
+/* audit: the ring and the bars share one colour rule — green at the 80% target, amber under it, red under 60 */
+const band = (a) => a >= 80 ? '#2FA85C' : a >= 60 ? '#E8A317' : '#E2553A'
+const AUD = SITES.slice(1).map(([n, , , a]) => [n, a])
+$('#audHead').insertAdjacentHTML('afterbegin', `<span class="ic sm" style="background-image:${M.audit.bg}"><img src="${I + M.audit.icon}" alt=""></span>`)
+$('#audSites').innerHTML = AUD.map(([n, a]) => `<div class="ar"><span>${n}</span><b style="color:${a < 60 ? '#C2412A' : '#1D2B33'}">${a}%</b><i><em data-w="${a}" style="background:${band(a)}"></em></i></div>`).join('')
+const low = AUD.filter(([, a]) => a < 60)
+$('#audFoot').innerHTML = (low.length ? `<span class="pill">${low.length} site below 60%</span><span>${low.map(([n]) => n).join(', ')}</span>` : '<span>Every site at 60% or over</span>') + '<span class="tgt">Target 80%</span>'
+setTimeout(() => { $('#ringArc').setAttribute('stroke-dasharray', `${(.68 * 169.6).toFixed(1)} 170`); $$('#audSites em').forEach((e) => (e.style.width = e.dataset.w + '%')) }, 50)
+$('#wgAud').addEventListener('click', () => openWin('audit', $('#audHead .ic')))
+
+/* pending: a bar of the whole by urgency, a legend, then each queue with its module */
+const CHEV = '<svg viewBox="0 0 8 8" fill="none" stroke="#1D2B33" stroke-width="1.6" stroke-linecap="round"><path d="m3 1.5 2.5 2.5L3 6.5"/></svg>'
+const byU = Object.fromEntries(Object.keys(URG).map((u) => [u, PEND.filter((p) => p[2] === u).reduce((t, p) => t + p[1], 0)]))
 $('#pendTot').textContent = PEND.reduce((t, p) => t + p[1], 0).toLocaleString('en-US') + ' open'
-$('#pend').innerHTML = PEND.map(([l, n, c, mod]) => `<button data-open="${mod}"><i style="background:${c}"></i><span>${l}</span><b>${n.toLocaleString('en-US')}</b></button>`).join('')
-$('#pend').addEventListener('click', (e) => { const b = e.target.closest('[data-open]'); if (b) openWin(b.dataset.open, b) })
+$('#pbar').innerHTML = Object.entries(byU).map(([u, n]) => `<i style="flex:${n};background:${URG[u][0]}" title="${URG[u][1]} · ${n.toLocaleString('en-US')}"></i>`).join('')
+$('#plg').innerHTML = Object.entries(byU).map(([u, n]) => `<span style="--c:${URG[u][0]}"><b>${n.toLocaleString('en-US')}</b>${URG[u][1].toLowerCase()}</span>`).join('')
+$('#pend').innerHTML = PEND.map(([l, n, u, mod]) => `<button class="pr" data-open="${mod}">${icon(mod).replace('class="ic', 'class="ic sm')}<span class="pr__t"><span>${l}</span><small><i style="background:${URG[u][0]}"></i>${URG[u][1]} · ${esc(SHORT[mod] || M[mod].name)}</small></span><b class="${u === 'overdue' ? 'hot' : ''}">${n.toLocaleString('en-US')}</b>${CHEV}</button>`).join('')
+$('#pend').addEventListener('click', (e) => { const b = e.target.closest('[data-open]'); if (b) openWin(b.dataset.open, b.querySelector('.ic')) })
 $('#wgGreet').addEventListener('click', (e) => openWin('home', e.currentTarget))
 
-/* favourites: Quick Look on a click; Edit takes them off; + puts them back */
-let favs = store.get('antz.mac.favs', FAVS.map((f) => f.id)).filter((id) => FAVS.some((f) => f.id === id))
+/* favourites: three pinned to the widget; all hundred in a panel that opens beside it */
+const FAV_PIN = 3
+const F = Object.fromEntries(FAVS.map((f) => [f.id, f]))
+let pinned = store.get('antz.mac.favpin', FAVS.slice(0, FAV_PIN).map((f) => f.id)).filter((id) => F[id]).slice(0, FAV_PIN)
 const drawFavs = () => {
-  $('#favs').innerHTML = favs.map((id) => { const f = FAVS.find((x) => x.id === id); return `<button class="fa" data-f="${id}"><span class="fa__x" data-x="${id}" aria-label="Remove">×</span><img src="${P + f.img}" alt=""><span>${esc(f.sp.split(' ')[0])}</span></button>` }).join('') +
-    (favs.length < FAVS.length ? `<button class="fa fa--add" id="favAdd"><div>+</div><span>Add</span></button>` : '')
+  const rest = FAVS.filter((f) => !pinned.includes(f.id))
+  $('#favN').textContent = FAVS.length
+  $('#favs').innerHTML = pinned.map((id) => { const f = F[id]; return `<button class="fa" data-f="${id}"><img src="${P + f.img}" alt=""><span>${esc(f.sp.split(' ')[0])}</span></button>` }).join('') +
+    `<button class="fa fa--more" id="favMore" aria-label="All ${FAVS.length} favourites"><span class="stk">${rest.slice(0, 3).map((f) => `<img src="${P + f.img}" alt="" style="border-radius:50%;object-fit:cover">`).join('')}<b>+${rest.length}</b></span><span>See all</span></button>`
 }
 drawFavs()
-$('#favEdit').addEventListener('click', () => { const on = $('#wgFav').classList.toggle('editing'); $('#favEdit').textContent = on ? 'Done' : 'Edit' })
+$('#favAll').addEventListener('click', () => toggleFp())
 $('#favs').addEventListener('click', (e) => {
-  const x = e.target.closest('[data-x]'); if (x) { e.stopPropagation(); favs = favs.filter((f) => f !== x.dataset.x); store.set('antz.mac.favs', favs); drawFavs(); return }
-  if (e.target.closest('#favAdd')) { const miss = FAVS.filter((f) => !favs.includes(f.id)); if (miss.length) { favs.push(miss[0].id); store.set('antz.mac.favs', favs); drawFavs(); toast(`${miss[0].sp} is a favourite again`) } return }
-  const b = e.target.closest('[data-f]'); if (b && !$('#wgFav').classList.contains('editing')) quickLook(FAVS.find((f) => f.id === b.dataset.f), b)
+  if (e.target.closest('#favMore')) return toggleFp()
+  const b = e.target.closest('[data-f]'); if (b) quickLook(F[b.dataset.f], b)
+})
+
+let fCls = 'all', fSite = 'all'
+const PIN = (c) => `<svg viewBox="0 0 16 16" fill="${c}"><path d="M10.2 1.6 14.4 5.8l-1.3.5-2.3 2.3.3 3.3-1.2 1.2-2.6-2.6-3.6 3.6-.9-.9 3.6-3.6L3.8 7l1.2-1.2 3.3.3 2.3-2.3z"/></svg>`
+$('#fpSite').innerHTML = '<option value="all">Every site</option>' + SITES.slice(1).map(([n]) => `<option>${n}</option>`).join('')
+const drawCls = () => ($('#fpCls').innerHTML = CLS.map(([k, l]) => `<button data-cls="${k}" aria-pressed="${k === fCls}">${l}<em>${k === 'all' ? FAVS.length : FAVS.filter((f) => f.cls === k).length}</em></button>`).join(''))
+const an = (f, i) => { const on = pinned.includes(f.id)
+  return `<div class="an" data-f="${f.id}" role="button" tabindex="0" style="animation-delay:${Math.min(i, 30) * 12}ms">` +
+  `<button class="an__pin${on ? ' on' : ''}" data-pin="${f.id}" aria-label="${on ? 'Take off' : 'Show on'} the widget" title="${on ? 'On your widget' : 'Show on widget'}">${PIN(on ? '#fff' : '#1F515B')}</button>` +
+  `<img src="${P + f.img}" alt="" loading="lazy">${f.care ? `<i class="an__dot" style="background:${CARE[f.care][0]}" title="${CARE[f.care][1]}"></i>` : ''}<span>${esc(f.sp)}</span><small>AAID ${f.id}</small></div>` }
+const dot = (c) => `<i style="display:inline-block;width:7px;height:7px;margin:0 3px 0 8px;border-radius:50%;background:${c}"></i>`
+function renderFp() {
+  const q = $('#fpQ').value.trim().toLowerCase()
+  const list = FAVS.filter((f) => (fCls === 'all' || f.cls === fCls) && (fSite === 'all' || f.site === fSite) && (!q || (f.sp + ' ' + f.id).toLowerCase().includes(q)))
+  const filtered = q || fCls !== 'all' || fSite !== 'all'
+  $('#fpN').textContent = `${FAVS.length} animals`
+  $('#fpBody').innerHTML = (filtered ? '' : `<div class="fp__sec">On your widget <span>${pinned.length} of ${FAV_PIN} · pin another to swap</span></div><div class="fp__grid">${pinned.map((id, i) => an(F[id], i)).join('')}</div>`) +
+    `<div class="fp__sec">${filtered ? `${list.length} match${list.length === 1 ? '' : 'es'}` : 'All favourites'} <span>${dot(CARE.medical[0])}Under treatment${dot(CARE.transfer[0])}Transfer pending</span></div>` +
+    `<div class="fp__grid">${list.length ? list.map(an).join('') : '<div class="fp__none">No favourite matches.</div>'}</div>`
+}
+function toggleFp() { $('#fp').classList.contains('open') ? closeFp() : openFp() }
+function openFp() {
+  closeLib(); closeQA(); fCls = 'all'; fSite = 'all'; $('#fpQ').value = ''; $('#fpSite').value = 'all'; drawCls(); renderFp()
+  const r = $('#wgFav').getBoundingClientRect(), fp = $('#fp')
+  fp.style.setProperty('--oy', `${r.top + r.height / 2 - 40}px`); fp.classList.add('open'); setTimeout(() => $('#fpQ').focus({ preventScroll: true }), 200)
+}
+function closeFp() { $('#fp').classList.remove('open'); ql && (ql.remove(), ql = null) }
+$('#fpX').addEventListener('click', closeFp)
+$('#fpQ').addEventListener('input', renderFp)
+$('#fpSite').addEventListener('change', (e) => { fSite = e.target.value; renderFp() })
+$('#fpCls').addEventListener('click', (e) => { const b = e.target.closest('[data-cls]'); if (!b) return; fCls = b.dataset.cls; drawCls(); renderFp() })
+$('#fpBody').addEventListener('click', (e) => {
+  const p = e.target.closest('[data-pin]')
+  if (p) { const id = p.dataset.pin
+    if (pinned.includes(id)) pinned = pinned.filter((x) => x !== id)
+    else { pinned.push(id); if (pinned.length > FAV_PIN) toast(`${F[pinned.shift()].sp} moved off the widget`); else toast(`${F[id].sp} is on your widget`) }
+    store.set('antz.mac.favpin', pinned); drawFavs(); renderFp(); return }
+  const t = e.target.closest('[data-f]'); if (t) quickLook(F[t.dataset.f], t.querySelector('img'))
 })
 let ql = null
 function quickLook(f, at) {
   ql && ql.remove(); const r = at.getBoundingClientRect(), s = SEX[f.sex]
-  ql = document.createElement('div'); ql.className = 'ql'; ql.style.left = r.right + 18 + 'px'; ql.style.top = Math.max(36, Math.min(innerHeight - 380, r.top - 100)) + 'px'
-  ql.innerHTML = `<div class="ql__img" style="background-image:url(${P + f.img})"></div><div class="ql__b"><b>AAID:${f.id}</b><span class="sx" style="background:${s[0]};color:${s[1]}">${s[2]}</span><p>${esc(f.sp)}</p><div class="acts"><button class="pri" data-ql="species">Open in Species</button><button data-ql="note">Add a note</button></div></div>`
+  ql = document.createElement('div'); ql.className = 'ql'; ql.style.left = Math.min(r.right + 18, innerWidth - 316) + 'px'; ql.style.top = Math.max(36, Math.min(innerHeight - 400, r.top - 100)) + 'px'
+  ql.innerHTML = `<div class="ql__img" style="background-image:url(${P + f.img})"></div><div class="ql__b"><b>AAID:${f.id}</b><span class="sx" style="background:${s[0]};color:${s[1]}">${s[2]}</span><p>${esc(f.sp)} · ${esc(f.site)}${f.care ? ` · <span style="color:${CARE[f.care][0]};font-weight:600">${CARE[f.care][1]}</span>` : ''}</p><div class="acts"><button class="pri" data-ql="species">Open in Species</button><button data-ql="note">Add a note</button></div></div>`
   document.body.append(ql)
   ql.addEventListener('click', (e) => { const o = e.target.closest('[data-ql]'); if (!o) return; ql.remove(); ql = null; if (o.dataset.ql === 'species') openWin('species', at); else toast('Observation note — opens in ANTZ') })
 }
@@ -773,10 +972,13 @@ $('#mbSpot').addEventListener('click', openSpot)
 
 /* ── menus ── */
 const menuEl = $('#menu')
-function openMenu(items, at) {
-  const r = at.getBoundingClientRect(), real = items.filter((x) => x !== '-')
+/* a menu drops from its button, or — given a point, as on the Dock — rises from the pointer */
+function openMenu(items, at, pt) {
+  const real = items.filter((x) => x !== '-')
   menuEl.innerHTML = items.map((it) => it === '-' ? '<hr>' : `<button class="${it[2] === 'dim' ? 'dim' : ''}"><span class="chk">${it[3] ? '✓' : ''}</span>${esc(it[0])}${it[2] && it[2] !== 'dim' ? `<kbd>${it[2]}</kbd>` : ''}</button>`).join('')
-  menuEl.style.left = Math.min(r.left, innerWidth - 260) + 'px'; menuEl.style.top = r.bottom + 2 + 'px'; menuEl.classList.add('open')
+  menuEl.classList.add('open')
+  if (pt) { menuEl.style.left = Math.min(pt.x, innerWidth - 260) + 'px'; menuEl.style.top = pt.y - menuEl.offsetHeight - 6 + 'px' }
+  else { const r = at.getBoundingClientRect(); menuEl.style.left = Math.min(r.left, innerWidth - 260) + 'px'; menuEl.style.top = r.bottom + 2 + 'px' }
   $$('button', menuEl).forEach((b, i) => { b.onclick = () => { closeMenu(); real[i][1] && real[i][1]() } })
   $$('.mb__it').forEach((b) => b.classList.toggle('open', b === at))
 }
@@ -785,11 +987,11 @@ const activeWin = () => [...wins.values()].find((w) => w.el.classList.contains('
 const MENUS = {
   antz: () => [['About ANTZ', () => toast('ANTZ Command Centre for Mac · a mockup')], '-', ['Settings…', null, '⌘,'], '-', ['Hide Widgets', toggleWgs]],
   file: () => [['New Home Window', () => openWin('home'), '⌘N'], ['Quick Actions…', () => toggleQA($('.di[data-id=qa]'))], '-', ['Close Window', () => { const a = activeWin(); a && closeWin(a) }, '⌘W']],
-  edit: () => [['Undo', null, 'dim'], ['Redo', null, 'dim'], '-', ['Edit Favourite Animals', () => $('#favEdit').click()], ['Find…', openSpot, '⌘K']],
-  view: () => [['Show Widgets', toggleWgs, null, !$('#wgs').classList.contains('hide')], ['Show Notifications', toggleNc, null, !$('#nc').classList.contains('away')], ['Dock Magnification', () => { magOn = !magOn; store.set('antz.mac.mag', magOn) }, null, magOn], '-', ['All Modules', () => openLib(), '⌘L']],
+  edit: () => [['Undo', null, 'dim'], ['Redo', null, 'dim'], '-', ['All Favourite Animals', openFp], ['Choose Dock Modules…', () => openLib(null, true)], ['Find…', openSpot, '⌘K']],
+  view: () => [['Show Widgets', toggleWgs, null, !$('#wgs').classList.contains('hide')], ['Show Notifications', toggleNc, null, !$('#nc').classList.contains('away')], '-',['All Modules', () => openLib(), '⌘L']],
   sites: () => SITES.map(([n]) => [n, () => { openWin('home'); setScope(n) }, null, n === scope]),
   window: () => [['Minimise All', () => wins.forEach((w) => !w.min && minWin(w))], ['Bring All to Front', () => wins.forEach((w) => { if (w.min) restore(w); focus(w) })], '-', ...[...wins.values()].map((w) => [nameOf(w.id), () => { if (w.min) restore(w); focus(w) }, null, w.el.classList.contains('act')]), ...(wins.size ? [] : [['No windows open', null, 'dim']])],
-  help: () => [['Show the welcome again', () => { store.set('antz.mac.seen', null); store.set('antz.mac.tip', false); location.reload() }], ['⌘K search · ⌘L modules · Esc closes', null, 'dim']],
+  help: () => [['Show the welcome again', () => { store.set('antz.mac.seen', null); store.set('antz.mac.tip2', false); location.reload() }], ['⌘K search · ⌘L modules · Esc closes', null, 'dim']],
 }
 $('#mb').addEventListener('click', (e) => { const b = e.target.closest('[data-menu]'); if (!b) return; e.stopPropagation(); menuEl.classList.contains('open') && b.classList.contains('open') ? closeMenu() : openMenu(MENUS[b.dataset.menu](), b) })
 $('#mb').addEventListener('mouseover', (e) => { const b = e.target.closest('[data-menu]'); if (b && menuEl.classList.contains('open') && !b.classList.contains('open')) openMenu(MENUS[b.dataset.menu](), b) })
@@ -809,7 +1011,7 @@ $('#nc').innerHTML =
     `<b>${esc(ANN[0].hl)}</b><div style="color:#54636A">${esc(ANN[0].by)} · and ${ANN.length - 1} more — click to expand</div>` +
     `<div class="stack__list">${ANN.map((a, i) => `<button data-ann="${i}"><i style="${a.img ? `background-image:url(${P + a.img})` : 'background:linear-gradient(135deg,#AFEFEB,#CBEAE8)'}"></i><span>${esc(a.hl)}<small>${esc(a.by)} · ${esc(a.d)}</small></span></button>`).join('')}</div></div>` +
   `<div class="nt glass"><button class="nt__x" aria-label="Dismiss">×</button><div class="nt__h"><img src="${P}antz-logo.png" alt="">New on Mac<time>tip</time></div>` +
-    `<b>Your modules live in the Dock now</b><div>Open <b>Modules</b> to see them all; drag one into the Dock to keep it, drag it out to let it go. Press <b>⌘K</b> to find anything.</div></div>`
+    `<b>Your modules live in the Dock now</b><div><b>More</b> opens every module. Tap <b>Choose for Dock</b> to tick the ones you want down there, or drag one in. Press <b>⌘K</b> to find anything.</div></div>`
 $('#nc').addEventListener('click', (e) => {
   const gone = (n) => { n.classList.add('gone'); setTimeout(() => n.remove(), 350) }
   const x = e.target.closest('.nt__x, [data-go="x"]'); if (x) { gone(x.closest('.nt')); return }
@@ -821,13 +1023,13 @@ store.set('antz.mac.seen', new Date().toISOString())
 
 renderDock()
 /* the first-visit tip over the Modules icon */
-if (!store.get('antz.mac.tip', false)) {
+if (!store.get('antz.mac.tip2', false)) {
   const b = $('.di[data-id=lib]'), r = b.getBoundingClientRect()
   b.querySelector('.ic').classList.add('pulse')
-  const t = document.createElement('div'); t.className = 'tip'; t.style.left = Math.max(12, r.left + r.width / 2 - 40) + 'px'; t.style.bottom = innerHeight - r.top + 16 + 'px'; t.style.setProperty('--ax', '40px')
-  t.innerHTML = '<b>All your modules are in here</b>Open it, then drag any module into the Dock.<br><button>Got it</button>'
+  const t = document.createElement('div'); t.className = 'tip'; t.style.left = Math.max(12, Math.min(innerWidth - 282, r.left + r.width / 2 - 40)) + 'px'; t.style.bottom = innerHeight - r.top + 16 + 'px'; t.style.setProperty('--ax', '40px')
+  t.innerHTML = '<b>Every module is under More</b>Choose which ones sit in your Dock — tick them in, tick them out.<br><button>Got it</button>'
   document.body.append(t)
-  const done = () => { t.remove(); store.set('antz.mac.tip', true) }
+  const done = () => { t.remove(); store.set('antz.mac.tip2', true) }
   t.querySelector('button').onclick = done
   dock.addEventListener('pointerdown', done, { once: true })
 }
@@ -837,14 +1039,15 @@ addEventListener('dragstart', (e) => e.preventDefault())
 addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#spot').classList.contains('open') ? closeSpot() : openSpot() }
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'l') { e.preventDefault(); toggleLib() }
-  if (e.key === 'Escape') { closeSpot(); closeLib(); closeQA(); closeMenu(); ql && (ql.remove(), ql = null) }
+  if (e.key === 'Escape') { closeSpot(); closeLib(); closeQA(); closeMenu(); closeFp(); ql && (ql.remove(), ql = null) }
 })
 addEventListener('pointerdown', (e) => {
   if (!e.target.closest('.menu, .mb, .lib__more')) closeMenu()
-  if (!e.target.closest('.lib, .di[data-id=lib], .menu')) closeLib()
+  if (!e.target.closest('.lib, .di[data-id=lib], .menu, .dock')) closeLib()
   if (!e.target.closest('.qa, .di[data-id=qa], .qbtn')) closeQA()
   if (!e.target.closest('.spot, #mbSpot, .di[data-id=spot], .wsearch')) closeSpot()
-  if (!e.target.closest('.ql, .fa')) { ql && ql.remove(); ql = null }
+  if (!e.target.closest('.ql, .fa, .an')) { ql && ql.remove(); ql = null }
+  if (!e.target.closest('.fp, .ql, #wgFav, .menu')) closeFp()
 }, true)
 </script>
 </body>
