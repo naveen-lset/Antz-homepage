@@ -13906,7 +13906,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261006b">
+<link rel="stylesheet" href="review.css?v=20261007c">
 </head>
 
 <style>
@@ -36929,7 +36929,8 @@ function createWeatherSky({ tone = 'light' } = {}) {
   function place() {
     const head = document.querySelector('.home-header')
     const foot = document.getElementById('favSpecies')
-    const end = foot && !foot.hidden ? foot : document.querySelector('.search-row')
+    /* on the web the favourites sit in the right rail, so the sky ends at the search row */
+    const end = foot && !foot.hidden && !('v2desk' in root.dataset) ? foot : document.querySelector('.search-row')
     if (!head || !end) return
     const a = head.getBoundingClientRect(), b = end.getBoundingClientRect()
     /* V2's My Species block ends in its own 20px foot corners: the band ends there */
@@ -56417,6 +56418,75 @@ __x.mount = mount;
 __req('js/app.js');
 __req('js/components/Clock.js').mount();
 })();
+</script>
+<script>
+/* V2 ON THE WEB (owner, 7 Oct 2026: "if I change to Web then this page has
+   to open" — mockups/home-desktop.html). On a desktop browser, 1200 and up
+   with a mouse or trackpad, V2 Home is two columns: the Modules on the left
+   (the site chips, the Command Centre banner and the grid, the tablet's own),
+   and on the right a rail that stays put while they scroll — Favourites,
+   Announcements, Observation Notes. The audit ticker runs over both.
+   The bands are the app's own elements, MOVED, not copied: every handler
+   and renderer keeps working on them. Below 1200, or on a touch screen (an
+   iPad, or Chrome's device mode), they go back where they were and the
+   tablet and phone layouts are untouched. Styles: the end of review.css. */
+(function () {
+  var root = document.documentElement
+  if (root.dataset.home !== 'v2') return
+  var DESK = matchMedia('(min-width: 1200px) and (hover: hover) and (pointer: fine)')
+  var RAIL = ['favSpecies', 'heroStage', 'recentObs']
+  var panel = document.getElementById('panel-modules')
+  if (!panel) return
+  var wrap, main, rail, order = null, busy = false
+  var kids = function (el) { return Array.prototype.slice.call(el.children) }
+  function sort() {
+    busy = true
+    if (!wrap) {
+      wrap = document.createElement('div'); wrap.className = 'v2d'
+      main = document.createElement('div'); main.className = 'v2d__main'
+      rail = document.createElement('aside'); rail.className = 'v2d__rail'; rail.setAttribute('aria-label', 'Favourites, announcements and notes')
+      wrap.append(main, rail)
+      mo.observe(rail, { childList: true })   /* the ticker is built after the favourites: it lands here first */
+    }
+    if (!order) order = kids(panel)
+    var strip = document.getElementById('healthStrip')
+    if (!wrap.parentNode) panel.append(wrap)
+    if (strip && strip.nextElementSibling !== wrap) wrap.before(strip)
+    RAIL.forEach(function (id) { var el = document.getElementById(id); if (el && el.parentNode !== rail) rail.append(el) })
+    /* everything else the panel holds (or gains later, like the site tabs)
+       goes to the left column, in the order it stands */
+    kids(panel).concat(kids(rail)).forEach(function (el) {
+      if (el === wrap || el === strip || RAIL.indexOf(el.id) >= 0) return
+      if (order.indexOf(el) < 0) order.push(el)
+      if (/^siteTabs/.test(el.id)) main.prepend(el); else main.append(el)   /* the chips head the column */
+    })
+    busy = false
+  }
+  function unsort() {
+    if (!wrap || !wrap.parentNode) return
+    busy = true
+    var all = (order || []).slice()
+    kids(main).concat(kids(rail)).forEach(function (el) { if (all.indexOf(el) < 0) all.push(el) })
+    var strip = document.getElementById('healthStrip'), fav = document.getElementById('favSpecies')
+    all.forEach(function (el) { if (el !== strip) panel.append(el) })
+    if (strip && fav) fav.after(strip)   /* the ticker's own place: under the favourites */
+    var tabs = document.getElementById('siteTabsV2'), obs = document.getElementById('recentObs')
+    if (tabs && obs) obs.before(tabs)    /* and the chips', over the notes */
+    wrap.remove()
+    order = null
+    busy = false
+  }
+  function apply() {
+    if (DESK.matches) { root.dataset.v2desk = ''; sort() } else { delete root.dataset.v2desk; unsort() }
+    dispatchEvent(new Event('resize'))   /* the sky, the ticker and the rails measure again */
+  }
+  /* the ticker and the site tabs are built after the markup: keep sorting
+     whatever arrives in the panel (or lands in the rail) while this is on */
+  var mo = new MutationObserver(function () { if (DESK.matches && !busy) sort() })
+  mo.observe(panel, { childList: true })
+  DESK.addEventListener('change', apply)
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply); else apply()
+})()
 </script>
 <script>
 // Agentation feedback toolbar, dev only: loads solely on localhost.
