@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANTZ Desktop Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,600&display=swap">
+<!--
+  V2 HOME ON A DESKTOP — a basic mockup, not the app (7 Oct 2026).
+  Owner: "Yesterday we worked Mobile & iPad. Same way for Desktop — on the
+  right show Favourites, Notes & Announcements; on the left the Modules."
+    · the header (greeting, search, weather, bell) runs the full width
+    · LEFT  = Modules: the site chips, the Command Centre banner and V2's own
+      cards (same colours, same order as V2_LAYOUT) on a six-column grid
+    · RIGHT = a 400px rail that stays put while the modules scroll:
+      Favourites → Announcements → Observation Notes, each with View all
+  Data and photos are V2's, read off ?v=2 the same day.
+-->
+<style>
+:root {
+  --ink: #1F2A30; --ink-2: #44544A; --mute: #6B7773; --line: #E3E9E6;
+  --teal: #1F515B; --green: #006D35; --page: #EFF5F2; --card: #fff;
+  --font: Inter, system-ui, sans-serif; --num: "DM Sans", Inter, sans-serif;
+  --r: 16px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--font); color: var(--ink); background: var(--page); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; }
+img { display: block; }
+h2 { margin: 0; font-size: 16px; font-weight: 600; }
+
+/* ── page ── */
+.page { max-width: 1440px; margin: 0 auto; padding: 0 32px 48px; }
+
+/* header: the V2 sky, full width */
+.top { background: url(../assets/img/header-sky.png) center/cover, #DCE9E4; border-radius: 0 0 28px 28px; }
+.top__in { max-width: 1440px; margin: 0 auto; padding: 20px 32px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 32px; align-items: center; }
+.hi { display: flex; align-items: center; gap: 12px; }
+.hi img { width: 44px; height: 44px; border-radius: 50%; }
+.hi small { display: block; font-size: 13px; color: var(--ink-2); }
+.hi b { display: block; font-size: 22px; font-weight: 600; color: #1F415B; white-space: nowrap; }
+.search { display: flex; gap: 10px; max-width: 640px; width: 100%; justify-self: center; }
+.search label { flex: 1; height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 16px; background: #fff; border-radius: 12px; color: var(--mute); font-size: 14px; }
+.search input { border: 0; outline: 0; font: inherit; flex: 1; background: none; color: var(--ink); }
+.ib { width: 44px; height: 44px; border-radius: 12px; background: #fff; display: grid; place-items: center; flex: none; }
+.ib img { width: 20px; height: 20px; }
+.wx { display: flex; align-items: center; gap: 16px; }
+.wx__t { text-align: right; font-size: 12px; color: var(--ink-2); }
+.wx__t b { display: block; font: 600 20px var(--num); color: var(--ink); }
+
+/* ticker */
+.tick { margin: 16px 0 0; height: 36px; display: flex; align-items: center; gap: 22px; padding: 0 14px; overflow: hidden; white-space: nowrap;
+  background: #FFF6D6; border-radius: 10px; font-size: 13px; }
+.tick b { font-size: 11px; font-weight: 700; letter-spacing: .02em; }
+.tick em { font-style: normal; color: #E5533D; font-weight: 600; }
+.tick span { display: inline-flex; gap: 6px; align-items: center; color: var(--ink-2); }
+.tick span i { font-style: normal; font-weight: 600; color: var(--ink); }
+
+/* ── the two columns ── */
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 28px; margin-top: 20px; align-items: start; }
+.head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; min-height: 32px; }
+.head a { font-size: 13px; color: var(--ink-2); text-decoration: none; }
+.head a::after { content: " »"; }
+.tools { display: flex; gap: 6px; }
+.tools button { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--green); font-size: 20px; }
+.tools button:hover { background: rgba(0,109,53,.08); }
+
+/* LEFT: modules */
+.chips { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.chips button { height: 38px; padding: 0 18px; border-radius: 999px; background: #E2E8E6; font-size: 14px; color: var(--ink-2); }
+.chips button.on { background: var(--teal); color: #fff; }
+.banner { position: relative; height: 168px; border-radius: var(--r); overflow: hidden; color: #fff; margin-bottom: 12px;
+  background: url(../assets/img/hero-banner-v2.jpg) center 60%/cover; }
+.banner div { position: absolute; left: 24px; bottom: 22px; }
+.banner b { display: block; font-size: 28px; font-weight: 600; }
+.banner span { font-size: 14px; opacity: .9; }
+.grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 150px; gap: 12px; grid-auto-flow: dense; }
+.m { position: relative; border-radius: var(--r); overflow: hidden; color: #fff; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; text-align: left;
+  transition: transform .18s ease, box-shadow .18s ease; }
+.m:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(20,40,40,.16); }
+.m img.ic { width: 24px; height: 24px; filter: brightness(0) invert(1); }
+.m b { font-size: 14px; font-weight: 500; position: relative; }
+.m.w2 { grid-column: span 2; } .m.h2 { grid-row: span 2; }
+.m.photo { background-size: cover; background-position: center; }
+.m.photo::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.05) 40%, rgba(0,0,0,.45)); }
+.m.photo > * { position: relative; }
+.m .big { font: 500 34px/1 var(--num); }
+.m .row { display: flex; justify-content: space-between; align-items: flex-end; }
+.m .row small { display: block; font-size: 12px; opacity: .9; }
+.seg { display: inline-flex; background: rgba(255,255,255,.35); border-radius: 8px; padding: 2px; font-size: 11px; }
+.seg i { font-style: normal; padding: 3px 8px; border-radius: 6px; }
+.seg i.on { background: #fff; color: var(--ink); }
+.m .lbl { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; }
+.pend { background: linear-gradient(180deg, #FFE6DC, #FFD6C7); color: var(--ink); justify-content: flex-start; gap: 8px; }
+.pend h3 { margin: 0 0 4px; font-size: 18px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+.pend p { margin: 0; height: 40px; background: rgba(255,255,255,.75); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-size: 14px; }
+.pend p b { font-weight: 600; } .pend p b.hot { color: #E5533D; }
+
+/* RIGHT: the rail */
+.rail { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 32px); overflow-y: auto; scrollbar-width: thin; padding-bottom: 4px; }
+.box { background: var(--card); border-radius: 20px; padding: 16px; }
+.box .head { margin-bottom: 10px; }
+.favs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.fav { position: relative; aspect-ratio: 3/4; border-radius: 12px; overflow: hidden; color: #fff; background-size: cover; background-position: center; }
+.fav::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,.7)); }
+.fav div { position: absolute; left: 8px; right: 6px; bottom: 7px; }
+.fav b { display: block; font-size: 11px; font-weight: 600; }
+.fav span { display: block; font-size: 10px; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fav u { position: absolute; top: 6px; right: 6px; text-decoration: none; font-size: 9px; font-weight: 600; color: #C2412D; background: #FFE3DD; border-radius: 4px; padding: 1px 4px; }
+
+.ann { background: linear-gradient(180deg, #E6F6F3, #D8F0EC); }
+.ann__card { background: #fff; border-radius: 14px; overflow: hidden; }
+.ann__card img { width: 100%; height: 150px; object-fit: cover; }
+.ann__body { padding: 12px 14px 14px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 600; letter-spacing: .04em; color: #2A6B5F; background: #E6F4F1; padding: 4px 8px 4px 4px; border-radius: 999px; }
+.chip img { width: 18px; height: 18px; }
+.ann__body h4 { margin: 8px 0 4px; font-size: 15px; font-weight: 500; color: #2E9E87; line-height: 1.35; }
+.ann__body p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ann__meta { margin-top: 10px; font-size: 11px; color: var(--mute); }
+.dots { display: flex; justify-content: center; gap: 4px; margin-top: 12px; }
+.dots i { width: 6px; height: 6px; border-radius: 3px; background: #BCD3CE; }
+.dots i.on { width: 16px; background: #5B7F7A; }
+
+.note { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.note:first-of-type { border-top: 0; padding-top: 2px; }
+.note__pic { width: 72px; height: 72px; border-radius: 12px; background-size: cover; background-position: center; position: relative; }
+.note__pic i { position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; border-radius: 50%; background: #fff; display: grid; place-items: center; font: 700 10px var(--font); font-style: normal; color: #E5533D; }
+.note h5 { margin: 0; font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+.note h5 span { font-size: 11px; font-weight: 400; color: var(--mute); flex: none; }
+.note .tags { font-size: 11px; color: var(--mute); margin: 2px 0 4px; }
+.note p { margin: 0; font-size: 12px; line-height: 1.45; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.note .by { display: flex; flex-wrap: nowrap; white-space: nowrap; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--mute); }
+
+/* bottom bar, as on the tablet */
+.fab { position: fixed; bottom: 22px; left: calc(50% - 214px); transform: translateX(-50%); display: flex; gap: 10px; z-index: 5; }
+.fab button { height: 46px; padding: 0 18px; border-radius: 999px; background: rgba(255,255,255,.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.14); font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+
+/* narrower desktops: the rail drops under the modules */
+@media (max-width: 1100px) {
+  .cols { grid-template-columns: 1fr; }
+  .rail { position: static; max-height: none; display: grid; grid-template-columns: 1fr 1fr; }
+  .fab { left: 50%; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top__in">
+    <div class="hi">
+      <img src="../assets/img/avatar.png" alt="">
+      <div><small>Good Afternoon,</small><b>Sourav Tambe 👋🏻</b></div>
+    </div>
+    <div class="search">
+      <label><img src="../assets/icon/search.svg" alt="" width="18"><input placeholder="Search “Enclosure”"></label>
+      <button class="ib" aria-label="Scan"><img src="../assets/icon/scan.svg" alt=""></button>
+    </div>
+    <div class="wx">
+      <div class="wx__t"><b>☀️ 29°</b>Mainly Clear</div>
+      <button class="ib" aria-label="Notifications"><img src="../assets/icon/bell.svg" alt=""></button>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="tick">
+    <b>⚠ ANIMAL AUDIT SCORE <em>68%</em></b>
+    <span>Crimson Frosted <i>72%</i></span><span>Clearspring <i>64%</i></span>
+    <span>Hollowpine <i>81%</i></span><span>Foxglen <i>55%</i></span>
+  </div>
+
+  <div class="cols">
+    <!-- LEFT · MODULES -->
+    <section>
+      <div class="head">
+        <h2>Modules</h2>
+        <div class="tools"><button title="Add module">+</button><button title="Edit"><img src="../assets/icon/v2-pencil.svg" alt="" width="18"></button></div>
+      </div>
+      <div class="chips">
+        <button class="on">All sites</button><button>Crimson Frosted</button><button>Clearspring</button><button>Hollowpine</button><button>Foxglen</button>
+      </div>
+
+      <div class="banner"><div><b>Antz Command Centre</b><span>A clear view of what’s happening across the zoo.</span></div></div>
+
+      <div class="grid">
+        <button class="m" style="background:linear-gradient(160deg,#3C9A72,#6DAF8E)"><img class="ic" src="../assets/icon/m-medical.svg" alt=""><b>Medical</b></button>
+        <button class="m" style="background:linear-gradient(160deg,#4D7480,#6E8F98)"><img class="ic" src="../assets/icon/m-housing.svg" alt=""><b>Housing</b></button>
+        <button class="m w2 photo" style="background-image:url(../assets/img/species-cheetahs.jpg)">
+          <b style="display:flex;gap:6px;align-items:center;font-size:13px"><img class="ic" src="../assets/icon/m-species.svg" alt="" style="width:18px;height:18px">Species Management</b>
+          <div class="row"><div><span class="big">2,411</span><small>Species</small></div><div style="text-align:right"><span class="big">110,020</span><small>Animal Population</small></div></div>
+        </button>
+        <button class="m" style="background:linear-gradient(160deg,#8EAA9C,#B4C6BD)"><img class="ic" src="../assets/icon/m-administer.svg" alt=""><b>Administer</b></button>
+        <button class="m" style="background:linear-gradient(160deg,#2F5B6A,#3F6E7C)"><img class="ic" src="../assets/icon/m-users.svg" alt=""><b>Users</b></button>
+
+        <button class="m w2" style="background:var(--ki-n, linear-gradient(156deg,#5CD6CE 8%,#24BAB2 73%))">
+          <div class="lbl"><span>Natality</span><span class="seg"><i class="on">7D</i><i>30D</i><i>30+</i></span></div><span class="big">76</span>
+        </button>
+        <button class="m w2 photo" style="background-image:url(../assets/img/hospital.jpg)"><img class="ic" src="../assets/icon/m-hospital.svg" alt=""><b>Hospital</b></button>
+        <div class="m w2 h2 pend">
+          <h3>🕒 Pending</h3>
+          <p>Deworming <b class="hot">319</b></p><p>Vaccinations <b class="hot">143</b></p>
+          <p>Necropsy reports <b>14,296</b></p><p>Sexing <b>28,532</b></p>
+        </div>
+        <button class="m w2 photo" style="background-image:url(../assets/img/diet-kitchen.jpg)"><img class="ic" src="../assets/icon/m-diet.svg" alt=""><b>Diet &amp; Kitchen</b></button>
+        <button class="m" style="background:linear-gradient(160deg,#F38A6E,#F8A88E)"><img class="ic" src="../assets/icon/m-mortality.svg" alt=""><b>Mortality</b></button>
+        <button class="m" style="background:linear-gradient(160deg,#6F7F7B,#9BA8A4)"><img class="ic" src="../assets/icon/m-security.svg" alt=""><b>Security</b></button>
+        <button class="m w2" style="background:linear-gradient(156deg,#FB9984 8%,#FB8066 73%)">
+          <div class="lbl"><span>Mortality</span><span class="seg"><i class="on">7D</i><i>30D</i><i>30+</i></span></div><span class="big">192</span>
+        </button>
+        <button class="m w2" style="background:linear-gradient(160deg,#3FB6CF,#73CFE0)"><img class="ic" src="../assets/icon/m-eggs.svg" alt=""><b>Eggs</b></button>
+        <button class="m w2" style="background:linear-gradient(117deg,#FFE86E -105%,#FA6140 65%)"><img class="ic" src="../assets/icon/fp-paw.svg" alt=""><b>Animals</b><span class="big" style="position:absolute;right:14px;bottom:12px;font-size:26px">14,445</span></button>
+      </div>
+    </section>
+
+    <!-- RIGHT · FAVOURITES, ANNOUNCEMENTS, NOTES -->
+    <aside class="rail">
+      <section class="box">
+        <div class="head"><h2>Favourites</h2><a href="#">View all</a></div>
+        <div class="favs">
+          <div class="fav" style="background-image:url(../assets/img/species/chital.jpg)"><u>F</u><div><b>AAID:190317</b><span>Slate Pangolin</span></div></div>
+          <div class="fav" style="background-image:url(../assets/img/species/sarus-crane.jpg)"><u>UD</u><div><b>AAID:143944</b><span>Glacial Egret</span></div></div>
+          <div class="fav" style="background-image:url(../assets/img/species/indian-rock-python.jpg)"><u>UD</u><div><b>AAID:172277</b><span>Russet Whipsnake</span></div></div>
+          <div class="fav" style="background-image:url(../assets/img/species/sloth-bear.jpg)"><u>F</u><div><b>AAID:169095</b><span>Marbled Phantom Sloth</span></div></div>
+        </div>
+      </section>
+
+      <section class="box ann">
+        <div class="head"><h2>Announcements</h2><a href="#">View all</a></div>
+        <article class="ann__card">
+          <img src="../assets/img/species/indian-leopard.jpg" alt="">
+          <div class="ann__body">
+            <span class="chip"><img src="../assets/icon/ann-announcement.svg" alt="">ANNOUNCEMENT</span>
+            <h4>Zara and Kian, our leopard cubs, go on exhibit from Monday</h4>
+            <p>After twelve weeks in the den the two Persian leopard cubs have passed their final health check and will be out in the main habitat from Monday morning. Please keep the service path behind the exhibit closed between 09:00 and 11:00.</p>
+            <div class="ann__meta">Emerson Vance • 24 Aug 2026</div>
+          </div>
+        </article>
+        <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+      </section>
+
+      <section class="box">
+        <div class="head"><h2>Observation Notes</h2><a href="#">View all</a></div>
+        <article class="note">
+          <div class="note__pic" style="background-image:url(../assets/img/v2-note-tiger.jpg)"><i>🔥</i></div>
+          <div><h5>Deep Flank Wound <span>03 Sep</span></h5><div class="tags">Open Wound · Bleeding</div>
+            <p>Found a 6cm laceration on the left flank during the morning check, still bleeding lightly. Separated him into the night house.</p>
+            <div class="by"><span>Emerson Vance</span><span>👍 12 · 💬 4</span></div></div>
+        </article>
+        <article class="note">
+          <div class="note__pic" style="background:linear-gradient(180deg,#EE8A72,#D9644E)"><i>!!!</i></div>
+          <div><h5>Metal Work <span>02 Sep</span></h5><div class="tags">Rust and Corrosion · Structural Changes</div>
+            <p>The lower rail on the north gate has rusted through where it meets the post, and the whole panel now flexes.</p>
+            <div class="by"><span>Kai Vance</span><span>👍 31 · 💬 9</span></div></div>
+        </article>
+        <article class="note">
+          <div class="note__pic" style="background:linear-gradient(180deg,#5BC0DA,#2E93AE)"><i>!</i></div>
+          <div><h5>Coat Condition <span>30 Aug</span></h5><div class="tags">Grooming · Routine Check</div>
+            <p>Slight thinning across the shoulders on four of the herd, most likely the seasonal moult rather than anything to treat.</p>
+            <div class="by"><span>Jordan Brenner</span><span>👍 5 · 💬 2</span></div></div>
+        </article>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<div class="fab">
+  <button><img src="../assets/icon/grid.svg" alt="" width="18">Quick Actions</button>
+  <button aria-label="Chat" style="background:#3FA7C9;padding:0 13px"><img src="../assets/icon/qa-chat.svg" alt="" width="20"></button>
+</div>
+</body>
+</html>
