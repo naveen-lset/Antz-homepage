@@ -79,8 +79,8 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 .flip button { padding: 2px 6px; border-radius: 5px; }
 .flip button[aria-pressed='true'] { background: rgba(0,0,0,.08); color: #1D2B33; }
 .wgs { max-height: calc(100vh - 32px); overflow-y: auto; scrollbar-width: none; }
-/* the desktop's free area starts right of the widgets: the Dock and the Modules panel centre in it, not on the screen */
-:root { --free: calc(50% + 188px); }
+/* where the centred Dock reaches under the widget column (narrower screens), the column stops above it and scrolls */
+@media (max-width: 1720px) { .wgs { max-height: calc(100vh - 132px); scrollbar-width: thin; } }
 .wh { display: flex; align-items: center; gap: 8px; color: #1D2B33; font-size: 13px; font-weight: 600; }
 .ic.sm { width: 26px; height: 26px; border-radius: 8px; flex: none; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
 .wg h6 .meta { font-size: 11.5px; font-weight: 500; color: #6B7A80; }
@@ -168,11 +168,10 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 /* ── the ANTZ mark on the wallpaper, in the brand site's holographic finish
    (antz-branding-philosophy.vercel.app, .hero-mark): the mark masks a drifting pastel
    spectrum, a conic wash turns under it, and a sheen of light sweeps across ── */
-/* it sits under the notification stack (which ends near 472px) while that shows, and takes the room back once it goes */
-.mark { position: fixed; z-index: 1; right: 40px; bottom: 120px; height: clamp(240px, calc(100vh - 610px), 440px); aspect-ratio: 1191 / 1293; pointer-events: none;
-  filter: drop-shadow(0 4px 22px rgba(0,0,0,.22)); animation: markIn 1.6s var(--ease) .3s both; transition: height .6s var(--ease); }
+/* centred on the screen, in the band between the menu bar and the Dock */
+.mark { position: fixed; z-index: 1; left: 50%; top: calc(14px + (100vh - 100px) / 2); translate: -50% -50%; height: clamp(260px, 58vh, 540px); aspect-ratio: 1191 / 1293; pointer-events: none;
+  filter: drop-shadow(0 4px 22px rgba(0,0,0,.22)); animation: markIn 1.6s var(--ease) .3s both; }
 .mark .holo { --src: url(../assets/img/antz-mark.svg); }
-body:has(.nc.away) .mark { height: clamp(240px, calc(100vh - 220px), 560px); }
 @keyframes markIn { from { opacity: 0; transform: translateY(16px) scale(.97); } }
 .holo { position: absolute; inset: 0; overflow: hidden;
   -webkit-mask: var(--src) center / contain no-repeat; mask: var(--src) center / contain no-repeat;
@@ -187,8 +186,7 @@ body:has(.nc.away) .mark { height: clamp(240px, calc(100vh - 220px), 560px); }
 @keyframes holoSheen { 0%, 35% { transform: translateX(-160%) skewX(-12deg); } 75%, 100% { transform: translateX(330%) skewX(-12deg); } }
 
 /* ── THE WALLPAPER · the brand site's banner (antz-branding-philosophy.vercel.app, .hero):
-   a photo for each element of the logo, crossfading every 7s with a slow drift, under a
-   dark halo; the element's glyph and name in the holographic finish, right of the widgets ── */
+   a photo for each element of the logo, crossfading every 7s with a slow drift, under a dark halo ── */
 .wall { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #0d1311; }
 .wall img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.1); transition: opacity 2.2s cubic-bezier(.45,0,.25,1); will-change: opacity, transform; }
 .wall img.on { opacity: 1; z-index: 1; animation: wallDrift 11s cubic-bezier(.2,.6,.35,1) forwards; }
@@ -197,35 +195,6 @@ body:has(.nc.away) .mark { height: clamp(240px, calc(100vh - 220px), 560px); }
 .wall::after { content: ''; position: absolute; inset: 0; z-index: 2;
   background: radial-gradient(ellipse closest-side at 50% 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,.66) 100%),
     linear-gradient(90deg, rgba(0,0,0,.56) 0%, rgba(0,0,0,.32) 42%, rgba(0,0,0,.28) 62%, rgba(0,0,0,.44) 100%); }
-.story { position: fixed; z-index: 1; left: 408px; top: 46%; transform: translateY(-50%); width: 380px; color: #fff; pointer-events: none; }
-.story__sym { position: relative; width: min(190px, 14vw); aspect-ratio: 1; pointer-events: auto; cursor: pointer; }
-.glyph { position: absolute; inset: 0; opacity: 0; transform: scale(1.06); filter: blur(10px);
-  transition: opacity 1.1s cubic-bezier(.4,0,.2,1), transform 1.6s cubic-bezier(.22,.8,.24,1), filter 1.1s cubic-bezier(.4,0,.2,1); }
-.glyph.on { opacity: 1; transform: none; filter: blur(0); transition-delay: .45s; }
-.glyph.off { opacity: 0; transform: scale(.94); filter: blur(8px); transition-duration: .9s; transition-delay: 0s; }
-.glyph__art { position: absolute; inset: 0; filter: drop-shadow(0 2px 18px rgba(0,0,0,.28)); }
-.glyph .holo { -webkit-mask-position: left bottom; mask-position: left bottom; }
-.story h3 { margin: 24px 0 10px; font: 900 3.4rem/.98 Epilogue, Inter, sans-serif; letter-spacing: .03em; text-transform: uppercase; }
-.story p { margin: 0; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,.9); text-shadow: 0 2px 22px rgba(0,0,0,.5); }
-.story h3, .story p { transition: opacity .8s cubic-bezier(.4,0,.2,1), transform .9s cubic-bezier(.22,.8,.24,1), filter .8s cubic-bezier(.4,0,.2,1); }
-.story p { transition-delay: .12s; }
-.story.leaving h3, .story.leaving p { opacity: 0; transform: translateY(-10px); filter: blur(4px); transition-duration: .5s; transition-delay: 0s; }
-.story.entering h3, .story.entering p { opacity: 0; transform: translateY(14px); filter: blur(4px); transition: none; }
-.holo-text { display: inline; color: transparent;
-  background: linear-gradient(100deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.95) 50%, rgba(255,255,255,0) 60%),
-    linear-gradient(125deg, #fbe4ff 0%, #c9f1ff 14%, #e1d4ff 28%, #c8ffe9 42%, #fff4cc 56%, #ffd3ec 70%, #cfe9ff 84%, #fbe4ff 100%);
-  background-size: 250% 100%, 300% 300%; -webkit-background-clip: text; background-clip: text; -webkit-box-decoration-break: clone; box-decoration-break: clone;
-  filter: drop-shadow(0 2px 14px rgba(0,0,0,.45)); animation: holoText 9s ease-in-out infinite alternate; }
-@keyframes holoText { 0% { background-position: 170% 0, 0% 30%; } 100% { background-position: -70% 0, 100% 70%; } }
-/* the title's ripple, 24ms a letter; letters move with top so they stay inside the clipped sheen */
-.wave-word { white-space: nowrap; }
-.wave-ch { position: relative; top: 0; animation: textWave 820ms cubic-bezier(.37,0,.63,1) calc(var(--wave-delay, 700ms) + var(--i, 0) * 24ms) both; }
-@keyframes textWave { 0% { top: 0; } 50% { top: -.05em; } 100% { top: 0; } }
-@supports (-webkit-hyphens: none) { .wave-ch { position: static; animation: none; } }
-.story__bar { display: block; width: 50%; height: 2px; margin-top: 16px; background: rgba(255,255,255,.22); overflow: hidden; }
-.story__bar span { display: block; height: 100%; background: rgba(255,255,255,.85); transform: scaleX(0); transform-origin: left; }
-.story__bar.run span { animation: barRun 7000ms linear forwards; }
-@keyframes barRun { to { transform: scaleX(1); } }
 
 /* ── notifications (returning users) ── */
 .nc { position: fixed; z-index: 700; top: 40px; right: 14px; width: 356px; display: grid; gap: 12px; transition: transform .45s var(--ease), opacity .3s; }
@@ -259,7 +228,7 @@ body:has(.nc.away) .mark { height: clamp(240px, calc(100vh - 220px), 560px); }
 
 /* ── dock ── */
 /* every icon carries its name under it; no magnification — this is ANTZ's bar, not a copy of the Mac's */
-.dock { position: fixed; z-index: 800; left: var(--free); bottom: 8px; transform: translateX(-50%); display: flex; align-items: flex-start; gap: 2px; padding: 8px 8px 6px; border-radius: 24px;
+.dock { position: fixed; z-index: 800; left: 50%; bottom: 8px; transform: translateX(-50%); display: flex; align-items: flex-start; gap: 2px; padding: 8px 8px 6px; border-radius: 24px;
   background: rgba(255,255,255,.76); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.6), 0 10px 30px rgba(0,0,0,.22); }
 .di { position: relative; flex: none; width: 66px; display: flex; flex-direction: column; align-items: center; gap: 7px; }
 .di .ic { width: 50px; height: 50px; transition: transform .22s var(--spring); }
@@ -289,7 +258,7 @@ body:has(.nc.away) .mark { height: clamp(240px, calc(100vh - 220px), 560px); }
 @keyframes poof { from { transform: scale(.4); opacity: 1; } to { transform: scale(1.8); opacity: 0; } }
 
 /* ── the Modules panel: the App Library ── */
-.lib { position: fixed; z-index: 850; left: var(--free); bottom: 110px; width: 740px; max-height: calc(100vh - 140px); display: flex; flex-direction: column; border-radius: 30px; padding: 22px 26px 24px;
+.lib { position: fixed; z-index: 850; left: 50%; bottom: 110px; width: 740px; max-height: calc(100vh - 140px); display: flex; flex-direction: column; border-radius: 30px; padding: 22px 26px 24px;
   background: rgba(236,246,250,.66); -webkit-backdrop-filter: blur(40px) saturate(190%); backdrop-filter: blur(40px) saturate(190%);
   box-shadow: 0 30px 80px rgba(0,0,0,.35), inset 0 0 0 .5px rgba(255,255,255,.8);
   transform-origin: var(--ox, 50%) 100%; transform: translateX(-50%) scale(.2); opacity: 0; pointer-events: none; transition: transform .38s var(--spring), opacity .2s; }
@@ -454,7 +423,7 @@ body:has(.nc.away) .mark { height: clamp(240px, calc(100vh - 220px), 560px); }
 .tip button { margin-top: 8px; padding: 4px 10px; border-radius: 7px; background: rgba(255,255,255,.18); color: #fff; font-size: 12px; font-weight: 600; }
 .pulse { animation: pulse 1.6s ease-out 1.6s 3; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,.9); } 100% { box-shadow: 0 0 0 16px rgba(255,255,255,0); } }
-.toast { position: fixed; z-index: 1200; left: var(--free); bottom: 116px; transform: translate(-50%, 20px); padding: 10px 16px; border-radius: 12px; background: rgba(30,40,46,.9); color: #fff; font-size: 13px; opacity: 0; transition: opacity .2s, transform .3s var(--spring); pointer-events: none; }
+.toast { position: fixed; z-index: 1200; left: 50%; bottom: 116px; transform: translate(-50%, 20px); padding: 10px 16px; border-radius: 12px; background: rgba(30,40,46,.9); color: #fff; font-size: 13px; opacity: 0; transition: opacity .2s, transform .3s var(--spring); pointer-events: none; }
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 </style>
@@ -510,10 +479,6 @@ body:has(.nc.away) .mark { height: clamp(240px, calc(100vh - 220px), 560px); }
 </aside>
 
 <div class="wall" id="wall" aria-hidden="true"><img alt=""><img alt=""></div>
-<div class="story" id="story" aria-live="polite">
-  <div class="story__sym" id="storySym" title="Next" aria-hidden="true"><span class="glyph on"><span class="glyph__art"><span class="holo"></span></span></span><span class="glyph"><span class="glyph__art"><span class="holo"></span></span></span></div>
-  <h3><span class="holo-text" id="storyT"></span></h3><p id="storyB"></p><span class="story__bar" id="storyBar" aria-hidden="true"><span></span></span>
-</div>
 <div class="mark" aria-hidden="true"><span class="holo"></span></div>
 <aside class="nc" id="nc" aria-label="Notifications"></aside>
 <div id="wins"></div>
@@ -794,7 +759,7 @@ function toggleLib(b) { $('#lib').classList.contains('open') ? closeLib() : open
 /* More always opens on every module — never on a category or a search left from last time */
 function openLib(b, pick = false) {
   closeQA(); closeFp(); cat = 'all'; picking = pick; $('#libQ').value = ''; drawCats(); renderLib()
-  const lib = $('#lib'), r = (b || $('.di[data-id=lib]')).getBoundingClientRect(), L = innerWidth / 2 + 188 - 370
+  const lib = $('#lib'), r = (b || $('.di[data-id=lib]')).getBoundingClientRect(), L = innerWidth / 2 - 370
   lib.style.setProperty('--ox', `${r.left + r.width / 2 - L}px`); lib.classList.add('open'); setTimeout(() => $('#libQ').focus({ preventScroll: true }), 200)
 }
 function closeLib() { $('#lib').classList.remove('open'); $('#libQ').value = ''; picking = false }
@@ -1089,71 +1054,53 @@ $('#nc').addEventListener('click', (e) => {
 })
 store.set('antz.mac.seen', new Date().toISOString())
 
-/* ── THE WALLPAPER: the brand banner's slideshow — photo, glyph and copy for each logo element
-   (the brand site's own list; Plus, Snail and Crocodile have no photo there, so none here) ── */
+/* ── THE WALLPAPER: the brand banner's photos, one for each element of the logo, in the brand site's order
+   (Plus, Snail and Crocodile have no photo there, so none here) ── */
 const SLIDES = [
-  {"title": "Lion", "icon": "lion.svg", "photo": "lion.jpg", "body": "Leadership, authority and guardianship. It signals strength, confidence and trust in institutional care."},
-  {"title": "Swan", "icon": "swan.svg", "photo": "swan.jpg", "body": "Elegance and grace. It brings refinement, calm stewardship and a high standard of care."},
-  {"title": "Apple", "icon": "apple.svg", "photo": "apple.jpg", "body": "Part of the fruits cluster. It stands for balanced diets and the daily nutrition planned for every animal."},
-  {"title": "Banana", "icon": "fruit.svg", "photo": "banana.jpg", "body": "Part of the fruits cluster. It reflects feeding schedules, food preparation and keepers’ care in the kitchen."},
-  {"title": "Fruit", "icon": "fruits2.svg", "photo": "fruit.jpg", "body": "Part of the fruits cluster. It completes the story of variety, enrichment and well-managed nutrition."},
-  {"title": "Squirrel", "icon": "squirrel.svg", "photo": "squirrel.jpg", "body": "Energy and quick movement. It gives a place to the small animals that are just as important as the large ones."},
-  {"title": "Flying on top", "icon": "bird.svg", "photo": "flying-on-top.jpg", "body": "Ambition and open skies. Sitting at the top of the ‘a’, it reminds us to aim high and protect freedom."},
-  {"title": "Tree", "icon": "treee.svg", "photo": "tree.jpg", "body": "Growth, habitat and ecological stability. It grounds the identity in nature, forests and sustainability."},
-  {"title": "Tiger / Panther", "icon": "tiger.svg", "photo": "tiger.jpg", "body": "Power with precision. It speaks to agility, strength and the big cats in our care."},
-  {"title": "Feather", "icon": "feather.svg", "photo": "feather.jpg", "body": "Lightness and the written record. It reinforces learning, note-taking and knowledge that is easy to capture."},
-  {"title": "Giraffe", "icon": "giraffe.svg", "photo": "giraffe.jpg", "body": "Wild and one of a kind. It speaks to species diversity, habitat range and a broad ecological view.", "position": "50% 30%"},
-  {"title": "Magnifier", "icon": "magnifieer.svg", "photo": "magnifier.jpg", "body": "Finding what matters. It stands for searchable records and data that is always within reach."},
-  {"title": "Feeder", "icon": "feeder.svg", "photo": "feeder.jpg", "body": "Medicine and hands-on care. It reflects dosing, treatment plans and the attention behind every recovery."},
-  {"title": "Egg", "icon": "egg.svg", "photo": "egg.jpg", "body": "New life and breeding. It represents egg tracking, incubation and the next generation of each species."},
-  {"title": "Heart", "icon": "heart.svg", "photo": "heart.jpg", "body": "Compassion and ethical care. It brings human values to the centre of the institution’s mission."},
-  {"title": "Primate", "icon": "monkey.svg", "photo": "primate.jpg", "body": "Curiosity, alertness and social awareness. It reflects behavioural understanding and connection.", "position": "50% 35%"},
-  {"title": "Humming bird", "icon": "bird4.svg", "photo": "humming-bird.jpg", "body": "Speed and efficiency. It stands for quick, focused work that gets more done with less effort."},
-  {"title": "Research", "icon": "network.svg", "photo": "research.jpg", "body": "Shared discovery. It shows connected institutions exchanging research, evidence and expertise."},
-  {"title": "Tick", "icon": "tick.svg", "photo": "tick.jpg", "body": "Tasks done right. It represents checklists, daily routines and work that is tracked to completion."},
-  {"title": "Iguana", "icon": "iguana.svg", "photo": "iguana.jpg", "body": "The reptile world. It forms the curling base of the ‘a’ and gives cold-blooded species their place."},
-  {"title": "Speech bubble", "icon": "speech_bubbles.svg", "photo": "speech-bubble.jpg", "body": "Conversation and shared knowledge. It reflects teams talking, updating and learning from one another."},
-  {"title": "Flower plant", "icon": "flower.svg", "photo": "flower.jpg", "body": "Horticulture and living landscapes. It adds the plants and gardens that shape every habitat."},
-  {"title": "Deer", "icon": "deer.svg", "photo": "deer.jpg", "body": "Speed, spirit and renewal. It evokes balance with nature and a respectful relationship with wildlife.", "position": "50% 25%"},
-  {"title": "School of fishes", "icon": "fish_school.svg", "photo": "school-of-fishes.jpg", "body": "Moving as one. It stands for groups, harmony and teams working together towards a shared goal."},
-  {"title": "Turtle", "icon": "turtle.svg", "photo": "turtle.jpg", "body": "Robust and enduring. It represents sea life, long-term stewardship and the safeguarding of vulnerable species."},
-  {"title": "Fish / Whale", "icon": "fish.svg", "photo": "fish-whale.jpg", "body": "Water and the life within it. It expands the system beyond land to the wider aquatic world."},
-  {"title": "Flying bird", "icon": "bird5.svg", "photo": "flying-bird.jpg", "body": "Placed at the centre in perfect symmetry, it is also the eye of the elephant hidden within the ‘a’."}
+  { photo: "lion.jpg" },
+  { photo: "swan.jpg" },
+  { photo: "apple.jpg" },
+  { photo: "banana.jpg" },
+  { photo: "fruit.jpg" },
+  { photo: "squirrel.jpg" },
+  { photo: "flying-on-top.jpg" },
+  { photo: "tree.jpg" },
+  { photo: "tiger.jpg" },
+  { photo: "feather.jpg" },
+  { photo: "giraffe.jpg", position: "50% 30%" },
+  { photo: "magnifier.jpg" },
+  { photo: "feeder.jpg" },
+  { photo: "egg.jpg" },
+  { photo: "heart.jpg" },
+  { photo: "primate.jpg", position: "50% 35%" },
+  { photo: "humming-bird.jpg" },
+  { photo: "research.jpg" },
+  { photo: "tick.jpg" },
+  { photo: "iguana.jpg" },
+  { photo: "speech-bubble.jpg" },
+  { photo: "flower.jpg" },
+  { photo: "deer.jpg", position: "50% 25%" },
+  { photo: "school-of-fishes.jpg" },
+  { photo: "turtle.jpg" },
+  { photo: "fish-whale.jpg" },
+  { photo: "flying-bird.jpg" }
 ]
 {
-  const W = A + 'img/brand/', G = A + 'icon/brand/', MS = 7000
-  const photos = $$('#wall img'), glyphs = $$('#storySym .glyph'), story = $('#story'), bar = $('#storyBar')
-  let cur = (store.get('antz.mac.slide', -1) + 1) % SLIDES.length, layer = 0, timer = 0, busy = false
+  const W = A + 'img/brand/', MS = 7000, photos = $$('#wall img')
+  let cur = (store.get('antz.mac.slide', -1) + 1) % SLIDES.length, layer = 0, first = true
   const load = (src) => { const i = new Image(); i.src = src; return i.decode().catch(() => {}) }
-  const wait = (ms) => new Promise((r) => setTimeout(r, ms))
-  const setTitle = (text, delay) => {
-    const t = $('#storyT'); t.textContent = ''; t.setAttribute('aria-label', text); t.style.setProperty('--wave-delay', delay + 'ms')
-    let i = 0
-    text.split(' ').forEach((word, w) => { if (w) t.append(' '); const we = document.createElement('span'); we.className = 'wave-word'; we.setAttribute('aria-hidden', 'true')
-      for (const ch of word) { const c = document.createElement('span'); c.className = 'wave-ch'; c.style.setProperty('--i', i++); c.textContent = ch; we.append(c) }
-      t.append(we) })
-  }
-  const schedule = () => { clearTimeout(timer); timer = setTimeout(() => go((cur + 1) % SLIDES.length), MS); bar.classList.remove('run'); void bar.offsetWidth; bar.classList.add('run') }
-  async function go(i, first) {
-    if (busy) return; busy = true
+  async function go(i) {
     const sl = SLIDES[i], nl = first ? layer : 1 - layer
-    await Promise.all([load(W + sl.photo), load(G + sl.icon)])
+    await load(W + sl.photo)
     const pin = photos[nl], pout = photos[layer]
     pin.src = W + sl.photo; pin.style.objectPosition = sl.position || 'center'; pin.classList.remove('off'); void pin.offsetWidth
     if (!first) { pout.classList.remove('on'); pout.classList.add('off') }
     pin.classList.add('on')
-    const gin = glyphs[nl], gout = glyphs[layer]
-    gin.querySelector('.holo').style.setProperty('--src', `url('${G + sl.icon}')`)
-    if (!first) { gout.classList.remove('on'); gout.classList.add('off'); gin.classList.remove('off') }
-    gin.classList.add('on')
-    if (!first) { story.classList.add('leaving'); await wait(560) }
-    setTitle(sl.title, 650); $('#storyB').textContent = sl.body
-    story.classList.remove('leaving'); story.classList.add('entering'); void story.offsetWidth; story.classList.remove('entering')
-    layer = nl; cur = i; busy = false; store.set('antz.mac.slide', i); schedule()
+    layer = nl; cur = i; first = false; store.set('antz.mac.slide', i)
+    setTimeout(() => go((cur + 1) % SLIDES.length), MS)
     load(W + SLIDES[(i + 1) % SLIDES.length].photo)
   }
-  go(cur, true)
-  $('#storySym').addEventListener('click', () => go((cur + 1) % SLIDES.length))
+  go(cur)
 }
 
 renderDock()
