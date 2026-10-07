@@ -52,7 +52,7 @@
 <html lang="en">
 <head>
 <script>try{var nl=new URLSearchParams(location.search).get('notelines');if(/^[1-9]$/.test(nl||''))document.documentElement.style.setProperty('--obs-lines',nl)}catch(e){}</script>
-<script>document.documentElement.dataset.review='1';document.documentElement.dataset.profileDrawer='1';try{var u=new URL(location.href);if(u.searchParams.get('v')!=='2'){u.searchParams.set('v','2');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}try{if(localStorage.getItem('rv-hdr')==='climate')document.documentElement.dataset.hdrStyle='climate'}catch(e){}window.__rvHdr=function(v){var r=document.documentElement;if(v==='climate')r.dataset.hdrStyle='climate';else delete r.dataset.hdrStyle;try{localStorage.setItem('rv-hdr',v)}catch(e){}dispatchEvent(new Event('resize'))};</script>
+<script>try{var __dk=matchMedia('(min-width: 1200px) and (hover: hover) and (pointer: fine)'),__df=function(){if(__dk.matches)document.documentElement.dataset.v2desk='';else delete document.documentElement.dataset.v2desk};__df();__dk.addEventListener('change',__df)}catch(e){}document.documentElement.dataset.review='1';document.documentElement.dataset.profileDrawer='1';try{var u=new URL(location.href);if(u.searchParams.get('v')!=='2'){u.searchParams.set('v','2');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}try{if(localStorage.getItem('rv-hdr')==='climate')document.documentElement.dataset.hdrStyle='climate'}catch(e){}window.__rvHdr=function(v){var r=document.documentElement;if(v==='climate')r.dataset.hdrStyle='climate';else delete r.dataset.hdrStyle;try{localStorage.setItem('rv-hdr',v)}catch(e){}dispatchEvent(new Event('resize'))};</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- ADDED TO THE HOME SCREEN, THE PAGE IS THE APP. The owner reviews this on
@@ -13906,7 +13906,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261007c">
+<link rel="stylesheet" href="review.css?v=20261007f">
 </head>
 
 <style>
@@ -20691,7 +20691,7 @@ const VARIANTS = [
        5 + 4. */
     id: 'species.newcount', moduleId: 'species', name: 'Newly Added',
     layout: 'v2-stat', purpose: 'MONITOR', gradient: '--g-v2-newcount',
-    supportedSizes: ['small'], defaultSize: 'small', priority: 'secondary',
+    supportedSizes: ['small', 'medium'], defaultSize: 'small', priority: 'secondary',
     data: { title: 'Animals', value: '24', label: 'Newly Added Animals' },
     /* on V2, every animal the database took in over the same window */
     scopedData() {
@@ -22424,7 +22424,13 @@ const { isV2, isV3, isV4, isV5 } = __req('js/lib/pageVersion.js');
    are stored apart and a phone's edits never reorder the tablet */
 const V2_PHONE = matchMedia('(max-width: 743px)')
 const isV2Phone = () => isV2() && V2_PHONE.matches
-const KEY_OF = () => isV2() ? (isV2Phone() ? 'antz.home.layout.v2p' : 'antz.home.layout.v2r') : isV5() ? 'antz.home.layout.v5' : isV4() ? 'antz.home.layout.v4' : 'antz.home.layout'
+/* …AND SO DOES V2 ON THE WEB (owner, 7 Oct 2026: "exactly as the second
+   image" — mockups/home-desktop.html): six columns, its own order, stored
+   apart. The query is the one that sets data-v2desk in the head script. */
+const V2_DESK = matchMedia('(min-width: 1200px) and (hover: hover) and (pointer: fine)')
+const isV2Desk = () => isV2() && !V2_PHONE.matches && V2_DESK.matches
+const v2SeedNo = () => isV2Phone() ? V2_PHONE_SEED : isV2Desk() ? V2_DESK_SEED : V2_SEED
+const KEY_OF = () => isV2() ? (isV2Phone() ? 'antz.home.layout.v2p' : isV2Desk() ? 'antz.home.layout.v2d' : 'antz.home.layout.v2r') : isV5() ? 'antz.home.layout.v5' : isV4() ? 'antz.home.layout.v4' : 'antz.home.layout'
 let KEY = KEY_OF()
 
 /**
@@ -22766,6 +22772,29 @@ const V2_PHONE_LAYOUT = [
 ]
 const V2_PHONE_SEED = 1
 
+/* the web's six columns, first-fit into the mockup's four rows:
+     Medical · Housing · Species (2) · Administer · Users
+     Natality (2) · Hospital (2) · Pending (2×2, rows 2–3)
+     Diet (2) · Mortality · Security
+     Mortality insight (2) · Eggs (2) · Animals (2) */
+const V2_DESK_LAYOUT = [
+  { variantId: 'medical.default',    size: 'small'  },
+  { variantId: 'housing.default',    size: 'small'  },
+  { variantId: 'species.stats',      size: 'medium' },
+  { variantId: 'administer.default', size: 'small'  },
+  { variantId: 'users.default',      size: 'small'  },
+  { variantId: 'insight.natality',   size: 'medium' },
+  { variantId: 'hospital.photo',     size: 'medium' },
+  { variantId: 'pending.v2',         size: 'tall'   },
+  { variantId: 'diet.photo',         size: 'medium' },
+  { variantId: 'mortality.default',  size: 'small'  },
+  { variantId: 'security.default',   size: 'small'  },
+  { variantId: 'insight.mortality',  size: 'medium' },
+  { variantId: 'eggs.default',       size: 'medium' },
+  { variantId: 'species.newcount',   size: 'medium' },
+]
+const V2_DESK_SEED = 1
+
 /**
  * V3 · NODE 506:10213's OWN ORDER, ROW BY ROW.
  * ───────────────────────────────────────────────────────────────────────────
@@ -23026,7 +23055,7 @@ function seed() {
   /* EACH PAGE SEEDS ITS OWN SET. V3's is node 506:10213's, row by row — see
      V3_LAYOUT above for how the frame's geometry was read into grid cells. */
   /* V2 first: isV4() is true on V2 since 24 Sep, and V2 has a seed of its own */
-  const layout = isV2Phone() ? V2_PHONE_LAYOUT : isV2() ? V2_LAYOUT : isV5() ? V5_LAYOUT : isV4() ? V4_LAYOUT : isV3() ? V3_LAYOUT : DEFAULT_LAYOUT
+  const layout = isV2Phone() ? V2_PHONE_LAYOUT : isV2Desk() ? V2_DESK_LAYOUT : isV2() ? V2_LAYOUT : isV5() ? V5_LAYOUT : isV4() ? V4_LAYOUT : isV3() ? V3_LAYOUT : DEFAULT_LAYOUT
   return layout.map((d) => ({ ...d, uid: newUid() }))
 }
 
@@ -23044,7 +23073,7 @@ function load() {
       if (parsed && parsed.version === VERSION) raw = parsed.cards
       /* a V4 layout saved while the week tiles were doors drops them here,
          rather than by a schema bump that would reset every version's grid */
-      if (raw && isV2() && parsed.seed !== (isV2Phone() ? V2_PHONE_SEED : V2_SEED)) raw = null
+      if (raw && isV2() && parsed.seed !== v2SeedNo()) raw = null
       /* V4's retirements and required cards are V4's page's, not V2's */
       if (raw && isV4() && !isV2() && parsed.seed !== V4_SEED) raw = null
       if (raw && isV5() && parsed.seed !== V5_SEED) raw = null
@@ -23072,7 +23101,7 @@ function load() {
 
 function save(cards) {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ version: VERSION, seed: isV2() ? (isV2Phone() ? V2_PHONE_SEED : V2_SEED) : isV4() ? V4_SEED : isV5() ? V5_SEED : undefined, savedAt: Date.now(), cards }))
+    localStorage.setItem(KEY, JSON.stringify({ version: VERSION, seed: isV2() ? v2SeedNo() : isV4() ? V4_SEED : isV5() ? V5_SEED : undefined, savedAt: Date.now(), cards }))
     return true
   } catch {
     return false   // the layout still works this session; it just will not persist
@@ -23094,12 +23123,15 @@ const layoutStore = createStore({
   snapshot: null,
 })
 
-/* crossing 744 on V2 swaps the phone's grid for the tablet's, and back */
-V2_PHONE.addEventListener('change', () => {
+/* crossing 744 on V2 swaps the phone's grid for the tablet's, and back;
+   crossing into the web's layout swaps the tablet's for the web's */
+const swapGrid = () => {
   if (!isV2() || layoutStore.get().editing) return
   KEY = KEY_OF()
   layoutStore.set({ cards: load() }, { reason: 'breakpoint' })
-})
+}
+V2_PHONE.addEventListener('change', swapGrid)
+V2_DESK.addEventListener('change', swapGrid)
 
 /* Every mutation goes through one of these. Nothing else writes `cards`, which
    is why persistence can live in exactly one place. */
@@ -36929,8 +36961,9 @@ function createWeatherSky({ tone = 'light' } = {}) {
   function place() {
     const head = document.querySelector('.home-header')
     const foot = document.getElementById('favSpecies')
-    /* on the web the favourites sit in the right rail, so the sky ends at the search row */
-    const end = foot && !foot.hidden && !('v2desk' in root.dataset) ? foot : document.querySelector('.search-row')
+    /* on the web the favourites sit in the right rail and the search joins the
+       header's row, so the sky ends with the header */
+    const end = 'v2desk' in root.dataset ? head : foot && !foot.hidden ? foot : document.querySelector('.search-row')
     if (!head || !end) return
     const a = head.getBoundingClientRect(), b = end.getBoundingClientRect()
     /* V2's My Species block ends in its own 20px foot corners: the band ends there */
@@ -56422,10 +56455,12 @@ __req('js/components/Clock.js').mount();
 <script>
 /* V2 ON THE WEB (owner, 7 Oct 2026: "if I change to Web then this page has
    to open" — mockups/home-desktop.html). On a desktop browser, 1200 and up
-   with a mouse or trackpad, V2 Home is two columns: the Modules on the left
-   (the site chips, the Command Centre banner and the grid, the tablet's own),
-   and on the right a rail that stays put while they scroll — Favourites,
-   Announcements, Observation Notes. The audit ticker runs over both.
+   with a mouse or trackpad, V2 Home is the mockup, exactly (owner, same day:
+   "I want it exactly as the second image"): one header row — greeting,
+   search, weather and bell — the audit ticker, then two columns: Modules on
+   the left (head, site chips, the Command Centre banner, the grid in six
+   columns: V2_DESK_LAYOUT) and on the right Favourites, Announcements and
+   Observation Notes as a rail of three cards.
    The bands are the app's own elements, MOVED, not copied: every handler
    and renderer keeps working on them. Below 1200, or on a touch screen (an
    iPad, or Chrome's device mode), they go back where they were and the
@@ -56446,7 +56481,7 @@ __req('js/components/Clock.js').mount();
       main = document.createElement('div'); main.className = 'v2d__main'
       rail = document.createElement('aside'); rail.className = 'v2d__rail'; rail.setAttribute('aria-label', 'Favourites, announcements and notes')
       wrap.append(main, rail)
-      mo.observe(rail, { childList: true })   /* the ticker is built after the favourites: it lands here first */
+      mo.observe(rail, { childList: true, subtree: true })   /* the ticker lands here first (built after the favourites), and a redrawn favourites head loses its View all */
     }
     if (!order) order = kids(panel)
     var strip = document.getElementById('healthStrip')
@@ -56460,6 +56495,19 @@ __req('js/components/Clock.js').mount();
       if (order.indexOf(el) < 0) order.push(el)
       if (/^siteTabs/.test(el.id)) main.prepend(el); else main.append(el)   /* the chips head the column */
     })
+    /* the chips sit under the Modules head; the search row joins the header's row */
+    var tabs = document.getElementById('siteTabsV2'), mh = document.getElementById('modulesHead')
+    if (tabs && mh && mh.nextElementSibling !== tabs) mh.after(tabs)
+    var hdr = document.querySelector('.home-header'), sr = document.querySelector('.search-row'), acts = hdr && hdr.querySelector('.header-actions')
+    if (sr && acts && sr.nextElementSibling !== acts) acts.before(sr)
+    /* the favourites are called Favourites here, with a View all (the picker of every favourite) */
+    var ft = document.getElementById('favTitle'), fh = ft && ft.parentNode
+    if (ft && !ft.dataset.was) { ft.dataset.was = ft.textContent; ft.textContent = 'Favourites' }
+    if (fh && !fh.querySelector('.v2d-all')) {
+      var all = document.createElement('button'); all.type = 'button'; all.className = 'v2d-all'; all.textContent = 'View all'
+      all.addEventListener('click', function () { var e = fh.querySelector('.fav__edit'); if (e) e.click() })
+      fh.append(all)
+    }
     busy = false
   }
   function unsort() {
@@ -56472,6 +56520,11 @@ __req('js/components/Clock.js').mount();
     if (strip && fav) fav.after(strip)   /* the ticker's own place: under the favourites */
     var tabs = document.getElementById('siteTabsV2'), obs = document.getElementById('recentObs')
     if (tabs && obs) obs.before(tabs)    /* and the chips', over the notes */
+    var hdr = document.querySelector('.home-header'), sr = document.querySelector('.search-row')
+    if (hdr && sr && sr.parentNode === hdr) hdr.after(sr)
+    var ft = document.getElementById('favTitle')
+    if (ft && ft.dataset.was) { ft.textContent = ft.dataset.was; delete ft.dataset.was }
+    var va = document.querySelector('.v2d-all'); if (va) va.remove()
     wrap.remove()
     order = null
     busy = false
