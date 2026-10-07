@@ -165,6 +165,26 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
 .an__dot { position: absolute; top: 44px; left: calc(50% - 26px); width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 2px #fff; }
 .fp__none { grid-column: 1 / -1; padding: 30px 0; text-align: center; color: #6B7A80; font-size: 13px; }
 
+/* ── the ANTZ mark on the wallpaper, in the brand site's holographic finish
+   (antz-branding-philosophy.vercel.app, .hero-mark): the mark masks a drifting pastel
+   spectrum, a conic wash turns under it, and a sheen of light sweeps across ── */
+/* it sits under the notification stack (which ends near 472px) while that shows, and takes the room back once it goes */
+.mark { position: fixed; z-index: 1; right: 40px; bottom: 120px; height: clamp(240px, calc(100vh - 610px), 440px); aspect-ratio: 1191 / 1293; pointer-events: none;
+  filter: drop-shadow(0 4px 22px rgba(0,0,0,.22)); animation: markIn 1.6s var(--ease) .3s both; transition: height .6s var(--ease); }
+body:has(.nc.away) .mark { height: clamp(240px, calc(100vh - 220px), 560px); }
+@keyframes markIn { from { opacity: 0; transform: translateY(16px) scale(.97); } }
+.holo { position: absolute; inset: 0; overflow: hidden;
+  -webkit-mask: url(../assets/img/antz-mark.svg) center / contain no-repeat; mask: url(../assets/img/antz-mark.svg) center / contain no-repeat;
+  background: linear-gradient(125deg, #fbe4ff 0%, #c9f1ff 14%, #e1d4ff 28%, #c8ffe9 42%, #fff4cc 56%, #ffd3ec 70%, #cfe9ff 84%, #fbe4ff 100%);
+  background-size: 300% 300%; animation: holoDrift 9s ease-in-out -4s infinite alternate; }
+.holo::before { content: ''; position: absolute; inset: -50%; mix-blend-mode: soft-light; animation: holoSpin 14s linear -7s infinite;
+  background: conic-gradient(from 0deg, rgba(255,170,230,.55), rgba(140,220,255,.55), rgba(190,160,255,.55), rgba(150,255,210,.55), rgba(255,235,150,.55), rgba(255,170,230,.55)); }
+.holo::after { content: ''; position: absolute; top: -20%; bottom: -20%; left: 0; width: 45%; transform: translateX(-160%) skewX(-12deg);
+  background: linear-gradient(100deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.85) 50%, rgba(255,255,255,0) 100%); animation: holoSheen 5.5s cubic-bezier(.45,0,.25,1) -2.5s infinite; }
+@keyframes holoDrift { 0% { background-position: 0% 30%; } 100% { background-position: 100% 70%; } }
+@keyframes holoSpin { to { transform: rotate(360deg); } }
+@keyframes holoSheen { 0%, 35% { transform: translateX(-160%) skewX(-12deg); } 75%, 100% { transform: translateX(330%) skewX(-12deg); } }
+
 /* ── notifications (returning users) ── */
 .nc { position: fixed; z-index: 700; top: 40px; right: 14px; width: 356px; display: grid; gap: 12px; transition: transform .45s var(--ease), opacity .3s; }
 .nc.away { transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; }
@@ -447,6 +467,7 @@ img { display: block; -webkit-user-drag: none; }  /* no native image drag: it ca
   </section>
 </aside>
 
+<div class="mark" aria-hidden="true"><span class="holo"></span></div>
 <aside class="nc" id="nc" aria-label="Notifications"></aside>
 <div id="wins"></div>
 
@@ -1013,7 +1034,7 @@ $('#nc').innerHTML =
   `<div class="nt glass"><button class="nt__x" aria-label="Dismiss">×</button><div class="nt__h"><img src="${P}antz-logo.png" alt="">New on Mac<time>tip</time></div>` +
     `<b>Your modules live in the Dock now</b><div><b>More</b> opens every module. Tap <b>Choose for Dock</b> to tick the ones you want down there, or drag one in. Press <b>⌘K</b> to find anything.</div></div>`
 $('#nc').addEventListener('click', (e) => {
-  const gone = (n) => { n.classList.add('gone'); setTimeout(() => n.remove(), 350) }
+  const gone = (n) => { n.classList.add('gone'); setTimeout(() => { n.remove(); if (!$('#nc .nt')) $('#nc').classList.add('away') }, 350) }
   const x = e.target.closest('.nt__x, [data-go="x"]'); if (x) { gone(x.closest('.nt')); return }
   if (e.target.closest('[data-go="home"]')) { const n = e.target.closest('.nt'); openWin('home', n); gone(n); return }
   const a = e.target.closest('[data-ann]'); if (a) { openWin('home', a).el._ann(+a.dataset.ann); return }
