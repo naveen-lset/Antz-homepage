@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event Landing Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: one reading column; wireframe of the module wall in the middle */
+  :root {
+    --bg: #EFF5F2;
+    --card: #FFFFFF;
+    --ink: #10231A;
+    --muted: #5A6B62;
+    --line: #D6E3DC;
+    --brand: #006D35;
+    --brand-soft: #DCEFE4;
+    --animals: #E8F1FB; --health: #FDEDEC; --places: #EEF6E6; --ops: #FFF4E0;
+    --font: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 40px 20px 80px; display: grid; gap: 28px; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0; text-wrap: balance; }
+  h2 { font-size: 19px; margin: 0 0 12px; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--brand); }
+  .lede { color: var(--muted); max-width: 65ch; margin: 8px 0 0; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; text-decoration: line-through; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+  th { width: 120px; }
+  .tbl { overflow-x: auto; }
+
+  /* Wireframe */
+  .wf { background: var(--bg); border-radius: 14px; padding: 16px; display: grid; gap: 14px; }
+  .wf-head { background: var(--brand); color: #fff; border-radius: 12px; padding: 16px; display: grid; gap: 12px; }
+  .wf-head b { font-size: 17px; }
+  .totals { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .totals div { background: rgba(255,255,255,.14); border-radius: 10px; padding: 8px; font-size: 12px; }
+  .totals strong { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+  .fam { display: grid; gap: 8px; }
+  .fam-t { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .mc { border-radius: 12px; padding: 10px; display: grid; gap: 4px; font-size: 12px; min-width: 0; }
+  .mc b { font-size: 13px; }
+  .mc .n { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .mc .s { color: var(--muted); }
+  .spark { height: 18px; }
+  .a .mc { background: var(--animals); } .h .mc { background: var(--health); }
+  .p .mc { background: var(--places); }  .o .mc { background: var(--ops); }
+
+  .opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .opt { border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+  .opt.rec { border-color: var(--brand); background: var(--brand-soft); }
+  .opt b { display: block; margin-bottom: 4px; }
+  .tag { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: .06em; }
+  ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+
+  @media (max-width: 700px) {
+    .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .totals { grid-template-columns: repeat(2, 1fr); }
+    .opts { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Plan · not built yet · 6 Oct 2026</div>
+    <h1>Event landing page: every module with its own insight</h1>
+    <p class="lede">A visitor scans a QR code or taps a link at the event and lands on one page that shows what ANTZ covers. Every module shows a live insight, so the page proves the product works without anyone needing to log in.</p>
+  </header>
+
+  <section>
+    <h2>1. Take out everything personal</h2>
+    <div class="chips">
+      <span class="chip">Notes</span><span class="chip">Announcements</span><span class="chip">Favourites</span>
+      <span class="chip">Recently viewed</span><span class="chip">Pending Actions</span><span class="chip">Quick Actions</span>
+      <span class="chip">Chat</span><span class="chip">Bell</span><span class="chip">Profile drawer</span><span class="chip">“Since you left”</span>
+    </div>
+    <p class="lede">A visitor has no history in the app, so these parts would sit empty or make no sense.</p>
+  </section>
+
+  <section>
+    <h2>2. Page structure (recommended layout A, sketch)</h2>
+    <div class="wf" aria-label="Wireframe of the module wall">
+      <div class="wf-head">
+        <b>ANTZ · One platform for the whole zoo</b>
+        <div class="totals">
+          <div><strong>4,812</strong>Animals</div>
+          <div><strong>326</strong>Species</div>
+          <div><strong>540</strong>Enclosures</div>
+          <div><strong>4</strong>Sites</div>
+        </div>
+      </div>
+
+      <div class="fam a"><div class="fam-t">Animals</div><div class="cards">
+        <div class="mc"><b>Collection</b><span class="n">4,812</span><span class="s">+38 this month</span></div>
+        <div class="mc"><b>Species</b><span class="n">326</span><span class="s">41 threatened (IUCN)</span></div>
+        <div class="mc"><b>Breeding</b><span class="n">27</span><span class="s">births in 30 days</span></div>
+        <div class="mc"><b>Welfare</b><span class="n">92%</span><span class="s">checks on time</span></div>
+      </div></div>
+
+      <div class="fam h"><div class="fam-t">Health</div><div class="cards">
+        <div class="mc"><b>Medical</b><span class="n">14</span><span class="s">vaccinations due this week</span></div>
+        <div class="mc"><b>Pharmacy</b><span class="n">6</span><span class="s">drugs below stock</span></div>
+        <div class="mc"><b>Mortality</b><span class="n">−18%</span><span class="s">vs last month</span></div>
+        <div class="mc"><b>Diet</b><span class="n">212</span><span class="s">feeds planned today</span></div>
+      </div></div>
+
+      <div class="fam p"><div class="fam-t">Places</div><div class="cards">
+        <div class="mc"><b>Housing</b><span class="n">540</span><span class="s">enclosures · 88% occupied</span></div>
+        <div class="mc"><b>Maintenance</b><span class="n">9</span><span class="s">open work orders</span></div>
+        <div class="mc"><b>Utilities</b><span class="n">31 kL</span><span class="s">water today</span></div>
+        <div class="mc"><b>IoT</b><span class="n">2</span><span class="s">sensors alerting</span></div>
+      </div></div>
+
+      <div class="fam o"><div class="fam-t">Operations</div><div class="cards">
+        <div class="mc"><b>Manpower</b><span class="n">96%</span><span class="s">attendance today</span></div>
+        <div class="mc"><b>Stores &amp; Feed</b><span class="n">4</span><span class="s">items to reorder</span></div>
+        <div class="mc"><b>Transport</b><span class="n">3</span><span class="s">animal moves this week</span></div>
+        <div class="mc"><b>Safety</b><span class="n">0</span><span class="s">incidents in 21 days</span></div>
+      </div></div>
+    </div>
+    <p class="lede">The numbers in this sketch are placeholders. Each card shows one headline number, one small chart (ring, sparkline or bars) and one plain sentence of insight.</p>
+  </section>
+
+  <section>
+    <h2>3. The four module families</h2>
+    <div class="tbl"><table>
+      <tr><th>Animals</th><td>Collection, Species, Breeding / Population, Welfare</td></tr>
+      <tr><th>Health</th><td>Medical, Pharmacy, Mortality &amp; Necropsy, Diet</td></tr>
+      <tr><th>Places</th><td>Housing / Enclosures, Maintenance, Utilities (Water / Energy), IoT</td></tr>
+      <tr><th>Operations</th><td>Manpower &amp; Attendance, Stores &amp; Feed, Procurement, Transport, Safety &amp; Incidents, Compliance</td></tr>
+    </table></div>
+    <p class="lede">Taken from the 40 module specs in <code>docs/Modules.md Files/</code>.</p>
+  </section>
+
+  <section>
+    <h2>4. Tapping a card</h2>
+    <ul>
+      <li><b>Modules already built</b> (Species, Medical-Vaccination, Mortality, Necropsy, Eggs, Natality) open their full module page.</li>
+      <li><b>All other modules</b> open a preview sheet: 3–4 insights, one chart, and “What this module does” in two lines.</li>
+      <li>Every screen has a back button, so a visitor never ends up on a page with no way back to the landing page.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>5. Behaviour suited to an event (kiosk mode)</h2>
+    <ul>
+      <li><b>Nothing to edit:</b> no +, pencil, swipe-to-add or Add Module.</li>
+      <li><b>Idle reset:</b> after about 60s with no touch, the page goes back to the top and closes any open sheet.</li>
+      <li><b>Idle animation (optional):</b> cards highlight one after another and the numbers tick up, to draw people to the stand.</li>
+      <li><b>Large touch targets</b> for walk-up visitors.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>6. Data and where it lives</h2>
+    <ul>
+      <li><b>Real, from the V5 dump:</b> Collection, Species, Medical, Mortality, Necropsy, Natality.</li>
+      <li><b>Sample numbers:</b> every other module. All of it sits in one <code>event-insights.json</code>, so the numbers stay consistent and are easy to change before the event.</li>
+      <li><b>A separate entry</b> (<code>?v=event</code> or its own Vercel project), not a change to V2. It reuses V2's palette, cards, sheets and toggles without forking them.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>7. Three layouts to choose from</h2>
+    <div class="opts">
+      <div class="opt rec"><span class="tag">Recommended</span><b>A. Module wall</b>The four family bands above. You see everything at a glance, which suits walk-up visitors.</div>
+      <div class="opt"><b>B. Story scroll</b>One family per full screen, each with a big insight up top and its modules underneath. Good on a large screen or TV.</div>
+      <div class="opt"><b>C. Zoo map</b>An illustrated site map where tapping an area shows the modules working there. The most memorable, but the most work.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Questions before building</h2>
+    <ol>
+      <li><b>Device:</b> an iPad on a stand, a big TV, or visitors’ own phones via the QR code?</li>
+      <li><b>How many modules:</b> all ~20 listed above, or a featured 8–12?</li>
+      <li><b>Sample data:</b> fine for modules without real data, or should those cards show only “what it does” with no numbers?</li>
+      <li><b>Layout:</b> A, B or C, or a mockup of all three to compare?</li>
+    </ol>
+  </section>
+
+</div>
+</body>
+</html>

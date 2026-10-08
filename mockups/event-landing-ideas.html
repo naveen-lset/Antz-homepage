@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event Landing Ideas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Layout: concept switcher on top; each concept = a tablet-sized stage + a "what happens on tap" rail */
+  :root {
+    --bg: #EFF5F2; --card: #FFFFFF; --ink: #10231A; --muted: #5A6B62; --line: #D6E3DC;
+    --brand: #006D35; --brand-2: #0B8A4A; --brand-soft: #DCEFE4;
+    --birth: #2F7DD3; --birth-soft: #E6F0FB;
+    --health: #C2453B; --health-soft: #FBE9E7;
+    --place: #5E8B2E; --place-soft: #EDF5E3;
+    --ops: #B7791F; --ops-soft: #FDF2DF;
+    --night: #0E1F17; --night-2: #16302A;
+    --font: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  .also .mod, .scene .mod, .stop .mod { justify-self: start; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--font); }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 32px 20px 80px; display: grid; gap: 22px; }
+  h1 { font-size: 28px; line-height: 1.2; margin: 0; text-wrap: balance; }
+  .lede { color: var(--muted); max-width: 72ch; margin: 6px 0 0; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--brand); }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 5; background: var(--bg); padding-block: 10px; }
+  .tabs button { font: 600 14px var(--font); border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 9px 16px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .tabs button:focus-visible { outline: 3px solid var(--brand-2); outline-offset: 2px; }
+
+  .concept { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+  .premise { grid-column: 1 / -1; display: grid; gap: 4px; }
+  .premise h2 { margin: 0; font-size: 22px; }
+  .premise p { margin: 0; color: var(--muted); max-width: 80ch; }
+  .stage { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 22px; min-width: 0; overflow: hidden; }
+  .rail { display: grid; gap: 12px; }
+  .note { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  .note h3 { margin: 0 0 8px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .note ol, .note ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+  .note.good { border-color: var(--brand); background: var(--brand-soft); }
+  .note.warn { border-color: #E6C48A; background: var(--ops-soft); }
+
+  .mod { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+  .m-birth { background: var(--birth-soft); color: var(--birth); }
+  .m-health { background: var(--health-soft); color: var(--health); }
+  .m-place { background: var(--place-soft); color: var(--place); }
+  .m-ops { background: var(--ops-soft); color: var(--ops); }
+  .m-brand { background: var(--brand-soft); color: var(--brand); }
+  .num { font-variant-numeric: tabular-nums; }
+  .src { font-size: 11px; color: var(--muted); }
+
+  /* ---------- A. Ask ---------- */
+  .ask-hero { display: grid; gap: 14px; }
+  .ask-hero h3 { font-size: 26px; margin: 0; letter-spacing: -.01em; }
+  .ask-field { display: flex; align-items: center; gap: 10px; border: 2px solid var(--brand); border-radius: 16px; padding: 14px 16px; font-size: 17px; color: var(--muted); }
+  .ask-field b { color: var(--ink); font-weight: 600; }
+  .qs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .q { border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; font-weight: 500; background: var(--bg); }
+  .q.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .answer { margin-top: 16px; border-radius: 18px; background: var(--birth-soft); padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 22px; }
+  .answer .big { font-size: 56px; font-weight: 800; line-height: 1; color: var(--birth); letter-spacing: -.02em; }
+  .answer p { margin: 8px 0 12px; font-size: 16px; }
+  .bars { display: grid; gap: 8px; }
+  .bar { display: grid; grid-template-columns: 140px minmax(0, 1fr) 40px; align-items: center; gap: 10px; font-size: 13px; }
+  .bar i { display: block; height: 14px; border-radius: 7px; background: var(--birth); }
+  .bar span:last-child { text-align: right; font-weight: 700; }
+  .answer .cta { display: inline-flex; gap: 8px; align-items: center; background: var(--birth); color: #fff; border-radius: 12px; padding: 10px 14px; font-weight: 600; }
+  .also { margin-top: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .also div { border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 4px; }
+  .also b { font-size: 22px; }
+
+  /* ---------- B. Follow one animal ---------- */
+  .pass { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; }
+  .id { background: var(--night); color: #E6F2EC; border-radius: 18px; padding: 18px; display: grid; gap: 10px; align-content: start; }
+  .id .ph { aspect-ratio: 1; border-radius: 14px; background: radial-gradient(circle at 40% 35%, #8C6A4E, #4A3626 70%); display: grid; place-items: center; font-size: 64px; }
+  .id h4 { margin: 0; font-size: 20px; }
+  .id dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 12px; }
+  .id dt { color: #9DB8AA; } .id dd { margin: 0; font-family: var(--mono); }
+  .swap { display: flex; gap: 6px; flex-wrap: wrap; }
+  .swap span { font-size: 11px; border: 1px solid #335a49; border-radius: 999px; padding: 3px 8px; color: #BFD8CB; }
+  .tl { position: relative; display: grid; gap: 12px; padding-left: 22px; }
+  .tl::before { content: ""; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--line); }
+  .stop { position: relative; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 4px; background: var(--card); }
+  .stop::before { content: ""; position: absolute; left: -21px; top: 16px; width: 12px; height: 12px; border-radius: 50%; background: var(--card); border: 3px solid currentColor; }
+  .stop .top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .stop time { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .stop b { font-size: 15px; }
+  .stop.c-birth { color: var(--birth); } .stop.c-health { color: var(--health); } .stop.c-place { color: var(--place); } .stop.c-ops { color: var(--ops); }
+  .stop > * { color: var(--ink); }
+  .stop.tap { outline: 3px solid var(--health); outline-offset: 2px; }
+
+  /* ---------- C. Today ---------- */
+  .day { display: grid; gap: 14px; }
+  .clock { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .clock b { font-size: 44px; font-weight: 800; letter-spacing: -.02em; font-family: var(--mono); }
+  .scrub { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+  .scrub div { height: 8px; border-radius: 4px; background: var(--line); }
+  .scrub div.done { background: var(--brand); } .scrub div.now { background: var(--brand-2); box-shadow: 0 0 0 3px var(--brand-soft); }
+  .slots { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .scenes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .scene { border-radius: 16px; padding: 14px; display: grid; gap: 8px; align-content: start; }
+  .scene.past { opacity: .55; }
+  .scene.live { box-shadow: 0 0 0 2px var(--health); }
+  .scene h4 { margin: 0; font-size: 15px; }
+  .scene .n { font-size: 32px; font-weight: 800; line-height: 1; }
+  .scene ul { margin: 0; padding-left: 16px; font-size: 12px; display: grid; gap: 3px; }
+  .s-birth { background: var(--birth-soft); } .s-health { background: var(--health-soft); } .s-place { background: var(--place-soft); } .s-ops { background: var(--ops-soft); }
+
+  /* ---------- D. Map ---------- */
+  .mapwrap { display: grid; gap: 12px; }
+  .lenses { display: flex; flex-wrap: wrap; gap: 8px; }
+  .lens { border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; font-weight: 600; font-size: 13px; background: var(--bg); cursor: pointer; font-family: var(--font); color: var(--ink); }
+  .lens[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .map { position: relative; width: 100%; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 18px; overflow: hidden; background: #DCEBD8; }
+  .map svg { width: 100%; height: 100%; display: block; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+
+  /* ---------- E. Pulse wall ---------- */
+  .wall { background: var(--night); color: #E6F2EC; border-radius: 18px; padding: 18px; display: grid; gap: 14px; }
+  .wall-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .live { display: inline-flex; gap: 8px; align-items: center; font-weight: 700; font-size: 12px; letter-spacing: .08em; }
+  .live i { width: 9px; height: 9px; border-radius: 50%; background: #FF5A4E; animation: blink 1.2s infinite; }
+  @keyframes blink { 50% { opacity: .25; } }
+  .meters { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  .meter { background: var(--night-2); border-radius: 12px; padding: 10px; display: grid; gap: 2px; transition: box-shadow .3s; }
+  .meter b { font-size: 22px; font-variant-numeric: tabular-nums; }
+  .meter span { font-size: 11px; color: #9DB8AA; text-transform: uppercase; letter-spacing: .06em; }
+  .meter.hit { box-shadow: 0 0 0 2px #7FE0A8; }
+  .feed { display: grid; gap: 8px; min-height: 300px; align-content: start; }
+  .ev { display: grid; grid-template-columns: 64px 110px minmax(0, 1fr); gap: 12px; align-items: center; background: var(--night-2); border-radius: 12px; padding: 10px 12px; animation: drop .45s ease-out; }
+  .ev time { font-family: var(--mono); font-size: 12px; color: #9DB8AA; }
+  .ev .mod { justify-self: start; }
+  .ev p { margin: 0; min-width: 0; }
+  .ev p small { color: #9DB8AA; }
+  @keyframes drop { from { transform: translateY(-8px); opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) { .ev, .live i { animation: none; } }
+  @media (max-width: 980px) {
+    .concept { grid-template-columns: 1fr; }
+    .pass, .answer { grid-template-columns: 1fr; }
+    .scenes { grid-template-columns: 1fr 1fr; }
+    .meters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .also, .scenes { grid-template-columns: 1fr; }
+    .bar { grid-template-columns: 100px minmax(0, 1fr) 36px; }
+    .ev { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Event landing · 5 directions · 6 Oct 2026</div>
+    <h1>Five ways to show visitors what ANTZ does</h1>
+    <p class="lede">Each direction starts from a different idea, not a different card layout. Figures are real, from the V5 anonymised dump (data “today” = 20 May 2026), except where a card says <b>sample</b>. The panel beside each one says what happens when a visitor taps.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Directions">
+    <button role="tab" aria-selected="true" data-c="a">A · Ask the zoo</button>
+    <button role="tab" aria-selected="false" data-c="b">B · Follow one animal</button>
+    <button role="tab" aria-selected="false" data-c="c">C · A day at the zoo</button>
+    <button role="tab" aria-selected="false" data-c="d">D · Zoo map with lenses</button>
+    <button role="tab" aria-selected="false" data-c="e">E · Live pulse wall</button>
+  </nav>
+
+  <!-- ================= A ================= -->
+  <section class="concept" id="c-a">
+    <div class="premise">
+      <h2>A. Ask the zoo</h2>
+      <p>Visitors don’t know module names; they know questions. The page is a set of questions a zoo director asks. Each answer is a live insight, and the module that produced it is named as the source, so the modules come second, as the reason the answer exists.</p>
+    </div>
+    <div class="stage">
+      <div class="ask-hero">
+        <h3>What do you want to know about the zoo?</h3>
+        <div class="ask-field">🔍 <b>What was born this spring?</b></div>
+        <div class="qs">
+          <span class="q on">What was born this spring?</span>
+          <span class="q">Who saw the vet this week?</span>
+          <span class="q">How many threatened species do we keep?</span>
+          <span class="q">Which site is the busiest?</span>
+          <span class="q">How fast do we close a necropsy?</span>
+          <span class="q">Is any stock running low? <small>sample</small></span>
+          <span class="q">Who is on duty today? <small>sample</small></span>
+        </div>
+      </div>
+      <div class="answer">
+        <div>
+          <span class="mod m-birth">Answered by Breeding · Natality</span>
+          <div class="big num" style="margin-top:12px">972</div>
+          <p>animals were born across 4 sites in April and May. Hollowpine alone recorded 583 of them.</p>
+          <span class="cta">Open Natality →</span>
+        </div>
+        <div class="bars">
+          <div class="src">Top species by births, Apr–May 2026</div>
+          <div class="bar"><span>Coral Mudturtle</span><i style="width:100%"></i><span class="num">315</span></div>
+          <div class="bar"><span>Saffron Myna</span><i style="width:24.8%"></i><span class="num">78</span></div>
+          <div class="bar"><span>Crimson Vinesnake</span><i style="width:17.5%"></i><span class="num">55</span></div>
+          <div class="bar"><span>Veiled Krait</span><i style="width:16.5%"></i><span class="num">52</span></div>
+          <div class="bar"><span>Glacial Jerboa</span><i style="width:11.4%"></i><span class="num">36</span></div>
+          <div class="bar"><span>Azure Vole</span><i style="width:10.8%"></i><span class="num">34</span></div>
+        </div>
+      </div>
+      <div class="also">
+        <div><span class="mod m-health">Medical</span><b class="num">634</b><span>doses given in 30 days: 598 treatments, 36 vaccinations</span></div>
+        <div><span class="mod m-brand">Species</span><b class="num">347</b><span>of 1,880 species are Vulnerable or worse on the IUCN list</span></div>
+        <div><span class="mod m-place">Housing</span><b class="num">7,771</b><span>enclosures hold 18,056 animals across 4 sites</span></div>
+      </div>
+    </div>
+    <aside class="rail">
+      <div class="note"><h3>On tap</h3><ol>
+        <li>Tap a question → the answer card swaps in place (no page change), with a chart and the module it came from.</li>
+        <li>Tap <b>Open Natality</b> → the real module page we already built (#m/natality).</li>
+        <li>Modules without a page → a sheet: 3 insights + “What this module does”.</li>
+        <li>60 s idle → the questions cycle by themselves, like a quiz show.</li>
+      </ol></div>
+      <div class="note good"><h3>Why it works</h3><ul><li>Explains value in the visitor’s words. A good fit for a booth where a salesperson talks over it.</li></ul></div>
+      <div class="note warn"><h3>Risk</h3><ul><li>Covers only as many modules as we write questions for (about 12).</li></ul></div>
+    </aside>
+  </section>
+
+  <!-- ================= B ================= -->
+  <section class="concept" id="c-b" hidden>
+    <div class="premise">
+      <h2>B. Follow one animal</h2>
+      <p>Modules only make sense together. So the page tells one real animal’s life, and each moment is recorded by a different module. Visitors see that it’s one connected system, not 20 apps.</p>
+    </div>
+    <div class="stage">
+      <div class="pass">
+        <div class="id">
+          <div class="ph" aria-hidden="true">🐹</div>
+          <h4>Brindled Vole</h4>
+          <dl>
+            <dt>ID</dt><dd>#188502</dd>
+            <dt>Sex</dt><dd>Female</dd>
+            <dt>Born</dt><dd>11 Feb 2026</dd>
+            <dt>Home</dt><dd>Spruce Gate Terrarium</dd>
+            <dt>Site</dt><dd>Hollowpine</dd>
+          </dl>
+          <div class="src" style="color:#9DB8AA">Meet another</div>
+          <div class="swap"><span>Umber Dormouse</span><span>Indigo Jerboa</span><span>Maroon Toucan</span></div>
+        </div>
+        <div class="tl">
+          <div class="stop c-birth"><div class="top"><span class="mod m-birth">Breeding</span><time>11 Feb 2026</time></div><b>Born at Spruce Gate Terrarium</b><span class="src">Birth recorded the next day, with a Local ID</span></div>
+          <div class="stop c-place"><div class="top"><span class="mod m-place">Housing</span><time>12 Feb 2026</time></div><b>Placed in Spruce Gate Terrarium, Hollowpine</b><span class="src">Enclosure occupancy updated</span></div>
+          <div class="stop c-health tap"><div class="top"><span class="mod m-health">Medical</span><time>20 Mar 2026</time></div><b>First vaccination · Vanguard plus 5L4 CV, 1 ml</b><span class="src">Booster on 10 Apr</span></div>
+          <div class="stop c-ops"><div class="top"><span class="mod m-ops">Pharmacy</span><time>20 Mar → 15 Apr</time></div><b>Dewormed 3 times · Nemocid, 0.3 ml</b><span class="src">Stock deducted from the store each time</span></div>
+          <div class="stop c-health"><div class="top"><span class="mod m-health">Medical</span><time>19 May 2026</time></div><b>Vanguard DAPP+L4+CV + Nobivac rabies</b><span class="src">Given with Drontal Puppy, 1 ml</span></div>
+          <div class="stop c-ops"><div class="top"><span class="mod m-ops">Diet</span><time>daily · sample</time></div><b>Seed mix 12 g + greens, 2 feeds a day</b><span class="src">From the species diet plan</span></div>
+        </div>
+      </div>
+    </div>
+    <aside class="rail">
+      <div class="note"><h3>On tap</h3><ol>
+        <li>Tap a moment (outlined) → that module opens <b>already filtered to this animal</b>, e.g. Medical with its 4 vaccinations.</li>
+        <li>Tap <b>Meet another</b> → a new animal, a new story, different modules lit.</li>
+        <li>Below the story: a strip of every module, with the ones this animal touched highlighted.</li>
+        <li>Idle → swaps to the next animal every 20 s.</li>
+      </ol></div>
+      <div class="note good"><h3>Why it works</h3><ul><li>The most memorable one. People remember an animal, not a dashboard.</li></ul></div>
+      <div class="note warn"><h3>Risk</h3><ul><li>Few animals in the dump touch 4+ modules. We hand-pick 4–6 hero animals.</li></ul></div>
+    </aside>
+  </section>
+
+  <!-- ================= C ================= -->
+  <section class="concept" id="c-c" hidden>
+    <div class="premise">
+      <h2>C. A day at the zoo</h2>
+      <p>Time is the organiser. The page plays one real day, 19 May 2026, from 6 am to 6 pm. As the clock moves, each module shows up at the moment it does its job. On a TV it plays on its own; on an iPad the visitor scrubs the day.</p>
+    </div>
+    <div class="stage">
+      <div class="day">
+        <div class="clock"><b>10:30</b><span class="lede" style="margin:0">Tuesday 19 May 2026 · all 4 sites</span></div>
+        <div class="scrub"><div class="done"></div><div class="done"></div><div class="now"></div><div></div><div></div><div></div><div></div></div>
+        <div class="slots"><span>06:00</span><span>08:00</span><span>10:00</span><span>12:00</span><span>14:00</span><span>16:00</span><span>18:00</span></div>
+        <div class="scenes">
+          <div class="scene s-ops past"><span class="mod m-ops">Diet · sample</span><h4>06:00 · Feeds prepared</h4><div class="n num">1,240</div><ul><li>Kitchen sheet printed per section</li><li>3 diet changes flagged by vets</li></ul></div>
+          <div class="scene s-ops past"><span class="mod m-ops">Manpower · sample</span><h4>08:00 · Keepers check in</h4><div class="n num">96%</div><ul><li>142 of 148 on shift</li><li>2 sections short, reassigned</li></ul></div>
+          <div class="scene s-health live"><span class="mod m-health">Medical · now</span><h4>10:00 · Vet rounds</h4><div class="n num">45</div><ul><li>27 vaccinations, 18 treatments</li><li>Nobivac rabies · Brindled Vole · Spruce Gate</li><li>Vanguard DAPP · Umber Dormouse · Moss Nook</li></ul></div>
+          <div class="scene s-birth"><span class="mod m-birth">Breeding</span><h4>12:00 · New arrivals logged</h4><div class="n num">11</div><ul><li>Crimson Vinesnake hatchlings · Larch Marsh Warren</li><li>Local IDs assigned on entry</li></ul></div>
+          <div class="scene s-place"><span class="mod m-place">Housing</span><h4>14:00 · Enclosure checks</h4><div class="n num">7,771</div><ul><li>Enclosures with live headcounts</li><li>Moves update occupancy</li></ul></div>
+          <div class="scene s-health"><span class="mod m-health">Mortality · Necropsy</span><h4>16:00 · Losses reviewed</h4><div class="n num">28</div><ul><li>Recorded today, each sent for necropsy</li><li>134 necropsies closed in May</li></ul></div>
+        </div>
+      </div>
+    </div>
+    <aside class="rail">
+      <div class="note"><h3>On tap</h3><ol>
+        <li>Drag the clock bar → scenes light up and dim; the current one gets a red ring.</li>
+        <li>Tap a scene → its module opens on <b>that day</b> (Medical shows the 45 doses of 19 May).</li>
+        <li>Idle → the day plays itself in 60 s, then loops.</li>
+      </ol></div>
+      <div class="note good"><h3>Why it works</h3><ul><li>Shows operations, not just records. Best for a TV behind the stand.</li></ul></div>
+      <div class="note warn"><h3>Risk</h3><ul><li>The dump has dates, not times of day; the clock positions are staged.</li></ul></div>
+    </aside>
+  </section>
+
+  <!-- ================= D ================= -->
+  <section class="concept" id="c-d" hidden>
+    <div class="premise">
+      <h2>D. Zoo map with module lenses</h2>
+      <p>Place is the organiser. One map holds the 4 sites; each module is a <b>lens</b> laid over it. Switching lens re-colours the same map, so visitors see that every module sees the same zoo.</p>
+    </div>
+    <div class="stage">
+      <div class="mapwrap">
+        <div class="lenses" role="group" aria-label="Lens">
+          <button class="lens" aria-pressed="true" data-l="animals">Collection</button>
+          <button class="lens" aria-pressed="false" data-l="births">Breeding</button>
+          <button class="lens" aria-pressed="false" data-l="necropsy">Necropsy</button>
+          <button class="lens" aria-pressed="false" data-l="housing">Housing</button>
+        </div>
+        <div class="map">
+          <svg viewBox="0 0 800 450" role="img" aria-label="Four ANTZ sites on a map">
+            <rect width="800" height="450" fill="#DCEBD8"/>
+            <path d="M0 300 C160 260 260 360 420 330 S700 260 800 300 L800 450 L0 450Z" fill="#CFE2CB"/>
+            <path d="M560 0 C540 80 600 140 590 220 S520 330 560 450" stroke="#B9D7EA" stroke-width="18" fill="none"/>
+            <g id="sites"></g>
+          </svg>
+        </div>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+    <aside class="rail">
+      <div class="note"><h3>On tap</h3><ol>
+        <li>Tap a lens → bubbles resize and recolour; the caption under each site changes. Try it on the left.</li>
+        <li>Tap a site → it zooms to sections and enclosures, with the same lens kept.</li>
+        <li>Tap an enclosure → a sheet with its animals and the lens module’s records.</li>
+      </ol></div>
+      <div class="note good"><h3>Why it works</h3><ul><li>Spatial and touchable, great on a big iPad. Shows multi-site, a real ANTZ strength.</li></ul></div>
+      <div class="note warn"><h3>Risk</h3><ul><li>Needs an illustrated map. The positions here are invented.</li></ul></div>
+    </aside>
+  </section>
+
+  <!-- ================= E ================= -->
+  <section class="concept" id="c-e" hidden>
+    <div class="premise">
+      <h2>E. Live pulse wall</h2>
+      <p>Activity is the organiser. A big screen shows records arriving as they happen. Each one is tagged with its module, and the module counters along the top tick as records land. It says “this is a living system” without anyone reading a chart.</p>
+    </div>
+    <div class="stage">
+      <div class="wall">
+        <div class="wall-head"><span class="live"><i></i>LIVE · 4 SITES</span><span class="src" style="color:#9DB8AA">Replaying 19 May 2026 from the V5 data</span></div>
+        <div class="meters">
+          <div class="meter" data-m="Breeding"><span>Births</span><b class="num">0</b></div>
+          <div class="meter" data-m="Medical"><span>Vaccines</span><b class="num">0</b></div>
+          <div class="meter" data-m="Pharmacy"><span>Treatments</span><b class="num">0</b></div>
+          <div class="meter" data-m="Mortality"><span>Losses</span><b class="num">0</b></div>
+          <div class="meter" data-m="Housing"><span>Moves</span><b class="num">0</b></div>
+          <div class="meter" data-m="Diet"><span>Feeds</span><b class="num">0</b></div>
+        </div>
+        <div class="feed" id="feed" aria-live="off"></div>
+      </div>
+    </div>
+    <aside class="rail">
+      <div class="note"><h3>On tap</h3><ol>
+        <li>Nothing needs a tap; it runs on its own.</li>
+        <li>Tap a record → that animal’s profile (opens direction B’s story).</li>
+        <li>Tap a counter → that module’s page, filtered to today.</li>
+      </ol></div>
+      <div class="note good"><h3>Why it works</h3><ul><li>Draws people from across the hall. Pairs well with A or B on the iPad at the stand.</li></ul></div>
+      <div class="note warn"><h3>Risk</h3><ul><li>Mortality appears in a public feed. We could leave losses out of the wall.</li></ul></div>
+    </aside>
+  </section>
+
+  <section class="note" style="padding:18px">
+    <h3>My suggestion</h3>
+    <ul>
+      <li><b>B</b> on the iPad at the stand. It’s the one visitors remember, and it shows modules working together.</li>
+      <li><b>E</b> on the big screen behind it, to pull people in.</li>
+      <li><b>A</b> is the safest single choice if there is only one screen.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+  // Tabs
+  const tabs = document.querySelectorAll('.tabs button');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', x === t));
+    document.querySelectorAll('.concept').forEach(c => c.hidden = c.id !== 'c-' + t.dataset.c);
+    if (t.dataset.c === 'e') startPulse();
+  }));
+
+  // D: map lenses (real per-site figures)
+  const SITES = [
+    { n: 'Clearspring',     x: 220, y: 150, animals: 7752, births: 181, necropsy: 473,  housingNote: 'Largest collection' },
+    { n: 'Foxglen',         x: 430, y: 110, animals: 5057, births: 43,  necropsy: 346,  housingNote: 'Rescue centre' },
+    { n: 'Hollowpine',      x: 680, y: 190, animals: 4325, births: 583, necropsy: 527,  housingNote: 'Wetland park' },
+    { n: 'Crimson Frosted', x: 330, y: 330, animals: 922,  births: 165, necropsy: 493,  housingNote: 'Safari estate' },
+  ];
+  const LENS = {
+    animals:  { c: '#006D35', k: 'animals',  lab: v => v.toLocaleString() + ' animals', leg: 'Collection · animals on record per site' },
+    births:   { c: '#2F7DD3', k: 'births',   lab: v => v + ' births Apr–May',          leg: 'Breeding · births in April and May 2026' },
+    necropsy: { c: '#C2453B', k: 'necropsy', lab: v => v + ' necropsies closed',       leg: 'Necropsy · completed reports, all time' },
+    housing:  { c: '#5E8B2E', k: 'animals',  lab: (v, s) => s.housingNote,             leg: 'Housing · tap a site to see its enclosures (7,771 in all)' },
+  };
+  function drawMap(l) {
+    const L = LENS[l], max = Math.max(...SITES.map(s => s[L.k]));
+    document.getElementById('sites').innerHTML = SITES.map(s => {
+      const r = 22 + 48 * Math.sqrt(s[L.k] / max);
+      return `<g><circle cx="${s.x}" cy="${s.y}" r="${r}" fill="${L.c}" fill-opacity=".85" stroke="#fff" stroke-width="3" style="transition:r .4s"/>
+        <text x="${s.x}" y="${s.y + r + 20}" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="16" fill="#10231A">${s.n}</text>
+        <text x="${s.x}" y="${s.y + r + 38}" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#5A6B62">${L.lab(s[L.k], s)}</text></g>`;
+    }).join('');
+    document.getElementById('legend').innerHTML = `<span><b style="color:${L.c}">●</b> ${L.leg}</span><span>Bubble size = share of the largest site</span>`;
+  }
+  document.querySelectorAll('.lens').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.lens').forEach(x => x.setAttribute('aria-pressed', x === b));
+    drawMap(b.dataset.l);
+  }));
+  drawMap('animals');
+
+  // E: pulse wall (real 19 May records; Diet + Housing marked sample)
+  const EVENTS = [
+    ['06:12', 'Diet', 'm-ops', 'Morning feed issued · Moss Nook Vivarium', 'sample'],
+    ['09:41', 'Medical', 'm-health', 'Vanguard DAPP+L4+CV, 1 ml · Brindled Vole #188502', 'Spruce Gate Terrarium · Hollowpine'],
+    ['09:44', 'Medical', 'm-health', 'Nobivac rabies, 1 ml · Brindled Vole #188502', 'Spruce Gate Terrarium · Hollowpine'],
+    ['09:58', 'Pharmacy', 'm-ops', 'Drontal Puppy, 1 ml · Brindled Vole #188502', 'Stock deducted · store'],
+    ['10:20', 'Medical', 'm-health', 'Vanguard DAPP+L4+CV · Umber Dormouse ×4', 'Moss Nook Vivarium'],
+    ['11:05', 'Breeding', 'm-birth', '11 Crimson Vinesnake hatchlings logged', 'Larch Marsh Warren'],
+    ['11:30', 'Breeding', 'm-birth', '8 Russet Worm-lizard births', 'Larch Marsh Warren'],
+    ['12:10', 'Housing', 'm-place', 'Azure Vole ×4 moved to Willow Creek Yard', 'sample move'],
+    ['13:02', 'Breeding', 'm-birth', '2 Maroon Toucan chicks', 'Ridge Ford Burrow'],
+    ['14:40', 'Mortality', 'm-health', 'Loss recorded · sent for necropsy', 'Necropsy pending'],
+    ['15:15', 'Medical', 'm-health', 'Nobivac rabies · Umber Dormouse ×4', 'Moss Nook Vivarium'],
+  ];
+  const ADD = { Diet: 120, Medical: 1, Pharmacy: 1, Breeding: 1, Housing: 4, Mortality: 1 };
+  ADD.Breeding = 1;
+  let pulseTimer = null, pi = 0;
+  function startPulse() {
+    if (pulseTimer) return;
+    const feed = document.getElementById('feed');
+    const tick = () => {
+      const [t, m, cls, what, where] = EVENTS[pi % EVENTS.length];
+      const el = document.createElement('div');
+      el.className = 'ev';
+      el.innerHTML = `<time>${t}</time><span class="mod ${cls}">${m}</span><p>${what}<br><small>${where}</small></p>`;
+      feed.prepend(el);
+      while (feed.children.length > 6) feed.lastChild.remove();
+      const meter = document.querySelector(`.meter[data-m="${m}"]`);
+      if (meter) {
+        const b = meter.querySelector('b');
+        const inc = m === 'Breeding' ? (parseInt(what) || 1) : m === 'Medical' && /×(\d+)/.test(what) ? +what.match(/×(\d+)/)[1] : ADD[m];
+        b.textContent = (parseInt(b.textContent.replace(/,/g, '')) + inc).toLocaleString();
+        meter.classList.add('hit'); setTimeout(() => meter.classList.remove('hit'), 600);
+      }
+      pi++;
+    };
+    for (let i = 0; i < 4; i++) tick();
+    pulseTimer = setInterval(tick, 1800);
+  }
+</script>
+</body>
+</html>

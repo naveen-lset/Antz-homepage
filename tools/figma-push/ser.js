@@ -10,6 +10,8 @@ const imgIndex = new Map()
 
 function parseColor(c) {
   if (!c) return null
+  const cm = c.match(/color\(srgb\s+([^)]+)\)/)
+  if (cm) { const p = cm[1].split(/[\s/]+/).filter(Boolean).map(Number); const a = p.length > 3 ? p[3] : 1; if (a === 0) return null; return { r: p[0], g: p[1], b: p[2], a } }
   const m = c.match(/rgba?\(([^)]+)\)/)
   if (!m) return null
   const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number)
@@ -29,7 +31,7 @@ function gradient(g, w, h) {
   } else if (!/rgb/.test(first)) parts.shift()
   const stops = []
   parts.forEach((s, i) => {
-    const cm = s.match(/rgba?\([^)]+\)/); if (!cm) return
+    const cm = s.match(/rgba?\([^)]+\)|color\(srgb[^)]+\)/); if (!cm) return
     const c = parseColor(cm[0]) || { ...(parseColor(cm[0].replace(/,\s*0\)$/, ',1)')) || { r: 0, g: 0, b: 0 }), a: 0 }
     const pos = s.replace(cm[0], '').trim().split(/\s+/).filter(Boolean)
     stops.push({ c: { r: c.r, g: c.g, b: c.b, a: c.a ?? 1 }, p: pos.length ? (pos[0].endsWith('%') ? parseFloat(pos[0]) / 100 : parseFloat(pos[0]) / (lin ? Math.abs(w * Math.sin(angle * Math.PI / 180)) + Math.abs(h * Math.cos(angle * Math.PI / 180)) : Math.max(w, h))) : null })
@@ -37,7 +39,13 @@ function gradient(g, w, h) {
   if (stops.length < 2) return null
   stops.forEach((s, i) => { if (s.p == null) s.p = i === 0 ? 0 : i === stops.length - 1 ? 1 : null })
   for (let i = 1; i < stops.length - 1; i++) if (stops[i].p == null) { let j = i; while (stops[j].p == null) j++; const a = stops[i - 1].p, b = stops[j].p; for (let k = i; k < j; k++) stops[k].p = a + (b - a) * (k - i + 1) / (j - i + 1) }
-  stops.forEach((s) => { s.p = Math.max(0, Math.min(1, s.p)) })
+  // stops outside the box (CSS allows -105% or 197%) are resampled at its edges, not clamped
+  const at = (t) => { if (t <= stops[0].p) return stops[0].c; for (let i = 1; i < stops.length; i++) if (t <= stops[i].p) { const a = stops[i - 1], b = stops[i], k = b.p === a.p ? 1 : (t - a.p) / (b.p - a.p); return { r: a.c.r + (b.c.r - a.c.r) * k, g: a.c.g + (b.c.g - a.c.g) * k, b: a.c.b + (b.c.b - a.c.b) * k, a: a.c.a + (b.c.a - a.c.a) * k } } return stops[stops.length - 1].c }
+  if (stops.some((s) => s.p < 0 || s.p > 1)) {
+    const inner = stops.filter((s) => s.p > 0 && s.p < 1)
+    const res = [{ c: at(0), p: 0 }, ...inner, { c: at(1), p: 1 }]
+    stops.length = 0; res.forEach((s) => stops.push(s))
+  }
   return lin ? { type: 'LIN', angle, stops } : { type: 'RAD', stops }
 }
 const clipText = (cs) => cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text'
@@ -189,7 +197,15 @@ function isPlainInline(el) {
 function collectRuns(el, runs, pre) {
   for (const n of el.childNodes) {
     if (n.nodeType === 3) { let s = n.textContent; if (!pre) s = s.replace(/\s+/g, ' '); if (s) runs.push({ s, st: textStyle(getComputedStyle(n.parentElement)) }) }
-    else if (n.nodeType === 1) { if (n.tagName === 'BR') runs.push({ s: '\n', st: textStyle(getComputedStyle(el)) }); else if (visible(n)) collectRuns(n, runs, pre) }
+    else if (n.nodeType === 1) {
+      if (n.tagName === 'BR') { runs.push({ s: '\n', st: textStyle(getComputedStyle(el)) }); continue }
+      if (!visible(n)) continue
+      const ncs = getComputedStyle(n), sp = (m) => (m > 0.5 ? ' '.repeat(Math.max(1, Math.round(m / (px(ncs.fontSize) * 0.3)))) : '')
+      const ml = sp(px(ncs.marginLeft)), mr = sp(px(ncs.marginRight))
+      if (ml) runs.push({ s: ml, st: textStyle(ncs) })
+      collectRuns(n, runs, pre)
+      if (mr) runs.push({ s: mr, st: textStyle(ncs) })
+    }
   }
 }
 function pseudoText(el, which) {
@@ -218,7 +234,7 @@ function textNode(el, rect, name) {
   const lineH = base.lh || base.sz * 1.21
   const lines = new Set(rects.map((q) => Math.round(q.top / (lineH * .6)))).size
   const clamp = parseInt(cs.webkitLineClamp) || 0
-  const ell = cs.textOverflow === 'ellipsis' && cs.whiteSpace.includes('nowrap')
+  const ell = cs.textOverflow === 'ellipsis' && cs.whiteSpace.includes('nowrap') && el.scrollWidth > el.clientWidth + 1
   return { t: 'T', n: name || chars.slice(0, 40).replace(/\n/g, ' '), chars, st: base, segs, w: r1(rect.width), h: r1(rect.height), align: cs.textAlign === 'center' ? 'CENTER' : cs.textAlign === 'right' || cs.textAlign === 'end' ? 'RIGHT' : cs.textAlign === 'justify' ? 'JUSTIFIED' : 'LEFT', one: lines <= 1 && !clamp, trunc: ell ? 1 : clamp || 0, wrapOK: !cs.whiteSpace.includes('nowrap') }
 }
 function contentRect(el) {
@@ -251,6 +267,8 @@ function node(el, pr, ctx) {
   const base = { n: nameOf(el), w: r1(r.width), h: r1(r.height), x: r1(r.left - pr.left), y: r1(r.top - pr.top) }
   if (+cs.opacity < 1) base.op = +cs.opacity
   if (/^(absolute|fixed)$/.test(cs.position)) base.abs = true
+  // CSS paint order: non-positioned in-flow boxes under positioned ones; z-index orders the rest
+  base.zk = cs.position === 'static' ? -0.5 : (cs.zIndex === 'auto' ? 0 : parseInt(cs.zIndex) || 0)
   const flexGrow = px(cs.flexGrow)
   if (flexGrow > 0) base.grow = 1
   if (cs.alignSelf === 'stretch') base.stretch = 1
@@ -277,6 +295,10 @@ function node(el, pr, ctx) {
     if (s) return { ...base, t: 'V', svg: s, n: base.n.includes('/') ? base.n : 'Icon' }
   }
 
+  if (![...el.children].some(visible) && !el.textContent.trim()) {
+    const pb = getComputedStyle(el, '::before'), pu = pb.content !== 'none' && (pb.backgroundImage || '').match(/url\(["']?([^"')]+\.svg[^"')]*)["']?\)/)
+    if (pu && !/absolute|fixed/.test(pb.position)) { const pw = px(pb.width) || r.width, ph = px(pb.height) || r.height; const sv = svgFromUrl(new URL(pu[1], location.href).href, pw, ph); if (sv) return { ...base, t: 'V', svg: sv, w: r1(pw), h: r1(ph), n: base.n.includes('·') ? base.n : 'Icon' } }
+  }
   const f = { ...base, t: 'F' }
   const fills = bgPaints(cs, r.width, r.height, el); if (fills.length) f.fills = fills
   const st = strokes(cs); if (st) f.strokes = st
@@ -303,7 +325,7 @@ function node(el, pr, ctx) {
   if (pureText && hasText && !/flex|grid/.test(cs.display)) {
     const tn = textNode(el, contentRect(el))
     if (tn && !hasBox(cs) && !px(cs.paddingLeft) && !px(cs.paddingTop) && !px(cs.paddingRight) && !px(cs.paddingBottom)) {
-      Object.assign(tn, { x: base.x, y: base.y, abs: base.abs, grow: base.grow, op: base.op })
+      Object.assign(tn, { x: base.x, y: base.y, abs: base.abs, grow: base.grow, op: base.op, zk: base.zk })
       if (tn.n === tn.chars.slice(0, 40).replace(/\n/g, ' ') && !/^(Text|Title|Heading|Label|Group|Item)$/.test(base.n) && base.n !== 'Link') tn.n = tn.chars.slice(0, 40).replace(/\n/g, ' ')
       return tn
     }
@@ -321,7 +343,7 @@ function node(el, pr, ctx) {
       }
       if (n.nodeType !== 1 || !visible(n)) continue
       const ccs = getComputedStyle(n)
-      const add = (k, el2) => { const it = { node: k, rect: el2.getBoundingClientRect() }; (k.abs ? kidsAbs : kidsIn).push(it); all.push(it) }
+      const add = (k, el2) => { let rc = el2.getBoundingClientRect(); if (k._dy) { rc = { left: rc.left, right: rc.right, width: rc.width, top: rc.top + k._dy, bottom: rc.bottom, height: rc.height - k._dy }; delete k._dy } const it = { node: k, rect: rc }; (k.abs ? kidsAbs : kidsIn).push(it); all.push(it) }
       if (ccs.display === 'contents') { for (const m of n.children) if (visible(m)) { const k = node(m, r, ctx); if (k) add(k, m) } continue }
       const k = node(n, r, ctx); if (!k) continue
       add(k, n)
@@ -337,17 +359,20 @@ function node(el, pr, ctx) {
     if (p.left === 'auto' && p.right !== 'auto') x = r.width - px(cs.borderLeftWidth) - px(cs.borderRightWidth) - px(p.right) - pw
     if (p.top === 'auto' && p.bottom !== 'auto') y = r.height - px(cs.borderTopWidth) - px(cs.borderBottomWidth) - px(p.bottom) - ph
     x += px(cs.borderLeftWidth); y += px(cs.borderTopWidth)
-    const pit = { node: { t: 'F', n: which === '::before' ? `${base.n} / Before` : `${base.n} / After`, w: r1(pw), h: r1(ph), x: r1(x), y: r1(y), abs: true, fills: pf, strokes: pst, radius: radius(p, pw, ph), op: +p.opacity < 1 ? +p.opacity : undefined, pseudo: 1 } }
+    const pit = { node: { t: 'F', n: which === '::before' ? `${base.n} / Before` : `${base.n} / After`, w: r1(pw), h: r1(ph), x: r1(x), y: r1(y), abs: true, fills: pf, strokes: pst, radius: radius(p, pw, ph), op: +p.opacity < 1 ? +p.opacity : undefined, pseudo: 1, zk: p.zIndex === 'auto' ? 0 : parseInt(p.zIndex) || 0 } }
     kidsAbs.push(pit); if (which === '::before') all.unshift(pit); else all.push(pit)
   }
   kidsAbs.forEach((k) => { if (k.node.pseudo) return; k.node.x = r1(k.rect.left - r.left); k.node.y = r1(k.rect.top - r.top) })
 
   f.L = inferLayout(el, cs, r, kidsIn)
+  if (kidsIn.length === 1 && kidsIn[0].rect.width > r.width + 1 && (f.L.m === 'V' || f.L.m === 'H')) f.L = { m: 'H', gap: 0, pad: f.L.pad, pa: 'MIN', ca: 'MIN' }
   // a <button> centres its own label, with no flex rule to say so
   if (tag === 'BUTTON' && f.L.m === 'V' && kidsIn.length === 1 && kidsIn[0].node.t === 'T') { f.L.m = 'H'; f.L.pa = 'CENTER'; f.L.ca = 'CENTER'; const p = f.L.pad; f.L.pad = [Math.min(p[0], p[2]), p[1], Math.min(p[0], p[2]), p[3]] }
+  if (f.L.negA && !f.fills && !f.strokes && !f.fx && !f.clip) { f.y = r1(f.y + f.L.negA); f.h = r1(f.h - f.L.negA); f._dy = f.L.negA; f.kids_shift = -f.L.negA }
   f.kids = []
   const sp = f.L.spacers || []; delete f.L.spacers
   all.forEach((k) => { f.kids.push(k.node); const i = kidsIn.indexOf(k); if (i >= 0 && sp[i]) f.kids.push({ t: 'SP', n: 'Spacer', size: r1(sp[i]), w: 0, h: 0 }) })
+  if (f.kids_shift) { f.kids.forEach((k) => { if (k.abs) k.y = r1(k.y + f.kids_shift) }); delete f.kids_shift }
   if (f.L.m === 'N') f.kids.forEach((k) => { k.abs = true })
   // collapse a bare wrapper around one child of the same box
   if (f.kids.length === 1 && !f.fills && !f.strokes && !f.fx && !f.radius && !f.clip && !f.op && !f.kids[0].abs) {
@@ -404,6 +429,7 @@ function inferLayout(el, cs, r, kids) {
   const jc = cs.justifyContent
   let pa = 'MIN', gap = 0, spacers = null
   const padA = R[0][s] - S, padB = E - R[R.length - 1][e]
+  const negA = padA < -0.5 ? padA : 0
   const cssA = m === 'V' ? cssPad[0] : cssPad[3], cssB = m === 'V' ? cssPad[2] : cssPad[1]
   let pad = m === 'V' ? [padA, cssPad[1], padB, cssPad[3]] : [cssPad[0], padB, cssPad[2], padA]
   if (gaps.length) {
@@ -440,7 +466,7 @@ function inferLayout(el, cs, r, kids) {
   let ca = votes.CENTER > votes.MIN && votes.CENTER >= votes.MAX ? 'CENTER' : votes.MAX > votes.MIN ? 'MAX' : 'MIN'
   if (/flex/.test(disp) && m === 'H' && ai === 'baseline') ca = 'BASELINE'
   if (m === 'V') { pad[3] = cA; pad[1] = cB } else { pad[0] = cA; pad[2] = cB }
-  return { m, gap: r1(gap), pad: pad.map((v) => r1(Math.max(0, v))), pa, ca, spacers, neg: gap < 0 }
+  return { m, gap: r1(gap), pad: pad.map((v) => r1(Math.max(0, v))), pa, ca, spacers, neg: gap < 0, negA: negA ? r1(negA) : 0 }
 }
 
 window.__ser = (root, opts = {}) => {

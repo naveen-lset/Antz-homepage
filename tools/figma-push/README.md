@@ -29,3 +29,15 @@ Serialised from the REVIEW BUILD (`tools/review-build/build.py` into scratch, se
   - Transforms are not carried (the corkboard's tilts).
   - Negative margins are lost (fav-band −16).
 - **`insertChild(i, n)` on a node that is already a child counts the index before the move.** To push a layer down, move the layer *under* it to 0 instead.
+
+## 5 Oct 2026: Home · Tablet `902:2` (x 200) and Home · Mobile `903:2` (x 1044)
+Serialised from the Selected-Modules clone (`?v=2`, served on :8731) at 744 and 390; page 0:1 now also holds the designer's `Section 1`.
+Fixed in ser.js / builder.js this time (no hand fixes needed for these any more):
+- **Paste builder.js with its ` ` escape intact.** A literal NBSP in the restore regex became a space when pasted inline, so every SVG failed to parse (empty icon frames) and text broke mid-word.
+- Paint order: every node carries a `zk` key (non-positioned −0.5, else z-index); siblings are re-appended in that order when in-flow keys already ascend (deck peeks, scrims under text).
+- A box whose single child is wider than it (the ticker lane) is HORIZONTAL; ellipsis truncation only when the browser actually cut the line.
+- Gradient stops outside 0–100% are resampled at the edges; `color(srgb …)` parses; an empty box drawn by a `::before` SVG background becomes that icon; inline margins become spaces.
+- A bare frame whose first child sits above it (negative margin) grows upward instead of clamping; leftover spacers become neighbour padding with the frame gap set to the most common total.
+- builder's same-name cleanup removes while iterating `page.children` and can skip frames — check for leftovers.
+Still by hand: Page and Home Header were set to auto layout after the build (Page gap −10), the Modules pencil was added (its button has an sr-only label), and CSS-derived names were renamed (L V2sn → Pending, Hstrip → Audit Ticker).
+Image fills can be re-applied by `imageHash` from an earlier upload in the same file — no re-upload needed for a rebuild.

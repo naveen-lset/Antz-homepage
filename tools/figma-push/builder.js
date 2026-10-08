@@ -13,7 +13,7 @@ for (const t of (mine[mine.length - 1] ? mine[mine.length - 1].findAllWithCriter
 }
 if (!parts.length) throw new Error('no carrier for ' + KEY)
 parts.sort((a, b) => a.i - b.i)
-const P = JSON.parse(parts.map(p => p.s).join('').replace(/ /g, ' '))
+const P = JSON.parse(parts.map(p => p.s).join('').replace(/\u00A0/g, ' '))
 const S = P.S, T = P.tree
 
 // retry-safe: drop an earlier build of this screen
@@ -117,6 +117,31 @@ function mergeSpacers(n) {
     else out.push(k)
   }
   n.kids = out
+  // what is left: every gap is gap + spacer. Use the most common total as the
+  // frame's gap and settle each difference in a neighbour's padding
+  if (!n.kids.some(k => k.t === 'SP') || n.L.pa === 'SPACE_BETWEEN') return
+  const flow = [], G = []
+  for (const k of n.kids) { if (k.abs) continue; if (k.t === 'SP') { if (G.length) G[G.length - 1] += k.size; continue } if (flow.length) G.push(n.L.gap); flow.push(k) }
+  if (G.length < 1) return
+  const cnt = {}; G.forEach(g => { const r = Math.round(g * 10) / 10; cnt[r] = (cnt[r] || 0) + 1 })
+  const mode = +Object.entries(cnt).sort((a, b) => b[1] - a[1] || b[0] - a[0])[0][0]
+  const padOf = (x) => x.t === 'F' && x.L && (x.L.m === 'V' || x.L.m === 'H')
+  // plan every difference first; apply only if all of them have a home
+  const plan = []
+  for (let i = 0; i < G.length; i++) {
+    const d = Math.round((G[i] - mode) * 10) / 10; if (!d) continue
+    const prev = flow[i], next = flow[i + 1], ix = V ? 2 : 1, iy = V ? 0 : 3
+    if (d < 0 && padOf(prev) && prev.L.pad[ix] >= -d) plan.push([prev, ix, d, false])
+    else if (d < 0 && padOf(next) && next.L.pad[iy] >= -d) plan.push([next, iy, d, true])
+    else if (d > 0 && padOf(next)) plan.push([next, iy, d, true])
+    else if (d > 0 && padOf(prev)) plan.push([prev, ix, d, false])
+    else return
+  }
+  for (const [x, i, d, start] of plan) {
+    x.L.pad[i] += d; if (V) x.h += d; else x.w += d
+    if (start) (x.kids || []).forEach(c => { if (c.abs) { if (V) c.y += d; else c.x += d } })
+  }
+  n.L.gap = mode; n.kids = n.kids.filter(k => k.t !== 'SP')
 }
 mergeSpacers(T)
 
@@ -202,8 +227,10 @@ function build(n) {
   const order = L.m === 'G' ? inflow.map((k, i) => ({ k, p: L.place[i] })).sort((a, b) => a.p.r - b.p.r || a.p.c - b.p.c) : null
   const place = new Map(); if (order) order.forEach(o => place.set(o.k, o.p))
   const seq = L.m === 'G' ? [...order.map(o => o.k), ...kids.filter(k => k.abs)] : kids
+  const built = []
   for (const k of seq) {
     const c = build(k)
+    built.push({ c, k })
     if (auto && L.m === 'G' && !k.abs) {
       const p = place.get(k)
       f.appendChildAt(c, p.r, p.c)
@@ -230,6 +257,17 @@ function build(n) {
       if (k.fillX) { if (V) { c.layoutSizingHorizontal = 'FILL'; fillsW = true } else { c.layoutSizingVertical = 'FILL'; fillsH = true } }
       if (k.grow) { if (V) { c.layoutSizingVertical = 'FILL'; fillsH = true } else { c.layoutSizingHorizontal = 'FILL'; fillsW = true } }
     } catch (e) {}
+  }
+  // paint order: browsers paint by z key; Figma by child order. Reorder when the
+  // in-flow children already ascend (so their layout order is untouched)
+  if (built.length > 1 && L.m !== 'G') {
+    const key = (k) => (k.zk == null ? -0.5 : k.zk)
+    const inflowKeys = built.filter(b => !b.k.abs).map(b => key(b.k))
+    const mono = inflowKeys.every((v, i) => i === 0 || v >= inflowKeys[i - 1])
+    if (mono) {
+      const sorted = built.map((b, i) => ({ ...b, i })).sort((a, b2) => key(a.k) - key(b2.k) || a.i - b2.i)
+      if (sorted.some((b, i) => b.i !== i)) for (const b of sorted) f.appendChild(b.c)
+    }
   }
   if (auto && L.m !== 'G') hug(f, n, fillsW, fillsH)
   return f
