@@ -58,6 +58,9 @@ Both were built with `tools/figma-push` from the site-command-centre branch. Tha
 - The real screen lists for modules other than Pharmacy are needed.
 - Should the switcher on module pages open the Explorer?
 
-## Not pushed or deployed
+## Status (8 Oct 2026, end of session)
 
-This work is committed on `Selected-Modules` but not pushed. `mockups/event-home.html` has separate edits that were made outside this session, and they are not in this commit.
+- **Deployed.** <https://home-page-changes.vercel.app/?v=2> serves this work. Vercel project `home-page-changes` (team `naveen-lsets-projects`); deploy `home-page-changes-oqxa7ua20`, made from a clean `git archive` of `bc39786`.
+- **Not on GitHub yet.** The push was refused with a 403: this Mac's git is signed in as `Naveenkumar310`, and the repo is `naveen-lset/Antz-homepage`. Fix it by adding `Naveenkumar310` as a collaborator with Write access, or by pushing with a token from `naveen-lset`. Until then, another device can't pull this work.
+- **Deploying from this Mac:** Node.js and the Vercel tool are installed under `~/.local/node/bin` (add that to PATH). The token is stored in `~/.vercel-token`. It was pasted into a chat, so revoke it and make a new one.
+- `mockups/event-home.html` has edits made outside this session. They are not committed and were not deployed.
