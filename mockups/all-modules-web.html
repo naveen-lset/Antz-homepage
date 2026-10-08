@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All Modules · Web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!--
+  ALL MODULES ON THE WEB · three other ways (owner, 8 Oct 2026: "Need
+  Improvement on this. Can U make Some other different Way").
+
+  What the current sheet does badly: twenty wide cards, each carrying a
+  sentence cut off at "…", in a 920-wide sheet that has to scroll — it reads
+  like a form, the eye has to read every card to find one, and the panel
+  hides the page. The three below each pick one job and do it well:
+    A · Launcher   find by sight: icons first, like a phone's home screen or
+                   Google's apps grid. Twenty fit at once, no scroll, no text.
+    B · Explorer   find by area: categories down the left, modules on the
+                   right, and the module under the mouse shows its screens,
+                   so you can go straight to Pharmacy › Stock Report.
+    C · Command    find by typing: one field, results as you type, arrow
+                   keys and Enter — modules and their screens alike (⌘K).
+  All three: Recent first, search, Esc closes, a pick says where it goes.
+-->
+<style>
+:root {
+  --ink: #1F2A30; --ink-2: #44544A; --mute: #6B7773; --line: #E4EAE7; --teal: #1F515B; --soft: #F2F6F4;
+  --g-medical: linear-gradient(135deg, #6FB28C, #2E8B57); --g-hospital: linear-gradient(135deg, #5A7F8B, #2F525D); --g-pharmacy: linear-gradient(135deg, #45C9BD, #12A99B);
+  --g-lab: linear-gradient(135deg, #E3C98B, #C9A65A); --g-species: linear-gradient(135deg, #4CA36C, #1E6B43); --g-mortality: linear-gradient(135deg, #F4A08A, #EE7457);
+  --g-natality: linear-gradient(135deg, #7AD9CF, #2BB5A6); --g-fetal: linear-gradient(135deg, #F48FA0, #E35D78); --g-eggs: linear-gradient(135deg, #6FD3E3, #2DB3D3);
+  --g-housing: linear-gradient(135deg, #7E9AA2, #44646E); --g-diet: linear-gradient(135deg, #F79A6B, #E8613C); --g-followup: linear-gradient(135deg, #6E9098, #3F616A);
+  --g-parivesh: linear-gradient(135deg, #7BE3D6, #3CCBBB); --g-audit: linear-gradient(135deg, #D9708A, #B8405F); --g-administer: linear-gradient(135deg, #B2C2BA, #889D93);
+  --g-users: linear-gradient(135deg, #3F6B78, #234652); --g-security: linear-gradient(135deg, #9AA59F, #6A766F); --g-reports: linear-gradient(135deg, #4FD1C5, #22A99D);
+  --g-approvals: linear-gradient(135deg, #4C7280, #24495A); --g-communication: linear-gradient(135deg, #6E9098, #3F616A);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font: 14px/1.45 Inter, system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+
+/* the page under it: a blurred stand-in for the home page */
+.under { position: fixed; inset: 0; background: url(../assets/img/species-cheetahs.jpg) center / cover; filter: blur(18px) saturate(.7); transform: scale(1.1); }
+.veil { position: fixed; inset: 0; background: rgba(20, 40, 46, .35); }
+
+.pick { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: #1F2A30; color: #fff; }
+.pick b { margin-right: 10px; font-size: 14px; }
+.pick button { padding: 7px 14px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .1); color: #fff; font-size: 13px; cursor: pointer; }
+.pick button[aria-pressed='true'] { background: #fff; color: #1F2A30; font-weight: 600; }
+.pick span { margin-left: auto; font-size: 12px; opacity: .7; }
+.stage { position: fixed; inset: 52px 0 0; display: grid; place-items: center; padding: 24px; }
+.v { display: none; } .v.on { display: flex; }
+
+.g { flex: none; display: grid; place-items: center; border-radius: 14px; background: var(--bg); box-shadow: inset 0 0 0 1px rgba(255,255,255,.15), 0 4px 10px -6px rgba(0,0,0,.35); }
+.g i { display: block; background: #fff; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+.find { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border-radius: 12px; background: var(--soft); color: var(--mute); }
+.find svg { width: 18px; height: 18px; flex: none; }
+.find input { flex: 1; min-width: 0; border: 0; background: none; outline: none; font-size: 14px; color: var(--ink); }
+.find kbd { padding: 2px 6px; border-radius: 6px; background: #fff; box-shadow: 0 0 0 1px var(--line); font: 11px Inter, sans-serif; color: var(--mute); }
+.cap { margin: 0 0 10px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.close { position: absolute; top: 14px; right: 14px; display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--soft); cursor: pointer; }
+.close svg { width: 16px; height: 16px; }
+.toast { position: fixed; left: 50%; bottom: 24px; z-index: 60; padding: 10px 16px; border-radius: 10px; background: #1F2A30; color: #fff; font-size: 13px; transform: translate(-50%, 16px); opacity: 0; transition: .2s; pointer-events: none; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+.empty { padding: 30px; text-align: center; color: var(--mute); }
+
+/* ══ A · LAUNCHER ══ */
+.a { position: relative; flex-direction: column; gap: 18px; width: min(860px, 100%); max-height: 100%; padding: 26px 28px 24px; border-radius: 24px; background: rgba(255, 255, 255, .96); box-shadow: 0 40px 100px -30px rgba(0, 0, 0, .5); }
+.a .top { display: flex; align-items: center; gap: 14px; padding-right: 40px; }
+.a h2 { margin: 0; font-size: 20px; font-weight: 600; }
+.a .find { flex: 1; }
+.a .recent { display: flex; gap: 8px; flex-wrap: wrap; }
+.a .rc { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 4px; border: 1px solid var(--line); border-radius: 999px; background: #fff; font-size: 13px; font-weight: 500; cursor: pointer; }
+.a .rc:hover { background: var(--soft); }
+.a .rc .g { width: 28px; height: 28px; border-radius: 50%; } .a .rc .g i { width: 15px; height: 15px; }
+.a .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px 4px; overflow-y: auto; }
+.a .tile { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 4px 10px; border: 0; border-radius: 16px; background: none; cursor: pointer; transition: background .15s; }
+.a .tile:hover, .a .tile:focus-visible { background: var(--soft); outline: none; }
+.a .tile .g { width: 60px; height: 60px; border-radius: 18px; transition: transform .15s; }
+.a .tile:hover .g { transform: translateY(-2px) scale(1.04); }
+.a .tile .g i { width: 30px; height: 30px; }
+.a .tile span { max-width: 100%; font-size: 12.5px; font-weight: 500; text-align: center; line-height: 1.25; }
+.a .tile[hidden] { display: none; }
+.a .foot { display: flex; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--mute); font-size: 12px; }
+.a .foot button { margin-left: auto; border: 0; background: none; color: var(--teal); font-weight: 600; cursor: pointer; }
+
+/* ══ B · EXPLORER (clean pass, 8 Oct 2026: "Explorer is good. Can u make
+   Clean up the Ui") ══
+   One header across the panel (title · search · close); a quiet sidebar
+   (tinted selection, not a dark block); module rows that are a flat glyph and
+   a name only — the sentence moved to the detail side, where it fits; under
+   All modules the list is grouped by area with small headings; the detail
+   side leads with the module, one Open button, then its screens. */
+.b { position: relative; flex-direction: column; width: min(1060px, 100%); height: min(620px, 100%); border-radius: 20px; background: #fff; box-shadow: 0 30px 80px -24px rgba(0, 0, 0, .45), 0 0 0 1px rgba(0, 0, 0, .04); overflow: hidden; }
+.b .bh { flex: none; display: flex; align-items: center; gap: 16px; height: 68px; padding: 0 16px 0 24px; border-bottom: 1px solid var(--line); }
+.b .bh h2 { flex: none; width: 204px; margin: 0; font-size: 17px; font-weight: 600; }
+.b .bh .find { flex: 1; height: 40px; max-width: 520px; background: #F4F7F6; }
+.b .bh .find kbd { margin-left: auto; }
+.b .bh .close { position: static; margin-left: auto; background: none; }
+.b .bh .close:hover { background: var(--soft); }
+.b .bb { flex: 1; min-height: 0; display: flex; }
+.b .side { flex: none; width: 228px; display: flex; flex-direction: column; gap: 2px; padding: 14px 12px; border-right: 1px solid var(--line); }
+.b .cat { display: flex; align-items: center; gap: 10px; height: 36px; white-space: nowrap; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); font-size: 13.5px; text-align: left; cursor: pointer; }
+.b .cat:hover { background: #F4F7F6; color: var(--ink); }
+.b .cat[aria-pressed='true'] { background: #E8F3F0; color: var(--teal); font-weight: 600; }
+.b .cat em { margin-left: auto; font-style: normal; font-size: 12px; color: var(--mute); font-weight: 400; }
+.b .cat svg { width: 16px; height: 16px; flex: none; }
+.b .side hr { width: 100%; margin: 8px 0; border: 0; border-top: 1px solid var(--line); }
+.b .side .edit { margin-top: auto; border: 0; background: none; padding: 8px 10px; color: var(--teal); font-size: 13px; font-weight: 600; text-align: left; cursor: pointer; }
+.b .mid { flex: 1; min-width: 0; overflow-y: auto; padding: 8px 16px 20px; }
+.b .grp { margin: 14px 8px 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.b .list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 8px; }
+.b .row { position: relative; display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 10px; border: 0; border-radius: 10px; background: none; text-align: left; cursor: pointer; }
+.b .row:hover { background: #F4F7F6; }
+.b .row.on { background: #EEF6F3; }
+.b .row .g { width: 32px; height: 32px; border-radius: 9px; box-shadow: none; }
+.b .row .g i { width: 17px; height: 17px; }
+.b .row b { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b .row .arr { margin-left: auto; color: var(--mute); opacity: 0; transition: opacity .15s; }
+.b .row.on .arr, .b .row:hover .arr { opacity: 1; }
+.b .row .arr svg { width: 16px; height: 16px; }
+.b .detail { flex: none; width: 280px; display: flex; flex-direction: column; padding: 20px 20px 16px; border-left: 1px solid var(--line); background: #FAFBFB; }
+.b .dh { display: flex; align-items: center; gap: 12px; }
+.b .dh .g { width: 44px; height: 44px; border-radius: 12px; box-shadow: none; }
+.b .dh .g i { width: 23px; height: 23px; }
+.b .dh h3 { margin: 0; font-size: 17px; font-weight: 600; }
+.b .dh small { display: block; color: var(--mute); font-size: 12px; }
+.b .detail p { margin: 12px 0 16px; color: var(--ink-2); font-size: 13px; line-height: 1.5; }
+.b .detail .open { flex: none; height: 38px; margin-bottom: 18px; border: 0; border-radius: 10px; background: var(--teal); color: #fff; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.b .detail .open:hover { background: #18434B; }
+.b .detail .cap { margin: 0 0 6px; }
+.b .scr { display: flex; flex-direction: column; overflow-y: auto; margin: 0 -6px; }
+.b .scr button { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 8px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); font-size: 13.5px; text-align: left; cursor: pointer; }
+.b .scr button:hover { background: #EEF3F1; color: var(--ink); }
+.b .scr button::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #C9D6D1; flex: none; }
+.b .scr button:hover::before { background: var(--teal); }
+.b .scr button::after { content: '›'; margin-left: auto; color: var(--mute); }
+
+/* ══ C · COMMAND ══ */
+.c { position: relative; flex-direction: column; width: min(640px, 100%); max-height: min(560px, 100%); align-self: start; margin-top: 8vh; border-radius: 18px; background: #fff; box-shadow: 0 40px 100px -30px rgba(0, 0, 0, .55), 0 0 0 1px rgba(0,0,0,.05); overflow: hidden; }
+.c .in { display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 18px; border-bottom: 1px solid var(--line); }
+.c .in svg { width: 20px; height: 20px; color: var(--mute); }
+.c .in input { flex: 1; border: 0; outline: none; font-size: 17px; }
+.c .in kbd { padding: 2px 7px; border-radius: 6px; background: var(--soft); font: 11px Inter, sans-serif; color: var(--mute); }
+.c .res { flex: 1; overflow-y: auto; padding: 8px; }
+.c .grp { margin: 10px 10px 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.c .opt { display: flex; align-items: center; gap: 12px; width: 100%; height: 48px; padding: 0 10px; border: 0; border-radius: 10px; background: none; text-align: left; cursor: pointer; }
+.c .opt .g { width: 32px; height: 32px; border-radius: 9px; } .c .opt .g i { width: 17px; height: 17px; }
+.c .opt b { font-weight: 500; } .c .opt b mark { background: none; color: var(--teal); font-weight: 700; }
+.c .opt small { color: var(--mute); }
+.c .opt .k { margin-left: auto; font-size: 12px; color: var(--mute); opacity: 0; }
+.c .opt.on { background: #E9F3F0; } .c .opt.on .k { opacity: 1; }
+.c .foot { display: flex; gap: 16px; padding: 10px 16px; border-top: 1px solid var(--line); background: #FAFBFB; color: var(--mute); font-size: 12px; }
+.c .foot kbd { padding: 1px 5px; border-radius: 5px; background: #fff; box-shadow: 0 0 0 1px var(--line); font: 11px Inter, sans-serif; }
+</style>
+</head>
+<body>
+<div class="under"></div><div class="veil"></div>
+<div class="pick">
+  <b>All Modules · three ways</b>
+  <button data-v="a" aria-pressed="true">A · Launcher</button>
+  <button data-v="b" aria-pressed="false">B · Explorer</button>
+  <button data-v="c" aria-pressed="false">C · Command (⌘K)</button>
+  <span>Try it: type, hover, click · mockup</span>
+</div>
+<div class="stage">
+  <!-- A -->
+  <section class="v a on" data-var="a" aria-label="All modules">
+    <button class="close" data-x aria-label="Close"></button>
+    <div class="top"><h2>Modules</h2><label class="find"><span data-i="find"></span><input data-q="a" placeholder="Find a module" autocomplete="off"><kbd>/</kbd></label></div>
+    <div><div class="cap">Recent</div><div class="recent" data-recent></div></div>
+    <div class="grid" data-grid></div>
+    <div class="foot">20 modules · ← → ↑ ↓ to move, Enter to open<button>Edit Home modules</button></div>
+  </section>
+  <!-- B -->
+  <section class="v b" data-var="b" aria-label="All modules">
+    <header class="bh"><h2>Modules</h2><label class="find"><span data-i="find"></span><input data-q="b" placeholder="Search modules or screens" autocomplete="off"><kbd>/</kbd></label><button class="close" data-x aria-label="Close"></button></header>
+    <div class="bb">
+      <nav class="side" data-cats></nav>
+      <div class="mid" data-list></div>
+      <aside class="detail" data-detail></aside>
+    </div>
+  </section>
+  <!-- C -->
+  <section class="v c" data-var="c" aria-label="Go to a module">
+    <label class="in"><span data-i="find"></span><input data-q="c" placeholder="Go to a module or screen…" autocomplete="off"><kbd>Esc</kbd></label>
+    <div class="res" data-res></div>
+    <div class="foot"><span><kbd>↑</kbd> <kbd>↓</kbd> move</span><span><kbd>Enter</kbd> open</span><span><kbd>⌘K</kbd> anywhere</span></div>
+  </section>
+</div>
+<div class="toast" role="status"></div>
+
+<script>
+const A = '../assets/icon/'
+const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`
+const IC = { find: svg('<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/>'), x: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
+  all: svg('<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>'),
+  medical: svg('<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>'), animal: svg('<circle cx="7" cy="9" r="2"/><circle cx="17" cy="9" r="2"/><circle cx="10" cy="5" r="2"/><circle cx="14" cy="5" r="2"/><path d="M8 17a4 4 0 0 1 8 0c0 2-2 3-4 3s-4-1-4-3z"/>'),
+  operations: svg('<path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/>'), admin: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'), clock: svg('<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>') }
+const CATS = [['medical', 'Medical'], ['animal', 'Animal Management'], ['operations', 'Operations'], ['admin', 'Administration']]
+/* the launcher's twenty (modules.js, the ones with a page), with the shell's screens */
+const M = [
+  ['medical', 'Medical', 'medical', 'Treatments, procedures and clinical requests.', ['Dashboard', 'Medical Records', 'Prescriptions', 'Vaccination', 'Deworming', 'Clinical Assessment']],
+  ['hospital', 'Hospital', 'medical', 'Admissions, ward occupancy and active cases.', ['Dashboard', 'Admissions', 'Ward Occupancy', 'Active Cases', 'Discharges']],
+  ['pharmacy', 'Pharmacy', 'medical', 'Medicine requests, dispensing and stock levels.', ['Dashboard', 'Stock Report', 'Request', 'Returns', 'Shipments', 'Dispense', 'Inventory', 'Supplier']],
+  ['lab', 'Lab', 'medical', 'Sample tracking, diagnostics and results.', ['Dashboard', 'Sample Requests', 'Test Results', 'Reports']],
+  ['species', 'Species Management', 'animal', 'The living collection: species, animals, lineage.', ['Species List', 'Animals', 'Transfers', 'Circle of Life']],
+  ['mortality', 'Mortality', 'animal', 'Deaths, necropsy records and trends.', ['Deaths', 'Necropsy', 'Carcass Disposal', 'Reports']],
+  ['natality', 'Natality', 'animal', 'Births, neonates and natality trend.', ['Births', 'Neonates', 'Trends']],
+  ['fetal', 'Fetal Death', 'animal', 'Stillbirth and neonatal loss records.', ['Dashboard', 'Fetal Death Records', 'Add Fetal Death']],
+  ['eggs', 'Eggs', 'animal', 'Clutches, incubation and nursery.', ['Collected', 'Incubation', 'Hatched', 'Transferred', 'Discarded']],
+  ['housing', 'Housing', 'operations', 'Every site, section and enclosure.', ['Dashboard', 'Sites', 'Sections', 'Enclosures', 'Occupancy']],
+  ['diet', 'Diet & Kitchen', 'operations', 'Diet plans, kitchen output and feeds.', ['Dashboard', 'Diet Plans', 'Feed Schedule', 'Kitchen Stock']],
+  ['followup', 'Follow Up', 'operations', 'Scheduled rechecks and what is due.', ['Due Today', 'Upcoming', 'Overdue']],
+  ['parivesh', 'Parivesh', 'operations', 'Regulatory filings, permits and compliance.', ['Applications', 'Permits', 'Compliance']],
+  ['audit', 'Audit', 'operations', 'Audit trails, change history and findings.', ['Animal Audit', 'Inventory Audit', 'Findings']],
+  ['administer', 'Administer', 'admin', 'Sites, departments, roles and settings.', ['Sites', 'Departments', 'Roles & Permissions', 'Settings']],
+  ['users', 'Users', 'admin', 'Staff accounts, roles and access.', ['All Users', 'Add User', 'Roles', 'Activity Log']],
+  ['security', 'Security', 'admin', 'Gates, patrols and site access.', ['Gate Passes', 'Security Checks', 'Incidents']],
+  ['reports', 'Reports', 'admin', 'Every report in one place.', ['Animal Reports', 'Medical Reports', 'Scheduled', 'Exports']],
+  ['approvals', 'Approvals', 'admin', 'Requests waiting on you.', ['Pending', 'Approved', 'Rejected']],
+  ['communication', 'Communication', 'admin', 'Messages, groups and broadcasts.', ['Messages', 'Groups', 'Announcements']],
+]
+const RECENT = ['pharmacy', 'species', 'medical', 'eggs']
+const byId = Object.fromEntries(M.map((m) => [m[0], m]))
+const glyph = (id, cls = '') => `<span class="g ${cls}" style="--bg:var(--g-${id})"><i style="--m:url(${A}m-${id}.svg)"></i></span>`
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+const toastEl = document.querySelector('.toast'); let tt
+const go = (m, s) => { toastEl.textContent = `Opens ${byId[m][1]}${s ? ' › ' + s : ''}`; toastEl.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => toastEl.classList.remove('on'), 1600) }
+document.querySelectorAll('[data-i]').forEach((e) => (e.outerHTML = IC[e.dataset.i]))
+document.querySelectorAll('[data-x]').forEach((e) => { e.innerHTML = IC.x; e.onclick = () => { toastEl.textContent = 'Closes, back to Home'; toastEl.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => toastEl.classList.remove('on'), 1600) } })
+
+/* ── A ── */
+const gridA = document.querySelector('[data-grid]')
+document.querySelector('[data-recent]').innerHTML = RECENT.map((id) => `<button class="rc" data-m="${id}">${glyph(id)}${byId[id][1]}</button>`).join('')
+gridA.innerHTML = M.map(([id, n]) => `<button class="tile" data-m="${id}">${glyph(id)}<span>${n}</span></button>`).join('')
+document.querySelector('[data-q="a"]').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase()
+  gridA.querySelectorAll('.tile').forEach((t) => (t.hidden = !!q && !byId[t.dataset.m][1].toLowerCase().includes(q) && !byId[t.dataset.m][3].toLowerCase().includes(q)))
+})
+gridA.addEventListener('keydown', (e) => {
+  const ts = [...gridA.querySelectorAll('.tile:not([hidden])')], i = ts.indexOf(document.activeElement); if (i < 0) return
+  const d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 7, ArrowUp: -7 }[e.key]; if (!d) return
+  e.preventDefault(); ts[Math.max(0, Math.min(ts.length - 1, i + d))].focus()
+})
+document.querySelector('.a').addEventListener('click', (e) => { const b = e.target.closest('[data-m]'); if (b) go(b.dataset.m) })
+
+/* ── B ── */
+let catB = 'all', curB = 'medical'
+const side = document.querySelector('[data-cats]'), listB = document.querySelector('[data-list]'), det = document.querySelector('[data-detail]'), qB = document.querySelector('[data-q="b"]')
+const catName = (k) => CATS.find((c) => c[0] === k)?.[1]
+side.innerHTML = [['recent', 'Recent', IC.clock, RECENT.length], ['all', 'All modules', IC.all, M.length], 'hr', ...CATS.map(([k, n]) => [k, n, IC[k], M.filter((m) => m[2] === k).length])]
+  .map((x) => x === 'hr' ? '<hr>' : `<button class="cat" data-c="${x[0]}" aria-pressed="${x[0] === catB}">${x[2]}${x[1]}<em>${x[3]}</em></button>`).join('') + '<button class="edit">Edit Home modules</button>'
+const rowB = ([id, n]) => `<button class="row${id === curB ? ' on' : ''}" data-m="${id}">${glyph(id)}<b>${n}</b><span class="arr">${svg('<path d="m9 6 6 6-6 6"/>')}</span></button>`
+function drawB() {
+  const q = qB.value.trim().toLowerCase()
+  const hit = (m) => !q || (m[1] + ' ' + m[4].join(' ')).toLowerCase().includes(q)
+  let html = ''
+  if (catB === 'all' && !q) html = CATS.map(([k, n]) => `<div class="grp">${n}</div><div class="list">${M.filter((m) => m[2] === k).map(rowB).join('')}</div>`).join('')
+  else {
+    const ms = (catB === 'recent' ? RECENT.map((id) => byId[id]) : M.filter((m) => catB === 'all' || m[2] === catB)).filter(hit)
+    html = ms.length ? `<div class="grp">${q ? 'Results' : catB === 'recent' ? 'Recent' : catName(catB)}</div><div class="list">${ms.map(rowB).join('')}</div>` : '<p class="empty">No module or screen matches.</p>'
+  }
+  listB.innerHTML = html
+  drawDet()
+}
+function drawDet() {
+  const m = byId[curB], q = qB.value.trim().toLowerCase()
+  det.innerHTML = `<div class="dh">${glyph(m[0])}<div><h3>${m[1]}</h3><small>${catName(m[2])}</small></div></div><p>${m[3]}</p>` +
+    `<button class="open" data-open="${m[0]}">Open ${m[1]}</button><div class="cap">Go straight to</div>` +
+    `<div class="scr">${m[4].map((s) => `<button data-s="${esc(s)}">${q && s.toLowerCase().includes(q) ? `<b>${s}</b>` : s}</button>`).join('')}</div>`
+}
+side.addEventListener('click', (e) => { const b = e.target.closest('[data-c]'); if (!b) return; catB = b.dataset.c; side.querySelectorAll('[data-c]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); drawB() })
+listB.addEventListener('mouseover', (e) => { const r = e.target.closest('[data-m]'); if (r && r.dataset.m !== curB) { curB = r.dataset.m; listB.querySelectorAll('.row').forEach((x) => x.classList.toggle('on', x === r)); drawDet() } })
+listB.addEventListener('click', (e) => { const r = e.target.closest('[data-m]'); if (r) go(r.dataset.m) })
+det.addEventListener('click', (e) => { const s = e.target.closest('[data-s]'); if (s) return go(curB, s.dataset.s); if (e.target.closest('[data-open]')) go(curB) })
+qB.addEventListener('input', () => { const q = qB.value.trim().toLowerCase(); const first = q && M.find((m) => (m[1] + ' ' + m[4].join(' ')).toLowerCase().includes(q)); if (first) curB = first[0]; drawB() })
+drawB()
+
+/* ── C ── */
+const qC = document.querySelector('[data-q="c"]'), res = document.querySelector('[data-res]'); let sel = 0
+const hl = (t, q) => q ? esc(t).replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'ig'), '<mark>$1</mark>') : esc(t)
+function drawC() {
+  const q = qC.value.trim(), ql = q.toLowerCase(); let html = '', n = 0
+  const opt = (id, title, sub, s) => `<button class="opt" data-n="${n++}" data-m="${id}"${s ? ` data-s="${esc(s)}"` : ''}>${glyph(id)}<b>${hl(title, q)}</b><small>${sub}</small><span class="k">Enter ↵</span></button>`
+  if (!q) {
+    html += `<div class="grp">Recent</div>` + RECENT.map((id) => opt(id, byId[id][1], '· ' + CATS.find((c) => c[0] === byId[id][2])[1])).join('')
+    html += `<div class="grp">All modules</div>` + M.filter((m) => !RECENT.includes(m[0])).map((m) => opt(m[0], m[1], '· ' + CATS.find((c) => c[0] === m[2])[1])).join('')
+  } else {
+    const mods = M.filter((m) => m[1].toLowerCase().includes(ql)), scr = M.flatMap((m) => m[4].filter((s) => s.toLowerCase().includes(ql)).map((s) => [m, s]))
+    if (mods.length) html += `<div class="grp">Modules</div>` + mods.map((m) => opt(m[0], m[1], '· ' + m[3])).join('')
+    if (scr.length) html += `<div class="grp">Screens</div>` + scr.slice(0, 12).map(([m, s]) => opt(m[0], s, '· in ' + m[1], s)).join('')
+    if (!n) html = `<p class="empty">Nothing called “${esc(q)}”.</p>`
+  }
+  res.innerHTML = html; sel = 0; mark()
+}
+const mark = () => { const os = [...res.querySelectorAll('.opt')]; os.forEach((o, i) => o.classList.toggle('on', i === sel)); os[sel]?.scrollIntoView({ block: 'nearest' }) }
+qC.addEventListener('input', drawC)
+qC.addEventListener('keydown', (e) => {
+  const os = res.querySelectorAll('.opt')
+  if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(os.length - 1, sel + 1); mark() }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(0, sel - 1); mark() }
+  else if (e.key === 'Enter') { e.preventDefault(); os[sel]?.click() }
+})
+res.addEventListener('mousemove', (e) => { const o = e.target.closest('.opt'); if (o && +o.dataset.n !== sel) { sel = +o.dataset.n; mark() } })
+res.addEventListener('click', (e) => { const o = e.target.closest('.opt'); if (o) go(o.dataset.m, o.dataset.s) })
+drawC()
+
+/* switcher, ⌘K and / */
+const show = (v) => {
+  document.querySelectorAll('.pick button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === v)))
+  document.querySelectorAll('.v').forEach((x) => x.classList.toggle('on', x.dataset.var === v))
+  history.replaceState(null, '', '#' + v); document.querySelector(`[data-q="${v}"]`).focus()
+}
+document.querySelectorAll('.pick button').forEach((b) => (b.onclick = () => show(b.dataset.v)))
+addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); show('c') }
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); document.querySelector('.v.on input')?.focus() }
+})
+show(['a', 'b', 'c'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'a')
+</script>
+</body>
+</html>

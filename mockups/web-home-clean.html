@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web Home · Clean layouts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!--
+  THE WEB HOME, DECLUTTERED · three variations (owner, 8 Oct 2026: "Now Full
+  Conjasted Can u make 3 Variations. Neet and Clean").
+
+  What made the page crowded, and what all three answer:
+    · every band is the same loud weight — big photo tiles, a 411-tall notes
+      rail, a big announcement photo — so nothing leads;
+    · module tiles are 155 tall to carry one word and a glyph;
+    · the floating Quick Actions bar sits over the content;
+    · two right-hand cards and a grid compete side by side.
+  So: one clear order (glance → modules → work), modules as compact tiles,
+  numbers in a calm stat row, notes as a lighter rail, announcements as a
+  short list, more white space, and Quick Actions out of the content.
+    1 · Calm grid      today's two columns, quietened
+    2 · Sections       one column of titled sections, like a dashboard
+    3 · App sidebar    the modules become the left navigation, like the
+                       ANTZ web app's module pages
+  Same content in all three — the page's own modules, notes, favourites and
+  announcements — so the layouts compare, not the data.
+-->
+<style>
+:root {
+  --bg: #F3F6F5; --card: #fff; --ink: #1F2A30; --ink-2: #44544A; --mute: #6B7773; --line: #E4EAE7; --teal: #1F515B; --mint: #E6F4F1;
+  --r: 16px; --shadow: 0 1px 2px rgba(16, 45, 52, .05), 0 0 0 1px rgba(16, 45, 52, .04);
+  --g-medical: linear-gradient(135deg, #6FB28C, #2E8B57); --g-housing: linear-gradient(135deg, #7E9AA2, #44646E);
+  --g-species: linear-gradient(135deg, #4CA36C, #1E6B43); --g-administer: linear-gradient(135deg, #B2C2BA, #889D93);
+  --g-users: linear-gradient(135deg, #3F6B78, #234652); --g-mortality: linear-gradient(135deg, #F4A08A, #EE7457);
+  --g-security: linear-gradient(135deg, #9AA59F, #6A766F); --g-hospital: linear-gradient(135deg, #5A7F8B, #2F525D);
+  --g-diet: linear-gradient(135deg, #F79A6B, #E8613C); --g-eggs: linear-gradient(135deg, #6FD3E3, #2DB3D3);
+  --g-natality: linear-gradient(135deg, #7AD9CF, #2BB5A6); --g-pharmacy: linear-gradient(135deg, #45C9BD, #12A99B);
+  --g-lab: linear-gradient(135deg, #E3C98B, #C9A65A); --g-reports: linear-gradient(135deg, #4FD1C5, #22A99D);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+img { display: block; }
+
+/* the switcher above the three */
+.pick { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 8px; padding: 10px 24px; background: #1F2A30; color: #fff; }
+.pick b { margin-right: 12px; font-size: 14px; }
+.pick button { padding: 7px 14px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .1); color: #fff; font-size: 13px; cursor: pointer; }
+.pick button[aria-pressed='true'] { background: #fff; color: #1F2A30; font-weight: 600; }
+.pick span { margin-left: auto; opacity: .7; font-size: 12px; }
+.v { display: none; } .v.on { display: block; }
+
+/* ── shared parts ── */
+.hdr { display: flex; align-items: center; gap: 16px; padding: 18px 40px; }
+.hi { display: flex; align-items: center; gap: 12px; }
+.hi img { width: 44px; height: 44px; border-radius: 50%; background: #E6EEEB; }
+.hi small { display: block; color: var(--mute); font-size: 13px; }
+.hi b { font-size: 20px; font-weight: 600; color: #1F415B; }
+.search { display: flex; align-items: center; gap: 12px; height: 44px; width: 520px; margin-left: auto; padding: 0 16px; border-radius: 12px; background: var(--card); box-shadow: var(--shadow); color: var(--mute); }
+.search svg { width: 18px; height: 18px; }
+.ticker { display: flex; align-items: center; gap: 28px; height: 36px; padding: 0 40px; overflow: hidden; white-space: nowrap; background: #FBF8E6; border-block: 1px solid #F1EBC6; font-size: 13px; color: var(--ink-2); }
+.ticker .live { color: #E5484D; font-weight: 600; font-size: 11px; letter-spacing: .06em; }
+.ticker b { color: var(--ink); font-weight: 600; }
+.ticker .warn b { color: #E5484D; }
+.chips { display: flex; gap: 8px; }
+.chip { padding: 7px 14px; border: 0; border-radius: 999px; background: #E6ECEA; color: var(--ink-2); font-size: 13px; cursor: pointer; }
+.chip.on { background: var(--teal); color: #fff; }
+.h2 { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; }
+.h2 h2 { margin: 0; font-size: 16px; font-weight: 600; }
+.h2 .all { margin-left: auto; border: 0; background: none; color: var(--ink-2); font-size: 13px; cursor: pointer; }
+.h2 .all::after { content: ' »'; }
+.ico { width: 24px; height: 24px; background: #fff; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+.panel { padding: 20px; border-radius: var(--r); background: var(--card); box-shadow: var(--shadow); }
+
+/* module tiles, compact: a glyph chip and a name */
+.mods { display: grid; gap: 12px; }
+.mod { display: flex; align-items: center; gap: 12px; height: 72px; padding: 0 14px; border: 0; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); text-align: left; cursor: pointer; transition: box-shadow 160ms, transform 160ms; }
+.mod:hover { box-shadow: 0 8px 20px -10px rgba(16, 45, 52, .35); transform: translateY(-1px); }
+.mod .g { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--bgx); }
+.mod .g .ico { width: 22px; height: 22px; }
+.mod b { font-size: 14px; font-weight: 600; }
+.mod small { display: block; color: var(--mute); font-size: 12px; font-weight: 400; }
+.mod.add { justify-content: center; background: none; box-shadow: inset 0 0 0 1.5px #CFDAD6; color: var(--teal); font-weight: 600; }
+
+/* stat cards */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.stat { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); overflow: hidden; }
+.stat::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--acc); }
+.stat .lbl { display: flex; align-items: center; gap: 8px; color: var(--mute); font-size: 13px; }
+.stat .num { font-size: 28px; font-weight: 600; letter-spacing: -.02em; line-height: 1.1; }
+.stat .sub { color: var(--mute); font-size: 12px; }
+.stat .sub em { color: var(--acc); font-style: normal; font-weight: 600; }
+.seg { margin-left: auto; display: flex; gap: 2px; padding: 2px; border-radius: 8px; background: #F0F4F2; font-size: 11px; }
+.seg i { padding: 2px 6px; border-radius: 6px; font-style: normal; color: var(--mute); }
+.seg i.on { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+
+/* observation notes, lighter */
+.rail { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; }
+.rail::-webkit-scrollbar { display: none; }
+.note { flex: none; width: 250px; scroll-snap-align: start; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); overflow: hidden; cursor: pointer; }
+.note .ph { position: relative; height: 110px; background: var(--c) center / cover; }
+.note .pri { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #fff; font-size: 10px; font-weight: 800; }
+.note .bd { padding: 12px 14px 12px; }
+.note .tr { display: flex; justify-content: space-between; gap: 8px; }
+.note .tr b { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.note time { flex: none; color: var(--mute); font-size: 11px; }
+.note p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin: 6px 0 10px; color: var(--ink-2); font-size: 12.5px; }
+.note .ft { display: flex; align-items: center; gap: 10px; color: var(--mute); font-size: 12px; }
+.note .ft span:first-child { flex: 1; }
+.note .aid { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px 3px 3px; border-radius: 999px; background: #F2F6F4; color: var(--ink-2); font-size: 11px; }
+.note .aid img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; }
+/* a note as one row */
+.nrow { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.nrow:first-child { border-top: 0; padding-top: 0; }
+.nrow .ph { width: 56px; height: 56px; border-radius: 12px; background: var(--c) center / cover; position: relative; }
+.nrow .ph i { position: absolute; top: -3px; right: -3px; width: 12px; height: 12px; border: 2px solid #fff; border-radius: 50%; background: var(--p); }
+.nrow b { display: block; font-size: 14px; font-weight: 600; }
+.nrow span { display: block; color: var(--mute); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nrow time { align-self: start; color: var(--mute); font-size: 11px; }
+
+/* favourites, small */
+.favs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.fav { position: relative; aspect-ratio: 1; border-radius: 12px; background: var(--c) center / cover; overflow: hidden; }
+.fav::after { content: ''; position: absolute; inset: 40% 0 0; background: linear-gradient(transparent, rgba(0,0,0,.6)); }
+.fav span { position: absolute; left: 8px; right: 6px; bottom: 6px; z-index: 1; color: #fff; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* announcements as a short list */
+.ann { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.ann:first-of-type { border-top: 0; padding-top: 0; }
+.ann .ph { width: 64px; height: 64px; border-radius: 12px; background: var(--c) center / cover; }
+.ann .tag { font-size: 10px; font-weight: 600; letter-spacing: .06em; color: #12A69B; }
+.ann .tag.imp { color: #E5484D; }
+.ann b { display: block; margin: 2px 0; font-size: 13.5px; font-weight: 600; line-height: 1.35; }
+.ann small { color: var(--mute); font-size: 11px; }
+
+/* quick actions, docked out of the content */
+.dock { position: fixed; right: 32px; bottom: 28px; z-index: 20; display: flex; gap: 10px; }
+.dock button { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 18px; border: 0; border-radius: 999px; background: #1F2A30; color: #fff; font-weight: 600; box-shadow: 0 10px 24px -10px rgba(16, 45, 52, .6); cursor: pointer; }
+.dock .chat { width: 48px; padding: 0; justify-content: center; background: linear-gradient(135deg, #57B7CC, #6ECCC2); }
+.dock svg { width: 18px; height: 18px; }
+
+/* ══ 1 · CALM GRID ══ */
+.v1 .body { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; padding: 28px 40px 120px; max-width: 1480px; margin: 0 auto; }
+.v1 .main { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.v1 .top { display: flex; align-items: center; }
+.v1 .top .tools { margin-left: auto; display: flex; gap: 6px; }
+.v1 .mods { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.v1 .side { display: flex; flex-direction: column; gap: 20px; }
+.iconbtn { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 10px; background: #fff; box-shadow: var(--shadow); color: #1F6B43; cursor: pointer; }
+.iconbtn svg { width: 18px; height: 18px; }
+
+/* ══ 2 · SECTIONS ══ */
+.v2 .body { max-width: 1240px; margin: 0 auto; padding: 28px 40px 120px; display: flex; flex-direction: column; gap: 36px; }
+.v2 .row { display: flex; align-items: center; gap: 16px; }
+.v2 .mods { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.v2 .mods .mod { flex-direction: column; justify-content: center; gap: 8px; height: 104px; text-align: center; }
+.v2 .duo { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 24px; }
+.v2 .note { width: 240px; }
+
+/* ══ 3 · APP SIDEBAR ══ */
+.v3 { --side: 248px; }
+.v3 .app { display: grid; grid-template-columns: var(--side) minmax(0, 1fr); min-height: 100vh; }
+.v3 .nav { position: sticky; top: 44px; height: calc(100vh - 44px); display: flex; flex-direction: column; gap: 2px; padding: 20px 14px; background: #fff; border-right: 1px solid var(--line); overflow-y: auto; }
+.v3 .logo { display: flex; align-items: center; gap: 8px; margin: 0 8px 20px; color: #2E8B57; font-size: 22px; font-weight: 700; }
+.v3 .logo i { width: 28px; height: 30px; background: #2E8B57; -webkit-mask: url(../assets/img/antz-mark.svg) center / contain no-repeat; mask: url(../assets/img/antz-mark.svg) center / contain no-repeat; }
+.v3 .cap { margin: 16px 10px 6px; color: var(--mute); font-size: 11px; font-weight: 600; letter-spacing: .08em; }
+.v3 .it { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px; border: 0; border-radius: 10px; background: none; font-size: 14px; text-align: left; cursor: pointer; }
+.v3 .it:hover { background: #F2F6F4; }
+.v3 .it.on { background: var(--teal); color: #fff; }
+.v3 .it .g { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: var(--bgx); }
+.v3 .it .g .ico { width: 15px; height: 15px; }
+.v3 .it.on .g { background: rgba(255,255,255,.18); }
+.v3 .it svg { width: 18px; height: 18px; }
+.v3 .more { margin-top: auto; }
+.v3 .main { min-width: 0; }
+.v3 .hdr { padding: 18px 32px; background: transparent; }
+.v3 .hdr .qa { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--teal); color: #fff; font-weight: 600; cursor: pointer; }
+.v3 .hdr .qa svg { width: 18px; height: 18px; }
+.v3 .hdr .search { width: 420px; }
+.v3 .ticker { padding: 0 32px; }
+.v3 .content { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; padding: 24px 32px 60px; }
+.v3 .col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.v3 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+.pend { display: flex; flex-direction: column; }
+.pend div { display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.pend div:first-child { border-top: 0; padding-top: 0; }
+.pend b { font-weight: 600; } .pend b.over { color: #E5484D; }
+</style>
+</head>
+<body>
+<div class="pick">
+  <b>Web Home · clean layouts</b>
+  <button data-v="1" aria-pressed="true">1 · Calm grid</button>
+  <button data-v="2" aria-pressed="false">2 · Sections</button>
+  <button data-v="3" aria-pressed="false">3 · App sidebar</button>
+  <span>Same content in all three · mockup, not the live page</span>
+</div>
+
+<!-- ══════════════════ 1 · CALM GRID ══════════════════ -->
+<div class="v v1 on" data-var="1">
+  <header class="hdr"><div class="hi"><img src="../assets/img/avatar.png" alt=""><div><small>Good Afternoon,</small><b>Sourav Tambe 👋</b></div></div><label class="search" data-search></label></header>
+  <div class="ticker" data-ticker></div>
+  <div class="body">
+    <div class="main">
+      <div class="top"><div class="chips" data-chips></div><div class="tools"><button class="iconbtn" title="Add module" data-i="plus"></button><button class="iconbtn" title="Edit" data-i="pen"></button></div></div>
+      <section><div class="stats" data-stats></div></section>
+      <section><div class="h2"><h2>Modules</h2><button class="all">All modules</button></div><div class="mods" data-mods="8"></div></section>
+      <section><div class="h2"><h2>Observation Notes</h2><button class="all">View all</button></div><div class="rail" data-notes></div></section>
+    </div>
+    <aside class="side">
+      <div class="panel"><div class="h2"><h2>Favourites</h2><button class="all">View all</button></div><div class="favs" data-favs></div></div>
+      <div class="panel"><div class="h2"><h2>Announcements</h2><button class="all">View all</button></div><div data-anns></div></div>
+      <div class="panel"><div class="h2"><h2>Pending</h2><button class="all">View all</button></div><div class="pend" data-pend></div></div>
+    </aside>
+  </div>
+  <div class="dock"><button data-i="qa">Quick Actions</button><button class="chat" data-i="chat" aria-label="Chat"></button></div>
+</div>
+
+<!-- ══════════════════ 2 · SECTIONS ══════════════════ -->
+<div class="v v2" data-var="2">
+  <header class="hdr"><div class="hi"><img src="../assets/img/avatar.png" alt=""><div><small>Good Afternoon,</small><b>Sourav Tambe 👋</b></div></div><label class="search" data-search></label></header>
+  <div class="ticker" data-ticker></div>
+  <div class="body">
+    <div class="row"><div class="chips" data-chips></div></div>
+    <section><div class="h2"><h2>Today at a glance</h2></div><div class="stats" data-stats></div></section>
+    <section><div class="h2"><h2>Your modules</h2><button class="all">Edit</button></div><div class="mods" data-mods="11"></div></section>
+    <div class="duo">
+      <section><div class="h2"><h2>Observation Notes</h2><button class="all">View all</button></div><div class="rail" data-notes></div></section>
+      <section><div class="h2"><h2>Announcements</h2><button class="all">View all</button></div><div class="panel" data-anns></div></section>
+    </div>
+    <section><div class="h2"><h2>Favourites</h2><button class="all">View all</button></div><div class="favs" data-favs style="grid-template-columns:repeat(8,minmax(0,1fr))"></div></section>
+  </div>
+  <div class="dock"><button data-i="qa">Quick Actions</button><button class="chat" data-i="chat" aria-label="Chat"></button></div>
+</div>
+
+<!-- ══════════════════ 3 · APP SIDEBAR ══════════════════ -->
+<div class="v v3" data-var="3">
+  <div class="app">
+    <nav class="nav">
+      <div class="logo"><i></i>antz</div>
+      <button class="it on"><span data-i="home"></span>Home</button>
+      <div class="cap">MODULES</div>
+      <div data-navmods></div>
+      <button class="it more"><span data-i="grid"></span>All modules</button>
+    </nav>
+    <div class="main">
+      <header class="hdr"><div class="hi"><div><small>Good Afternoon,</small><b>Sourav Tambe 👋</b></div></div><label class="search" data-search></label><button class="qa"><span data-i="qa2"></span>Quick Actions</button><img src="../assets/img/avatar.png" alt="" style="width:40px;height:40px;border-radius:50%"></header>
+      <div class="ticker" data-ticker></div>
+      <div class="content">
+        <div class="col">
+          <div class="chips" data-chips></div>
+          <div class="stats" data-stats></div>
+          <section class="panel"><div class="h2"><h2>Observation Notes</h2><button class="all">View all</button></div><div class="rail" data-notes></div></section>
+          <div class="two">
+            <section class="panel"><div class="h2"><h2>Pending</h2><button class="all">View all</button></div><div class="pend" data-pend></div></section>
+            <section class="panel"><div class="h2"><h2>Recent notes</h2><button class="all">View all</button></div><div data-nrows></div></section>
+          </div>
+        </div>
+        <aside class="col">
+          <div class="panel"><div class="h2"><h2>Favourites</h2><button class="all">View all</button></div><div class="favs" data-favs></div></div>
+          <div class="panel"><div class="h2"><h2>Announcements</h2><button class="all">View all</button></div><div data-anns></div></div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const A = '../assets/'
+const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`
+const IC = {
+  search: svg('<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/>'), plus: svg('<path d="M12 5v14M5 12h14"/>'), pen: svg('<path d="M4 20h4L19 9l-4-4L4 16z"/>'),
+  home: svg('<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/>'), grid: svg('<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>'),
+  qa: svg('<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><path d="M17 14v6M14 17h6"/>') + 'Quick Actions',
+  qa2: svg('<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><path d="M17 14v6M14 17h6"/>'),
+  chat: svg('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>'),
+}
+const MODS = [
+  ['Medical', 'medical', 'Treatments & records'], ['Housing', 'housing', 'Sites & enclosures'], ['Species Management', 'species', '2,411 species'], ['Hospital', 'hospital', 'Admissions'],
+  ['Diet & Kitchen', 'diet', 'Plans & feeds'], ['Mortality', 'mortality', 'Deaths & necropsy'], ['Eggs', 'eggs', 'Clutches'], ['Users', 'users', 'Staff & roles'],
+  ['Pharmacy', 'pharmacy', 'Stock & dispense'], ['Security', 'security', 'Gates & checks'], ['Administer', 'administer', 'Settings'],
+]
+const NOTES = [
+  ['Deep Flank Wound', '03 Sep', 'url(' + A + 'img/v2-note-tiger.jpg)', '#E5484D', 'Found a 6cm laceration on the left flank during the morning check, still bleeding lightly.', 'Emerson Vance', 'Open Wound · Bleeding'],
+  ['Metal Work', '02 Sep', 'linear-gradient(180deg,#F38B72,#D45A43)', '#F06A4A', 'The lower rail on the north gate has rusted through where it meets the post.', 'Kai Vance', 'Rust · Structural'],
+  ['Coat Condition', '30 Aug', 'linear-gradient(180deg,#3DC2DD,#118AA6)', '#12A6C4', 'Slight thinning across the shoulders on four of the herd, most likely the seasonal moult.', 'Jordan Brenner', 'Grooming · Routine'],
+  ['Feed Refusal', '01 Sep', 'url(' + A + 'img/hero-leopard.jpg)', '#F06A4A', 'Third morning running that she has left the meat and taken only the browse.', 'Quinn Underwood', 'Appetite · Diet'],
+  ['Water Line Leak', '29 Aug', 'url(' + A + 'img/diet-kitchen.jpg)', '#12A6C4', 'The supply to the drinker in the outdoor run has been dripping since Tuesday.', 'Rowan Finch', 'Utilities · Enclosure'],
+]
+const FAVS = [['Slate Pangolin', 'species-b.jpg'], ['Glacial Egret', 'v3-parakeet.png'], ['Russet Whipsnake', 'species.jpg'], ['Marbled Phantom', 'focus-animal.jpg'], ['Bengal Tiger', 'v2-note-tiger.jpg'], ['Leopard', 'hero-leopard.jpg'], ['Cheetah', 'species-cheetahs.jpg'], ['Parakeet', 'v3-parakeet.png']]
+const ANNS = [
+  ['ANNOUNCEMENT', 'Zara and Kian, our leopard cubs, go on exhibit from Monday', 'Emerson Vance · 24 Aug', 'hero-leopard.jpg'],
+  ['IMPORTANT', 'Please follow all safety protocols carefully in every section', 'Vantara admin · 26 Aug', ''],
+  ['ANNOUNCEMENT', 'Quarterly health checks begin 7 September', 'Hospital team · 22 Aug', 'hospital.jpg'],
+]
+const STATS = [
+  ['Natality', '76', 'births · <em>+12%</em> vs last week', '#2BB5A6'], ['Mortality', '192', 'deaths · 30 days', '#EE7457'],
+  ['Pending actions', '319', 'deworming · <em>143 overdue</em>', '#E5484D'], ['Newly added', '643', 'animals this month', '#E8A33C'],
+]
+const PEND = [['Deworming', '319', 1], ['Vaccinations', '143', 1], ['Necropsy reports', '14,296'], ['Sexing', '28,532'], ['Microchipping', '20,302']]
+
+const fill = (sel, html) => document.querySelectorAll(sel).forEach((e) => (e.innerHTML = typeof html === 'function' ? html(e) : html))
+fill('[data-search]', IC.search + '<span>Search “Animals”, “Chitra”, “Users”</span>')
+fill('[data-ticker]', '<span class="live">● LIVE</span><span class="warn">⚠ Animal Audit Score <b>68%</b></span>' + ['Crimson Frosted 72%', 'Clearspring 64%', 'Hollowpine 81%', 'Foxglen 55%', 'Crimson Frosted 72%', 'Clearspring 64%'].map((t) => { const [n, p] = [t.replace(/ \d+%$/, ''), t.match(/\d+%/)[0]]; return `<span>${n} <b>${p}</b></span>` }).join(''))
+fill('[data-chips]', ['All sites', 'Crimson Frosted', 'Clearspring', 'Hollowpine', 'Foxglen'].map((c, i) => `<button class="chip${i ? '' : ' on'}">${c}</button>`).join(''))
+fill('[data-stats]', STATS.map(([l, n, s, c], i) => `<div class="stat" style="--acc:${c}"><div class="lbl">${l}${i < 2 ? '<span class="seg"><i class="on">7D</i><i>30D</i><i>30+</i></span>' : ''}</div><div class="num">${n}</div><div class="sub">${s}</div></div>`).join(''))
+fill('[data-mods]', (e) => MODS.slice(0, +e.dataset.mods - 1).map(([n, k, d]) => `<button class="mod" style="--bgx:var(--g-${k})"><span class="g"><i class="ico" style="--m:url(${A}icon/m-${k}.svg)"></i></span><span><b>${n}</b>${e.closest('.v2') ? '' : `<small>${d}</small>`}</span></button>`).join('') + '<button class="mod add">+ Add module</button>')
+fill('[data-notes]', NOTES.map(([t, d, c, p, n, by, tg]) => `<article class="note"><div class="ph" style="--c:${c}"><span class="pri" style="color:${p}">${p === '#E5484D' ? '🔥' : p === '#F06A4A' ? '!!!' : '!'}</span></div><div class="bd"><div class="tr"><b>${t}</b><time>${d}</time></div><p>${n}</p><div class="ft"><span>${by}</span><span class="aid"><img src="${A}img/obs-animal.png" alt="">190317</span></div></div></article>`).join(''))
+fill('[data-nrows]', NOTES.slice(0, 4).map(([t, d, c, p, n, by, tg]) => `<div class="nrow"><div class="ph" style="--c:${c};--p:${p}"><i></i></div><div><b>${t}</b><span>${tg} · ${by}</span></div><time>${d}</time></div>`).join(''))
+fill('[data-favs]', (e) => FAVS.slice(0, e.closest('.v2') ? 8 : 4).map(([n, f]) => `<div class="fav" style="--c:url(${A}img/${f})"><span>${n}</span></div>`).join(''))
+fill('[data-anns]', ANNS.map(([g, t, m, f]) => `<div class="ann"><div class="ph" style="--c:${f ? `url(${A}img/${f})` : 'linear-gradient(135deg,#FDE8E8,#F9C9C9)'}"></div><div><div class="tag${g === 'IMPORTANT' ? ' imp' : ''}">${g}</div><b>${t}</b><small>${m}</small></div></div>`).join(''))
+fill('[data-pend]', PEND.map(([l, n, o]) => `<div><span>${l}</span><b class="${o ? 'over' : ''}">${n}</b></div>`).join(''))
+fill('[data-navmods]', MODS.slice(0, 9).map(([n, k]) => `<button class="it" style="--bgx:var(--g-${k})"><span class="g"><i class="ico" style="--m:url(${A}icon/m-${k}.svg)"></i></span>${n}</button>`).join(''))
+document.querySelectorAll('[data-i]').forEach((e) => { const k = e.dataset.i; if (IC[k]) e.innerHTML = IC[k] })
+for (const b of document.querySelectorAll('.pick button')) b.onclick = () => {
+  document.querySelectorAll('.pick button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+  document.querySelectorAll('.v').forEach((v) => v.classList.toggle('on', v.dataset.var === b.dataset.v))
+  scrollTo(0, 0); history.replaceState(null, '', '#' + b.dataset.v)
+}
+const h = location.hash.slice(1); if (['1', '2', '3'].includes(h)) document.querySelector(`.pick button[data-v="${h}"]`).click()
+</script>
+</body>
+</html>

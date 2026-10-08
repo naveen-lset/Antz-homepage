@@ -13906,7 +13906,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261007f">
+<link rel="stylesheet" href="review.css?v=20261009b">
 </head>
 
 <style>
@@ -19353,6 +19353,11 @@ const SPAN_TABLE = {
      that short, and widening `full` would have halved the height of every
      card using it on four other pages. */
   band:   { 2: [2, 1], 4: [4, 1], 5: [5, 1], 8: [8, 1], 12: [12, 1] },
+  /* FOUR OF FIVE COLUMNS AT THREE ROWS · added 8 Oct 2026 (three since the
+     same day: the tablet's 411-tall note cards and their head need them) for the web's
+     Observation Notes ("Make it like This Much only, other we can have another
+     Module"): the rail leaves the fifth column to the modules beside it. */
+  wide:   { 2: [2, 3], 4: [4, 3], 5: [4, 3], 8: [6, 3], 12: [8, 3] },
   full:   { 2: [2, 2], 4: [4, 2], 5: [5, 2], 8: [8, 2], 12: [12, 2] },
 }
 
@@ -19431,7 +19436,7 @@ function currentColumns(el = document.documentElement) {
  * The picker offers exactly this and nothing else, which is how the brief's
  * "do not show unavailable sizes" rule is enforced in one place.
  */
-const SIZE_ORDER = ['small', 'medium', 'tall', 'large', 'full']
+const SIZE_ORDER = ['small', 'medium', 'tall', 'large', 'wide', 'full']
 
 function orderedSizes(supported) {
   return SIZE_ORDER.filter((s) => supported.includes(s))
@@ -19703,6 +19708,7 @@ const SIZE_LABELS = {
   medium: 'Medium',
   large:  'Large',
   tall:   'Tall',
+  wide:   'Wide',
   full:   'Full Width',
 }
 
@@ -22081,6 +22087,18 @@ const VARIANTS = [
   /* ══ NOTES ══════════════════════════════════════════════════════════════
      Node 250:6297. One note on a plate tinted with its priority, an indicator
      saying there are more behind it, and since 8 Sep 2026 five of them. */
+  /* ══ OBSERVATION NOTES, IN THE GRID · the web's (8 Oct 2026: "Observation
+     notes Can we Add in the Modules. Similer Like Tablet View") ══════════════
+     A frame only: the page's own Observation Notes band (#recentObs, with its
+     cards, its popup and its data) is moved into it on the web, the way the
+     web layout moves the other bands — so nothing is drawn twice. */
+  {
+    id: 'obs.rail', moduleId: 'notes', name: 'Observation Notes',
+    layout: 'obsslot', purpose: 'MONITOR',
+    passive: true,
+    supportedSizes: ['wide'], defaultSize: 'wide', priority: 'secondary',
+    data: {},
+  },
   {
     id: 'notes.recent', moduleId: 'notes', name: 'Notes',
     layout: 'note', purpose: 'MONITOR',
@@ -22772,28 +22790,36 @@ const V2_PHONE_LAYOUT = [
 ]
 const V2_PHONE_SEED = 1
 
-/* the web's six columns, first-fit into the mockup's four rows:
-     Medical · Housing · Species (2) · Administer · Users
-     Natality (2) · Hospital (2) · Pending (2×2, rows 2–3)
-     Diet (2) · Mortality · Security
-     Mortality insight (2) · Eggs (2) · Animals (2) */
+/* THE WEB'S CARDS ARE THE TABLET'S (owner, 8 Oct 2026: "Tablet View how
+   we are Showing same way"): V2_LAYOUT's list, at V2_LAYOUT's sizes, in four
+   columns at the tablet's 162:144 cell — the grid's sizing is in review.css.
+   Still stored apart (antz.home.layout.v2d), so arranging one leaves the other
+   alone. Seed 2 drops a web grid saved from the six-column mockup. */
+/* …AS FIGMA 918:24 "Desktop Home page" DRAWS IT (owner, 8 Oct 2026: "Implement
+   this design from Figma … For Web u can do like these"): four columns of
+   162 × 144 inside the Modules panel, first-fit into its four rows —
+     Medical · Housing · Pharmacy · Lab          (the frame's three Housing tiles
+                                                  are placeholders; the app's next doors)
+     Species (2) · Hospital photo (2)
+     Diet & Kitchen photo (2) · Administer · Mortality
+     Security · Users · Eggs
+   Observation Notes sits under the grid in the same panel and Pending in the
+   right column, so neither is a grid card here. Seed 5. */
 const V2_DESK_LAYOUT = [
   { variantId: 'medical.default',    size: 'small'  },
   { variantId: 'housing.default',    size: 'small'  },
+  { variantId: 'pharmacy.default',   size: 'small'  },
+  { variantId: 'lab.default',        size: 'small'  },
   { variantId: 'species.stats',      size: 'medium' },
-  { variantId: 'administer.default', size: 'small'  },
-  { variantId: 'users.default',      size: 'small'  },
-  { variantId: 'insight.natality',   size: 'medium' },
   { variantId: 'hospital.photo',     size: 'medium' },
-  { variantId: 'pending.v2',         size: 'tall'   },
   { variantId: 'diet.photo',         size: 'medium' },
+  { variantId: 'administer.default', size: 'small'  },
   { variantId: 'mortality.default',  size: 'small'  },
   { variantId: 'security.default',   size: 'small'  },
-  { variantId: 'insight.mortality',  size: 'medium' },
-  { variantId: 'eggs.default',       size: 'medium' },
-  { variantId: 'species.newcount',   size: 'medium' },
+  { variantId: 'users.default',      size: 'small'  },
+  { variantId: 'eggs.default',       size: 'small'  },
 ]
-const V2_DESK_SEED = 1
+const V2_DESK_SEED = 5
 
 /**
  * V3 · NODE 506:10213's OWN ORDER, ROW BY ROW.
@@ -33111,6 +33137,9 @@ const NOTE_PRIORITY = {
    ─────────────────────────────────────────────────────────────────────────── */
 
 const LAYOUTS = {
+
+  /* the web's Observation Notes frame: empty until the band is moved in */
+  obsslot: () => '<div class="obs-slot"></div>',
 
   /* A glyph and a name, pushed to opposite ends of the card — the artboard's
      own module tile, and the whole of a navigation card. No figures, no
@@ -45274,7 +45303,8 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
   const dwell = stack.querySelector('.adeck__dwell')
   const restartDwell = () => { dwell.style.animation = 'none'; void dwell.offsetWidth; dwell.style.animation = '' }
   function paint() {
-    order.forEach((ai, pos) => { const c = card(ai), p = Math.min(pos, 3); c.dataset.i = p; c.setAttribute('aria-hidden', String(pos !== 0)); c.tabIndex = pos === 0 ? 0 : -1 })
+    /* on the web the cards are a list, every one of them read and reachable (flat(), below) */
+    order.forEach((ai, pos) => { const c = card(ai), p = Math.min(pos, 3), live = pos === 0 || flat(); c.dataset.i = p; c.setAttribute('aria-hidden', String(!live)); c.tabIndex = live ? 0 : -1 })
     const f = order[0]
     root.querySelectorAll('.adeck__dots i').forEach((d, i) => d.classList.toggle('on', i === f))
     restartDwell()
@@ -45299,6 +45329,12 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
   const clock = (t) => { stack.style.setProperty('--adeck-ms', `${t.ms}ms`); stack.style.setProperty('--adeck-ease', t.ease) }
   const refocus = (from) => { if (document.activeElement === from) card(order[0]).focus({ preventScroll: true }) }
   const gone = (w) => `translateX(${-w * 1.1}px) rotate(-6deg)`
+  /* ON THE WEB THE DECK DOES NOT FLY (owner, 8 Oct 2026: "here announcements
+     Animetion not good. It has Only for Web Based"). In the narrow right-hand
+     rail a card flung 1.1 widths and tilted crossed the module grid. There the
+     turn is the stylesheet's: the leaver slides a little left as it fades, the
+     next slides in from the right (review.css, .v2d__rail .adeck). */
+  const flat = () => document.documentElement.hasAttribute('data-v2desk')
   /* the flight: fill forwards so the last frame holds while the deck's own
      transitions finish, then the animation is cancelled with the card
      already styled for where it landed — .is-flying has no transition, and
@@ -45313,7 +45349,7 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
     const c = card(order[0]), w = stack.clientWidth
     const turn = () => { order = [...order.slice(1), order[0]]; paint(); refocus(c) }
     c.classList.remove('is-dragging')
-    if (calm()) { c.style.transform = ''; return turn() }
+    if (calm() || flat()) { c.style.transform = ''; return turn() }
     const t = velocity ? { ms: Math.max(260, TURN.flick.ms - velocity * 120), ease: TURN.flick.ease } : TURN.auto
     clock(t)
     fly(c, [{ transform: c.style.transform || 'none', opacity: 1 }, { opacity: 1, offset: .8 }, { transform: gone(w), opacity: 0 }], t)
@@ -45330,7 +45366,7 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
     order = [order[order.length - 1], ...order.slice(0, -1)]
     const t = velocity ? { ms: Math.max(260, TURN.flick.ms - velocity * 120), ease: TURN.flick.ease } : TURN.auto
     clock(t); paint(); refocus(c)
-    if (!calm()) fly(p, from
+    if (!calm() && !flat()) fly(p, from
       ? [{ transform: from, opacity: 1 }, { transform: 'none', opacity: 1 }]
       : [{ transform: gone(w), opacity: 0 }, { opacity: 1, offset: .2 }, { transform: 'none', opacity: 1 }], t)
   }
@@ -45419,12 +45455,12 @@ function createAnnouncementDeck({ root, items = [], onViewAll, onOpen } = {}) {
     const openFront = (c) => onOpen(items[Number(c.dataset.ai)], c)
     stack.addEventListener('click', (e) => {
       const c = e.target.closest('.adeck__card')
-      if (!c || c.dataset.i !== '0' || performance.now() - dragAt < 350) return
+      if (!c || (c.dataset.i !== '0' && !flat()) || performance.now() - dragAt < 350) return
       openFront(c)
     })
     stack.addEventListener('keydown', (e) => {
       const c = e.target.closest?.('.adeck__card')
-      if (!c || c.dataset.i !== '0' || (e.key !== 'Enter' && e.key !== ' ')) return
+      if (!c || (c.dataset.i !== '0' && !flat()) || (e.key !== 'Enter' && e.key !== ' ')) return
       e.preventDefault(); openFront(c)
     })
   }
@@ -45818,6 +45854,7 @@ function ensure() {
   page.className = 'mpage'; page.hidden = true
   page.setAttribute('role', 'dialog'); page.setAttribute('aria-modal', 'true'); page.setAttribute('aria-labelledby', 'mpTitle')
   page.innerHTML =
+    `<div class="mweb" role="navigation" aria-label="ANTZ"></div>` +
     `<div class="mpage__bar"><button type="button" class="mpage__back" aria-label="Back">${I.back}${VI.back.replace('<svg ', '<svg class="vx-back" ')}</button>` +
       `<div class="mpage__head"><h2 class="mpage__title" id="mpTitle" tabindex="-1"></h2><span class="mpage__sub"></span></div>` +
       `<div class="mpage__right"></div></div>` +
@@ -45825,6 +45862,7 @@ function ensure() {
   document.body.append(page)
   body = page.querySelector('.mpage__body')
   page.querySelector('.mpage__back').addEventListener('click', back)
+  webBar()
   /* THE BAR'S OWN CONTROLS (29 Sep 2026): the bar is outside the body that
      wire() listens on, so the site picker there never opened. The site is
      every page's; anything else a page puts in its bar it names in `bar`. */
@@ -45835,6 +45873,7 @@ function ensure() {
   page.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !page.querySelector('.msheet:not([hidden])')) back() })
   /* every in-page link is a data-go; nothing needs its own handler to move */
   page.addEventListener('click', (e) => {
+    if (e.target.closest('[data-web-home]')) { home(); return }
     const a = e.target.closest('[data-go]'); if (!a || !page.contains(a)) return
     e.preventDefault(); go(a.dataset.go, { replace: a.hasAttribute('data-replace') })
   })
@@ -45849,13 +45888,26 @@ function go(path, { replace = false } = {}) {
   const h = `#m/${path}`
   if (!page || page.hidden) restore = document.activeElement
   if (location.hash === h) return render()
-  if (replace) history.replaceState(null, '', h)
-  else { history.pushState(null, '', h); pushed++ }
+  /* each entry carries its depth among the module pages, so Home knows how far back Home is
+     whatever the browser's own Back has done in between */
+  const md = history.state?.md || 0
+  if (replace) history.replaceState({ md }, '', h)
+  else { history.pushState({ md: md + 1 }, '', h); pushed++ }
   render()
 }
 function back() {
   if (pushed > 0) { pushed--; history.back(); return }
   close()
+}
+/* BACK TO HOME, from any depth (owner, 8 Oct 2026: "Inside Pharmacy Module I
+   want Back From Home Option too"): every page this visit pushed is unwound
+   in one step — popstate then finds no module page and closes — so the
+   browser's own Back does not walk into them again. */
+let homing = false
+function home() {
+  const d = history.state?.md || 0
+  if (d > 0) { homing = true; pushed = 0; history.go(-d); return }
+  pushed = 0; close()
 }
 function close() {
   if (!page) return
@@ -45866,7 +45918,11 @@ function close() {
   routeNow = null
   restore?.focus?.({ preventScroll: true }); restore = null
 }
-addEventListener('popstate', () => { if (parse()) render(); else if (page && !page.hidden) { pushed = 0; close() } })
+addEventListener('popstate', () => {
+  /* Home's unwind lands on the first module entry (or the page itself): close there */
+  if (homing) { homing = false; pushed = 0; if (page && !page.hidden) close(); return }
+  if (parse()) render(); else if (page && !page.hidden) { pushed = 0; close() }
+})
 
 async function render() {
   const r = parse(); if (!r) return
@@ -45882,6 +45938,7 @@ async function render() {
   /* a form or filter belongs to the page it was opened on */
   const open = page.querySelector('.msheet:not([hidden])'); if (open) { open.hidden = true; open.innerHTML = '' }
   const [mod, ...rest] = r.parts
+  noteRecent(mod)
   const view = (ROUTES[mod] || ROUTES.species)(rest, r.q)
   const key = r.parts.join('/') + '?' + new URLSearchParams(r.q)
   /* EACH MODULE WEARS ITS OWN SCREENS — owner, 29 Sep 2026: match the
@@ -45894,6 +45951,7 @@ async function render() {
   page.dataset.view = view.layout || ''
   page.dataset.tone = view.tone || ''
   setBar(view)
+  setWeb(mod, rest, view)
   barOn = view.bar || {}
   /* A FRESH BODY EVERY RENDER. Each page wires its listeners onto the body;
      reusing one element stacked every earlier render's listeners — with
@@ -48104,10 +48162,296 @@ ROUTES.eggs = (parts) => {
 /* ── the doors in ── */
 /* a home card's module → its page (V2 only; others keep their own door) */
 const MODULE_PAGE = { species: 'species', medical: 'medical', mortality: 'mortality', eggs: 'eggs', natality: 'species' }
+/* ON THE WEB EVERY MODULE IS A DOOR (owner, 8 Oct 2026: "Once I have
+   Selected It has to go to that Particuler ModulePage") — a built page where
+   there is one, else the module's own shell below. The tablet keeps its four. */
+const onWeb = () => document.documentElement.hasAttribute('data-v2desk')
+function pageOf(id) { return MODULE_PAGE[id] || (onWeb() && ROUTES[id] ? id : null) }
 function openFor(variant) {
-  const to = MODULE_PAGE[variant?.moduleId]
+  const to = pageOf(variant?.moduleId)
   if (!to) return false
   go(to); return true
+}
+function openModule(id) {
+  const to = pageOf(id)
+  if (!to) return false
+  go(to); return true
+}
+
+/* ── RECENT MODULES (owner, 8 Oct 2026: "Some Where Have to Show Recent
+   Module on Home") — the last six module pages opened, newest first, kept in
+   this browser; Home draws them (the web's Recent row) ── */
+const RECENT_KEY = 'antz.home.recentModules'
+function recentModules() {
+  try { const v = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); return Array.isArray(v) ? v : [] } catch { return [] }
+}
+function noteRecent(mod) {
+  const { MODULES } = __req('js/data/modules.js')
+  const id = mod === 'deaths' ? 'mortality' : mod
+  if (!MODULES.some((m) => m.id === id)) return
+  const list = [id, ...recentModules().filter((x) => x !== id)].slice(0, 6)
+  try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)) } catch {}
+  dispatchEvent(new CustomEvent('antz:recent-modules', { detail: list }))
+}
+
+/* ══ THE MODULE SHELL · the web's page for a module this build has not drawn
+   (owner, 8 Oct 2026, with the live Pharmacy dashboard as the picture): the
+   module's own screens down the left — its flows, as the ANTZ web app lists
+   them — and on the right its dashboard, or the screen picked. The screens
+   are named and reachable; what is inside each is the live app's, so each
+   says so instead of inventing records. ═════════════════════════════════ */
+const MOD_FLOWS = {
+  pharmacy:      ['Dashboard', 'Stock Report', 'Request', 'Returns', 'Dispatch without request', 'Shipments', 'Dispense', 'Products', 'Inventory', 'Add Existing Inventory', 'Stocks Adjustment', 'Reports', 'Supplier'],
+  hospital:      ['Dashboard', 'Admissions', 'Ward Occupancy', 'Active Cases', 'Critical Care', 'Discharges', 'Reports'],
+  lab:           ['Dashboard', 'Sample Requests', 'Sample Collection', 'Test Results', 'Lab Tests', 'Reports'],
+  fetal:         ['Dashboard', 'Fetal Death Records', 'Add Fetal Death', 'Reports'],
+  housing:       ['Dashboard', 'Sites', 'Sections', 'Enclosures', 'Occupancy', 'Transfers', 'Reports'],
+  diet:          ['Dashboard', 'Diet Plans', 'Feed Schedule', 'Kitchen Stock', 'Purchase Orders', 'Suppliers', 'Reports'],
+  followup:      ['Dashboard', 'Due Today', 'Upcoming', 'Overdue', 'Completed'],
+  parivesh:      ['Dashboard', 'Applications', 'Permits', 'Compliance', 'Documents'],
+  administer:    ['Dashboard', 'Sites', 'Departments', 'Roles & Permissions', 'Master Data', 'Settings'],
+  users:         ['Dashboard', 'All Users', 'Add User', 'Roles', 'Access Requests', 'Activity Log'],
+  audit:         ['Dashboard', 'Animal Audit', 'Inventory Audit', 'Audit Schedule', 'Findings', 'Reports'],
+  security:      ['Dashboard', 'Gate Passes', 'Security Checks', 'Incidents', 'Visitors', 'Reports'],
+  reports:       ['Dashboard', 'Animal Reports', 'Medical Reports', 'Inventory Reports', 'Scheduled Reports', 'Exports'],
+  approvals:     ['Dashboard', 'Pending', 'Approved', 'Rejected', 'Transfer Approvals', 'Helpdesk'],
+  communication: ['Dashboard', 'Messages', 'Groups', 'Announcements', 'Broadcasts'],
+}
+const slugOf = (t) => t.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+const SH_I = {
+  dash: svg('<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/>'),
+  grid: svg('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'),
+  item: svg('<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/>'),
+  open: svg('<path d="M7 17 17 7M9 7h8v8"/>'),
+}
+function shellRoute(id) {
+  return (parts) => {
+    const m = __req('js/data/modules.js').MODULES.find((x) => x.id === id) || { name: id, blurb: '' }
+    const name = m.name.replace(/[\u00AD]/g, '')
+    const flows = MOD_FLOWS[id]
+    const cur = flows.find((f) => slugOf(f) === (parts[0] || 'dashboard')) || flows[0]
+    const isDash = cur === flows[0]
+    const nav = flows.map((f) => {
+      const on = f === cur
+      return `<a class="msh__item" href="#m/${id}/${slugOf(f)}" data-go="${id}/${slugOf(f)}" data-replace${on ? ' aria-current="page"' : ''}>` +
+        `${f === 'Dashboard' ? SH_I.grid : SH_I.item}<span>${esc(f)}</span></a>`
+    }).join('')
+    const tiles = flows.slice(1).map((f) =>
+      `<a class="msh__tile" href="#m/${id}/${slugOf(f)}" data-go="${id}/${slugOf(f)}" data-replace><span>${esc(f)}</span>${SH_I.open}</a>`).join('')
+    const main = isDash
+      ? `<h1 class="msh__h">Welcome to your ${esc(name)} Dashboard</h1>` +
+        `<section class="msh__hero" style="--msh-g: var(${m.gradient || '--g-users'})">` +
+          (m.icon ? `<span class="msh__hero-ico"><img src="assets/icon/${m.icon}" alt=""></span>` : '') +
+          `<div><h2>${esc(name)}</h2><p>${esc(m.blurb || '')}</p></div></section>` +
+        `<h3 class="msh__sh">Go to</h3><div class="msh__tiles">${tiles}</div>`
+      : `<nav class="msh__crumbs"><a href="#m/${id}" data-go="${id}" data-replace>${esc(name)}</a><span>›</span><b>${esc(cur)}</b></nav>` +
+        `<h1 class="msh__h">${esc(cur)}</h1>` +
+        `<div class="msh__empty"><p><b>${esc(cur)}</b> opens in the ANTZ web app.</p><p>This preview names the screen and where it sits in ${esc(name)}; its records are not part of the preview.</p></div>`
+    return {
+      title: name, sub: isDash ? '' : cur, layout: 'msh',
+      html: `<div class="msh"><aside class="msh__nav" aria-label="${esc(name)}">` +
+        `<button type="button" class="msh__item msh__home" data-web-home>${SH_I.dash}<span>Home</span></button>` +
+        `<div class="msh__cap">${esc(name.toUpperCase())}</div>${nav}</aside>` +
+        `<main class="msh__main">${main}</main></div>`,
+    }
+  }
+}
+for (const id of Object.keys(MOD_FLOWS)) if (!ROUTES[id]) ROUTES[id] = shellRoute(id)
+
+/* ══ THE WEB BAR · one bar over every module page (owner, 8 Oct 2026: "when
+   I went Inside Home Button It Properly Placed, There Also I can Other
+   Modules It Will Redirect to that … Like now i have Pharmacy i want go to
+   the Hospital module it will open that thats All").
+   The way Odoo, Salesforce and Google Workspace do it: the logo is Home, in
+   the top-left corner, always; beside it the module you are in, and a click
+   on its name drops the module list — search, Recent, then every module by
+   category — so another module is one pick away and never a trip through
+   Home. A breadcrumb says where you are. Shown on the web only (review.css);
+   the tablet's pages keep their own bars and nothing here touches them. ══ */
+const WEB_I = {
+  home: svg('<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/>'),
+  down: svg('<path d="m6 9 6 6 6-6"/>'),
+  grid: svg('<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>'),
+  find: svg('<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/>'),
+  tick: svg('<path d="m5 12 5 5 9-10"/>'),
+}
+const modName = (m) => m.name.replace(/\u00AD/g, '')
+const webMods = () => __req('js/data/modules.js').MODULES.filter((m) => m.icon && pageOf(m.id))
+const idOfRoute = (mod) => (mod === 'deaths' ? 'mortality' : mod)
+let webNow = null
+function webBar() {
+  const bar = page.querySelector('.mweb')
+  bar.innerHTML =
+    `<button type="button" class="mweb__logo" data-web="home" aria-label="Home" title="Home"><i class="mweb__mark" aria-hidden="true"></i><span>antz</span></button>` +
+    `<div class="mweb__sw">` +
+      `<button type="button" class="mweb__mod" data-web="switch" aria-haspopup="dialog" aria-expanded="false" title="Switch module (⌘K)">` +
+        `<span class="mweb__g"></span><b class="mweb__name"></b>${WEB_I.down}</button>` +
+      `<div class="mweb__pop" role="dialog" aria-label="Switch module" hidden>` +
+        `<label class="mweb__find">${WEB_I.find}<input type="text" placeholder="Search modules" autocomplete="off" spellcheck="false" aria-label="Search modules"></label>` +
+        `<div class="mweb__list" role="listbox" aria-label="Modules"></div></div>` +
+    `</div>` +
+    `<nav class="mweb__crumbs" aria-label="Breadcrumb"></nav>`
+  const pop = bar.querySelector('.mweb__pop'), input = pop.querySelector('input'), list = pop.querySelector('.mweb__list'), sw = bar.querySelector('.mweb__mod')
+  const item = (m, on) => `<button type="button" class="mweb__it" role="option" data-mod="${m.id}" aria-selected="${on}" style="--mweb-g: var(${m.gradient})">` +
+    `<span class="mweb__ig"><img src="assets/icon/${m.icon}" alt=""></span><span class="mweb__in">${esc(modName(m))}</span>${on ? WEB_I.tick : ''}</button>`
+  function draw() {
+    const q = input.value.trim().toLowerCase(), all = webMods()
+    const hit = (m) => !q || modName(m).toLowerCase().includes(q) || (m.keywords || []).some((k) => k.includes(q))
+    let html = ''
+    if (!q) {
+      const rec = recentModules().map((id) => all.find((m) => m.id === id)).filter(Boolean).slice(0, 4)
+      if (rec.length) html += `<div class="mweb__cat">Recent</div><div class="mweb__row">${rec.map((m) => item(m, m.id === webNow)).join('')}</div>`
+    }
+    for (const c of __req('js/data/modules.js').CATEGORIES) {
+      const ms = all.filter((m) => m.category === c.id && hit(m)); if (!ms.length) continue
+      html += `<div class="mweb__cat">${esc(c.name)}</div><div class="mweb__row">${ms.map((m) => item(m, m.id === webNow)).join('')}</div>`
+    }
+    list.innerHTML = html || `<p class="mweb__none">No module called “${esc(input.value.trim())}”.</p>`
+  }
+  const open = () => { pop.hidden = false; sw.setAttribute('aria-expanded', 'true'); input.value = ''; draw(); input.focus() }
+  const shut = (focus = true) => { if (pop.hidden) return; pop.hidden = true; sw.setAttribute('aria-expanded', 'false'); if (focus) sw.focus() }
+  webBar.open = open
+  bar.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-web], [data-mod], [data-crumb]'); if (!t) return
+    if (t.dataset.web === 'home') { shut(false); home(); return }
+    if (t.dataset.web === 'switch') { pop.hidden ? open() : shut(); return }
+    if (t.dataset.mod) { shut(false); if (t.dataset.mod !== webNow) openModule(t.dataset.mod); return }
+    if (t.dataset.crumb === 'home') { home(); return }
+    if (t.dataset.crumb) go(t.dataset.crumb)
+  })
+  input.addEventListener('input', draw)
+  pop.addEventListener('keydown', (e) => {
+    const its = [...list.querySelectorAll('.mweb__it')], i = its.indexOf(document.activeElement)
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); shut() }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); its[Math.min(its.length - 1, i + 1)]?.focus() }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); (i <= 0 ? input : its[i - 1]).focus() }
+    else if (e.key === 'Enter' && document.activeElement === input) { e.preventDefault(); its[0]?.click() }
+  })
+  /* a click anywhere else closes it */
+  document.addEventListener('pointerdown', (e) => { if (!pop.hidden && !e.target.closest('.mweb__sw')) shut(false) })
+  /* ⌘K / Ctrl K opens it from anywhere in a module */
+  addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k' && page && !page.hidden && onWeb()) { e.preventDefault(); pop.hidden ? open() : shut() }
+  })
+}
+/* ══ THE MODULE EXPLORER · the web's All Modules (owner, 8 Oct 2026:
+   "Explorer is good … Ok Implement" — mockups/all-modules-web.html, B).
+   One header (title · search · close); the areas down the left — Recent,
+   All modules, then Medical, Animal Management, Operations, Administration;
+   the modules as a flat glyph and a name, grouped by area under All; and on
+   the right the module under the mouse: what it holds, Open, and its screens
+   to go straight to. Search finds modules and screens alike. Quick Actions
+   opens it on the web (the app's script); the tablet keeps its own panel. ══ */
+const BUILT_SCREENS = {
+  species:   [['Species list', 'species'], ['Unsexed animals', 'species?sort=unsexed'], ['Unchipped animals', 'species?sort=unchipped']],
+  medical:   [['Dashboard', 'medical'], ['Vaccination pending', 'medical/vaccination/pending'], ['Deworming pending', 'medical/deworming/pending']],
+  mortality: [['Dashboard', 'mortality'], ['Deaths', 'deaths'], ['Necropsy pending', 'necropsy/pending']],
+  natality:  [['Births', 'natality']],
+  eggs:      E_TABS.map(([k, l]) => [l, `eggs/${k}`]),
+}
+const screensOf = (id) => BUILT_SCREENS[id] || (MOD_FLOWS[id] || []).map((f) => [f, f === 'Dashboard' ? id : `${id}/${slugOf(f)}`])
+const MX_I = {
+  recent: svg('<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>'),
+  all: svg('<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>'),
+  medical: svg('<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>'),
+  animal: svg('<circle cx="7" cy="9" r="2"/><circle cx="17" cy="9" r="2"/><circle cx="10" cy="5" r="2"/><circle cx="14" cy="5" r="2"/><path d="M8 17a4 4 0 0 1 8 0c0 2-2 3-4 3s-4-1-4-3z"/>'),
+  operations: svg('<path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/>'),
+  admin: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
+  find: svg('<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/>'),
+  x: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
+  chev: svg('<path d="m9 6 6 6-6 6"/>'),
+}
+let mx = null
+function openExplorer() {
+  const { CATEGORIES } = __req('js/data/modules.js')
+  const all = webMods()
+  if (!mx) {
+    mx = document.createElement('div'); mx.className = 'mx'; mx.hidden = true
+    mx.innerHTML = `<div class="mx__scrim" data-mx="close"></div>` +
+      `<section class="mx__panel" role="dialog" aria-modal="true" aria-labelledby="mxTitle">` +
+        `<header class="mx__head"><h2 id="mxTitle">Modules</h2>` +
+          `<label class="mx__find">${MX_I.find}<input type="text" placeholder="Search modules or screens" autocomplete="off" spellcheck="false" aria-label="Search modules or screens"><kbd>/</kbd></label>` +
+          `<button type="button" class="mx__x" data-mx="close" aria-label="Close">${MX_I.x}</button></header>` +
+        `<div class="mx__body"><nav class="mx__side" aria-label="Areas"></nav><div class="mx__list"></div><aside class="mx__detail" aria-live="polite"></aside></div>` +
+      `</section>`
+    document.body.append(mx)
+  }
+  const side = mx.querySelector('.mx__side'), list = mx.querySelector('.mx__list'), det = mx.querySelector('.mx__detail'), input = mx.querySelector('input')
+  const catName = (k) => CATEGORIES.find((c) => c.id === k)?.name || ''
+  const recent = () => recentModules().map((id) => all.find((m) => m.id === id)).filter(Boolean)
+  let cat = 'all', cur = (recent()[0] || all[0]).id
+  const glyph = (m) => `<span class="mx__g" style="--mx-g: var(${m.gradient})"><img src="assets/icon/${m.icon}" alt=""></span>`
+  const hay = (m) => (modName(m) + ' ' + (m.keywords || []).join(' ') + ' ' + screensOf(m.id).map((x) => x[0]).join(' ')).toLowerCase()
+  function drawSide() {
+    const rows = [['recent', 'Recent', MX_I.recent, recent().length], ['all', 'All modules', MX_I.all, all.length], null,
+      ...CATEGORIES.map((c) => [c.id, c.name, MX_I[c.id] || MX_I.all, all.filter((m) => m.category === c.id).length]).filter((r) => r[3])]
+    side.innerHTML = rows.map((r) => r ? `<button type="button" class="mx__cat" data-cat="${r[0]}" aria-pressed="${r[0] === cat}">${r[2]}<span>${esc(r[1])}</span><em>${r[3]}</em></button>` : '<hr>').join('') +
+      `<button type="button" class="mx__edit" data-mx="edit">Edit Home modules</button>`
+  }
+  const row = (m) => `<button type="button" class="mx__row${m.id === cur ? ' is-on' : ''}" data-mod="${m.id}">${glyph(m)}<b>${esc(modName(m))}</b>${MX_I.chev}</button>`
+  function drawList() {
+    const q = input.value.trim().toLowerCase()
+    let html = ''
+    if (cat === 'all' && !q) html = CATEGORIES.map((c) => { const ms = all.filter((m) => m.category === c.id); return ms.length ? `<div class="mx__grp">${esc(c.name)}</div><div class="mx__rows">${ms.map(row).join('')}</div>` : '' }).join('')
+    else {
+      const ms = (cat === 'recent' ? recent() : all.filter((m) => cat === 'all' || m.category === cat)).filter((m) => !q || hay(m).includes(q))
+      html = ms.length ? `<div class="mx__grp">${q ? 'Results' : cat === 'recent' ? 'Recent' : esc(catName(cat))}</div><div class="mx__rows">${ms.map(row).join('')}</div>`
+        : `<p class="mx__none">${cat === 'recent' && !q ? 'Modules you open will appear here.' : 'No module or screen matches.'}</p>`
+    }
+    list.innerHTML = html
+  }
+  function drawDetail() {
+    const m = all.find((x) => x.id === cur); if (!m) { det.innerHTML = ''; return }
+    const q = input.value.trim().toLowerCase(), sc = screensOf(m.id)
+    det.innerHTML = `<div class="mx__dh">${glyph(m)}<div><h3>${esc(modName(m))}</h3><small>${esc(catName(m.category))}</small></div></div>` +
+      `<p>${esc(m.blurb || '')}</p><button type="button" class="mx__open" data-open="${m.id}">Open ${esc(modName(m))}</button>` +
+      (sc.length ? `<div class="mx__cap">Go straight to</div><div class="mx__scr">${sc.map(([l, to]) =>
+        `<button type="button" data-to="${esc(to)}"${q && l.toLowerCase().includes(q) ? ' class="is-hit"' : ''}>${esc(l)}</button>`).join('')}</div>` : '')
+  }
+  const drawAll = () => { drawSide(); drawList(); drawDetail() }
+  function shut() {
+    mx.classList.remove('is-on'); document.documentElement.classList.remove('mx-lock')
+    setTimeout(() => { if (!mx.classList.contains('is-on')) mx.hidden = true }, 180)
+    removeEventListener('keydown', key, true)
+  }
+  function key(e) {
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); shut() }
+    else if (e.key === '/' && document.activeElement !== input) { e.preventDefault(); input.focus() }
+    else if (e.key === 'Enter' && document.activeElement === input) { e.preventDefault(); list.querySelector('.mx__row')?.click() }
+  }
+  const pick = (to) => { shut(); setTimeout(() => go(to), 60) }
+  mx.onclick = (e) => {
+    const t = e.target
+    if (t.closest('[data-mx="close"]')) return shut()
+    if (t.closest('[data-mx="edit"]')) { shut(); return dispatchEvent(new CustomEvent('antz:edit-home')) }
+    const c = t.closest('[data-cat]'); if (c) { cat = c.dataset.cat; input.value = ''; return drawAll() }
+    const r = t.closest('[data-mod]'); if (r) { const to = pageOf(r.dataset.mod); if (to) pick(to); return }
+    const o = t.closest('[data-open]'); if (o) { const to = pageOf(o.dataset.open); if (to) pick(to); return }
+    const s = t.closest('[data-to]'); if (s) return pick(s.dataset.to)
+  }
+  list.onmouseover = (e) => { const r = e.target.closest('[data-mod]'); if (r && r.dataset.mod !== cur) { cur = r.dataset.mod; list.querySelectorAll('.mx__row').forEach((x) => x.classList.toggle('is-on', x === r)); drawDetail() } }
+  input.oninput = () => { const q = input.value.trim().toLowerCase(); const f = q && all.find((m) => hay(m).includes(q)); if (f) cur = f.id; drawList(); drawDetail() }
+  input.value = ''; drawAll()
+  mx.hidden = false; document.documentElement.classList.add('mx-lock')
+  requestAnimationFrame(() => { mx.classList.add('is-on'); input.focus() })
+  addEventListener('keydown', key, true)
+}
+
+function setWeb(mod, rest, view) {
+  const bar = page.querySelector('.mweb'); if (!bar) return
+  const id = idOfRoute(mod), m = __req('js/data/modules.js').MODULES.find((x) => x.id === id)
+  webNow = m ? m.id : null
+  const name = m ? modName(m) : (view.title || '')
+  bar.querySelector('.mweb__name').textContent = name
+  const g = bar.querySelector('.mweb__g')
+  g.style.setProperty('--mweb-g', m ? `var(${m.gradient})` : 'var(--d-teal, #1F515B)')
+  g.innerHTML = m?.icon ? `<img src="assets/icon/${m.icon}" alt="">` : WEB_I.grid
+  const deep = rest.length > 0, sub = deep ? (view.sub && view.sub !== name ? view.sub : view.title !== name ? view.title : '') : ''
+  bar.querySelector('.mweb__crumbs').innerHTML =
+    `<button type="button" data-crumb="home">Home</button><i>›</i>` +
+    (sub ? `<button type="button" data-crumb="${esc(mod)}">${esc(name)}</button><i>›</i><b>${esc(sub)}</b>` : `<b>${esc(name)}</b>`)
+  bar.querySelector('.mweb__pop').hidden = true
+  bar.querySelector('.mweb__mod').setAttribute('aria-expanded', 'false')
 }
 /* a Pending Actions row → the exact list it counts */
 const PENDING_TO = { vaccination: 'medical/vaccination/pending', deworming: 'medical/deworming/pending', admin: 'medical', necropsy: 'necropsy/pending',
@@ -48661,6 +49005,9 @@ function boot() { if (parse()) render() }
 
   __x.go = go;
   __x.openFor = openFor;
+  __x.openModule = openModule;
+  __x.openExplorer = openExplorer;
+  __x.recentModules = recentModules;
   __x.PENDING_TO = PENDING_TO;
   __x.INSIGHT_TO = INSIGHT_TO;
   __x.useSite = useSite;
@@ -51225,7 +51572,10 @@ function esc(v) {
    BOTH PANELS ARE STILL FULLY DRAWN AND STILL STYLED — the launcher's rules
    all hang off `.qa--modules`, the verbs' off `.qa-act` — so either reading
    is one word here. See the note at --qa-mod-w in the stylesheet. */
-const QA_CONTENT = 'verbs'
+/* …AND ON THE WEB IT IS THE MODULES (owner, 8 Oct 2026: "if i click it has
+   to More Moduls" — the all-modules grid). data-v2desk is set in the head,
+   before this runs; the tablet and phone keep the verbs. */
+const QA_CONTENT = document.documentElement.dataset.home === 'v2' && 'v2desk' in document.documentElement.dataset ? 'modules' : 'verbs'
 
 /* THE NINETEEN, IN THE APP'S OWN ORDER. `DOORS` decides membership rather
    than any shape test on MODULES — `insights` is structurally identical to a
@@ -51238,6 +51588,7 @@ const QA_CONTENT = 'verbs'
    panel, and no error to point at it. */
 const DOOR_IDS = new Set(DOORS.map((d) => d.moduleId))
 const QA_MODULES = MODULES.filter((m) => DOOR_IDS.has(m.id) && m.icon)
+const QA_CATS = __req('js/data/modules.js').CATEGORIES
 
 /* ══ V2 · THE PANEL KNOWS WHERE IT IS ACTING · 23 September 2026 ═══════════
  * Two ideas, built as one because separately neither is worth the surface:
@@ -51482,13 +51833,18 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
            `--qa-i` / `--qa-i-r` went the same way with the per-tile flight on
            10 Sep. The ink is white on all nineteen, as it has been since that
            ruling; what the glass costs is recorded at `.qa-mod`. */
-        ? QA_MODULES.map((m) => {
+        /* …grouped under the four categories, each tile wearing its module's
+           colour and one line of what it holds (owner, 8 Oct 2026: "Here have
+           to Show Propre Modules Selection") — the web's launcher; the style
+           is review.css's and reaches nowhere else */
+        ? QA_CATS.flatMap((c) => [`<h3 class="qa-mod-cat">${c.name}</h3>`, ...QA_MODULES.filter((m) => m.category === c.id).map((m) => {
             return `<button type="button" class="qa-mod" role="menuitem"` +
-              ` data-module="${m.id}">` +
+              ` data-module="${m.id}" style="--qa-mod-g: var(${m.gradient})">` +
               `<span class="qa-mod__g"><img src="assets/icon/${m.icon}" alt=""></span>` +
               `<span class="qa-mod__t">${m.name}</span>` +
+              `<span class="qa-mod__d">${m.blurb || ''}</span>` +
             '</button>'
-          }).join('')
+          })]).join('')
         /* ── TWO COLUMNS OF CATEGORIES · 635:21413 ──────────────────────
            The column each category sits in is DATA and not the order — see
            the note in js/data/quickActions.js. Both columns are emitted even
@@ -52999,15 +53355,39 @@ if (PAGE_VERSION === '1' || hasV4Top()) {
    the disc there would be inventing an intent the frame does not state. It
    announces instead, which is what the sixteen verbs beside it do. */
 const { createQuickActions } = __req('js/components/QuickActions.js')
+function openModuleDoor(id) {
+  if (__req('js/components/ModulePages.js').openModule(id)) return
+  const m = __req('js/data/modules.js').MODULES.find((x) => x.id === id)
+  const { variantsForModule, getVariant } = __req('js/data/cardVariants.js')
+  const vs = variantsForModule(id)
+  const v = getVariant(`${id}.default`) || vs.find((x) => x.purpose === 'NAVIGATE') || vs[0]
+  if (v && __req('js/components/ModulePages.js').openFor(v)) return
+  if (m?.href) { window.open(m.href, '_blank', 'noopener'); return }
+  if (v) activateCard(v)
+}
+/* ON THE WEB QUICK ACTIONS OPENS THE MODULE EXPLORER (8 Oct 2026) — taken in
+   the capture phase, before the pill's own panel can open; the tablet's pill
+   is untouched. "Edit Home modules" in it lands on the Modules, as the panel's
+   Edit Modules did. */
+document.addEventListener('click', (e) => {
+  if (!e.target.closest?.('.qa-pill') || !document.documentElement.hasAttribute('data-v2desk')) return
+  e.preventDefault(); e.stopPropagation()
+  __req('js/components/ModulePages.js').openExplorer()
+}, true)
+addEventListener('antz:edit-home', () => { if (!edit.editing) edit.enter() })
+/* a card of the catalogue drawn outside the grid (the web's Pending, in the right column) */
+window.__antzCard = (id, opts) => { const v = __req('js/data/cardVariants.js').getVariant(id); return v ? __req('js/components/ModuleCard.js').renderCard(v, opts) : null }
 const quickActions = createQuickActions({
   root: document.getElementById('quickActions'),
   /* `a.where` IS V2'S WHOLE POINT MADE VISIBLE. Without it the console says
      "Dispense Medicine" and a reader cannot tell whether the binding did
      anything at all; with it, it says which enclosure the record would have
      been filed against, which is the part the panel just saved them typing. */
-  onAction: (a) => console.info(
+  /* a module tile (the web's launcher) opens that module, as the Modules
+     list's rows do: its page if this build has one, its link, or its card */
+  onAction: (a) => (a.kind === 'module' ? openModuleDoor(a.id) : console.info(
     `[antz] quick action: ${a.label} (${a.id})` +
-    `${a.where ? ` · on ${a.where}` : ''} — no flow built yet`),
+    `${a.where ? ` · on ${a.where}` : ''} — no flow built yet`)),
   /* V2: the disc opens Communication, laid out as WhatsApp is on an iPad
      (owner, 1 Oct 2026) — ChatPage.js. The other versions still announce. */
   onChat: () => (isV2() ? __req('js/components/ChatPage.js').openChat(document.querySelector('.qa-chat'))
@@ -56472,7 +56852,30 @@ __req('js/components/Clock.js').mount();
   var RAIL = ['favSpecies', 'heroStage', 'recentObs']
   var panel = document.getElementById('panel-modules')
   if (!panel) return
-  var wrap, main, rail, order = null, busy = false
+  var wrap, main, rail, order = null, busy = false, obsBand = null
+  /* Figma 918:24: the notes band closes the Modules panel, under the grid */
+  function homeObs() {
+    obsBand = obsBand || document.getElementById('recentObs')
+    var grid = document.getElementById('moduleGrid')
+    if (!obsBand || !grid) return false
+    if (grid.nextElementSibling !== obsBand) grid.after(obsBand)
+    return true
+  }
+  /* …and Pending is a card of the right column, between the favourites and
+     the announcements: the catalogue's own card, drawn here once */
+  var pend = null
+  function homePending() {
+    if (!pend) {
+      /* the app's module script exposes its card renderer as window.__antzCard; it
+         may run after this one, so wait for it */
+      var card = window.__antzCard && window.__antzCard('pending.v2', { size: 'xtall', w: 2, h: 3, uid: 'v2dpend' })
+      if (!card) { if ((homePending.tries = (homePending.tries || 0) + 1) < 40) setTimeout(function () { if (DESK.matches) sort() }, 150); return }
+      pend = document.createElement('section'); pend.id = 'v2dPending'; pend.className = 'v2d-pend'
+      pend.append(card)
+    }
+    var fav = document.getElementById('favSpecies')
+    if (fav && fav.parentNode === rail && fav.nextElementSibling !== pend) fav.after(pend)
+  }
   var kids = function (el) { return Array.prototype.slice.call(el.children) }
   function sort() {
     busy = true
@@ -56486,23 +56889,26 @@ __req('js/components/Clock.js').mount();
     if (!order) order = kids(panel)
     var strip = document.getElementById('healthStrip')
     if (!wrap.parentNode) panel.append(wrap)
-    if (strip && strip.nextElementSibling !== wrap) wrap.before(strip)
-    RAIL.forEach(function (id) { var el = document.getElementById(id); if (el && el.parentNode !== rail) rail.append(el) })
+    if (strip && strip.nextElementSibling !== wrap && !(strip.nextElementSibling && /^siteTabs/.test(strip.nextElementSibling.id))) wrap.before(strip)
+    RAIL.forEach(function (id) { var el = document.getElementById(id); if (el && el.parentNode !== rail && !(id === 'recentObs' && homeObs())) rail.append(el) })
     /* everything else the panel holds (or gains later, like the site tabs)
        goes to the left column, in the order it stands */
     kids(panel).concat(kids(rail)).forEach(function (el) {
-      if (el === wrap || el === strip || RAIL.indexOf(el.id) >= 0) return
+      if (el === wrap || el === strip || el === pend || RAIL.indexOf(el.id) >= 0 || /^siteTabs/.test(el.id)) return
       if (order.indexOf(el) < 0) order.push(el)
-      if (/^siteTabs/.test(el.id)) main.prepend(el); else main.append(el)   /* the chips head the column */
+      main.append(el)
     })
-    /* the chips sit under the Modules head; the search row joins the header's row */
-    var tabs = document.getElementById('siteTabsV2'), mh = document.getElementById('modulesHead')
-    if (tabs && mh && mh.nextElementSibling !== tabs) mh.after(tabs)
+    homePending()
+    /* the chips run above both columns (Figma 918:24 "Site Tabs"); the search row joins the header's row */
+    var tabs = document.getElementById('siteTabsV2')
+    if (tabs && tabs.nextElementSibling !== wrap) wrap.before(tabs)
+    /* the ticker keeps its place above the chips (each move is checked first, or the panel's observer would loop) */
+    if (strip && tabs && strip.nextElementSibling !== tabs) tabs.before(strip)
     var hdr = document.querySelector('.home-header'), sr = document.querySelector('.search-row'), acts = hdr && hdr.querySelector('.header-actions')
     if (sr && acts && sr.nextElementSibling !== acts) acts.before(sr)
     /* the favourites are called Favourites here, with a View all (the picker of every favourite) */
     var ft = document.getElementById('favTitle'), fh = ft && ft.parentNode
-    if (ft && !ft.dataset.was) { ft.dataset.was = ft.textContent; ft.textContent = 'Favourites' }
+    if (ft && !ft.dataset.was) { ft.dataset.was = ft.textContent; ft.textContent = 'Favourites Animals' }
     if (fh && !fh.querySelector('.v2d-all')) {
       var all = document.createElement('button'); all.type = 'button'; all.className = 'v2d-all'; all.textContent = 'View all'
       all.addEventListener('click', function () { var e = fh.querySelector('.fav__edit'); if (e) e.click() })
@@ -56525,6 +56931,7 @@ __req('js/components/Clock.js').mount();
     var ft = document.getElementById('favTitle')
     if (ft && ft.dataset.was) { ft.textContent = ft.dataset.was; delete ft.dataset.was }
     var va = document.querySelector('.v2d-all'); if (va) va.remove()
+    if (pend) pend.remove()
     wrap.remove()
     order = null
     busy = false
@@ -56537,8 +56944,45 @@ __req('js/components/Clock.js').mount();
      whatever arrives in the panel (or lands in the rail) while this is on */
   var mo = new MutationObserver(function () { if (DESK.matches && !busy) sort() })
   mo.observe(panel, { childList: true })
+  /* the grid redraws its cards (an edit, a swap): re-home the band */
+  var grid = document.getElementById('moduleGrid')
+  if (grid) new MutationObserver(function () { if (DESK.matches && !busy) { busy = true; homeObs(); busy = false } }).observe(grid, { childList: true, subtree: true })
   DESK.addEventListener('change', apply)
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply); else apply()
+  /* THE FAVOURITES SCROLL WITH A MOUSE TOO (owner, 8 Oct 2026: "Its Not
+     Scrolling"). A trackpad's sideways swipe always worked; a mouse wheel only
+     scrolls up and down, which moved the page, and the Mac hides the bar. So
+     on the web, over the rail, the wheel turns it sideways — until it reaches
+     an end, when the page has the wheel back — and a mouse can drag it. */
+  document.addEventListener('wheel', function (e) {
+    if (!DESK.matches || e.ctrlKey) return
+    var r = e.target.closest && e.target.closest('.v2d__rail .fav__rail, .v2d__main .obs-rail'); if (!r) return
+    var dy = e.deltaY, max = r.scrollWidth - r.clientWidth
+    if (!dy || Math.abs(e.deltaX) > Math.abs(dy) || max <= 0) return
+    if ((dy < 0 && r.scrollLeft <= 0) || (dy > 0 && r.scrollLeft >= max - 1)) return
+    e.preventDefault(); r.scrollBy({ left: dy, behavior: 'auto' })
+  }, { passive: false })
+  var drag = null
+  document.addEventListener('pointerdown', function (e) {
+    if (!DESK.matches || e.pointerType !== 'mouse' || e.button !== 0) return
+    var r = e.target.closest && e.target.closest('.v2d__rail .fav__rail, .v2d__main .obs-rail'); if (!r || r.scrollWidth <= r.clientWidth) return
+    drag = { r: r, x: e.clientX, left: r.scrollLeft, moved: false }
+  })
+  addEventListener('pointermove', function (e) {
+    if (!drag) return
+    var dx = e.clientX - drag.x
+    if (!drag.moved && Math.abs(dx) < 5) return
+    if (!drag.moved) { drag.moved = true; drag.r.style.scrollSnapType = 'none'; drag.r.classList.add('is-dragging') }
+    drag.r.scrollLeft = drag.left - dx
+  })
+  addEventListener('pointerup', function () {
+    if (!drag) return
+    var d = drag; drag = null
+    if (!d.moved) return
+    d.r.classList.remove('is-dragging'); d.r.style.scrollSnapType = ''
+    /* a drag is not a tap: the card under the mouse does not open */
+    addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault() }, { capture: true, once: true })
+  })
 })()
 </script>
 <script>

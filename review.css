@@ -530,9 +530,11 @@ html:root[data-review][data-home='v2'] .kins { display: none; }
    are V2_DESK_LAYOUT. Every rule carries the full prefix so it outranks the
    tablet's, and nothing here reaches a page without data-v2desk. */
 html:root[data-review][data-home='v2'][data-v2desk] {
-  --max-content: 1376px; --grid-cols: 6; --grid-row: 150px; --grid-gap: 12px;
+  --max-content: 1376px; --grid-cols: 5; --grid-gap: 16px;  /* the tablet's cards (8 Oct 2026), five across so they sit smaller ("reduce the Card") */
   --d-ink: #1F2A30; --d-ink-2: #44544A; --d-mute: #6B7773; --d-line: #E3E9E6; --d-teal: #1F515B;
 }
+/* the row keeps the tablet's 162:144 cell at five columns (the tablet's own rule divides by four) */
+html:root[data-review][data-home='v2'][data-v2desk] #moduleGrid { --grid-row: calc((100cqw - 64px) / 5 / 1.125); }
 /* the page's ground goes on the root: the sky band sits at z -1, under any body background */
 html:root[data-review][data-home='v2'][data-v2desk] { background: #EFF5F2; }
 html:root[data-review][data-home='v2'][data-v2desk] body { background: transparent; }
@@ -562,15 +564,15 @@ html:root[data-review][data-home='v2'][data-v2desk] .home-header .search-btn { w
 html:root[data-review][data-home='v2'][data-v2desk] .main-frame { padding-top: 0; }
 
 /* ── the ticker over both columns, then the two ── */
-html:root[data-review][data-home='v2'][data-v2desk] #panel-modules > .hstrip { margin-top: 16px; }
-html:root[data-review][data-home='v2'][data-v2desk] .v2d { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 28px; align-items: start; margin-top: 20px; }
+html:root[data-review][data-home='v2'][data-v2desk] #panel-modules > .hstrip { margin-top: 24px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 40px; align-items: start; margin-top: 32px; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d__main { min-width: 0; display: flex; flex-direction: column; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d__main > .modules-band { margin: 0; padding: 0; }
-html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail > * { margin: 0; flex: none; }
 
 /* ── LEFT · Modules: the head, the chips, the banner, the grid ── */
-html:root[data-review][data-home='v2'][data-v2desk] #modulesHead { min-height: 32px; height: auto; margin: 0 0 12px; padding: 0; }
+html:root[data-review][data-home='v2'][data-v2desk] #modulesHead { min-height: 32px; height: auto; margin: 0 0 16px; padding: 0; }
 html:root[data-review][data-home='v2'][data-v2desk] #modulesTitle { font-size: 16px; font-weight: 600; line-height: normal; color: var(--d-ink); }
 html:root[data-review][data-home='v2'][data-v2desk] .modules-band .site-tabs--v2 {
   position: static; top: auto; display: flex; flex-wrap: wrap; gap: 8px; height: auto; width: auto;
@@ -584,7 +586,7 @@ html:root[data-review][data-home='v2'][data-v2desk] .modules-band .site-tabs--v2
 }
 html:root[data-review][data-home='v2'][data-v2desk] .modules-band .site-tabs--v2 .site-tabs__tab[aria-selected='true'] { padding: 0 18px; background: var(--d-teal); color: #fff; }
 html:root[data-review][data-home='v2'][data-v2desk] .modules-band .site-tabs__tab::after { display: none; }
-html:root[data-review][data-home='v2'][data-v2desk] .modules-band .hero { height: 168px; min-height: 0; margin: 0 0 12px; border-radius: 16px; }
+html:root[data-review][data-home='v2'][data-v2desk] .modules-band .hero { height: 168px; min-height: 0; margin: 0 0 16px; border-radius: 16px; }
 html:root[data-review][data-home='v2'][data-v2desk] #moduleGrid .card { border-radius: 16px; }
 
 /* ── RIGHT · the rail: three cards ── */
@@ -607,8 +609,21 @@ html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav-band:not([hi
 }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__head { display: flex; align-items: center; height: auto; min-height: 32px; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__edit { display: none !important; }
-html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__rail { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; overflow: visible; }
-html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__item:nth-child(n+5) { display: none; }
+/* every favourite, four in view, the rest a scroll away (owner, 8 Oct 2026:
+   "Favorites Animals i can Scroll there") — trackpad, shift-wheel or the bar */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__rail {
+  display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 24px) / 3.4); grid-template-columns: none; gap: 8px;
+  margin: 0; padding: 0 0 8px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+  scrollbar-width: thin; scrollbar-color: #C9D6D1 transparent;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__rail::-webkit-scrollbar { display: block; height: 6px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__rail::-webkit-scrollbar-thumb { background: #C9D6D1; border-radius: 3px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__item { scroll-snap-align: start; }
+/* three and a bit in view, so the cut card says the row moves; and V2 hides the
+   Find animals tile, so its empty slot goes too (it was a blank at the end) */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__item:has(> .fav__card--add) { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__rail.is-dragging { cursor: grabbing; user-select: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__rail.is-dragging * { pointer-events: none; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__card { width: 100%; flex-basis: auto; height: auto; aspect-ratio: 3 / 4; padding: 8px 6px 7px 8px; border-radius: 12px; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__name { font-size: 11px; font-weight: 600; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__idsep::before { font-size: 11px; }
@@ -672,6 +687,444 @@ html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .obs__ico,
 html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .obs__ico img { width: 13px; height: 13px; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .obs__count b { font-size: 11px; font-weight: 400; }
 
-/* ── the bottom bar: Quick Actions and chat, centred under the modules ── */
+/* ── the bottom bar: Quick Actions with chat beside it, centred on the page
+   (owner, 8 Oct 2026: "make it Centre for the Web") — the row's own left: 50% ── */
 html:root[data-review][data-home='v2'][data-v2desk] .qa-row .mhint { display: none; }
-html:root[data-review][data-home='v2'][data-v2desk] .qa-row { left: calc(50% - 214px); }
+
+/* ── WEB · fewer controls (owner, 8 Oct 2026: "For Web we can hide the Scaner,
+   Notifications, Modules Under Site Selection"): the scan button and the bell
+   leave the header, and the Modules title goes — the site chips take its row,
+   with + and the pencil kept at the row's end ── */
+html:root[data-review][data-home='v2'][data-v2desk] .home-header :is(.search-btn, .icon-btn--bell) { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main > .modules-band {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; align-items: center;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main > .modules-band > * { grid-column: 1 / -1; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main > .modules-band > #siteTabsV2 { grid-column: 1; grid-row: 1; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main > .modules-band > #modulesHead { grid-column: 2; grid-row: 1; align-self: start; height: 38px; min-height: 0; margin: 0 0 16px; }
+html:root[data-review][data-home='v2'][data-v2desk] #modulesTitle { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ── WEB · the ticker runs edge to edge (owner, 8 Oct 2026): out of the page's
+   column to the window's two sides, square-cornered; the root clips the
+   sideways overflow a classic scrollbar's width would otherwise make ── */
+html:root[data-review][data-home='v2'][data-v2desk] { overflow-x: clip; }
+html:root[data-review][data-home='v2'][data-v2desk] #panel-modules > .hstrip {
+  margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); border-radius: 0;
+}
+
+/* ── WEB · no weather in the header, no Command Centre banner over the grid
+   (owner, 8 Oct 2026: "Remove the Weather Part, Also Remove Antz Command
+   Centre") ── */
+html:root[data-review][data-home='v2'][data-v2desk] .home-header .wx,
+html:root[data-review][data-home='v2'][data-v2desk] .modules-band .hero--estate { display: none; }
+/* the search sits at the header's right end (owner, 8 Oct 2026: "Search
+   make it Right side"), where the weather was */
+html:root[data-review][data-home='v2'][data-v2desk] .home-header .search-row { margin: 0 0 0 auto; }
+
+/* ── WEB · the closed All Modules panel lets go of the page (owner, 8 Oct
+   2026: "here i can't scroll down"). At rest it was opacity 0 but still a
+   668 × 657 box over the middle of the screen, taking the wheel and the
+   clicks meant for the cards under it. Closed, it is hidden outright; it
+   shows again for its open and while it plays its close. ── */
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules:not(.is-open):not(.is-closing) .qa-menu { visibility: hidden; pointer-events: none; }
+
+/* ══ WEB · MODULES, PROPERLY (owner, 8 Oct 2026) ══════════════════════════
+   "Here have to Show Propre Modules Selection. Once I have Selected It has to
+   go to that Particuler ModulePage … Inside Pharmacy Module I want Back From
+   Home Option too. Also Some Where Have to Show Recent Module on Home." */
+
+/* ── the All Modules launcher: a white sheet, the four categories, each tile
+   the module's colour chip, its name and one line of what it holds ── */
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-menu {
+  width: min(920px, calc(100vw - 64px)); padding: 24px 24px 20px; border-radius: 24px;
+  background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none;
+  box-shadow: 0 30px 80px -24px rgba(16, 45, 52, .45), 0 0 0 1px rgba(16, 45, 52, .06);
+}
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-menu__head { padding: 0 0 4px; }
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-menu__head b { font-size: 20px; font-weight: 600; letter-spacing: 0; color: var(--d-ink); text-shadow: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-menu__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; overflow-y: auto; overscroll-behavior: contain;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod-cat {
+  grid-column: 1 / -1; margin: 14px 0 2px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--d-mute);
+}
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; justify-items: start;
+  height: auto; min-height: 64px; padding: 10px 12px; border: 1px solid var(--d-line); border-radius: 14px;
+  background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; color: var(--d-ink); text-align: left;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod::before,
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod::after { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod:hover { background: #F4F8F6; border-color: #CFDCD7; }
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod:active { transform: scale(.98); }
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod:focus-visible { outline: 2px solid var(--d-teal); outline-offset: 2px; }
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod__g {
+  grid-row: 1 / 3; display: grid; place-items: center; width: 40px; height: 40px; margin: 0; border-radius: 12px; background: var(--qa-mod-g, var(--d-teal));
+}
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod__g img { width: 22px; height: 22px; filter: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod__t {
+  align-self: end; font-size: 14px; font-weight: 600; line-height: 1.25; color: var(--d-ink); text-shadow: none; hyphens: manual;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-mod__d {
+  align-self: start; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden;
+  font-size: 12px; line-height: 1.35; color: var(--d-mute);
+}
+.qa-mod__d { display: none; }
+
+/* ── THE WEB BAR over every module page: the logo is Home, the module's name
+   drops the module list, the breadcrumb says where you are (ModulePages.js,
+   webBar). Not drawn off the web. ── */
+.mweb { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .mweb {
+  position: relative; z-index: 3; flex: none; display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 20px;
+  background: #fff; border-bottom: 1px solid #DFE8E4;
+}
+.mweb__logo { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 10px 0 4px; border: 0; border-radius: 10px; background: none; cursor: pointer; }
+.mweb__mark { width: 30px; height: 32px; background: #2E8B57; -webkit-mask: url("assets/img/antz-mark.svg") center / contain no-repeat; mask: url("assets/img/antz-mark.svg") center / contain no-repeat; }  /* the mark is drawn white: a mask lets it wear the wordmark's green */
+.mweb__logo span { font-size: 22px; font-weight: 700; letter-spacing: .02em; color: #2E8B57; }
+.mweb__logo:hover { background: #F0F6F4; }
+.mweb__sw { position: relative; }
+.mweb__mod {
+  display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px 0 6px; border: 1px solid #DFE8E4; border-radius: 12px;
+  background: #fff; color: #1F2A30; font: inherit; font-size: 15px; cursor: pointer;
+}
+.mweb__mod:hover, .mweb__mod[aria-expanded='true'] { background: #F4F8F6; border-color: #C9D6D1; }
+.mweb__mod b { font-weight: 600; white-space: nowrap; }
+.mweb__mod > svg { width: 16px; height: 16px; color: #6B7773; transition: transform 160ms ease; }
+.mweb__mod[aria-expanded='true'] > svg { transform: rotate(180deg); }
+.mweb__g, .mweb__ig { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--mweb-g, #1F515B); color: #fff; }
+.mweb__g img, .mweb__ig img { width: 16px; height: 16px; }
+.mweb__g svg { width: 16px; height: 16px; }
+.mweb__pop {
+  position: absolute; top: calc(100% + 8px); left: 0; width: 560px; max-height: min(620px, calc(100dvh - 90px)); display: flex; flex-direction: column;
+  padding: 12px; border-radius: 16px; background: #fff; box-shadow: 0 24px 60px -18px rgba(16, 45, 52, .4), 0 0 0 1px rgba(16, 45, 52, .08);
+}
+.mweb__pop[hidden] { display: none; }
+.mweb__find { flex: none; display: flex; align-items: center; gap: 10px; height: 42px; padding: 0 12px; border-radius: 10px; background: #F1F5F3; color: #6B7773; }
+.mweb__find svg { width: 18px; height: 18px; }
+.mweb__find input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 14px; color: #1F2A30; outline: none; }
+.mweb__list { overflow-y: auto; overscroll-behavior: contain; padding: 4px 2px 2px; }
+.mweb__cat { margin: 12px 8px 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #6B7773; }
+.mweb__row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; }
+.mweb__it { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px 0 8px; border: 0; border-radius: 10px; background: none; color: #1F2A30; font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.mweb__it:hover, .mweb__it:focus-visible { background: #F0F6F4; outline: none; }
+.mweb__it[aria-selected='true'] { background: #E6F2EE; font-weight: 600; }
+.mweb__in { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mweb__it > svg { flex: none; width: 16px; height: 16px; color: #1F515B; }
+.mweb__none { margin: 16px 8px; color: #6B7773; }
+.mweb__crumbs { display: flex; align-items: center; gap: 8px; min-width: 0; margin-left: 8px; padding-left: 16px; border-left: 1px solid #DFE8E4; font-size: 14px; color: #6B7773; }
+.mweb__crumbs button { padding: 4px 6px; border: 0; border-radius: 6px; background: none; color: #1F515B; font: inherit; cursor: pointer; }
+.mweb__crumbs button:hover { background: #F0F6F4; }
+.mweb__crumbs b { font-weight: 500; color: #1F2A30; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mweb__crumbs i { font-style: normal; color: #A3B0AC; }
+/* the shell's own pages need no second bar under it; a built page keeps its own */
+html:root[data-review][data-home='v2'][data-v2desk] .mpage[data-view='msh'] .mpage__bar { display: none; }
+.msh__home { width: 100%; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; }
+.msh__home + .msh__cap { margin-top: 14px; padding-top: 14px; border-top: 1px solid #DFE8E4; }
+
+/* ── the module shell: its screens down the left, the page on the right ── */
+.msh { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100%; background: #EFF5F2; }
+.msh__nav { position: sticky; top: 0; align-self: start; display: flex; flex-direction: column; gap: 4px; max-height: calc(100dvh - 60px); overflow-y: auto; padding: 16px 12px 24px; }
+.msh__cap { margin: 4px 12px 10px; font-size: 12px; font-weight: 600; letter-spacing: .08em; color: #6B7773; }
+.msh__item { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 14px; border-radius: 10px; color: #33443E; font-size: 15px; text-decoration: none; }
+.msh__item svg { flex: none; width: 20px; height: 20px; }
+.msh__item span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.msh__item:hover { background: rgba(31, 81, 91, .07); }
+.msh__item[aria-current='page'] { background: #1F515B; color: #fff; }
+.msh__main { min-width: 0; padding: 20px 32px 48px 16px; }
+.msh__h { margin: 4px 0 20px; font-size: 26px; font-weight: 500; color: #1F2A30; }
+.msh__hero { position: relative; display: flex; align-items: center; gap: 24px; min-height: 180px; padding: 28px 32px; border-radius: 20px; background: var(--msh-g); color: #fff; overflow: hidden; }
+.msh__hero-ico { flex: none; display: grid; place-items: center; width: 96px; height: 96px; border-radius: 24px; background: rgba(255, 255, 255, .18); }
+.msh__hero-ico img { width: 56px; height: 56px; }
+.msh__hero h2 { margin: 0 0 8px; font-size: 26px; font-weight: 600; }
+.msh__hero p { margin: 0; max-width: 60ch; font-size: 15px; line-height: 1.5; opacity: .92; }
+.msh__sh { margin: 28px 0 12px; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #6B7773; }
+.msh__tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.msh__tile { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 72px; padding: 0 18px; border-radius: 14px; background: #fff; color: #1F2A30; font-size: 15px; font-weight: 500; text-decoration: none; box-shadow: 0 1px 2px rgba(16, 45, 52, .06); }
+.msh__tile svg { flex: none; width: 18px; height: 18px; color: #1F515B; }
+.msh__tile:hover { box-shadow: 0 6px 18px -8px rgba(16, 45, 52, .3); }
+.msh__crumbs { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6B7773; }
+.msh__crumbs a { color: #1F515B; text-decoration: none; }
+.msh__crumbs a:hover { text-decoration: underline; }
+.msh__empty { padding: 40px 32px; border: 1px dashed #C9D6D1; border-radius: 16px; background: #fff; color: #44544A; font-size: 15px; line-height: 1.6; }
+.msh__empty p { margin: 0 0 6px; }
+
+/* ── WEB · the announcements turn inside their card (owner, 8 Oct 2026:
+   "announcements Animetion not good … Only for Web"): no deck behind the
+   front card and no flight; the one leaving slides 24 left as it fades, the
+   next comes in from 24 right, and nothing leaves the card's frame. Waiting
+   cards (data-i 1–2) sit to the right, the one just gone (3) to the left, so
+   Back runs the same motion the other way. The JS hand-off is `flat()` in
+   the deck. ── */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__stack { overflow: hidden; border-radius: 14px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__card {
+  transition: opacity 420ms ease, transform 520ms cubic-bezier(.2, .7, .2, 1);
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__card[data-i='0'] { transform: none; opacity: 1; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__card:is([data-i='1'], [data-i='2']) { transform: translateX(24px); opacity: 0; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__card[data-i='3'] { transform: translateX(-24px); opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__card { transition: opacity 200ms ease; transform: none !important; }
+}
+
+/* ── WEB · the All Modules list scrolls (owner, 8 Oct 2026: "all Modules i
+   con't scroll"): the panel is capped to the window (its max-height is set
+   on open) and clips, but the grid inside it was never given the rest of
+   that height, so it grew to its full 720 and the panel cut it off. The panel
+   is a column now and the grid takes what the title leaves, scrolling in it. ── */
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-menu { display: flex; flex-direction: column; }
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-menu__head { flex: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .qa--modules .qa-menu__grid {
+  flex: 1 1 auto; min-height: 0; align-content: start; padding: 0 4px 4px 0; scrollbar-width: thin; scrollbar-color: #C9D6D1 transparent;
+}
+
+/* ══ WEB · OBSERVATION NOTES IN THE GRID (owner, 8 Oct 2026) ════════════════
+   The page's own band, moved into the obs.rail frame (four columns by three
+   rows). Second pass, same day: "If I want See all Notes Where is See All?
+   Also is this Size we are used in Tablet view. Also Overall Section
+   Container icon … Check other Places how i placed." So:
+     · THE CARDS ARE THE TABLET'S, untouched — 290 × 411, the 209 photo, the
+       16px title, three lines of note — nothing here resizes them; three
+       rows is what it takes to hold them;
+     · THE HEAD IS THE WEB'S OTHER SECTIONS': no icon (Favourites and
+       Announcements carry none), the title at 16/600, and View all » at the
+       right in their 13px — it opens every note, as on the tablet;
+     · the frame is a grid card's: 16 round, the tablet band's grey. ══════════ */
+html:root[data-review][data-home='v2'][data-v2desk] #moduleGrid .card:has(> .obs-slot) {
+  padding: 0; border-radius: 16px; background: #E7EDEB; box-shadow: none; overflow: hidden; cursor: default;
+}
+html:root[data-review][data-home='v2'][data-v2desk] #moduleGrid .card:has(> .obs-slot)::before,
+html:root[data-review][data-home='v2'][data-v2desk] #moduleGrid .card:has(> .obs-slot)::after { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .obs-slot { position: absolute; inset: 0; display: flex; }
+html:root[data-review][data-home='v2'][data-v2desk] .obs-slot > .obs-band {
+  flex: 1; display: flex; flex-direction: column; min-width: 0; margin: 0; padding: 16px 0 20px; border-radius: 0; background: none; box-shadow: none; overflow: hidden;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .obs-slot .obs-head {
+  flex: none; display: flex; align-items: center; justify-content: space-between; height: auto; min-height: 32px; margin: 0 0 12px; padding: 0 20px;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .obs-slot #obsTitle { margin: 0; font-size: 16px; font-weight: 600; line-height: normal; letter-spacing: 0; color: var(--d-ink); }
+html:root[data-review][data-home='v2'][data-v2desk] .obs-slot .v2seg { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .obs-slot .obs-head__all {
+  display: inline-flex; align-items: center; height: auto; padding: 0; border: 0; background: none; margin-left: auto;
+  font: inherit; font-size: 13px; font-weight: 400; letter-spacing: 0; line-height: normal; color: var(--d-ink-2); cursor: pointer;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .obs-slot .obs-head__all img { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .obs-slot .obs-head__all::after { content: '\00a0»'; position: static; inset: auto; }
+html:root[data-review][data-home='v2'][data-v2desk] .obs-slot .obs-head__all:hover { color: var(--d-ink); text-decoration: underline; }
+html:root[data-review][data-home='v2'][data-v2desk] .obs-slot .obs-rail {
+  flex: 1; min-height: 0; margin: 0; padding: 0 20px; scroll-padding-left: 20px; overscroll-behavior-x: contain;
+}
+
+/* ══ WEB · THE MODULE EXPLORER (owner, 8 Oct 2026: "Explorer is good …
+   Implement") — mockups/all-modules-web.html, B; ModulePages.js,
+   openExplorer. Drawn only on the web, where Quick Actions opens it. ══ */
+.mx { position: fixed; inset: 0; z-index: 420; display: grid; place-items: center; padding: 32px; }
+.mx[hidden] { display: none; }
+html.mx-lock, html.mx-lock body { overflow: hidden; }
+.mx__scrim { position: absolute; inset: 0; background: rgba(16, 40, 46, .32); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); opacity: 0; transition: opacity 180ms ease; }
+.mx__panel {
+  --ink: #1F2A30; --ink-2: #44544A; --mute: #6B7773; --line: #E4EAE7; --teal: #1F515B;
+  position: relative; display: flex; flex-direction: column; width: min(1060px, 100%); height: min(620px, 100%);
+  border-radius: 20px; background: #fff; color: var(--ink); font: 14px/1.45 Inter, system-ui, sans-serif; box-shadow: 0 30px 80px -24px rgba(0, 0, 0, .45), 0 0 0 1px rgba(0, 0, 0, .04); overflow: hidden;
+  opacity: 0; transform: translateY(10px) scale(.985); transition: opacity 180ms ease, transform 220ms cubic-bezier(.2, .7, .2, 1);
+}
+.mx.is-on .mx__scrim { opacity: 1; }
+.mx.is-on .mx__panel { opacity: 1; transform: none; }
+.mx button { font-family: inherit; line-height: inherit; color: inherit; }
+.mx svg { flex: none; }
+.mx__head { flex: none; display: flex; align-items: center; gap: 16px; height: 68px; padding: 0 16px 0 24px; border-bottom: 1px solid var(--line); }
+.mx__head h2 { flex: none; width: 204px; margin: 0; font-size: 17px; font-weight: 600; }
+.mx__find { flex: 1; max-width: 520px; display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 14px; border-radius: 12px; background: #F4F7F6; color: var(--mute); }
+.mx__find svg { width: 18px; height: 18px; }
+.mx__find input { flex: 1; min-width: 0; border: 0; background: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); }
+.mx__find kbd { padding: 2px 6px; border-radius: 6px; background: #fff; box-shadow: 0 0 0 1px var(--line); font: 11px Inter, sans-serif; color: var(--mute); }
+.mx__x { display: grid; place-items: center; width: 34px; height: 34px; margin-left: auto; border: 0; border-radius: 50%; background: none; cursor: pointer; }
+.mx__x:hover { background: #F2F6F4; }
+.mx__x svg { width: 18px; height: 18px; }
+.mx__body { flex: 1; min-height: 0; display: flex; }
+.mx__side { flex: none; width: 228px; display: flex; flex-direction: column; gap: 2px; padding: 14px 12px; border-right: 1px solid var(--line); overflow-y: auto; }
+.mx__side hr { width: 100%; margin: 8px 0; border: 0; border-top: 1px solid var(--line); }
+.mx__cat { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); font-size: 13.5px; text-align: left; white-space: nowrap; cursor: pointer; }
+.mx__cat svg { width: 16px; height: 16px; }
+.mx__cat span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.mx__cat em { font-style: normal; font-size: 12px; color: var(--mute); }
+.mx__cat:hover { background: #F4F7F6; color: var(--ink); }
+.mx__cat[aria-pressed='true'] { background: #E8F3F0; color: var(--teal); font-weight: 600; }
+.mx__cat[aria-pressed='true'] em { font-weight: 400; }
+.mx__edit { margin-top: auto; padding: 8px 10px; border: 0; background: none; color: var(--teal) !important; font-size: 13px !important; font-weight: 600; text-align: left; cursor: pointer; }
+.mx__edit:hover { text-decoration: underline; }
+.mx__list { flex: 1; min-width: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 16px 20px; }
+.mx__grp { margin: 14px 8px 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.mx__rows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 8px; }
+.mx__row { display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 10px; border: 0; border-radius: 10px; background: none; text-align: left; cursor: pointer; }
+.mx__row:hover { background: #F4F7F6; }
+.mx__row.is-on { background: #EEF6F3; }
+.mx__row b { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 14px; font-weight: 500; hyphens: manual; }
+.mx__row > svg { width: 16px; height: 16px; color: var(--mute); opacity: 0; transition: opacity 150ms; }
+.mx__row:hover > svg, .mx__row.is-on > svg { opacity: 1; }
+.mx__g { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: var(--mx-g, var(--teal)); }
+.mx__g img { width: 17px; height: 17px; }
+.mx__none { margin: 40px 8px; color: var(--mute); text-align: center; }
+.mx__detail { flex: none; width: 280px; display: flex; flex-direction: column; padding: 20px 20px 16px; border-left: 1px solid var(--line); background: #FAFBFB; overflow: hidden; }
+.mx__dh { display: flex; align-items: center; gap: 12px; }
+.mx__dh .mx__g { width: 44px; height: 44px; border-radius: 12px; }
+.mx__dh .mx__g img { width: 23px; height: 23px; }
+.mx__dh h3 { margin: 0; font-size: 17px; font-weight: 600; hyphens: manual; }
+.mx__dh small { display: block; color: var(--mute); font-size: 12px; }
+.mx__detail p { margin: 12px 0 16px; color: var(--ink-2); font-size: 13px; line-height: 1.5; }
+.mx__open { flex: none; height: 38px; margin-bottom: 18px; border: 0; border-radius: 10px; background: var(--teal); color: #fff !important; font-size: 13.5px !important; font-weight: 600; cursor: pointer; }
+.mx__open:hover { background: #18434B; }
+.mx__cap { margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.mx__scr { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; margin: 0 -6px; }
+.mx__scr button { display: flex; align-items: center; gap: 10px; flex: none; height: 36px; padding: 0 8px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); font-size: 13.5px; text-align: left; cursor: pointer; }
+.mx__scr button::before { content: ''; flex: none; width: 6px; height: 6px; border-radius: 50%; background: #C9D6D1; }
+.mx__scr button::after { content: '›'; margin-left: auto; color: var(--mute); }
+.mx__scr button:hover { background: #EEF3F1; color: var(--ink); }
+.mx__scr button:hover::before, .mx__scr button.is-hit::before { background: var(--teal); }
+.mx__scr button.is-hit { font-weight: 600; color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .mx__scrim, .mx__panel { transition: none; } }
+
+/* ══ WEB · ANNOUNCEMENTS AS A LIST (owner, 8 Oct 2026: "Make it 3 Cards on
+   vertical inbetween i can Scroll. Do in the Live only"). The deck stops
+   turning (no dwell, so no auto-turn) and its cards stand one under another:
+   three in view, the rest a scroll away inside the card. Each is compact — the
+   photograph a square at the left, the chip, two lines of headline and two of
+   text, the byline — and any of them opens its announcement (the deck's
+   flat()). The dots go: a list needs no "which one". ══ */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__dwell { animation: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__dots { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__foot { height: 0; margin: 0; }  /* holds only View all now, which sits at the head */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__stack {
+  display: flex; flex-direction: column; gap: 10px; height: auto; max-height: 436px; margin: 0 -6px 0 0; padding: 0 6px 2px 0;
+  overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; border-radius: 0;
+  scrollbar-width: thin; scrollbar-color: #BFD3CE transparent;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__card {
+  position: relative !important; inset: auto !important; z-index: auto; flex: none; display: flex; flex-direction: row; align-items: stretch; gap: 12px;
+  width: 100%; height: auto; min-height: 0; padding: 10px; border-radius: 14px; background: #fff; box-shadow: none;
+  opacity: 1 !important; transform: none !important; pointer-events: auto !important; cursor: pointer; transition: box-shadow 160ms ease;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__card:hover { box-shadow: 0 8px 20px -12px rgba(16, 45, 52, .4); }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__img {
+  flex: none; order: -1; width: 92px; height: auto; min-height: 92px; align-self: stretch; border-radius: 10px; overflow: hidden;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__img img { width: 100%; height: 100%; object-fit: cover; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__body { flex: 1; min-width: 0; padding: 0; gap: 6px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__chip { align-self: flex-start; padding: 2px 8px 2px 2px; gap: 5px; font-size: 9.5px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__chip img { width: 16px; height: 16px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__hl { font-size: 14px; line-height: 1.3; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__desc { font-size: 12px; line-height: 1.4; -webkit-line-clamp: 2; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__more { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck .adeck__meta { margin-top: auto; font-size: 11px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   WEB · FIGMA 918:24 "Desktop Home page" (owner, 8 Oct 2026: "Implement this
+   design from Figma … For Web u can do like these"). Everything below is the
+   frame's, and overrides the web rules above it where they differ:
+     · a white header, rounded at its foot, the search on the right (317 × 48,
+       a 5% grey); no sky and no ticker — the frame draws neither;
+     · the site chips across the page under it, the site menu at their head;
+     · two columns, 744 and 632: the Modules panel (white, its head with + and
+       the pencil, the four-column grid of 162 × 144, Observation Notes under
+       it), and the right column — Favourites Animals, Pending, Announcements.
+   ══════════════════════════════════════════════════════════════════════════ */
+html:root[data-review][data-home='v2'][data-v2desk] { --max-content: 1392px; --grid-cols: 4; --grid-gap: 16px; background: #EFF5F2; }
+html:root[data-review][data-home='v2'][data-v2desk] #moduleGrid { --grid-row: 144px; }
+html:root[data-review][data-home='v2'][data-v2desk] :is(.wsky, #panel-modules > .hstrip) { display: none !important; }
+
+/* header */
+html:root[data-review][data-home='v2'][data-v2desk] .home-header {
+  margin: 0 calc(50% - 50vw); padding: 32px max(24px, calc(50vw - 50% + 24px)); border-radius: 0 0 20px 20px; background: #fff;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .greeting__word { font-size: 13px; color: rgba(31, 65, 91, .82); }
+html:root[data-review][data-home='v2'][data-v2desk] .greeting__name { font-size: 20px; font-weight: 500; color: #1F415B; }
+html:root[data-review][data-home='v2'][data-v2desk] .home-header .search-row { flex: none; width: 317px; max-width: none; margin: 0 0 0 auto; }
+html:root[data-review][data-home='v2'][data-v2desk] .home-header .search { height: 48px; min-height: 48px; padding: 0 24px; gap: 16px; border-radius: 12px; background: rgba(0, 0, 0, .05); box-shadow: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .home-header :is(.search__input, .search__hint) { font-size: 14px; color: #7A8684; }
+
+/* the site chips, across the page */
+html:root[data-review][data-home='v2'][data-v2desk] #panel-modules > .site-tabs--v2 {
+  position: static; display: flex; align-items: center; gap: 8px; height: auto; margin: 16px 0 0; padding: 5px 0; background: none; box-shadow: none; overflow: visible;
+}
+html:root[data-review][data-home='v2'][data-v2desk] #panel-modules > .site-tabs--v2::before { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] #panel-modules > .site-tabs--v2 .site-tabs__menu {
+  display: grid; place-items: center; width: 50px; height: 50px; border-radius: 10px; background: #DDEBE9; color: #1F415B;
+}
+html:root[data-review][data-home='v2'][data-v2desk] #panel-modules > .site-tabs--v2 .site-tabs__track { display: flex; gap: 8px; margin: 0; padding: 0; overflow: visible; }
+html:root[data-review][data-home='v2'][data-v2desk] #panel-modules > .site-tabs--v2 .site-tabs__tab {
+  height: 50px; padding: 0 12px; border-radius: 10px; background: #DDEBE9; color: #44544A; font-size: 14px; font-weight: 500; letter-spacing: .1px; box-shadow: none;
+}
+html:root[data-review][data-home='v2'][data-v2desk] #panel-modules > .site-tabs--v2 .site-tabs__tab[aria-selected='true'] { padding: 0 27.5px; border-radius: 12px; background: #1F415B; color: #fff; }
+html:root[data-review][data-home='v2'][data-v2desk] #panel-modules > .site-tabs--v2 .site-tabs__tab::after { display: none; }
+
+/* two columns */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d { grid-template-columns: minmax(0, 744fr) minmax(0, 632fr); gap: 16px; margin-top: 16px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail { gap: 16px; }
+
+/* LEFT · the Modules panel */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main > .modules-band {
+  display: block; padding: 24px; border-radius: 20px; background: #fff;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main > .modules-band > #modulesHead {
+  display: flex; align-items: center; height: auto; min-height: 19px; margin: 0 0 24px; padding: 0;
+}
+html:root[data-review][data-home='v2'][data-v2desk] #modulesTitle {
+  position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: nowrap;
+  font-size: 16px; font-weight: 500; line-height: normal; color: #1F2A30;
+}
+html:root[data-review][data-home='v2'][data-v2desk] #moduleGrid .card { border-radius: 12px; }
+
+/* Observation Notes, closing the panel */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main #recentObs {
+  margin: 24px 0 0; padding: 20px 0 20px 20px; border-radius: 16px; background: #E7EDEB; overflow: hidden;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main #recentObs .obs-head { display: flex; align-items: center; justify-content: space-between; height: auto; min-height: 19px; margin: 0 0 16px; padding: 0 20px 0 0; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main #obsTitle { margin: 0; font-size: 16px; font-weight: 500; line-height: normal; letter-spacing: 0; color: #1F2A30; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main #recentObs .v2seg { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main #recentObs .obs-head__all {
+  display: inline-flex; align-items: center; height: auto; padding: 0; border: 0; background: none; margin-left: auto;
+  font: inherit; font-size: 13px; font-weight: 400; letter-spacing: 0; line-height: normal; color: #44544A; cursor: pointer;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main #recentObs .obs-head__all img { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main #recentObs .obs-head__all::after { content: '\00a0»'; position: static; inset: auto; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main #recentObs .obs-rail {
+  margin: 0; padding: 0 20px 0 0; gap: 14px; scroll-padding-left: 0; overscroll-behavior-x: contain;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__main #recentObs .obs-rail.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+
+/* RIGHT · Favourites Animals */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav-band:not([hidden]) { gap: 16px; padding: 20px 0 20px 20px; border-radius: 20px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__head { padding-right: 20px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail :is(#favTitle, #adeckTitle) { font-size: 16px; font-weight: 500; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__rail { grid-auto-columns: 132px; gap: 8px; padding: 0 20px 0 0; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .fav__card { height: 158px; aspect-ratio: auto; }
+
+/* RIGHT · Pending, the catalogue's card in two columns of rows */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend > .card {
+  position: relative; display: block; width: 100%; height: auto; min-height: 0; padding: 0; border-radius: 16px;
+  background: linear-gradient(180deg, #FFE6DC, #FFD6C7); box-shadow: none; overflow: hidden; container-type: normal;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend > .card::before,
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend > .card::after { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn { position: static; display: flex; flex-direction: column; gap: 14px; padding: 18px 18px 16px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__head { display: flex; align-items: center; gap: 9px; color: #3B2420; font-size: 19px; font-weight: 700; letter-spacing: -.19px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__head svg { width: 21px; height: 21px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__rows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; height: auto; overflow: visible; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__row {
+  display: flex; align-items: center; gap: 10px; height: 66px; min-height: 0; padding: 0 16px; border: 0; border-radius: 10px;
+  background: rgba(255, 255, 255, .7); color: #3B2420; font-size: 14.9px; font-weight: 500; text-align: left; cursor: pointer;
+}
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__row:hover { background: rgba(255, 255, 255, .9); }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__t { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__row b { font-family: var(--font-num, 'DM Sans', sans-serif); font-size: 16.4px; font-weight: 700; color: #3B2420; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__row.is-late b { color: #D7263D; }
+
+/* RIGHT · Announcements */
+html:root[data-review][data-home='v2'][data-v2desk] .v2d__rail .adeck { padding: 20px; border-radius: 20px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__t { font-size: 14.9px; font-weight: 500; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__head b { font-size: 19px; font-weight: 700; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .card [class*='fold'], html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn::after { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .main-frame { padding-left: 24px; padding-right: 24px; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__curl { display: none; }
+html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__head { height: 23px; line-height: 23px; }
