@@ -1,0 +1,255 @@
+/* ══ MODULES · THE REFERENCE LOOK (Sourav, 12 Oct 2026) ═══════════════════
+   Only the Modules section: the Command Centre banner and the module grid.
+   The reference is a landing page (sky hero, white service cards with an
+   icon square, a photo card with a white inset panel, flat solid stat cards,
+   a dark accent card). Mixed with ANTZ:
+     · door cards     → white service cards: the module's own colour moves
+                        into a 36px icon square, the name and one line under it
+     · photo cards    → the photograph stays; the name sits on a white inset
+                        panel instead of a dark band
+     · Natality / Mortality → one light solid colour each, dark text
+     · Pending        → a plain grey card with white rows
+     · Animals        → the reference's dark accent card, in ANTZ navy
+     · banner         → centred title and a green "Open Command Centre" button
+   Every corner is 8. Colours are MD3_Antz values (shared/colors.css).
+   Specificity: #moduleGrid is doubled so these win over index.html and
+   review.css without !important. */
+
+html:root[data-home='v2'] {
+  --mr-ink: #000000;            /* src: --neutral-primary */
+  --mr-ink-2: #44544A;          /* src: --on-surface-variant */
+  --mr-mute: #7A8684;           /* src: --neutral-secondary */
+  --mr-line: #DAE7DF;           /* src: --surface-variant */
+  --mr-paper: #FFFFFF;          /* src: --paper */
+  --mr-grey: #F2F2F2;           /* src: --card-header-bg */
+  --mr-teal: #AFEFEB;           /* src: --secondary-container */
+  --mr-teal-ink: #1F415B;       /* src: --on-secondary-container */
+  --mr-coral: #FFEBE5;          /* src: --bg-teritary */
+  --mr-coral-ink: #FA6140;      /* src: --tertiary */
+  --mr-navy: #1F415B;           /* src: --secondary-dark */
+  --mr-green: #52F990;          /* src: --primary-container */
+  --mr-green-ink: #006D35;      /* src: --on-surface */
+  --mr-r: 8px;
+}
+
+/* ── every card: corner 8, no lift shadow ─────────────────────────────── */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card { border-radius: var(--mr-r); }
+
+/* ── DOOR CARDS → the reference's service cards ───────────────────────── */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='door'] {
+  background: var(--mr-paper);
+  box-shadow: inset 0 0 0 1px var(--mr-line);
+  color: var(--mr-ink);
+  padding: 16px;
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='door'] .l-door { justify-content: space-between; height: 100%; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='door'] .l-door .card__icon,
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] .card__icon,
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .c-head__icon {
+  box-sizing: border-box;
+  display: grid; place-items: center;
+  width: 36px; height: 36px; padding: 8px;
+  border-radius: var(--mr-r);
+  background: var(--card-bg);
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card .card__icon img,
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .c-head__icon img { width: 20px; height: 20px; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='door'] .l-door__name {
+  font-size: 16px; font-weight: 500; letter-spacing: 0; color: var(--mr-ink);
+}
+/* the one line under the name — the reference's service description */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='door'] .l-door__name::after,
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] .card__band .l-door__name::after {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  margin-top: 4px;
+  font-size: 12px; font-weight: 400; line-height: 16px; letter-spacing: .2px; color: var(--mr-mute);
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='medical.default'] .l-door__name::after    { content: 'Treatments and clinical requests'; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='housing.default'] .l-door__name::after    { content: 'Sections and enclosures'; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='administer.default'] .l-door__name::after { content: 'Vaccines, deworming, supplements'; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='users.default'] .l-door__name::after      { content: 'Staff, roles and shifts'; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='mortality.default'] .l-door__name::after  { content: 'Deaths and necropsy records'; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='security.default'] .l-door__name::after   { content: 'Gates, patrols and access'; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='eggs.default'] .l-door__name::after       { content: 'Clutches, incubation and hatching'; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='hospital.photo'] .l-door__name::after     { content: 'Admissions and active cases'; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='diet.photo'] .l-door__name::after         { content: 'Diet plans and feed stock'; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='eggs.default'] .l-door .card__icon { width: 36px; height: 36px; }
+
+/* ── PHOTO CARDS → the reference's photo card with a white inset panel ── */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] { padding: 12px; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] .card__wash { display: none; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] .card__band {
+  left: 12px; right: 12px; bottom: 12px; top: auto;
+  translate: none; width: auto;
+  display: block; height: auto; padding: 12px 14px;
+  border-radius: var(--mr-r);
+  background: var(--mr-paper);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] .card__band .l-door__name {
+  font-size: 16px; font-weight: 500; color: var(--mr-ink); text-shadow: none;
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] .card__band .l-door__name::after { -webkit-line-clamp: 1; margin-top: 2px; }
+
+/* Species Management: the two figures on the white panel */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] { padding: 12px; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats']::before {
+  background: linear-gradient(180deg, rgba(0, 0, 0, .28) 0%, rgba(0, 0, 0, 0) 40%);
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .c-head__text { text-shadow: 0 1px 2px rgba(0, 0, 0, .3); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .l-photo-stat__figures {
+  padding: 10px 14px;
+  border-radius: var(--mr-r);
+  background: var(--mr-paper);
+  color: var(--mr-ink);
+  flex: none; margin-top: auto;
+  justify-content: flex-start; gap: 28px;
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .figure { align-items: flex-start; text-align: left; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .figure__value { font-size: 28px; font-weight: 400; color: var(--mr-ink); text-shadow: none; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .figure__label { font-size: 12px; color: var(--mr-mute); text-shadow: none; }
+
+/* ── NATALITY / MORTALITY → flat light cards, a big light number ──────── */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-ki'] { padding: 14px 16px; border-radius: var(--mr-r); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='insight.natality']  { background: var(--mr-teal);  color: var(--mr-teal-ink); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='insight.mortality'] { background: var(--mr-coral); color: var(--mr-ink-2); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-ki'] .l-v2ki { color: inherit; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='insight.natality'] .l-v2ki__mark img  { content: url("assets/icon/ki-natality.svg"); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='insight.mortality'] .l-v2ki__mark img { content: url("assets/icon/ki-mortality.svg"); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-ki'] .l-v2ki__tabs { background: rgba(255, 255, 255, .6); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-ki'] .l-v2ki__n { font-size: 48px; font-weight: 400; line-height: 44px; letter-spacing: -1px; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='insight.mortality'] .l-v2ki__n { color: var(--mr-coral-ink); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-ki'] .l-v2ki__n::after {
+  display: block; margin-top: 6px;
+  font: 400 12px/16px var(--font); letter-spacing: .2px; color: var(--mr-ink-2);
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='insight.natality'] .l-v2ki__n::after  { content: 'Births recorded'; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='insight.mortality'] .l-v2ki__n::after { content: 'Deaths recorded'; }
+
+/* ── PENDING → the reference's grey card, white rows ──────────────────── */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-sticky'] {
+  background: var(--mr-grey);
+  box-shadow: none;
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-sticky'] .l-v2sn { color: var(--mr-ink); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-sticky'] .l-v2sn__head b { font-size: 16px; font-weight: 500; letter-spacing: 0; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-sticky'] .l-v2sn__ico { width: 18px; height: 18px; color: var(--mr-ink-2); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-sticky'] .l-v2sn__row { border-radius: var(--mr-r); background: var(--mr-paper); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-sticky'] .l-v2sn__t { font-size: 14px; font-weight: 400; color: var(--mr-ink-2); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-sticky'] .l-v2sn__row b { font-family: var(--font); font-size: 16px; font-weight: 500; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-sticky'] .l-v2sn__row.is-late b { color: var(--mr-coral-ink); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-sticky'] .l-v2sn__curl { display: none; }
+
+/* ── ANIMALS → the reference's dark accent card: label left, figure right ─ */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-stat'] { background: var(--mr-navy); padding: 16px; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-stat'] .l-v2st { margin: -16px; padding: 16px; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-stat'] .l-v2st__clip { display: none; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-stat'] .l-v2st__body { flex-direction: row-reverse; align-items: flex-end; justify-content: space-between; gap: 12px; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-stat'] .l-v2st__body b { font-size: 48px; font-weight: 400; line-height: 44px; letter-spacing: -1px; color: #FFFFFF; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-stat'] .l-v2st__body span { font-size: 12px; opacity: .8; }
+
+/* ── THE BANNER → centred like the reference hero, with its green button ─ */
+html:root[data-home='v2'] .modules-band > #modulesHead ~ .hero--estate {
+  border-radius: var(--mr-r);
+  align-items: center; justify-content: center;
+  text-align: center;
+}
+html:root[data-home='v2'] .modules-band > #modulesHead ~ .hero--estate .hero__scrim {
+  background: linear-gradient(180deg, rgba(0, 0, 0, .12) 0%, rgba(0, 0, 0, .38) 100%);
+}
+html:root[data-home='v2'] .modules-band > #modulesHead ~ .hero--estate .hero__row--top { position: absolute; top: 12px; right: 16px; }
+html:root[data-home='v2'] .modules-band > #modulesHead ~ .hero--estate .hero__row--foot { align-items: center; justify-content: center; }
+html:root[data-home='v2'] .modules-band > #modulesHead ~ .hero--estate .hero__titles {
+  flex: none; display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+html:root[data-home='v2'] .modules-band > #modulesHead ~ .hero--estate .hero__title { font-size: 34px; font-weight: 500; letter-spacing: -.5px; }
+html:root[data-home='v2'] .modules-band > #modulesHead ~ .hero--estate .hero__sub { max-width: none; font-size: 14px; opacity: .9; }
+/* the button is a picture of one: the whole banner is the link */
+html:root[data-home='v2'] .modules-band > #modulesHead ~ .hero--estate .hero__titles::after {
+  content: 'Open Command Centre';
+  display: inline-flex; align-items: center;
+  height: 36px; margin-top: 10px; padding: 0 44px 0 14px;
+  border-radius: var(--mr-r);
+  /* the arrow in a navy disc, as the reference's Get Started */
+  background:
+    url("assets/icon/v3-arrow-ne.svg") no-repeat right 14px center / 9px 9px,
+    radial-gradient(circle 13px at calc(100% - 18px) 50%, var(--mr-navy) 98%, transparent 100%),
+    var(--mr-green);
+  font-size: 13px; font-weight: 500; letter-spacing: .4px; color: var(--mr-green-ink);
+  text-shadow: none;
+}
+
+@media (max-width: 743px) {
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='door'] { padding: 12px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='door'] .l-door__name { font-size: 14px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='door'] .l-door__name::after { font-size: 11px; line-height: 14px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .figure__value { font-size: 22px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-ki'] .l-v2ki__n,
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-stat'] .l-v2st__body b { font-size: 36px; line-height: 36px; }
+  html:root[data-home='v2'] .modules-band > #modulesHead ~ .hero--estate .hero__title { font-size: 22px; }
+  html:root[data-home='v2'] .modules-band > #modulesHead ~ .hero--estate .hero__titles::after { height: 30px; margin-top: 6px; font-size: 12px; }
+}
+
+/* the grey card needs an edge on the pale page; no mid-word breaks in the blurbs */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-sticky'] { box-shadow: inset 0 0 0 1px var(--mr-line); }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card .l-door__name::after { hyphens: none; -webkit-hyphens: none; }
+
+/* ══ COLOUR PASS (Sourav, 12 Oct 2026: "many white cards … boring, add some
+   gradient colour") ══════════════════════════════════════════════════════
+   Four door cards take their module's own gradient back, alternating with
+   the white ones so no row is all white or all colour:
+     row 1  Medical ▣ · Housing □ · Species photo · Administer □ · Users ▣
+     row 3  Mortality ▣ · Security □        row 4  Eggs ▣ (the wide one)
+   The light cards get a soft two-stop wash of their own library colours,
+   and the navy card a navy → deep-teal ramp. */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card:is([data-variant='medical.default'], [data-variant='users.default'], [data-variant='mortality.default'], [data-variant='eggs.default']) {
+  background: var(--card-bg);
+  box-shadow: 0 8px 20px -12px rgba(31, 65, 91, .45);
+  color: #FFFFFF;
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card:is([data-variant='medical.default'], [data-variant='users.default'], [data-variant='mortality.default'], [data-variant='eggs.default']) .card__icon {
+  background: rgba(255, 255, 255, .22);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .28);
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card:is([data-variant='medical.default'], [data-variant='users.default'], [data-variant='mortality.default'], [data-variant='eggs.default']) .l-door__name { color: #FFFFFF; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card:is([data-variant='medical.default'], [data-variant='users.default'], [data-variant='mortality.default'], [data-variant='eggs.default']) .l-door__name::after { color: rgba(255, 255, 255, .85); }
+/* Eggs is 2 wide: the larger icon and name the extra room allows */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='eggs.default'] .l-door .card__icon { width: 44px; height: 44px; padding: 10px; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='eggs.default'] .l-door .card__icon img { width: 24px; height: 24px; }
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='eggs.default'] .l-door__name { font-size: 20px; }
+
+/* the insight cards: a soft wash instead of one flat colour */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='insight.natality'] {
+  background: linear-gradient(150deg, #AFEFEB 0%, #DFF9F7 100%);  /* src: --secondary-container → --antz-secondary-bg */
+}
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='insight.mortality'] {
+  background: linear-gradient(150deg, #FFBDA8 0%, #FFEBE5 100%);  /* src: --tertiary-container → --bg-teritary */
+}
+/* Animals: navy into deep teal */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='v2-stat'] {
+  background: linear-gradient(140deg, #1F415B 0%, #1F515B 100%);  /* src: --secondary-dark → --on-primary-container */
+}
+/* Administer's blurb fits one idea, not a clipped list */
+html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='administer.default'] .l-door__name::after { content: 'Vaccines and deworming'; }
+
+/* ── PHONE (≤743px) · Style 1 fitted (Sourav, 12 Oct 2026: "in mobile …
+   overlapped everywhere"): a phone tile is ~115 tall, so the white panels
+   covered the Species title and the Hospital / Diet icons. Slimmer panels,
+   smaller icon squares, one-line descriptions. */
+@media (max-width: 743px) {
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] { padding: 10px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card .card__icon,
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='door'] .l-door .card__icon,
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] .card__icon,
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .c-head__icon { width: 28px; height: 28px; padding: 6px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card .card__icon img,
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .c-head__icon img { width: 16px; height: 16px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] .card__band { left: 10px; right: 10px; bottom: 10px; padding: 7px 10px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-layout='photo'] .card__band .l-door__name { font-size: 14px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card .l-door__name::after { -webkit-line-clamp: 1; font-size: 11px; line-height: 14px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] { padding: 10px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .c-head__text { font-size: 13px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .l-photo-stat__figures { padding: 6px 12px; gap: 20px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .figure__value { font-size: 20px; }
+  html:root[data-home='v2'] #moduleGrid#moduleGrid .card[data-variant='species.stats'] .figure__label { font-size: 11px; }
+}

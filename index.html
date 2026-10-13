@@ -13907,6 +13907,9 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
 }
 </style>
 <link rel="stylesheet" href="review.css?v=20261007f">
+<link rel="stylesheet" href="modules-ref.css?v=20261012e">
+<link rel="stylesheet" href="modules-ref-v2.css?v=20261012s">
+<script src="modules-style.js?v=20261012c"></script>
 </head>
 
 <style>
@@ -22769,8 +22772,11 @@ const V2_PHONE_LAYOUT = [
   { variantId: 'security.default',   size: 'small'  },
   { variantId: 'insight.mortality',  size: 'medium' },
   { variantId: 'eggs.default',       size: 'small'  },
+  /* the Animals count beside Eggs, filling the last row (Sourav, 12 Oct
+     2026: "here there's no Animals count green colour card") */
+  { variantId: 'species.newcount',   size: 'small'  },
 ]
-const V2_PHONE_SEED = 1
+const V2_PHONE_SEED = 2   /* 2: the Animals count joins the phone grid (12 Oct 2026) */
 
 /* the web's six columns, first-fit into the mockup's four rows:
      Medical · Housing · Species (2) · Administer · Users
