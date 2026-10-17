@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Role Home · Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!--
+  ROLE-BASED HOME, DRAWN BY THE LIVE HOME ITSELF (owner, 11 Oct 2026: "Match
+  my live home exactly"). Four passes of a hand-made page missed the look; this
+  one cannot, because it is the live home. The page under the bar is
+  ../index.html in a frame, and a role changes only what the live home already
+  lets a person change:
+
+    · the Modules grid     a saved layout (antz.home.layout.v2d) of the live
+                           home's own card variants — the action cards
+                           (Medical: New Case · Administer · Request Medicine)
+                           are each role's quick access
+    · Pending              the six rows of the live Pending card, relabelled
+    · Favourites Animals   retitled and refilled where a role has its own
+                           animals (My Patients, Watch List)
+    · a role label         beside the name
+
+  The visitor's own saved grid is put back when this page closes.
+-->
+<style>
+:root { --bar: #13303A; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { display: flex; flex-direction: column; background: #EFF5F2; font: 14px/1.4 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.bar { flex: none; display: flex; align-items: center; gap: 14px; height: 52px; padding: 0 20px; background: var(--bar); color: #CFE2DC; }
+.bar span { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #8FB8AE; }
+.bar nav { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: rgba(255,255,255,.07); }
+.bar button { height: 32px; padding: 0 14px; border: 0; border-radius: 9px; background: none; color: #CFE2DC; font: 500 13.5px Inter, sans-serif; cursor: pointer; white-space: nowrap; }
+.bar button:hover { background: rgba(255,255,255,.08); }
+.bar button[aria-pressed='true'] { background: #fff; color: #1F515B; font-weight: 600; }
+.bar small { margin-left: auto; font-size: 12.5px; color: #8FB8AE; }
+iframe { flex: 1; width: 100%; border: 0; background: #EFF5F2; }
+@media (max-width: 900px) { .bar small { display: none; } .bar { overflow-x: auto; } }
+</style>
+</head>
+<body>
+<div class="bar"><span>Preview role</span><nav id="tabs"></nav><small>The live home, unchanged · only Modules, Pending and Favourites change per role</small></div>
+<iframe id="app" title="ANTZ home"></iframe>
+
+<script>
+const KEY = 'antz.home.layout.v2d'
+const L = (s) => s.split(' ').map((t, i) => { const [variantId, size] = t.split(':'); return { uid: `r${i}`, variantId, size } })
+const IMG = (n) => `assets/img/species/${n}.jpg`
+
+/* ══ THE FIVE ROLES ══════════════════════════════════════════════════════
+   grid     live card variants, in order, at a size each supports — written
+            as full rows of four cells so the grid has no holes
+   pending  the six rows: [label, count, overdue?]
+   fav      null keeps the live Favourites; otherwise a title and four animals
+            [photo, AAID, name, sex]                                         */
+const ROLES = {
+  vet: {
+    name: 'Veterinarian',
+    grid: L('medical.actions:medium hospital.patients:medium hospital.critical:medium lab.ready:medium mortality.review:medium followup.today:medium species.stats:medium pharmacy.default:small fetal.default:small'),
+    pending: [['Vaccinations', 143, 1], ['Deworming', 319, 1], ['Necropsy reports', 14296], ['Lab results', 4], ['Follow-ups', 17], ['Discharge review', 3]],
+    fav: { title: 'My Patients', rows: [['asiatic-lion', 87546, 'Asiatic Lion', 'm'], ['cinereous-vulture', 30871, 'Cinereous Vulture', 'f'], ['indian-rock-python', 40019, 'Indian Rock Python', 'u'], ['indian-peafowl', 33910, 'Indian Peafowl', 'm']] },
+  },
+  doctor: {
+    name: 'Doctor',
+    grid: L('medical.actions:medium administer.actions:medium hospital.patients:medium followup.today:medium pharmacy.actions:medium medical.requests:medium species.stats:medium lab.default:small diet.default:small'),
+    pending: [['Deworming', 319, 1], ['Vaccinations', 143, 1], ['Medicine admin', 39], ['Follow-ups', 17], ['Samples to collect', 6], ['Weights due', 5]],
+    fav: { title: 'My Patients', rows: [['asiatic-lion', 87546, 'Asiatic Lion', 'm'], ['bonnet-macaque', 61207, 'Bonnet Macaque', 'f'], ['blackbuck', 10221, 'Blackbuck', 'm'], ['indian-peafowl', 33910, 'Indian Peafowl', 'm']] },
+  },
+  biologist: {
+    name: 'Zoo Biologist',
+    grid: L('species.stats:medium species.sex:medium species.movement:medium natality.week:medium eggs.default:small fetal.default:small mortality.month:medium parivesh.submissions:medium medical.default:small housing.default:small'),
+    pending: [['Sexing', 28532, 1], ['Microchipping', 20302, 1], ['Transfer pending', 16], ['Births to verify', 100], ['Necropsy reports', 14296], ['Parivesh filings', 4]],
+    fav: null,
+  },
+  zoologist: {
+    name: 'Zoologist',
+    grid: L('species.stats:medium housing.default:small diet.default:small species.movement:medium natality.week:medium medical.default:small eggs.default:small mortality.month:medium communication.actions:medium reports.actions:medium'),
+    pending: [['Observations due', 18, 1], ['Welfare assessments', 157, 1], ['Enrichment plans', 9], ['Keeper flags', 7], ['Behaviour reports', 3], ['Transfer pending', 16]],
+    fav: { title: 'Watch List', rows: [['asiatic-lion', 120443, 'Asiatic Lion · pacing', 'm'], ['sloth-bear', 172290, 'Sloth Bear · off feed', 'f'], ['bonnet-macaque', 61207, 'Macaque troop', 'u'], ['sarus-crane', 143944, 'Sarus Crane · alone', 'f']] },
+  },
+  admin: {
+    name: 'Admin',
+    grid: L('approvals.pending:medium users.access:medium security.alerts:medium parivesh.permits:medium reports.actions:medium communication.actions:medium species.stats:medium users.today:small medical.default:small'),
+    pending: [['Approvals', 32, 1], ['Access requests', 8, 1], ['Parivesh submissions', 4], ['Security alerts', 3], ['Permits to renew', 2], ['Transfer pending', 16]],
+    fav: null,
+  },
+}
+const SEX = { m: 'M', f: 'F', u: 'UD' }
+
+/* ── keep the visitor's own grid, and give it back on the way out ─────── */
+let original = null
+try { original = localStorage.getItem(KEY) } catch {}
+addEventListener('pagehide', () => { try { original === null ? localStorage.removeItem(KEY) : localStorage.setItem(KEY, original) } catch {} })
+
+/* ── patch the live page once it has drawn ───────────────────────────── */
+/* writes only what differs, so the observer below never feeds itself */
+const setText = (el, v) => { if (el && el.textContent !== String(v)) el.textContent = v }
+const setHTML = (el, v) => { if (el && el.innerHTML !== v) el.innerHTML = v }
+function patch(doc, r) {
+  const pend = doc.querySelectorAll('#v2dPending .l-v2sn__row')
+  if (!pend.length) return false
+  pend.forEach((row, i) => {
+    const p = r.pending[i]; if (!p) return
+    setText(row.querySelector('.l-v2sn__t'), p[0])
+    setText(row.querySelector('b'), p[1].toLocaleString('en-IN'))
+    row.classList.toggle('is-late', !!p[2])
+    row.setAttribute('aria-label', `${p[0]}, ${p[1]}${p[2] ? ' overdue' : ' pending'}`)
+  })
+  if (r.fav) {
+    setText(doc.querySelector('#favTitle'), r.fav.title)
+    doc.querySelectorAll('#favSpecies .fav__card').forEach((c, i) => {
+      const f = r.fav.rows[i]; if (!f) return
+      const [img, aaid, name, sex] = f
+      const im = c.querySelector('.fav__img'); if (im && !im.src.endsWith(IMG(img))) im.src = IMG(img)
+      setHTML(c.querySelector('.fav__name'), `AAID<span class="fav__idsep"> </span>${aaid}`)
+      setText(c.querySelector('.fav__meta'), name)
+      const s = c.querySelector('.fav__sex'); if (s) { s.dataset.s = sex; setText(s, SEX[sex]) }
+      c.setAttribute('aria-label', `${name}, AAID ${aaid}`)
+    })
+  }
+  const name = doc.querySelector('.greeting__name')
+  if (name && !doc.getElementById('rolePill')) {
+    name.insertAdjacentHTML('afterend', `<span id="rolePill" style="display:inline-flex;align-self:flex-start;width:fit-content;align-items:center;height:26px;margin-top:6px;padding:0 12px;border-radius:999px;background:#DDEBE9;color:#1F415B;font:600 12.5px Inter,sans-serif">${r.name}</span>`)
+  } else if (name) setText(doc.getElementById('rolePill'), r.name)
+  return true
+}
+
+let role = 'vet'
+try { const v = sessionStorage.getItem('antz.preview.role'); if (ROLES[v]) role = v } catch {}
+const frame = document.getElementById('app')
+
+function load() {
+  const r = ROLES[role]
+  try { localStorage.setItem(KEY, JSON.stringify({ version: 13, seed: 6, savedAt: Date.now(), cards: r.grid })) } catch {}
+  document.getElementById('tabs').innerHTML = Object.entries(ROLES).map(([k, v]) => `<button type="button" data-role="${k}" aria-pressed="${k === role}">${v.name}</button>`).join('')
+  document.title = `${r.name} · Role Home`
+  frame.src = `../index.html?role=${role}`
+}
+frame.addEventListener('load', () => {
+  const doc = frame.contentDocument, r = ROLES[role]
+  let tries = 0
+  const tick = () => { if (!patch(doc, r) && tries++ < 40) setTimeout(tick, 100) }
+  tick()
+  /* the live page redraws Pending and Favourites on a site change — patch again */
+  new MutationObserver(() => { clearTimeout(frame._t); frame._t = setTimeout(() => patch(doc, r), 30) })
+    .observe(doc.querySelector('.v2d__rail') || doc.body, { childList: true, subtree: true })
+})
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-role]'); if (!b || b.dataset.role === role) return
+  role = b.dataset.role
+  try { sessionStorage.setItem('antz.preview.role', role) } catch {}
+  load()
+})
+load()
+</script>
+</body>
+</html>

@@ -1,31 +1,29 @@
 <!doctype html>
 <!--
-  EVENT HOME · mockup, not part of the app.
+  ONBOARDING HOME · mockup, not part of the app. Two people open the app for the first time:
 
-  V2's Home as a visitor (or a brand-new user) first sees it. Every section is
-  V2's own component with V2's own styles (read off the running app at 834),
-  given a visitor's job instead of a person's history:
+  ?user=new (default) · a NEW user, handed over from the Kiosk.
+    The Kiosk set the zoo up by voice (sites, sections, enclosures, species), the
+    owner reviewed it on the web and pushed it to the app. So nothing here asks
+    them to set up again: the welcome says "Your zoo is on ANTZ" and shows what
+    came across, the sites are already on Home, and the last card points at
+    checking the setup, inviting the team and choosing modules.
+      Recently viewed   empty state: ghost cards and one "Try me" animal
+      Announcements     welcome set: Hello · How ANTZ works · Your Kiosk setup ·
+                        Write a note · Explore the modules
+      Observation Notes empty state; the tour writes and posts a sample note
+      Tour              6 spotlight steps, then "You're all set"
+    The welcome comes back after 90 s idle (the next visitor at an event).
 
-    header + search         same; "Welcome to ANTZ", search suggests a species
-    Recently viewed         → its EMPTY state: ghost cards (dashed, a faint animal)
-                              and one "Try me" card. Opening that animal and coming
-                              back puts it in the row as a real Recently viewed card;
-                              the next suggestion takes the Try slot
-    health-strip ticker     → removed
-    Announcements deck      → the same mint band + stacked card, carrying five
-                              welcome announcements: Hello · How ANTZ works ·
-                              Add your site · Write your first note · Explore
-                              the modules. Turns every 6 s; tap opens the full one
-    site chips              same, plus a dashed "+ Add site" chip → a form sheet
-    Observation Notes       → the empty state: an illustration, "No notes yet",
-                              and the note types as options → a composer sheet
-    Modules grid            same tiles, same gradients and photos, each now with
-                              its own figure; Pending → "Did you know?"
-    Quick Actions pill      → Take the tour; the chat disc → All modules
+  ?user=existing · a person who already uses ANTZ opens the updated app.
+    Their Home is full (recently viewed, notes, team announcements). A "What's new
+    in ANTZ" card lists the new features; "Show me" spotlights each one on their
+    own Home, ending on ✦ in the top corner, where What's new lives from then on.
+    The ✦ dot counts features not seen yet, and each new section carries a NEW tag
+    until its step is seen.
 
-  Nothing personal: no notes, announcements, favourites, recently viewed,
-  pending or chat. A welcome card + six-step spotlight tour run on first open, and again
-  after 90 s idle (the next visitor). ?nowelcome skips the welcome.
+  ?nowelcome skips the first card in either mode. The pill at the very top
+  switches modes (mockup only).
   Figures: V5 anonymised dump (assets/data/v2-modules.json, v2-week.json;
   "today" 20 May 2026). Anything marked SAMPLE has no data in the dump.
 -->
@@ -33,7 +31,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Event Home</title>
+<title>Onboarding Home</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
   :root {
@@ -153,9 +151,6 @@
   /* Animal stories: the Observation Notes cards */
   .notes { background: #EEF2F1; border-radius: 16px; margin: 0 16px; padding: 18px 0; }
   .notes .sec-head { padding: 0 24px; }
-  /* add site chip */
-  .chip.add { background: transparent; border: 1.5px dashed #9DB0A8; color: var(--brand); font-weight: 500; display: inline-flex; align-items: center; gap: 8px; }
-  .chip.add b { width: 22px; height: 22px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-size: 16px; line-height: 1; }
 
   /* announcement art */
   .art { width: 100%; height: 100%; display: grid; place-items: center; }
@@ -352,10 +347,6 @@
   .tc-foot .btn-primary, .tc-foot .btn-ghost { padding: 0 16px; }
   .tc-back[disabled] { opacity: 0; pointer-events: none; }
   .tc-next:hover svg { transform: translateX(2px); }
-  /* a field inside the tour card (the Sites step: name your site) */
-  .tc-field { display: flex; gap: 8px; }
-  .tc-field input { flex: 1; min-width: 0; height: 44px; border: 1px solid #DCE3E0; border-radius: 12px; padding: 0 14px; font: 400 15px Inter, sans-serif; color: var(--navy); }
-  .tc-field input:focus { outline: 2px solid var(--live); border-color: transparent; }
   .tc-keys { font-size: 12px; color: var(--muted); text-align: center; }
   .tc-done { left: 50% !important; top: 50% !important; transform: translate(-50%, -50%); width: min(440px, calc(100vw - 32px)); padding: 26px 24px 22px; text-align: left; }
   .tc-done .badge { width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, #37BD69, #16A6B6); display: grid; place-items: center; box-shadow: 0 12px 28px rgba(22,166,182,.35); animation: pop .5s cubic-bezier(.34,1.56,.64,1); }
@@ -465,7 +456,6 @@
   .kin i img { width: 16px; height: 16px; }
   .kin b { font-size: 22px; font-weight: 600; color: var(--navy); line-height: 1; font-variant-numeric: tabular-nums; }
   .kin small { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .kin-empty { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fff; border-radius: 12px; padding: 12px 14px; font-size: 14px; color: var(--text); }
   .chip.fresh { animation: uPop .5s cubic-bezier(.34,1.56,.64,1); }
 
   /* ── notes: the empty state, its inline composer, and V2's note cards ── */
@@ -686,7 +676,7 @@
   .tiles11 span { height: 58px; border-radius: 12px; color: #fff; padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between; font-size: 12px; font-weight: 500; background-size: cover; background-position: center; overflow: hidden; white-space: nowrap; }
   .tiles11 span img { width: 18px; height: 18px; }
 
-  /* ── setup order on the last card: site, then animals, then the rest ── */
+  /* ── next steps on the last card ── */
   .setup { list-style: none; margin: 0; padding: 0; display: grid; }
   .setup li { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 8px 0; animation: uRise .5s cubic-bezier(.32,.72,0,1) var(--d, 0s) both; }
   .setup li + li::before { content: ""; position: absolute; left: 19px; top: -14px; height: 28px; width: 2px; background: #DCE7E2; }
@@ -697,6 +687,49 @@
   .setup span { font-size: 13px; color: var(--text); }
   .setup .go { height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid #D5E2DB; background: #F6FBF8; color: #1F515B; font: 600 13px Inter, sans-serif; cursor: pointer; }
   .setup li:first-child .go { background: #234C54; border-color: #234C54; color: #fff; }
+
+  /* ── Kiosk handover: what the voice setup created ── */
+  .wkiosk { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .wkiosk div { background: #F3F7F5; border-radius: 12px; padding: 10px; display: grid; gap: 6px; animation: uRise .5s cubic-bezier(.32,.72,0,1) var(--d, 0s) both; }
+  .wkiosk i { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background-size: cover; background-position: center; }
+  .wkiosk i img { width: 16px; height: 16px; }
+  .wkiosk b { font-size: 20px; font-weight: 600; color: var(--navy); line-height: 1; font-variant-numeric: tabular-nums; }
+  .wkiosk small { font-size: 12px; color: var(--muted); }
+  .wsrc { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
+  .wsrc i { width: 24px; height: 24px; border-radius: 50%; background: #E3F4EA; display: grid; place-items: center; flex: none; }
+  .ktree { display: grid; gap: 10px; }
+  .ksite { border: 1px solid #E6ECE9; border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
+  .ksite > header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .ksite > header b { font-size: 16px; color: var(--navy); }
+  .ksite > header small { font-size: 12px; color: var(--muted); }
+  .ksec { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 4px 12px; padding: 8px 10px; background: #F6F9F8; border-radius: 10px; font-size: 13px; color: var(--text); }
+  .ksec > b { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .ksec > span { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ksec em { font-style: normal; display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px 0 3px; border-radius: 13px; background: #fff; color: var(--navy); }
+  .ksec em img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+  .ksite > small { font-size: 12px; color: var(--muted); padding-left: 2px; }
+
+  /* ── What's new: ✦ in the top corner, its dot, the NEW tags, the list ── */
+  .sq.wn { position: relative; cursor: pointer; }
+  .sq.wn .dot { position: absolute; top: -5px; right: -5px; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 10px; background: #E5604A; color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 2px #fff; }
+  .sq.wn .dot::after { content: ""; position: absolute; inset: -2px; border-radius: inherit; animation: dotHalo 2s ease-out infinite; }
+  @keyframes dotHalo { from { box-shadow: 0 0 0 0 rgba(229,96,74,.55); } to { box-shadow: 0 0 0 9px rgba(229,96,74,0); } }
+  .newtag { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; margin-left: 8px; border-radius: 6px; background: linear-gradient(135deg, #37BD69, #16A6B6); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .5px; vertical-align: 2px; }
+  .wnlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .wnlist button { width: 100%; display: flex; align-items: center; gap: 12px; border: 0; background: none; border-radius: 12px; padding: 7px 8px; cursor: pointer; text-align: left; font: inherit; animation: uRise .5s cubic-bezier(.32,.72,0,1) var(--d, 0s) both; transition: background .2s; }
+  .wnlist button:hover { background: #F3F7F5; }
+  .wnlist i { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; flex: none; background-size: cover; background-position: center; }
+  .wnlist i img { width: 20px; height: 20px; }
+  .wnlist span { min-width: 0; flex: 1; }
+  .wnlist b { display: block; font-size: 15px; font-weight: 600; color: var(--navy); }
+  .wnlist small { display: block; font-size: 13px; color: var(--text); line-height: 1.35; }
+  .wnlist em { font-style: normal; flex: none; font-size: 11px; font-weight: 700; letter-spacing: .4px; color: #1E8A4C; }
+  .wnlist em.new { color: #fff; background: #E5604A; border-radius: 6px; padding: 3px 6px; }
+
+  /* mockup only: switch between the two people */
+  .modesw { position: fixed; top: 6px; left: 50%; transform: translateX(-50%); z-index: 70; display: flex; gap: 2px; padding: 2px; border-radius: 14px; background: rgba(15,30,25,.55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .modesw a { height: 24px; padding: 0 10px; border-radius: 12px; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.8); text-decoration: none; white-space: nowrap; }
+  .modesw a[aria-current] { background: #fff; color: var(--navy); }
 
   .chip:focus-visible, .card:focus-visible, .fav__card:focus-visible, .acard:focus-visible, .btn-primary:focus-visible, .btn-ghost:focus-visible, .qa-pill:focus-visible, .disc:focus-visible { outline: 3px solid var(--live); outline-offset: 2px; }
 
@@ -725,11 +758,13 @@
     .tiles11 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .beds { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bed { height: 54px; }
     .setup .go { display: none; }
+    .wkiosk { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ksec { grid-template-columns: 1fr; }
   }
   @media (prefers-reduced-motion: reduce) {
     #t-mods.editing .grid > .card, .tour-hole::after, .tour-hi, .tc-done .badge, .tcard .in, .fav__card.try .tryme::before, .fav__card.fresh,
     .wcard, .wneeds li, .gs, .gs-row, .ncard, .ncomp, .chip.fresh, .lart .orb, .lart .sat i, .lart .core::after, .how, .show, .sw, .szpop, .card .wg-bars i,
-    .u-rise, .u-pop, .u-fade, .u-slide, .u-num, .u-bar, .u-ring, .u-out, .dots9 i, .chk, .chk svg, .egg, .sweep, .setup li, .sw-prog i.now b, .how-stage line.lit { animation: none !important; }
+    .u-rise, .u-pop, .u-fade, .u-slide, .u-num, .u-bar, .u-ring, .u-out, .dots9 i, .chk, .chk svg, .egg, .sweep, .setup li, .wkiosk div, .wnlist button, .sq.wn .dot::after, .sw-prog i.now b, .how-stage line.lit { animation: none !important; }
     .sweep { display: none; }
     .acard, .sheet, .tour-hole, .tcard, .tcard .arrow, .hn, .hn em, .hev { transition: none; }
   }
@@ -743,6 +778,7 @@
       <span class="ava" id="ava"><img src="../assets/img/antz-logo.png" alt="ANTZ"></span>
       <div><small id="hiSmall">Good Afternoon,</small><h1 id="hiName">Welcome to ANTZ <span aria-hidden="true">👋</span></h1></div>
       <div class="wx"><b><svg width="26" height="18" viewBox="0 0 26 18" aria-hidden="true"><path d="M7 17h13a5 5 0 0 0 .6-9.96A7 7 0 0 0 7.2 6.1 5.5 5.5 0 0 0 7 17z" fill="#4C8DF0"/></svg>29°</b><span>Cloudy</span></div>
+      <button class="sq wn" id="wnBtn" hidden aria-label="What’s new"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l1.9 5.6a3 3 0 0 0 1.9 1.9l5.7 2-5.7 2a3 3 0 0 0-1.9 1.9L12 21.5l-1.9-5.6a3 3 0 0 0-1.9-1.9L2.5 12l5.7-2a3 3 0 0 0 1.9-1.9z" fill="#37BD69"/><path d="M19 2.5l.6 1.7 1.7.6-1.7.6-.6 1.7-.6-1.7-1.7-.6 1.7-.6z" fill="#16A6B6"/></svg><b class="dot" id="wnDot"></b></button>
       <button class="sq" aria-label="Notifications"><img src="../assets/icon/v2-bell.svg" alt="" width="22"></button>
     </div>
     <div class="search" id="t-search">
@@ -751,7 +787,7 @@
       <div class="gs" id="gs" hidden></div>
     </div>
     <div class="fav" id="t-born">
-      <div class="fav-head"><h2 class="h2">Recently viewed</h2><span id="bornCount"></span></div>
+      <div class="fav-head"><h2 class="h2" data-nf="born">Recently viewed</h2><span id="bornCount"></span></div>
       <div class="rail" id="born"></div>
     </div>
   </section>
@@ -766,12 +802,12 @@
     <section class="kins" id="t-kins" aria-live="polite"></section>
 
     <section class="notes" id="t-notes">
-      <div class="sec-head"><h2 class="h2">Observation Notes</h2><button class="viewall" data-note="obs">+ New note</button></div>
+      <div class="sec-head"><h2 class="h2" data-nf="notes">Observation Notes</h2><button class="viewall" data-note="obs">+ New note</button></div>
       <div class="nempty" id="notesEmpty"></div>
     </section>
 
     <section class="sec" id="t-mods">
-      <div class="sec-head"><h2 class="h2">Modules</h2><div class="mh-acts">
+      <div class="sec-head"><h2 class="h2" data-nf="mods">Modules</h2><div class="mh-acts">
         <button class="mh-btn" data-addmod aria-label="Add a module"><svg width="22" height="22" viewBox="0 0 22 22"><path d="M11 4v14M4 11h14" stroke="#006D35" stroke-width="2.2" stroke-linecap="round"/></svg></button>
         <button class="mh-btn" data-edit aria-label="Edit Home"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M3 17l1-4.2L13.6 3.2a1.9 1.9 0 0 1 2.7 0l.5.5a1.9 1.9 0 0 1 0 2.7L7.2 16 3 17z" fill="none" stroke="#006D35" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 4.8l3.2 3.2" stroke="#006D35" stroke-width="1.8"/></svg></button>
         <button class="mh-done" data-done-edit>Done</button></div></div>
@@ -812,11 +848,23 @@
     <div class="sw-foot"><button class="btn-ghost" data-sw="prev" id="swPrev">Back</button><span class="sp"></span><button class="btn-ghost" data-sw="add" id="swAdd"></button><button class="btn-primary" data-sw="next" id="swNext"></button></div>
   </div>
 </div>
+<nav class="modesw" aria-label="Mockup: who is opening the app"><a href="?user=new" id="mNew">New · from Kiosk</a><a href="?user=existing" id="mEx">Existing user</a></nav>
+<div class="welcome" id="wn" hidden>
+  <div class="wcard" role="dialog" aria-modal="true" aria-labelledby="wnT">
+    <div class="top"><div><small style="opacity:.9" id="wnHi">Hi!</small><b id="wnT">What’s new in ANTZ</b></div></div>
+    <div class="in">
+      <p>Home has a new look. Your animals, notes and records are all where you left them. Here’s what changed:</p>
+      <ul class="wnlist" id="wnList"></ul>
+      <div class="sh-cta"><button class="btn-ghost" id="wnLater">Later</button><button class="btn-primary" id="wnGo">Show me <svg class="go" width="16" height="16" viewBox="0 0 16 16"><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    </div>
+  </div>
+</div>
 <div class="welcome" id="welcome" hidden>
   <div class="wcard">
-    <div class="top"><div><small style="opacity:.9">Hello!</small><b>Welcome to ANTZ</b></div></div>
+    <div class="top"><div><small style="opacity:.9">Hello!</small><b>Your zoo is on ANTZ</b></div></div>
     <div class="in">
-      <p>Every part of your zoo, in one app.</p>
+      <p>You set it up at the Kiosk by voice, then reviewed it and pushed it here. This is what came across:</p>
+      <div class="wkiosk" id="wKiosk"></div>
       <label class="wname">What should we call you?<input id="wName" placeholder="Your name" autocomplete="given-name" maxlength="28"></label>
       <div class="sh-cta"><button class="btn-ghost" id="wSkip">I’ll explore</button><button class="btn-primary" id="wTour">Show me around <svg class="go" width="16" height="16" viewBox="0 0 16 16"><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
     </div>
@@ -825,9 +873,11 @@
 
 <script>
 /* ============ data (V5 anonymised dump, 20 May 2026) ============ */
-// two sites on show, then "+ Add site"; "all" below is those two (computed from the dump, species counted once)
-const SITES = [   // grows when a visitor adds their own site
-
+// who is opening the app: a new user handed over from the Kiosk, or someone who already uses ANTZ
+const MODE = new URLSearchParams(location.search).get('user') === 'existing' ? 'existing' : 'new';
+const EX = MODE === 'existing';
+// the two sites the Kiosk created; "all" below is those two (computed from the dump, species counted once)
+const SITES = [
   { id: 'all', n: 'All sites' }, { id: 'bg-zoo', n: 'Clearspring' }, { id: 'hg-field', n: 'Hollowpine' },
 ];
 const D = {
@@ -844,6 +894,14 @@ const D = {
   birds:   { all: 8078, 'bg-safari': 0, 'bg-zoo': 4897, 'hg-field': 3181, 'ms-rescue': 4886 },
   mammals: { all: 3988, 'bg-safari': 508, 'bg-zoo': 2855, 'hg-field': 1133, 'ms-rescue': 30 },
   audit:   { all: 73, 'bg-safari': 72, 'bg-zoo': 64, 'hg-field': 81, 'ms-rescue': 55 },
+};
+// what the Kiosk's voice setup created, by site. Sections and their contents are SAMPLE (the dump has no sections)
+const KIOSK = {
+  'bg-zoo': { sec: 14, list: [['Big Cats', ['Leopard Run', 'Tiger Ridge'], [['indian-leopard', 'Indian leopard'], ['bengal-tiger', 'Bengal tiger']]],
+                              ['Wetlands', ['Crane Marsh'], [['sarus-crane', 'Sarus crane'], ['indian-peafowl', 'Indian peafowl']]]] },
+  'hg-field': { sec: 9, list: [['Small Mammals', ['Ivy Rise Coop', 'Vale Cross Run'], [['sloth-bear', 'Tideborn numbat'], ['indian-leopard', 'Coral cat-snake']]],
+                               ['Reptiles', ['Laurel Marsh Pen'], [['indian-rock-python', 'Coral verdant adder']]],
+                               ['Aviary', ['Ivy Combe Habitat'], [['sarus-crane', 'Slate canary'], ['hill-myna', 'Hill myna']]]] },
 };
 const fmt = n => typeof n === 'number' ? n.toLocaleString('en-IN') : n;
 const scale = (n, s) => s === 'all' ? n : D.animals[s] ? Math.max(1, Math.round(n * D.animals[s] / D.animals.all)) : 0;
@@ -936,16 +994,16 @@ const tileBg = m => m.photo ? `background-image:linear-gradient(rgba(0,0,0,.15),
 
 /* announcements: a new user's first five, in V2's announcement card. The picture is the ANTZ mark with the
    modules the card is about in orbit around it (owner, 6 Oct: no stock photos on these, use the logo) */
-const ANN = [
+const ANN_NEW = [
   { k: 'hello', label: 'Welcome', to: 'Everyone', sats: ['medical', 'housing', 'natality', 'pharmacy', 'eggs', 'animals'], t: 'Hello! Welcome to ANTZ',
     b: 'Everything about your animals in one place: who they are, where they live, their health and their food. Home shows what needs you today.',
     more: ['Every animal has one record, from the day it is born.', 'Keepers, vets and managers each see what they need.', 'It works on the phone at the enclosure, even offline.'], cta: ['Take the tour', 'tour'] },
   { k: 'how', label: 'Getting started', to: 'Everyone', watch: true, sats: ['natality', 'housing', 'medical', 'pharmacy', 'audit'], t: 'How ANTZ works',
     b: 'Record something once, at the enclosure. Every module that needs it knows straight away, and Home shows what changed. Tap to watch it happen.',
     more: [], cta: ['Watch how it works', 'how'] },
-  { k: 'site', label: 'Set up', to: 'Site managers', sats: ['housing', 'users', 'security', 'audit'], t: 'Add your first site',
-    b: 'A site is your zoo, park or rescue centre. Add it, then its sections and enclosures, and every animal you record has a home.',
-    more: ['Name the site and its type', 'Add sections, then enclosures inside them', 'Invite the team who work there'], cta: ['Add a site', 'site'] },
+  { k: 'kiosk', label: 'Your setup', to: 'Site managers', sats: ['housing', 'species', 'animals', 'users'], t: 'Your Kiosk setup is live',
+    b: 'The sites, sections, enclosures and species you set up by voice at the Kiosk are on ANTZ now. Check them once, and change anything in Housing or Species.',
+    more: ['2 sites, 23 sections, every enclosure and species', 'Change a name or a count in Housing or Species', 'Invite the team who work there'], cta: ['See what was set up', 'kiosk'] },
   { k: 'note', label: 'Try it', to: 'Keepers', sats: ['animals', 'medical', 'housing', 'security'], t: 'Seen something? Write a note',
     b: 'A limp, a new behaviour, a broken fence. Write a note with a photo and tag the animal. The right people see it on their Home.',
     more: ['Pick the type: observation, health, enclosure or incident', 'Tag the animal or the enclosure', 'Add a photo, then post'], cta: ['Write a note', 'note'] },
@@ -953,6 +1011,19 @@ const ANN = [
     b: 'Medical, Housing, Diet, Natality, Pharmacy and more. Watch each one at work, then add the ones you use to Home.',
     more: ['Every tile shows a live figure', 'Tap a tile to open the module', 'Small, medium or large: pick each widget’s size'], cta: ['Watch the modules', 'show'] },
 ];
+// an existing user's deck: what's new first, then their team's own announcements (SAMPLE)
+const ANN_EX = [
+  { k: 'new', label: 'What’s new', to: 'Everyone', sats: ['animals', 'medical', 'housing', 'natality', 'pharmacy', 'diet'], t: 'Home has a new look',
+    b: 'Search everything from one bar, Key Insights for each site, notes with photos and widgets in three sizes. Tap ✦ at the top any time to see what changed.',
+    more: ['Your data has not moved: same animals, notes and records', 'Every new feature is marked NEW until you have seen it', '✦ at the top keeps the list'], cta: ['Show me what’s new', 'wn'] },
+  { k: 'vacc', label: 'Medical', by: 'Dr Rao', to: 'Clearspring vets', sats: ['medical', 'pharmacy', 'administer'], t: 'Leopard group vaccinations on 31 May',
+    b: 'All four leopards at Leopard Run are due. Keep them in the night house after the morning feed; the team starts at 9.',
+    more: ['Leopard Run, Clearspring · 31 May, 9 am', 'Doses come off Pharmacy stock by themselves', 'Record each one in Medical at the enclosure'], cta: ['Open Medical', 'mod:medical'] },
+  { k: 'audit', label: 'Audit', by: 'Meena S', to: 'Hollowpine keepers', sats: ['audit', 'housing', 'animals'], t: 'Weekly headcount moves to Friday',
+    b: 'From next week, count your enclosures on Friday afternoon instead of Monday. The app reminds you at 3 pm.',
+    more: ['Count on the phone, enclosure by enclosure', 'A mismatch is flagged at once', 'Hollowpine is at 81% this week'], cta: ['Open Audit', 'mod:audit'] },
+];
+const ANN = EX ? ANN_EX : ANN_NEW;
 const PLAY = '<svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.5v9l7.5-4.5z" fill="#fff"/></svg>';
 function logoArt(A, watch) {
   const n = A.sats.length;
@@ -962,15 +1033,16 @@ function logoArt(A, watch) {
 }
 
 /* ============ render ============ */
-let site = 'all', natMode = 'week', slide = 0, deckTimer = null, addedSite = '', justAddedSite = '';
-let notesMode = 'empty';   // empty → compose (the tour types one) → cards
+let site = 'all', natMode = 'week', slide = 0, deckTimer = null;
+let notesMode = EX ? 'cards' : 'empty';   // empty → compose (the tour types one) → cards
 
 function renderBand() {
   const seen = viewed.map(a => DEMO.find(d => d.aaid === a));
-  const next = DEMO.find(d => !viewed.includes(d.aaid));
-  const ghosts = Math.max(3, 6 - seen.length - (next ? 1 : 0));
+  const next = EX ? null : DEMO.find(d => !viewed.includes(d.aaid));
+  const ghosts = EX ? 0 : Math.max(3, 6 - seen.length - (next ? 1 : 0));
   const GH = ['bengal-tiger', 'sarus-crane', 'gaur', 'indian-peafowl', 'sambar', 'hill-myna'];
   document.getElementById('bornCount').textContent = seen.length ? `${seen.length} opened · tap to reopen` : 'Animals you open will appear here';
+  paintNew();
   document.getElementById('born').innerHTML =
     seen.map((d, i) => `<button class="fav__card${i === 0 && justViewed ? ' fresh' : ''}" data-demo="${d.aaid}"><img src="${SP(d.ph)}" alt="" loading="lazy"><span class="sex${d.sex === 'M' ? ' m' : ''}">${d.sex}</span><span class="fav__id">AAID:${d.aaid}</span><span class="fav__meta">${d.sp}</span></button>`).join('') +
     (next ? `<button class="fav__card try" data-demo="${next.aaid}"><img src="${SP(next.ph)}" alt=""><span class="tryme">TRY ME</span><span class="fav__id">AAID:${next.aaid}</span><span class="fav__meta hint">Tap to open</span></button>` : '') +
@@ -986,7 +1058,7 @@ function slideHTML(k, cls = '') {
       <span class="achip"><img src="${I('ann-announcement')}" alt="" width="32" height="32">${A.label}</span>
       <h3>${A.t}</h3>
       <p>${A.b}</p>
-      <span class="meta"><span class="ann-who"><img src="../assets/img/antz-logo.png" alt="">ANTZ Team</span> • Today <span class="aud">To: ${A.to}</span></span>
+      <span class="meta"><span class="ann-who"><img src="../assets/img/antz-logo.png" alt="">${A.by || 'ANTZ Team'}</span> • Today <span class="aud">To: ${A.to}</span></span>
     </div>
     <div class="pic">${logoArt(A, A.watch)}</div>
   </button>`;
@@ -1006,20 +1078,10 @@ function goSlide(k) {
 }
 function startDeck() { clearInterval(deckTimer); deckTimer = setInterval(() => goSlide(slide + 1), 6000); }
 
-/* sites: the chips, then a visitor's own site (it starts empty), then "+ Add site" */
+/* sites: the ones the Kiosk created */
 function renderSites() {
   document.getElementById('t-sites').innerHTML = `<button class="chip menu" aria-label="Filters"><svg width="20" height="14" viewBox="0 0 20 14"><path d="M1 1h18M1 7h18M1 13h18" stroke="#3B4A44" stroke-width="2" stroke-linecap="round"/></svg></button>` +
-    SITES.map(x => `<button class="chip${x.id === justAddedSite ? ' fresh' : ''}" data-site="${x.id}" aria-pressed="${x.id === site}">${esc(x.n)}</button>`).join('') +
-    `<button class="chip add" data-addsite><b>+</b>Add site</button>`;
-  justAddedSite = '';
-}
-function addSite(name) {
-  const id = 'new' + SITES.length;
-  SITES.push({ id, n: name });
-  Object.keys(D).forEach(key => { D[key][id] = key === 'drug' ? '—' : 0; });
-  site = id; justAddedSite = id; renderAll();
-  const row = document.getElementById('t-sites');
-  requestAnimationFrame(() => row.scrollTo({ left: row.scrollWidth, behavior: reduce() ? 'auto' : 'smooth' }));
+    SITES.map(x => `<button class="chip" data-site="${x.id}" aria-pressed="${x.id === site}">${esc(x.n)}</button>`).join('');
 }
 
 /* Key Insights: four figures for the picked site; they count from the last site's to this one's */
@@ -1033,10 +1095,10 @@ function countUp(el, from, to) {
 function renderKins() {
   const s = site, el = document.getElementById('t-kins');
   const K = [['animals', 'Animals', D.animals[s]], ['species', 'Species', D.species[s]], ['natality', 'Born · 7 days', D.week[s]], ['notes', 'Notes', notesFor(s).length]];
-  el.innerHTML = `<div class="kins-h"><h2>Key Insights</h2><span>${esc(siteName(s))}${s === 'all' ? ` · ${SITES.length - 1} sites` : ''}</span></div>
-    <div class="kins-row">${K.map(([k, l]) => `<button class="kin" ${k === 'notes' ? 'data-kn' : `data-mod="${k}"`}><i style="${k === 'notes' ? 'background:linear-gradient(#FFE6DC,#FFD6C7)' : tileBg(ALL[k])}">${k === 'notes' ? NOTE_IC : icon(ALL[k])}</i><b data-kv="${k}"></b><small>${l}</small></button>`).join('')}
-    ${D.animals[s] ? '' : `<div class="kin-empty"><span><b style="color:var(--navy)">${esc(siteName(s))}</b> has no animals yet. Add them and these figures fill in.</span><button class="btn-primary" data-setup="animals">Add animals</button></div>`}</div>`;
+  el.innerHTML = `<div class="kins-h"><h2 data-nf="kins">Key Insights</h2><span>${esc(siteName(s))}${s === 'all' ? ` · ${SITES.length - 1} sites` : ''}</span></div>
+    <div class="kins-row">${K.map(([k, l]) => `<button class="kin" ${k === 'notes' ? 'data-kn' : `data-mod="${k}"`}><i style="${k === 'notes' ? 'background:linear-gradient(#FFE6DC,#FFD6C7)' : tileBg(ALL[k])}">${k === 'notes' ? NOTE_IC : icon(ALL[k])}</i><b data-kv="${k}"></b><small>${l}</small></button>`).join('')}</div>`;
   K.forEach(([k, , v]) => { countUp(el.querySelector(`[data-kv="${k}"]`), kinsPrev[k] ?? v, v); kinsPrev[k] = v; });
+  paintNew();
 }
 
 /* notes */
@@ -1322,33 +1384,21 @@ function allSheet(addMode) {
 }
 function annSheet(k) {
   const A = ANN[k];
-  openSheet(`${shHead(`<img src="${I('ann-announcement')}" alt="" width="40" height="40">`, A.t, `ANTZ Team • Today • To: ${A.to} • ${k + 1} of ${ANN.length}`)}
+  openSheet(`${shHead(`<img src="${I('ann-announcement')}" alt="" width="40" height="40">`, A.t, `${A.by || 'ANTZ Team'} • Today • To: ${A.to} • ${k + 1} of ${ANN.length}`)}
     <div style="height:200px;border-radius:12px;overflow:hidden">${logoArt(A)}</div><p>${A.b}</p>
     ${A.more.length ? `<ul class="cando">${A.more.map(m => `<li>${m}</li>`).join('')}</ul>` : ''}
     <div class="sh-cta"><button class="btn-primary" data-go="${A.cta[1]}">${A.cta[0]}</button>${k < ANN.length - 1 ? `<button class="btn-ghost" data-ann="${k + 1}">Next: ${ANN[k + 1].t}</button>` : ''}</div>`);
 }
-function siteSheet() {
-  openSheet(`${shHead(`<span class="ti" style="background:var(--g-housing)"><img src="${I('m-housing')}" alt=""></span>`, 'Add a site', 'Your zoo, park or rescue centre')}
-    <form class="form" onsubmit="return false">
-      <label>Site name<input id="fSite" placeholder="e.g. Riverside Zoo" maxlength="32"></label>
-      <label>Type<div class="seg2" data-seg>${['Zoo', 'Safari park', 'Rescue centre', 'Breeding centre', 'Aviary'].map((t, i) => `<button type="button" class="${i ? '' : 'on'}">${t}</button>`).join('')}</div></label>
-      <div class="two"><label>City<input id="fCity" placeholder="e.g. Bengaluru"></label><label>Area (acres)<input id="fArea" inputmode="numeric" placeholder="e.g. 120"></label></div>
-      <label>First section<input id="fSec" placeholder="e.g. Aviary block A"></label>
-    </form>
-    <span class="sh-src">Next you add its enclosures, then its animals.</span>
-    <div class="sh-cta"><button class="btn-primary" data-savesite>Add site</button><button class="btn-ghost" data-close>Not now</button></div>`);
-}
-function animalSheet() {
-  const into = site === 'all' ? SITES[SITES.length - 1] : SITES.find(x => x.id === site);
-  openSheet(`${shHead(`<span class="ti" style="background:var(--g-animals)"><img src="${I('qa-paw')}" class="white" alt=""></span>`, 'Add animals', `Into ${esc(into.n)}`)}
-    <form class="form" onsubmit="return false">
-      <label>Species<input placeholder="e.g. Indian leopard"></label>
-      <div class="two"><label>How many<input inputmode="numeric" value="1"></label><label>Enclosure<input placeholder="e.g. Leopard Run"></label></div>
-      <label>Sex<div class="seg2" data-seg>${['Male', 'Female', 'Not known yet'].map((t, i) => `<button type="button" class="${i === 2 ? 'on' : ''}">${t}</button>`).join('')}</div></label>
-      <label>Born or arrived on<input type="date"></label>
-    </form>
-    <span class="sh-src">Each animal gets its own AAID. Photos, parents and tags can come later.</span>
-    <div class="sh-cta"><button class="btn-primary" data-saveanimals>Add animals</button><button class="btn-ghost" data-close>Not now</button></div>`);
+const KIOSK_FIGS = () => [['m-housing', 'var(--g-housing)', SITES.length - 1, 'sites'], ['m-insights', 'var(--g-admin)', KIOSK['bg-zoo'].sec + KIOSK['hg-field'].sec, 'sections'],
+  ['m-housing', 'var(--g-users)', D.encl.all, 'enclosures'], ['qa-paw', 'var(--g-animals)', D.species.all, 'species']];
+function kioskSheet() {
+  openSheet(`${shHead(`<span class="ti" style="background:var(--g-housing)"><img src="${I('m-housing')}" alt=""></span>`, 'Set up at the Kiosk', 'By voice · reviewed on the web and pushed to the app')}
+    <div class="figs" style="grid-template-columns:repeat(4,minmax(0,1fr))">${KIOSK_FIGS().map(([, , v, l]) => `<div><b>${fmt(v)}</b><span>${l}</span></div>`).join('')}</div>
+    <div class="ktree">${SITES.filter(x => x.id !== 'all').map(x => { const K = KIOSK[x.id]; return `<section class="ksite"><header><b>${esc(x.n)}</b><small>${K.sec} sections · ${fmt(D.encl[x.id])} enclosures · ${fmt(D.species[x.id])} species</small></header>
+      ${K.list.map(([sec, encl, sp]) => `<div class="ksec"><b>${sec}</b><span>${encl.join(' · ')}</span><span></span><span>${sp.map(([ph, n]) => `<em><img src="${SP(ph)}" alt="">${n}</em>`).join('')}</span></div>`).join('')}
+      <small>+ ${K.sec - K.list.length} more sections</small></section>`; }).join('')}</div>
+    <span class="sh-src">Sections and their contents are sample: the demo records have no sections. Anything wrong? Change it in Housing or Species.</span>
+    <div class="sh-cta"><button class="btn-primary" data-go="mod:housing">Open Housing</button><button class="btn-ghost" data-go="mod:species">Open Species</button></div>`);
 }
 function noteSheet(type) {
   const T = NOTE_TYPES.find(n => n[0] === type) || NOTE_TYPES[0];
@@ -1480,26 +1530,45 @@ function gridRows(n) {
 }
 
 const G_TEAL = 'linear-gradient(135deg,#37BD69,#16A6B6)';
-const STEPS = [
-  { sel: ['#t-search', '#gs'], ic: 'v2-search', bg: G_TEAL, eye: 'Global search',
+// one list of steps; a new user gets the "how it works" copy, an existing user gets "what changed" (ex*) and the
+// short line their What's new list shows (wt, ws). nf names the section's NEW tag.
+const STEPS_ALL = [
+  { nf: 'search', sel: ['#t-search', '#gs'], ic: 'v2-search', bg: G_TEAL, eye: 'Global search',
     t: 'One search for everything', p: 'Animals, medical records, enclosures and modules, all from this bar. Type a name or an ID, or scan the tag. <b>Tap the bar to try it.</b>',
+    ext: 'Search now finds everything', exp: 'Animals, medical records, enclosures and modules from one bar, grouped as you type. <b>Tap the bar to try it.</b>',
+    wt: 'Search everything', ws: 'Animals, records, enclosures and modules, from one bar',
     live: true, pre: () => { gsOpen(true); gsSet(''); undo.push(gsClose); }, on: searchDemo },
-  { sel: ['#t-born'], ic: 'qa-paw', bg: 'var(--g-animals)', eye: 'Recently viewed',
-    t: 'Get back to an animal fast', p: 'Every animal you open waits here, one tap away. Start with the one marked <b>Try me</b>.' },
-  { sel: ['#t-deck'], ic: 'ann-announcement', raw: true, bg: '#fff', eye: 'Announcements',
+  { nf: 'born', sel: ['#t-born'], ic: 'qa-paw', bg: 'var(--g-animals)', eye: 'Recently viewed',
+    t: 'Get back to an animal fast', p: 'Every animal you open waits here, one tap away. Start with the one marked <b>Try me</b>.',
+    ext: 'Your animals, one tap away', exp: 'The animals you opened last now wait at the top of Home. Tap one to go straight back to its record.',
+    wt: 'Recently viewed', ws: 'The animals you opened last, at the top of Home' },
+  { nf: 'deck', sel: ['#t-deck'], ic: 'ann-announcement', raw: true, bg: '#fff', eye: 'Announcements',
     t: 'Tell the whole zoo at once', p: 'Post news to your team, one site or everyone, and it lands on their Home. Tap <b>How ANTZ works</b> to watch it in action.',
-    pre: () => { clearInterval(deckTimer); if (slide !== 1) goSlide(1); undo.push(startDeck); } },
-  { sel: ['#t-sites .chip:not(.menu)', '#t-kins'], ic: 'm-housing', bg: 'var(--g-housing)', eye: 'Sites',
-    t: 'Each site gets its own Home', field: () => !addedSite,
-    p: () => addedSite ? `<b>${esc(addedSite)}</b> is on Home. Tap a site and its Notes and Key Insights follow it.` : 'Tap a site and its Notes and Key Insights follow it. Add yours:',
-    on: sitesDemo, pre: () => { const before = site; undo.push(() => { if (!addedSite) { site = before; renderSiteDeps(); } }); } },
-  { sel: ['#t-notes'], svg: NOTE_IC, bg: 'linear-gradient(#FFE6DC,#FFD6C7)', eye: 'Observation notes',
+    ext: 'Announcements reach the right people', exp: 'Each announcement now says who it is for: your team, one site or everyone. It lands on their Home, and turns on its own.',
+    wt: 'Announcements with an audience', ws: 'Post to a team, one site or everyone',
+    pre: () => { clearInterval(deckTimer); if (slide !== 1) goSlide(1); undo.push(startDeck); } },   // new: How ANTZ works · existing: a team post with its audience
+  { nf: 'kins', sel: ['#t-sites .chip:not(.menu)', '#t-kins'], ic: 'm-housing', bg: 'var(--g-housing)', eye: 'Sites',
+    t: 'Each site gets its own Home', p: 'These are the sites you set up at the Kiosk. Tap one and its Notes and Key Insights follow it.',
+    ext: 'Key Insights follow the site', exp: 'Tap a site and its animals, species, births and notes follow it. <b>All sites</b> adds them up.',
+    wt: 'Key Insights for each site', ws: 'Pick a site; its figures and notes follow',
+    on: sitesDemo, pre: () => { const before = site; undo.push(() => { site = before; renderSiteDeps(); }); } },
+  { nf: 'notes', sel: ['#t-notes'], svg: NOTE_IC, bg: 'linear-gradient(#FFE6DC,#FFD6C7)', eye: 'Observation notes',
     t: 'Share what you see', p: 'Pick a type, tag the animal, add a photo, post. Watch:',
-    pre: () => { notesMode = 'empty'; renderNotes(); renderKins(); }, on: notesDemo },
-  { rect: () => gridRows(2), ic: 'm-medical', bg: 'var(--g-medical)', eye: 'Modules',
+    ext: 'Notes with photos and tags', exp: 'Notes now carry a type, a photo and the animal or enclosure they are about, so the right people see them first.',
+    wt: 'Notes with photos and tags', ws: 'Observation, health, enclosure or incident',
+    pre: () => { if (EX) return; notesMode = 'empty'; renderNotes(); renderKins(); }, on: () => { if (!EX) notesDemo(); } },
+  { nf: 'mods', rect: () => gridRows(2), ic: 'm-medical', bg: 'var(--g-medical)', eye: 'Modules',
     t: 'Make Home yours', p: 'Tap <b>✎</b> to edit. Drag a tile to move it, then tap <b>⤢</b> to make it <b>Small</b>, <b>Medium</b> or <b>Large</b>. <b>−</b> hides one, <b>+</b> adds more.',
+    ext: 'Widgets in three sizes', exp: 'Tap <b>✎</b>, drag a tile to move it, then <b>⤢</b> to make it <b>Small</b>, <b>Medium</b> or <b>Large</b>. <b>−</b> hides one, <b>+</b> adds more.',
+    wt: 'Widgets in three sizes', ws: 'Move, resize or hide any tile',
     pre: () => document.getElementById('t-mods').scrollIntoView({ block: 'start' }), tryIt: true, on: homeDemo },
 ];
+// an existing user's tour ends on ✦, where What's new lives from now on
+const WN_STEP = { sel: ['#wnBtn'], svg: '', bg: '#fff', eye: 'What’s new', ext: 'Find it again here', exp: 'New features show up under <b>✦</b>. The dot counts the ones you haven’t seen yet.',
+  pre: () => scrollTo({ top: 0 }) };
+const STEPS = EX ? STEPS_ALL.map(S => ({ ...S, t: S.ext, p: S.exp })).concat({ ...WN_STEP, t: WN_STEP.ext, p: WN_STEP.exp }) : STEPS_ALL;
+const WN = STEPS_ALL;   // what the What's new list shows
+
 let step = -1, userFirst = '';
 const tourEl = document.getElementById('tour'), hole = document.getElementById('hole'), tcard = document.getElementById('tcard');
 const ARROW = '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -1521,8 +1590,9 @@ function cleanStep() { stopDemo(); document.querySelectorAll('.tour-hi').forEach
 function showStep(i) {
   cleanStep();
   if (i < 0) { endTour(); return; }
-  if (i >= STEPS.length) { doneCard(); return; }
+  if (i >= STEPS.length) { if (EX) { STEPS_ALL.forEach(S => seen.add(S.nf)); paintNew(); showStep(-1); toast('You’re up to date. ✦ keeps the list.'); } else doneCard(); return; }
   const first = step < 0; step = i;
+  if (EX && STEPS[i].nf) { seen.add(STEPS[i].nf); paintNew(); }
   closeSheet(); tourEl.hidden = false; tourEl.classList.remove('done'); lockTour(true);
   const S = STEPS[i];
   S.pre && S.pre();
@@ -1532,16 +1602,17 @@ function showStep(i) {
   const token = ++stepToken;
   setTimeout(() => { if (token !== stepToken || step !== i) return; renderCard(S, i); placeStep(); S.on && S.on(); }, reduce() || first ? 60 : 480);
 }
+const SPARK = document.querySelector('#wnBtn svg').outerHTML;
+const stepIcon = (S, w = 44) => S.svg !== undefined ? (S.svg || SPARK) : `<img src="${I(S.ic)}" alt=""${S.raw ? ` style="width:${w}px;height:${w}px"` : ' class="white"'}>`;
 function renderCard(S, i) {
   const p = typeof S.p === 'function' ? S.p() : S.p;
-  const ic = S.svg ? S.svg : `<img src="${I(S.ic)}" alt=""${S.raw ? ' style="width:44px;height:44px"' : ' class="white"'}>`;
+  const ic = stepIcon(S);
   tcard.className = 'tcard';
   tcard.innerHTML = `<span class="arrow"></span><div class="in">
     <div class="tc-top"><span class="tc-ic" style="background:${S.bg}">${ic}</span>
-      <div><div class="tc-eye">${S.eye} · ${i + 1} of ${STEPS.length}</div></div>
+      <div><div class="tc-eye">${EX && S.nf ? 'New · ' : ''}${S.eye} · ${i + 1} of ${STEPS.length}</div></div>
       <button class="tc-x" data-tour="end" aria-label="Skip the tour">✕</button></div>
     <h4>${S.t}</h4><p>${p}</p>
-    ${S.field && S.field() ? `<form class="tc-field" id="tcSiteF"><input id="tcSite" placeholder="Your site’s name, e.g. Riverside Zoo" maxlength="32" autocomplete="off" aria-label="Site name"><button class="btn-primary" type="submit">Add</button></form>` : ''}
     ${S.tryIt ? `<button class="tc-try" data-tour="try"><svg width="16" height="16" viewBox="0 0 20 20"><path d="M3 17l1-4.2L13.6 3.2a1.9 1.9 0 0 1 2.7 0l.5.5a1.9 1.9 0 0 1 0 2.7L7.2 16 3 17z" fill="none" stroke="#006D35" stroke-width="2" stroke-linejoin="round"/></svg>Try it yourself</button>` : ''}
     <div class="tc-foot"><button class="btn-ghost tc-back" data-tour="back" ${i ? '' : 'disabled'}>Back</button><div class="tc-prog">${STEPS.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div><button class="btn-primary tc-next" data-tour="next">${i === STEPS.length - 1 ? 'Finish' : 'Next'} ${ARROW}</button></div></div>`;
   tcard.querySelector('.tc-next').focus({ preventScroll: true });
@@ -1571,10 +1642,10 @@ function doneCard() {
   tcard.innerHTML = `<div class="in">
     <span class="badge"><svg width="30" height="30" viewBox="0 0 30 30"><path d="M8 15.5l4.5 4.5L22 10" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     <h4>You’re all set${userFirst ? ', ' + esc(userFirst) : ''}</h4>
-    <p>Set ANTZ up in this order. Each step makes the next one possible.</p>
+    <p>Your zoo came in from the Kiosk. Three things to do next:</p>
     <ol class="setup">
-      ${row(1, 'var(--g-housing)', 'm-housing', false, 'Create your site', 'Name it, then add its sections and enclosures', ['site', 'Start'], .1)}
-      ${row(2, 'var(--g-animals)', 'qa-paw', true, 'Add your animals', 'One at a time, or a whole group at once', ['animals', 'Add'], .2)}
+      ${row(1, 'var(--g-housing)', 'm-housing', false, 'Check your Kiosk setup', 'Sites, sections, enclosures and species', ['kiosk', 'Check'], .1)}
+      ${row(2, 'var(--g-users)', 'm-users', false, 'Invite your team', 'Keepers, vets and managers, each with a role', ['team', 'Invite'], .2)}
       ${row(3, 'var(--g-medical)', 'm-medical', false, 'Turn on more modules', 'Medical, Diet, Pharmacy and 18 more', ['mods', 'Choose'], .3)}
     </ol>
     <div class="tc-foot"><button class="btn-ghost tc-back" data-tour="back">Back</button><span style="flex:1"></span><button class="btn-primary tc-next" data-tour="explore">${PLAY} Explore modules</button></div></div>`;
@@ -1586,7 +1657,7 @@ function endTour() {
   hole.style.width = hole.style.height = '0px';
   startSugg();
 }
-function setupGo(x) { x === 'site' ? siteSheet() : x === 'animals' ? animalSheet() : allSheet(true); }
+function setupGo(x) { x === 'kiosk' ? kioskSheet() : x === 'team' ? modSheet('users') : allSheet(true); }
 tourEl.addEventListener('click', e => {
   if (STEPS[step]?.live && !e.target.closest('.tcard') && gsTakeOver(e.clientX, e.clientY)) return;
   const su = e.target.closest('[data-setup]'); if (su) { e.stopPropagation(); showStep(-1); setTimeout(() => setupGo(su.dataset.setup), 120); return; }
@@ -1597,13 +1668,6 @@ tourEl.addEventListener('click', e => {
   if (a === 'explore') { showStep(-1); showOpen(0); return; }
   if (a === 'next') showStep(step + 1); else if (a === 'back') showStep(step - 1); else if (a === 'end') showStep(-1);
 });
-tourEl.addEventListener('submit', e => {
-  e.preventDefault();
-  const inp = document.getElementById('tcSite'), v = inp.value.trim();
-  if (!v) { inp.focus(); return; }
-  stopDemo(); addedSite = v; addSite(v); showStep(step);
-});
-tourEl.addEventListener('focusin', e => { if (e.target.id === 'tcSite') stopDemo(); });
 addEventListener('keydown', e => {
   if (tourEl.hidden || e.target.closest?.('input, textarea')) return;
   if (e.key === 'ArrowRight') showStep(step + 1);
@@ -1807,14 +1871,13 @@ document.addEventListener('click', e => {
   if (t.closest('[data-open]')) { allSheet(); return; }
   const md = t.closest('[data-mod]'); if (md) { modSheet(md.dataset.mod); return; }
   const an = t.closest('[data-ann]'); if (an) { const k = +an.dataset.ann; if (ANN[k].k === 'how') howOpen(); else annSheet(k); return; }
-  const go = t.closest('[data-go]'); if (go) { const [g, arg] = go.dataset.go.split(':'); closeSheet(); setTimeout(() => g === 'tour' ? showStep(0) : g === 'site' ? siteSheet() : g === 'note' ? noteSheet('obs') : g === 'how' ? howOpen() : g === 'show' ? showOpen(arg ? SHOW.indexOf(arg) : 0) : allSheet(), 300); return; }
-  if (t.closest('[data-addsite]')) { siteSheet(); return; }
+  const go = t.closest('[data-go]'); if (go) { const [g, arg] = go.dataset.go.split(':'); closeSheet(); setTimeout(() => g === 'tour' ? showStep(0) : g === 'kiosk' ? kioskSheet() : g === 'mod' ? modSheet(arg) : g === 'wn' ? wnOpen() : g === 'note' ? noteSheet('obs') : g === 'how' ? howOpen() : g === 'show' ? showOpen(arg ? SHOW.indexOf(arg) : 0) : allSheet(), 300); return; }
   const nt = t.closest('[data-note]'); if (nt) { noteSheet(nt.dataset.note); return; }
   const sg = t.closest('[data-seg] button'); if (sg) { sg.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === sg)); return; }
-  if (t.closest('[data-savesite]')) { const n = document.getElementById('fSite').value.trim() || 'My site'; closeSheet(); addSite(n); toast(`${n} added. Next: add its animals.`); return; }
-  if (t.closest('[data-saveanimals]')) { closeSheet(); toast('Animals added. Each one has its own AAID.'); return; }
   if (t.closest('[data-postnote]')) { closeSheet(); notesMode = 'cards'; renderNotes(); renderKins(); toast('Note posted. The team sees it on Home.'); return; }
   const dm = t.closest('[data-demo]'); if (dm) { demoSheet(+dm.dataset.demo); return; }
+  if (t.closest('#wnBtn')) { wnSheet(); return; }
+  const wf = t.closest('[data-wnstep]'); if (wf) { closeSheet(); setTimeout(() => showStep(+wf.dataset.wnstep), 280); return; }
 });
 const toastEl = document.getElementById('toast'); let toastT;
 function toast(m) { toastEl.textContent = m; toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('on'), 2600); }
@@ -1826,6 +1889,7 @@ addEventListener('keydown', e => {
     return;
   }
   if (!howEl.hidden) { if (e.key === 'Escape') howClose(); return; }
+  if (e.key === 'Escape' && !wnEl.hidden) { wnClose(); return; }
   if (e.key === 'Escape') { closeSheet(); closeSize(); gsClose(); if (!tourEl.hidden) showStep(-1); }
 });
 document.getElementById('tourBtn').addEventListener('click', () => { closeSheet(); showStep(0); });
@@ -1840,36 +1904,72 @@ let si = 0, suggT;
 function startSugg() { clearInterval(suggT); suggT = setInterval(() => { const b = document.getElementById('sugg'); b.style.opacity = 0; setTimeout(() => { b.textContent = SUGG[++si % SUGG.length]; b.style.opacity = 1; }, 300); }, 3000); }
 startSugg();
 
-// welcome on first open, and again after 90 s idle (the next visitor)
+// a new user: the Kiosk welcome on first open, and again after 90 s idle (the next visitor at an event)
 const welcome = document.getElementById('welcome');
 function setName(n) {
   userFirst = n ? n.split(/\s+/)[0] : '';
   const ava = document.getElementById('ava'), hi = document.getElementById('hiName'), sm = document.getElementById('hiSmall');
   if (n) {
-    sm.textContent = 'Good Afternoon, welcome to ANTZ';
-    hi.innerHTML = `${esc(n)} <span aria-hidden="true">👋</span>`;
+    sm.textContent = EX ? 'Good Afternoon,' : 'Good Afternoon, welcome to ANTZ';
+    hi.innerHTML = `${esc(EX ? userFirst : n)} <span aria-hidden="true">👋</span>`;
     ava.className = 'ava me'; ava.textContent = initials(n);
   } else {
     sm.textContent = 'Good Afternoon,';
     hi.innerHTML = 'Welcome to ANTZ <span aria-hidden="true">👋</span>';
     ava.className = 'ava'; ava.innerHTML = '<img src="../assets/img/antz-logo.png" alt="ANTZ">';
   }
-  ANN[0].t = n ? `Hello ${esc(userFirst)}! Welcome to ANTZ` : 'Hello! Welcome to ANTZ';
-  renderDeck();
+  if (!EX) { ANN[0].t = n ? `Hello ${esc(userFirst)}! Welcome to ANTZ` : 'Hello! Welcome to ANTZ'; renderDeck(); }
+}
+function renderKioskWelcome() {
+  document.getElementById('wKiosk').innerHTML = KIOSK_FIGS().map(([ic, bg, v, l], i) =>
+    `<div style="--d:${.15 + i * .08}s"><i style="background:${bg}"><img src="${I(ic)}" alt=""${ic === 'qa-paw' ? ' class="white"' : ''}></i><b data-kw="${v}">0</b><small>${l}</small></div>`).join('');
+  document.querySelectorAll('[data-kw]').forEach((el, i) => setTimeout(() => countUp(el, 0, +el.dataset.kw), 300 + i * 120));
 }
 const closeWelcome = () => { setName(document.getElementById('wName').value.trim()); welcome.hidden = true; };
 document.getElementById('wTour').onclick = () => { closeWelcome(); showStep(0); };
 document.getElementById('wSkip').onclick = closeWelcome;
 document.getElementById('wName').addEventListener('keydown', e => { if (e.key === 'Enter') { closeWelcome(); showStep(0); } });
-let idle; const bump = () => { clearTimeout(idle); idle = setTimeout(() => {
+
+// an existing user: What's new. Each feature is NEW until its step has been seen; ✦ counts the rest
+const EX_USER = 'Asha Kulkarni';
+const seen = new Set();
+const wnEl = document.getElementById('wn'), wnBtn = document.getElementById('wnBtn');
+function paintNew() {
+  document.querySelectorAll('[data-nf]').forEach(h => {
+    const on = EX && !seen.has(h.dataset.nf), tag = h.querySelector('.newtag');
+    if (on && !tag) h.insertAdjacentHTML('beforeend', '<span class="newtag">NEW</span>'); else if (!on && tag) tag.remove();
+  });
+  const left = WN.filter(S => !seen.has(S.nf)).length, dot = document.getElementById('wnDot');
+  dot.textContent = left; dot.hidden = !left;
+  wnBtn.setAttribute('aria-label', left ? `What’s new, ${left} not seen yet` : 'What’s new');
+}
+const wnRows = () => WN.map((S, i) => `<li><button data-wnstep="${i}" style="--d:${.1 + i * .06}s"><i style="background:${S.bg}">${stepIcon(S, 38)}</i><span><b>${S.wt}</b><small>${S.ws}</small></span>${seen.has(S.nf) ? '<em>✓ Seen</em>' : '<em class="new">NEW</em>'}</button></li>`).join('');
+function wnOpen() { document.getElementById('wnList').innerHTML = wnRows(); wnEl.hidden = false; document.getElementById('wnGo').focus({ preventScroll: true }); }
+const wnClose = () => { wnEl.hidden = true; };
+document.getElementById('wnGo').onclick = () => { wnClose(); showStep(0); };
+document.getElementById('wnLater').onclick = () => { wnClose(); toast('It’s under ✦ at the top whenever you want it'); };
+wnEl.addEventListener('click', e => { const b = e.target.closest('[data-wnstep]'); if (b) { e.stopPropagation(); wnClose(); showStep(+b.dataset.wnstep); } });
+function wnSheet() {
+  openSheet(`${shHead(`<span class="ti" style="background:#F1F7F5">${SPARK}</span>`, 'What’s new in ANTZ', 'The new Home · tap one to see it')}
+    <ul class="wnlist">${wnRows()}</ul>
+    <div class="sh-cta"><button class="btn-primary" data-go="tour">${PLAY} Show me all of it</button><button class="btn-ghost" data-close>Close</button></div>`);
+}
+
+let idle; const bump = () => { if (EX) return; clearTimeout(idle); idle = setTimeout(() => {
   closeSheet(); showStep(-1); if (!howEl.hidden) howClose(); if (!showEl.hidden) showClose(); gsClose(); closeSize();
-  site = 'all'; viewed = []; order = [...BASE_ORDER]; sizes = {}; notesMode = 'empty'; addedSite = ''; SITES.length = 3; kinsPrev = {};
-  setEdit(false, true); setName(''); document.getElementById('wName').value = ''; renderAll(); scrollTo(0, 0); welcome.hidden = false;
+  site = 'all'; viewed = []; order = [...BASE_ORDER]; sizes = {}; notesMode = 'empty'; kinsPrev = {};
+  setEdit(false, true); setName(''); document.getElementById('wName').value = ''; renderAll(); scrollTo(0, 0); welcome.hidden = false; renderKioskWelcome();
 }, 90000); };
 ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev => addEventListener(ev, bump, { passive: true }));
 
+document.getElementById(EX ? 'mEx' : 'mNew').setAttribute('aria-current', 'page');
+if (EX) {
+  viewed = DEMO.map(d => d.aaid); wnBtn.hidden = false; setName(EX_USER);
+  document.getElementById('tourBtn').lastChild.textContent = 'What’s new';
+  document.getElementById('wnHi').textContent = `Hi ${EX_USER.split(' ')[0]}!`;
+}
 renderAll(); startDeck(); bump();
-if (!new URLSearchParams(location.search).has('nowelcome')) welcome.hidden = false;
+if (!new URLSearchParams(location.search).has('nowelcome')) { if (EX) wnOpen(); else { welcome.hidden = false; renderKioskWelcome(); } }
 </script>
 </body>
 </html>

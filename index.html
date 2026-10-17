@@ -4201,10 +4201,11 @@ body.is-report { overflow: hidden; }
 }   /* a clean container edge at the right, no fade (owner: "make a proper container instead of blur") */
 .hstrip__lane::-webkit-scrollbar { display: none; }
 .hstrip__tape, .hstrip__set { display: flex; width: max-content; height: 100%; }
-/* the cap's 30.5 ahead of the first run only, under the cap: no run carries a
+/* the cap's width ahead of the first run only, under the cap: no run carries a
    lead-in of its own (owner, 1 Oct 2026: "remove the empty space before
    Natality, Mortality and Audit") */
-.hstrip__tape { padding-left: 30.5px; }
+.hstrip { --hs-cap: 42.5px; }   /* the cap: 12, the 18.5 LIVE mark, then 12 clear of it (owner, 17 Oct 2026: "need some space between the Icon") */
+.hstrip__tape { padding-left: calc(var(--hs-cap) - 12px); }   /* the mark's own edge: the label's padding is the room after it (14, review.css) */
 .hstrip__run { flex: none; display: flex; align-items: center; gap: 12px; height: 100%; padding: 0; }   /* 12 a side of each rule (owner: "some spacing species to species") */
 .hstrip__run--births { background: linear-gradient(179.08deg, rgba(92, 214, 206, .2) 0%, rgba(36, 186, 178, .2) 100%); }
 .hstrip__run--deaths { background: linear-gradient(179.05deg, rgba(251, 153, 132, .2) 0%, rgba(251, 128, 102, .2) 100%); }
@@ -4222,7 +4223,7 @@ body.is-report { overflow: hidden; }
 .hstrip__label b { font-weight: 600; color: #FA6140; }
 /* THE PIN: still, just right of the cap, the pinned run's label on that run's
    tint laid on white with a 10px feather; pushed out by the next label */
-.hstrip__pin { position: absolute; z-index: 2; top: 0; bottom: 0; left: 30.5px; display: flex; will-change: transform; }
+.hstrip__pin { position: absolute; z-index: 2; top: 0; bottom: 0; left: var(--hs-cap); display: flex; will-change: transform; }
 .hstrip__pin[hidden] { display: none; }
 .hstrip__pin .hstrip__label { padding-right: 18px; }
 .hstrip__pin[data-k='natality'] .hstrip__label { background: linear-gradient(90deg, #DAF5F3 calc(100% - 10px), rgba(218, 245, 243, 0)); }
@@ -4244,8 +4245,10 @@ body.is-report { overflow: hidden; }
 .hstrip__txt b { font-weight: 600; }
 .hstrip__label:focus-visible, .hstrip__it:focus-visible { outline: 2px solid var(--c-add-primary, #00AFD6); outline-offset: 2px; border-radius: 4px; }
 .hstrip__cap {
-  position: absolute; z-index: 3; left: 0; top: 0; bottom: 0; width: 30.5px; padding: 8px 0 8px 12px; border-radius: 8px 0 0 8px; pointer-events: none;
+  position: absolute; z-index: 3; left: 0; top: 0; bottom: 0; width: var(--hs-cap); padding: 8px 0 8px 12px; border-radius: 8px 0 0 8px; pointer-events: none;
   transition: background-color .45s ease;
+  /* solid 6 past the mark, then a 6 feather: a name slides under it, never into it */
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 6px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 6px), transparent);
 }
 .hstrip__cap[data-k='natality'] { background: linear-gradient(179.08deg, #DEF7F5 0%, #D3F1F0 100%); }
 .hstrip__cap[data-k='mortality'] { background: linear-gradient(179.05deg, #FEEBE6 0%, #FEE6E0 100%); }
@@ -4585,7 +4588,11 @@ html:has(body.dpop-open), body.dpop-open { overflow: hidden; overscroll-behavior
 /* THE SCROLL LOCK (30 Sep 2026) · set while any aria-modal is on screen; the
    page holds still and a popup's own scroll stops at its ends */
 html.is-scroll-locked, html.is-scroll-locked body { overflow: hidden; overscroll-behavior: none; }
-[aria-modal='true'], [aria-modal='true'] * { overscroll-behavior: contain; }
+/* the popup only, never `[aria-modal] *` (owner, 17 Oct 2026: "Vertical scroll
+   is not happening"): `contain` on every clipped title and row made each one a
+   wall, so a scroll that began on a row never reached its list (View all,
+   View your modules, Chat). The locked page already stops what gets past. */
+[aria-modal='true'] { overscroll-behavior: contain; }
 /* the note's parts */
 .dpop__plate { position: absolute; left: 16px; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 8px; border-radius: 12px; background: rgba(255, 255, 255, .3); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; }
 .dpop__plate img { flex: none; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
@@ -4601,6 +4608,7 @@ html.is-scroll-locked, html.is-scroll-locked body { overflow: hidden; overscroll
 .dpop__title { margin: 0; font-size: 24px; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; color: #1F415B; }
 .dpop__tags { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--c-neutral-2, #7A8684); }
 .dpop__tags li::before { content: '•'; margin-right: 8px; }
+.dpop__tags li:first-child::before { content: none; }   /* none before the first, as on the card (17 Oct 2026) */
 .dpop__note { margin: 4px 0 0; padding-top: 14px; border-top: 1px solid rgba(31, 65, 91, .08); font-size: 16px; line-height: 26px; color: var(--c-on-surface-var, #44544A); }
 .dpop__date { font-size: 13px; font-weight: 500; color: var(--c-neutral-2, #7A8684); }
 .dpop__foot { display: flex; align-items: center; gap: 18px; margin-top: 8px; padding-top: 14px; border-top: 1px solid rgba(31, 65, 91, .08); font-size: 14px; color: #1F415B; }
@@ -13906,7 +13914,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261009b">
+<link rel="stylesheet" href="review.css?v=20261017c">
 </head>
 
 <style>
@@ -15987,6 +15995,7 @@ body.is-site .card:active { transform: scale(.978); }
   --f-reports: #1ABEB6;
   --f-approvals: #305068;
   --f-communication: #5A8088;
+  --f-helpdesk: #2F628A;
   /* THE CELL'S TARGET WIDTH, which is what the panel's width is derived from
      rather than the other way round: the longest of the sixteen labels sets
      the cell and the cell sets the panel.
@@ -19817,6 +19826,8 @@ const DOORS = [
      ruling, still addable from Add Module. */
   ['reports',       ['small', 'medium'], 'secondary'],
   ['communication', ['small', 'medium'], 'secondary'],
+  /* 17 Oct 2026, the owner: "Add one more Module Called Helpdesk" */
+  ['helpdesk',      ['small', 'medium'], 'secondary'],
 ].map(([moduleId, supportedSizes, priority]) => ({
   id: `${moduleId}.default`,
   moduleId,
@@ -20462,7 +20473,9 @@ const VARIANTS = [
        plates at 20px. Not a `queue`: a queue's rows are the same KIND of
        thing as its total, and "Awaiting Approval" is not a part of
        "Approved". */
-    id: 'approvals.v3helpdesk', moduleId: 'approvals', name: 'Help Desk',
+    /* its id keeps the old prefix so saved layouts still find it; it moved
+       from Approvals to the Helpdesk module when that came in (17 Oct 2026) */
+    id: 'approvals.v3helpdesk', moduleId: 'helpdesk', name: 'Help Desk',
     layout: 'v3-helpdesk', purpose: 'UNDERSTAND', gradient: '--g-v3-helpdesk',
     supportedSizes: ['medium'], defaultSize: 'medium', priority: 'secondary',
     data: {
@@ -22755,11 +22768,13 @@ const V2_LAYOUT = [
      into the two cells the taller card left open */
   { variantId: 'eggs.default',       size: 'small'  },
   { variantId: 'species.newcount',   size: 'small'  },
+  /* Helpdesk (17 Oct 2026): the grid was full, so it opens a seventh row */
+  { variantId: 'helpdesk.default',   size: 'small'  },
 ]
 /* THE V2 SEED HAS A NUMBER OF ITS OWN, as V4's does: a v2r grid saved from an
    older seed — the 280:3521 page, or the V4 list V2 borrowed on 24 Sep — is
    dropped for this one rather than kept for ever. */
-const V2_SEED = 7   /* 7: the insight cards (6 Oct 2026) */
+const V2_SEED = 8   /* 7: the insight cards (6 Oct 2026) · 8: Helpdesk (17 Oct 2026) */
 
 /* V2 ON A PHONE · Figma 903:2 "Home · Mobile (5 Oct)", its Module Grid
    (903:533) row by row — two columns of 173 in rows of 115.3, 12 apart:
@@ -22787,8 +22802,9 @@ const V2_PHONE_LAYOUT = [
   { variantId: 'security.default',   size: 'small'  },
   { variantId: 'insight.mortality',  size: 'medium' },
   { variantId: 'eggs.default',       size: 'small'  },
+  { variantId: 'helpdesk.default',   size: 'small'  },   /* beside Eggs (17 Oct 2026) */
 ]
-const V2_PHONE_SEED = 1
+const V2_PHONE_SEED = 2   /* 2: Helpdesk (17 Oct 2026) */
 
 /* THE WEB'S CARDS ARE THE TABLET'S (owner, 8 Oct 2026: "Tablet View how
    we are Showing same way"): V2_LAYOUT's list, at V2_LAYOUT's sizes, in four
@@ -22818,8 +22834,9 @@ const V2_DESK_LAYOUT = [
   { variantId: 'security.default',   size: 'small'  },
   { variantId: 'users.default',      size: 'small'  },
   { variantId: 'eggs.default',       size: 'small'  },
+  { variantId: 'helpdesk.default',   size: 'small'  },   /* the last row's empty fourth cell (17 Oct 2026) */
 ]
-const V2_DESK_SEED = 5
+const V2_DESK_SEED = 6   /* 6: Helpdesk (17 Oct 2026) */
 
 /**
  * V3 · NODE 506:10213's OWN ORDER, ROW BY ROW.
@@ -23650,6 +23667,21 @@ const MODULES = [
     category: 'admin',
     keywords: ['message', 'announcement', 'notice', 'broadcast', 'inbox', 'unread'],
     blurb: 'Announcements, messages and notices across the site.',
+  },
+  {
+    /* HELPDESK (owner, 17 Oct 2026: "Add one more Module Called Helpdesk").
+       NO NEW COLOURS, as above: it wears the file's own Help Desk card
+       gradient (506:10591, navy into blue), which no other door uses. The
+       file draws no Helpdesk glyph, so the headset is drawn in the exported
+       set's idiom — a white mark in a 44px box, as Approvals' clock. */
+    id: 'helpdesk',
+    icon: 'm-helpdesk.svg',
+    iconSize: 44,
+    gradient: '--g-v3-helpdesk',
+    name: 'Helpdesk',
+    category: 'admin',
+    keywords: ['help', 'help desk', 'support', 'ticket', 'issue', 'complaint', 'request', 'it'],
+    blurb: 'Raise a ticket, follow it and see it resolved.',
   },
 
   /* ── Two owners with no door ─────────────────────────────────────────────
@@ -44558,10 +44590,9 @@ function renderCard(o) {
         `<span class="obs__date">${esc(shortDate(o.date))}</span>` +
       `</div>` +
       `<div class="obs__tags">` +
-        /* a bullet BEFORE each tag, the first one included — the design file
-           draws the row that way, so it reads as a continuation of the title
-           above rather than as a list of its own */
-        (o.tags || []).map((t) => `<span aria-hidden="true">•</span><span>${esc(t)}</span>`).join('') +
+        /* a bullet BETWEEN tags, none before the first (owner, 17 Oct 2026:
+           "Remove first dot on the Notes") */
+        (o.tags || []).map((t, i) => `${i ? '<span aria-hidden="true">•</span>' : ''}<span>${esc(t)}</span>`).join('') +
       `</div>` +
       `<p class="obs__note">${esc(o.body)}</p>` +
     `</div>` +
@@ -48216,6 +48247,7 @@ const MOD_FLOWS = {
   reports:       ['Dashboard', 'Animal Reports', 'Medical Reports', 'Inventory Reports', 'Scheduled Reports', 'Exports'],
   approvals:     ['Dashboard', 'Pending', 'Approved', 'Rejected', 'Transfer Approvals', 'Helpdesk'],
   communication: ['Dashboard', 'Messages', 'Groups', 'Announcements', 'Broadcasts'],
+  helpdesk:      ['Dashboard', 'All Tickets', 'Raise a Ticket', 'Assigned to Me', 'In Progress', 'Resolved', 'Reports'],
 }
 const slugOf = (t) => t.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 const SH_I = {
@@ -48383,10 +48415,10 @@ function openExplorer() {
   const glyph = (m) => `<span class="mx__g" style="--mx-g: var(${m.gradient})"><img src="assets/icon/${m.icon}" alt=""></span>`
   const hay = (m) => (modName(m) + ' ' + (m.keywords || []).join(' ') + ' ' + screensOf(m.id).map((x) => x[0]).join(' ')).toLowerCase()
   function drawSide() {
-    const rows = [['recent', 'Recent', MX_I.recent, recent().length], ['all', 'All modules', MX_I.all, all.length], null,
+    /* Figma 950:6513: All modules, then the areas — no counts */
+    const rows = [['all', 'All modules', MX_I.all, all.length],
       ...CATEGORIES.map((c) => [c.id, c.name, MX_I[c.id] || MX_I.all, all.filter((m) => m.category === c.id).length]).filter((r) => r[3])]
-    side.innerHTML = rows.map((r) => r ? `<button type="button" class="mx__cat" data-cat="${r[0]}" aria-pressed="${r[0] === cat}">${r[2]}<span>${esc(r[1])}</span><em>${r[3]}</em></button>` : '<hr>').join('') +
-      `<button type="button" class="mx__edit" data-mx="edit">Edit Home modules</button>`
+    side.innerHTML = rows.map((r) => `<button type="button" class="mx__cat" data-cat="${r[0]}" aria-pressed="${r[0] === cat}">${r[2]}<span>${esc(r[1])}</span></button>`).join('')
   }
   const row = (m) => `<button type="button" class="mx__row${m.id === cur ? ' is-on' : ''}" data-mod="${m.id}">${glyph(m)}<b>${esc(modName(m))}</b>${MX_I.chev}</button>`
   function drawList() {
@@ -48403,9 +48435,9 @@ function openExplorer() {
   function drawDetail() {
     const m = all.find((x) => x.id === cur); if (!m) { det.innerHTML = ''; return }
     const q = input.value.trim().toLowerCase(), sc = screensOf(m.id)
-    det.innerHTML = `<div class="mx__dh">${glyph(m)}<div><h3>${esc(modName(m))}</h3><small>${esc(catName(m.category))}</small></div></div>` +
-      `<p>${esc(m.blurb || '')}</p><button type="button" class="mx__open" data-open="${m.id}">Open ${esc(modName(m))}</button>` +
-      (sc.length ? `<div class="mx__cap">Go straight to</div><div class="mx__scr">${sc.map(([l, to]) =>
+    /* Figma 950:6513: the panel is the hovered module's screens, nothing more */
+    det.setAttribute('aria-label', `${modName(m)} screens`)
+    det.innerHTML = (sc.length ? `<div class="mx__scr">${sc.map(([l, to]) =>
         `<button type="button" data-to="${esc(to)}"${q && l.toLowerCase().includes(q) ? ' class="is-hit"' : ''}>${esc(l)}</button>`).join('')}</div>` : '')
   }
   const drawAll = () => { drawSide(); drawList(); drawDetail() }
@@ -49008,6 +49040,7 @@ function boot() { if (parse()) render() }
   __x.openModule = openModule;
   __x.openExplorer = openExplorer;
   __x.recentModules = recentModules;
+  __x.noteRecent = noteRecent;
   __x.PENDING_TO = PENDING_TO;
   __x.INSIGHT_TO = INSIGHT_TO;
   __x.useSite = useSite;
@@ -50883,7 +50916,10 @@ function modulesHint() {
     row.prepend(chip)   /* in the row: the three are centred as one group */
     const count = () => grid.querySelectorAll('.card').length
     /* the chip says "Modules"; the count lives in its name for a screen reader */
-    const label = () => chip.setAttribute('aria-label', `${count()} modules below. Go to Modules`)
+    const label = () => {
+      if (window.__antzModulesSheet) { chip.setAttribute('aria-label', 'Modules'); chip.setAttribute('aria-haspopup', 'dialog') }
+      else chip.setAttribute('aria-label', `${count()} modules below. Go to Modules`)
+    }
     /* reached: any of the head is above the row's footprint — or scrolled past */
     const reached = () => head.getBoundingClientRect().top < row.getBoundingClientRect().top - 8
     /* all three must fit with 16 a side: the pill's widest (label showing)
@@ -50901,6 +50937,11 @@ function modulesHint() {
     row.addEventListener('transitionend', soon)   /* the pill's label collapsing changes the row's width */
     new MutationObserver(soon).observe(grid, { childList: true })
     chip.addEventListener('click', () => {
+      /* THE PILL OPENS THE MODULES SHEET (owner, 17 Oct 2026, with Gojek's
+         services sheet as the picture: "When i select Module … page down
+         Going"). Your Modules is that sheet; scrolling down to the grid is
+         kept for a build without it. */
+      if (window.__antzModulesSheet) { window.__antzModulesSheet(); return }
       /* land the head under the sticky search row, not beneath it */
       const bar = document.querySelector('.search-row')
       /* its height once STUCK, which is taller than at rest (it gains its
@@ -51042,8 +51083,8 @@ function healthStrip(after) {
       `<span class="hstrip__cap" data-k="audit" aria-hidden="true"><span class="hstrip__live">` +
         `<img class="hstrip__live-on" src="assets/icon/hs-live.gif" alt=""><img class="hstrip__live-still" src="assets/icon/hs-live-still.png" alt=""></span></span>`
     lane = strip.querySelector('.hstrip__lane'); sets = strip.querySelectorAll('.hstrip__set'); cap = strip.querySelector('.hstrip__cap'); pin = null; pinKey = ''
-    /* the label starts clear of the LIVE mark, not under it */
-    strip.querySelector('.hstrip__tape').style.paddingLeft = cap.offsetLeft + cap.offsetWidth - lane.offsetLeft + 'px'
+    /* the label starts clear of the LIVE mark by the CSS alone (--hs-cap): this
+       used to run before the strip was laid out, read a cap of 0 and wrote 0px */
     x = 0; lane.scrollLeft = 0; bind(); tint()
   }
   /* the drift: our own float, since scrollLeft rounds; a user's scroll is read back into it */
@@ -53632,6 +53673,9 @@ function activateCard(variant) {
   /* V2's own module pages (29 Sep 2026: "if I click that particular module
      it has to go to that page") — Species Management, Medical, Mortality,
      Eggs — before V4's report tiles, which V2 would otherwise inherit */
+  /* EVERY OPEN IS A USE (17 Oct 2026): Recent in the modules sheet lists the
+     modules last opened, a page or not — Users, Security, Helpdesk too */
+  if (isV2()) __req('js/components/ModulePages.js').noteRecent(variant?.moduleId)
   if (isV2() && __req('js/components/ModulePages.js').openFor(variant)) return
   if (isV4() && __req('js/components/ModuleTiles.js').open(variant)) return
   if (variant.moduleId === 'housing') { openHousing(); return }
@@ -53685,7 +53729,6 @@ if (document.documentElement.dataset.review && isV2()) {
       <button type="button" class="mview__x" aria-label="Close">${icon('close')}</button>
     </div>
     <label class="mview__search">${icon('search')}<input type="search" placeholder="Search" aria-label="Search your modules" autocomplete="off" spellcheck="false"></label>
-    <p class="mview__hint">Tap to open · swipe left to add to Home or remove</p>
     <div class="mview__list" role="list" aria-label="Modules"></div>
     <div class="mview__toast" role="status" aria-live="polite"></div>`
   document.body.append(scrim, sheet)
@@ -53698,12 +53741,41 @@ if (document.documentElement.dataset.review && isV2()) {
     toastEl.classList.add('is-on'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('is-on'), 3200)
   }
 
+  /* GRID OR LIST (owner, 17 Oct 2026, with Gojek's services sheet as the
+     picture): the modules on Home first, as tiles; then All Modules by
+     category, as tiles or as the rows with their one line and the swipe.
+     The switch is the 7D · 30D · 30+ control's pill, and it is remembered. */
+  const MODE_KEY = 'antz.mview.mode'
+  let mode = 'grid'
+  try { if (localStorage.getItem(MODE_KEY) === 'list') mode = 'list' } catch { /* no storage: tiles */ }
+  const setMode = (m) => {
+    if (m === mode) return
+    mode = m; openRow = null
+    try { localStorage.setItem(MODE_KEY, m) } catch { /* not remembered, still switched */ }
+    render()
+  }
+  const GRID_I = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>'
+  const LIST_I = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="4" y="5" width="4.5" height="4.5" rx="1.5"/><rect x="11" y="5.75" width="9" height="3" rx="1.5"/><rect x="4" y="14.5" width="4.5" height="4.5" rx="1.5"/><rect x="11" y="15.25" width="9" height="3" rx="1.5"/></svg>'
+  const tile = (m, on) => `<button type="button" class="mview__tile" data-mod="${qesc(m.id)}" aria-label="Open ${qesc(m.name)}${on ? ', on Home' : ''}">` +
+    `<span class="mview__ico" style="background:var(${m.gradient})">${m.icon ? `<img src="assets/icon/${qesc(m.icon)}" alt="">` : icon(m.sprite)}${on ? HOME_BADGE : ''}</span>` +
+    /* a name with a space wraps at it, not at the soft hyphen the 1×1 card needs ("Species Manage-ment") */
+    `<span class="mview__lbl">${qesc(/\s/.test(m.name) ? m.name.replace(/\u00AD/g, '') : m.name)}</span></button>`
+  /* RECENT IN PLACE OF ON HOME (owner, 17 Oct 2026: "Remove On Home
+     container. If user using multiple times that part it has to show recent
+     module"): the modules last opened — from this sheet, a home card or a
+     module page — newest first, one row (4 on a phone, 5 on a tablet). The
+     list is the web's Recent row's own; until it has one, nothing is drawn. */
+  const recent = () => __req('js/components/ModulePages.js').recentModules()
+    .map((id) => QM.find((m) => m.id === id)).filter((m) => m && defaultCard(m)).slice(0, 5)
+
   function render() {
     const q = query.trim().toLowerCase()
     const hit = (m) => !q || m.name.toLowerCase().includes(q) || (m.keywords || []).some((k) => k.includes(q))
-    list.innerHTML = QC.map((c) => {
+    const tiles = mode === 'grid'
+    const cats = QC.map((c) => {
       const ms = QM.filter((m) => m.category === c.id && hit(m)).map((m) => ({ m, v: defaultCard(m) })).filter((x) => x.v)
       if (!ms.length) return ''
+      if (tiles) return `<h3 class="mview__cat">${qesc(c.name)}</h3><div class="mview__grid">${ms.map(({ m, v }) => tile(m, placed(v))).join('')}</div>`
       return `<h3 class="mview__cat">${qesc(c.name)}</h3>` + ms.map(({ m, v }) => {
         /* 1 Oct 2026 (owner: "each module one line explanation need … remove
            from home interaction has to give"): the module's blurb under its
@@ -53722,7 +53794,17 @@ if (document.documentElement.dataset.review && isV2()) {
           ${core ? '' : `<button type="button" class="sr-only mview__kbd">${on ? 'Remove from Home' : 'Add to Home'}: ${qesc(m.name)}</button>`}
         </div>`
       }).join('')
-    }).join('') || '<p class="mview__empty">No module matches that.</p>'
+    }).join('')
+    const rec = q ? [] : recent()
+    list.innerHTML =
+      (rec.length ? `<h3 class="mview__sec">Recent</h3><div class="mview__grid mview__grid--recent">${rec.map((m) => tile(m, placed(defaultCard(m)))).join('')}</div>` : '') +
+      `<div class="mview__bar"><h3 class="mview__sec">${q ? 'Results' : 'All Modules'}</h3>` +
+        `<div class="mview__mode" role="group" aria-label="Show modules as">` +
+          `<button type="button" data-mode="grid" aria-pressed="${tiles}" aria-label="Grid" title="Grid">${GRID_I}</button>` +
+          `<button type="button" data-mode="list" aria-pressed="${!tiles}" aria-label="List" title="List">${LIST_I}</button>` +
+        `</div></div>` +
+      (cats && !tiles ? '<p class="mview__hint">Tap to open · swipe left to add to Home or remove</p>' : '') +
+      (cats || '<p class="mview__empty">No module matches that.</p>')
   }
 
   /* ── the swipe: one row open at a time, the action revealed under it ── */
@@ -53796,10 +53878,13 @@ if (document.documentElement.dataset.review && isV2()) {
       if (m.href) { window.open(m.href, '_blank', 'noopener'); return }
       if (m.id === 'housing') { activateCard(v); return }
       activateCard(v)
-      homeToast(`${m.name} opens in the ANTZ app — not part of this preview`)
+      /* a module with a report page (People, Security …) has opened it; the notice is for one that opened nothing */
+      if (!document.body.classList.contains('is-report')) homeToast(`${m.name.replace(/\u00AD/g, '')} opens in the ANTZ app — not part of this preview`)
     }, 200)
   }
   list.addEventListener('click', (e) => {
+    const sw = e.target.closest('.mview__mode [data-mode]'); if (sw) { setMode(sw.dataset.mode); return }
+    const tl = e.target.closest('.mview__tile'); if (tl) { openModule(tl); return }
     const item = e.target.closest('.mview__item'); if (!item) return
     if (e.target.closest('.mview__act, .mview__kbd')) { toggle(item); return }
     const row = e.target.closest('.mview__row'); if (!row || row.dataset.swiped) return
@@ -53821,11 +53906,16 @@ if (document.documentElement.dataset.review && isV2()) {
   let back = null
   function openView() {
     back = document.activeElement; query = ''; input.value = ''; openRow = null; render()
+    sheet.style.removeProperty('--mv-drag'); scrim.style.opacity = ''
     scrim.hidden = false; sheet.hidden = false
-    document.documentElement.classList.add('pmenu-lock')
+    document.documentElement.classList.add('pmenu-lock', 'mview-on')   /* mview-on: the bottom row steps out (review.css) */
     for (const t of ['touchmove', 'wheel']) addEventListener(t, refuse, { passive: false })
     requestAnimationFrame(() => { scrim.classList.add('is-on'); sheet.classList.add('is-on') })
     list.scrollTop = 0
+    /* FOCUS INTO THE LIST (17 Oct 2026): left on the button behind, the page
+       lock refused the arrow and Page keys and Escape never reached the sheet */
+    list.focus({ preventScroll: true })
+    document.addEventListener('keydown', onEsc, true)
     /* ONE NUDGE, the first time: the first free row slides to show its action and back */
     if (!nudged && !prefersReducedMotion()) {
       nudged = true
@@ -53838,16 +53928,51 @@ if (document.documentElement.dataset.review && isV2()) {
   function closeView() {
     shut()
     scrim.classList.remove('is-on'); sheet.classList.remove('is-on')
-    document.documentElement.classList.remove('pmenu-lock')
+    document.documentElement.classList.remove('pmenu-lock', 'mview-on')
     for (const t of ['touchmove', 'wheel']) removeEventListener(t, refuse, { passive: false })
+    document.removeEventListener('keydown', onEsc, true)
     /* not if it was opened again inside the 260ms: the late hide would blank a live sheet */
-    setTimeout(() => { if (!sheet.classList.contains('is-on')) { scrim.hidden = true; sheet.hidden = true } }, 260)
+    setTimeout(() => { if (!sheet.classList.contains('is-on')) { scrim.hidden = true; sheet.hidden = true; sheet.style.removeProperty('--mv-drag') } }, 260)
     back?.focus?.({ preventScroll: true })
   }
+  const onEsc = (e) => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeView() } }
+  list.tabIndex = -1
   input.addEventListener('input', () => { query = input.value; openRow = null; render() })
   sheet.querySelector('.mview__x').addEventListener('click', closeView)
   scrim.addEventListener('click', closeView)
   sheet.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); closeView() } })
+
+  /* PULL DOWN TO CLOSE, as an iOS sheet does (17 Oct 2026): from the handle
+     or the head the sheet follows the finger and the scrim thins; let go past
+     120px, or flick, and it closes — otherwise it springs back. */
+  let pull = null
+  const pullStart = (e) => {
+    if (e.button > 0 || e.target.closest('button, input, label')) return
+    pull = { y0: e.clientY, y: e.clientY, t: performance.now(), v: 0, dy: 0 }
+    sheet.classList.add('is-pulling')
+    try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* released already */ }
+  }
+  const pullMove = (e) => {
+    if (!pull) return
+    const now = performance.now(), d = e.clientY - pull.y0
+    pull.v = (e.clientY - pull.y) / Math.max(1, now - pull.t); pull.y = e.clientY; pull.t = now
+    pull.dy = d > 0 ? d : d * .15                 // upward: a little give, no more
+    sheet.style.setProperty('--mv-drag', `${pull.dy}px`)
+    scrim.style.opacity = String(Math.max(.2, 1 - Math.max(0, pull.dy) / 500))
+  }
+  const pullEnd = () => {
+    if (!pull) return
+    const p = pull; pull = null
+    sheet.classList.remove('is-pulling'); scrim.style.opacity = ''
+    if (p.dy > 120 || (p.dy > 24 && p.v > .5)) { closeView(); return }
+    sheet.style.removeProperty('--mv-drag')
+  }
+  for (const el of [sheet.querySelector('.mview__handle'), sheet.querySelector('.mview__head')]) {
+    el.addEventListener('pointerdown', pullStart); el.addEventListener('pointermove', pullMove)
+    el.addEventListener('pointerup', pullEnd); el.addEventListener('pointercancel', pullEnd)
+  }
+  /* the bottom row's Modules pill opens this same sheet (modulesHint) */
+  window.__antzModulesSheet = openView
 
   /* the button, beside Edit; edit mode swaps Edit for Done and this steps aside */
   const viewBtn = document.createElement('button')

@@ -1,0 +1,110 @@
+/* WEB V3 MOCKUP · a module's own screens (hospital.js first). Every part is
+   the Figma frame's: white cards with the #DAE7DF edge and 12px corners, the
+   outlined 4px chips, Inter at the frame's sizes, the status dot of "Health
+   Status • Guarded". */
+.own { display: flex; flex-direction: column; gap: 24px; }
+.enter .pgrid > *, .enter .beds > *, .enter .dcol > .dcard, .enter .crit > *, .enter .table > * { animation: rise 420ms var(--ease) both; animation-delay: calc(var(--i, 0) * 30ms); }
+.is-dim { opacity: .28; filter: grayscale(.6); transition: opacity 200ms ease, filter 200ms ease; }
+
+/* filter chips: the frame's outlined tab, smaller */
+.hchips { display: flex; gap: 8px; }
+.hchip { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px; border: 1px solid var(--outline-v); border-radius: 4px; background: #fff; color: var(--on-sv); font-size: 15px; font-weight: 500; cursor: pointer; transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease; }
+.hchip b { font-weight: 600; color: var(--neutral-2); }
+.hchip:hover { border-color: var(--outline); }
+.hchip[aria-pressed='true'] { background: var(--on-pc); border-color: var(--on-pc); color: #fff; }
+.hchip[aria-pressed='true'] b { color: #CFE2DC; }
+
+/* the status of "Health Status • Guarded" */
+.hdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.hdot[data-c='c'] { background: var(--c-c); box-shadow: 0 0 0 3px rgba(250, 97, 64, .16); }
+.hdot[data-c='y'] { background: var(--c-y); }
+.hdot[data-c='g'] { background: var(--primary); }
+.hstat { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--on-sv); white-space: nowrap; }
+.hstat.lg { padding: 4px 8px; font-size: 16px; line-height: 24px; }
+.hthumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex: none; }
+
+/* admissions */
+.htable .table__row { grid-template-columns: 150px minmax(0, 1.4fr) 140px 140px minmax(0, 1.4fr) 110px; }
+.hwho { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.hwho > span { min-width: 0; font-weight: 600; color: var(--on-sv); }
+.table__row small { font-weight: 400; }
+.hreason { overflow: hidden; }
+
+/* ward map */
+.hlegend { display: flex; gap: 16px; font-size: 14px; color: var(--on-sv); }
+.hlegend span { display: inline-flex; align-items: center; gap: 6px; }
+.hlegend i { width: 12px; height: 12px; border-radius: 4px; }
+.hlegend i[data-c='g'] { background: var(--primary); } .hlegend i[data-c='y'] { background: var(--c-y); } .hlegend i[data-c='c'] { background: var(--c-c); }
+.hlegend i[data-c='free'] { border: 1.5px dashed var(--outline-v); }
+.hward .w__title { cursor: default; }
+.beds { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 10px; }
+.bed { position: relative; display: block; aspect-ratio: 1; padding: 0; border: 0; border-radius: 10px; background: var(--bg); cursor: pointer; transition: transform 200ms var(--ease), box-shadow 200ms ease; }
+.bed:not(.is-free) { box-shadow: 0 0 0 2px var(--bc, var(--primary)); }
+.bed[data-c='y'] { --bc: var(--c-y); } .bed[data-c='c'] { --bc: var(--c-c); }
+.bed__ph { position: absolute; inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); border-radius: 7px; object-fit: cover; }
+.bed__n { position: absolute; left: 4px; bottom: 3px; padding: 0 4px; border-radius: 4px; background: rgba(255, 255, 255, .88); font-size: 11px; font-weight: 600; color: var(--on-sv); }
+.bed.is-free { border: 1.5px dashed var(--outline-v); background: #fff; cursor: default; }
+.bed.is-free .bed__n { background: none; color: var(--outline); }
+.bed:not(.is-free):hover, .bed:focus-visible { transform: translateY(-3px) scale(1.06); box-shadow: 0 0 0 2px var(--bc, var(--primary)), 0 10px 18px -10px rgba(16, 45, 52, .55); z-index: 2; }
+.bed__tip { position: absolute; left: 50%; bottom: calc(100% + 10px); z-index: 3; display: flex; flex-direction: column; padding: 8px 10px; border-radius: 8px; background: #1C3A48; color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; text-align: left;
+  opacity: 0; transform: translate(-50%, 4px); transition: opacity 140ms ease, transform 140ms ease; pointer-events: none; }
+.bed__tip small { font-weight: 400; color: #CFE2DC; }
+.bed:hover .bed__tip, .bed:focus-visible .bed__tip { opacity: 1; transform: translate(-50%, 0); }
+
+/* active cases: the frame's profile card, one per patient */
+.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.pcard { display: flex; flex-direction: column; padding: 8px; border: 1px solid var(--card-line); border-radius: 12px; background: linear-gradient(119.7deg, rgba(176, 239, 235, .27) 16.5%, rgba(255, 189, 168, .27) 109.7%), #fff; text-align: left; cursor: pointer;
+  transition: transform 240ms var(--ease), box-shadow 240ms ease, border-color 200ms ease; }
+.pcard:hover { transform: translateY(-3px); border-color: var(--outline-v); box-shadow: var(--elev-3), 0 12px 24px -18px rgba(16, 45, 52, .35); }
+.pcard__ph { position: relative; display: block; height: 128px; border-radius: 8px; overflow: hidden; }
+.pcard__ph .ph { width: 100%; height: 100%; object-fit: cover; transition: transform 600ms var(--ease); }
+.pcard:hover .pcard__ph .ph { transform: scale(1.05); }
+.pcard__st { position: absolute; right: 8px; top: 8px; padding: 3px 8px; border-radius: 15px; background: rgba(255, 255, 255, .92); }
+.pcard__st .hstat { font-size: 12px; }
+.pcard__id { display: flex; flex-direction: column; gap: 3px; padding: 10px 6px 4px; }
+.pcard__id .k { font-size: 13px; color: var(--neutral-2); }
+.pcard__id .n { font-size: 16px; font-weight: 600; color: var(--on-pc); }
+.pcard__id .c { font-size: 15px; color: var(--on-sv); }
+.pcard__id .d { font-size: 13px; font-style: italic; color: var(--neutral-2); }
+
+/* critical care: one card per patient, four small monitoring charts */
+.crit { display: flex; flex-direction: column; gap: 16px; }
+.critw { gap: 18px; }
+.critw__who { display: flex; align-items: center; gap: 14px; padding: 0; border: 0; background: none; text-align: left; cursor: pointer; }
+.critw__ph { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; }
+.critw__who > span:nth-child(2) { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.critw__who b { font-size: 16px; font-weight: 600; color: var(--on-pc); }
+.critw__who small { font-size: 13px; color: var(--neutral-2); }
+.critw__v { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.cv { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px 10px; border-radius: 8px; background: var(--bg); }
+.cv__t { font-size: 13px; font-weight: 600; color: var(--on-sv); }
+.cv__v { font-size: 24px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cv__ch { height: 46px; margin-top: 4px; }
+.cv__ch svg { height: 46px; }
+.cv__ch .lab, .cv__ch .grid { display: none; }
+.critw__f { display: flex; justify-content: space-between; font-size: 14px; color: var(--neutral-2); }
+
+/* discharges: three columns */
+.dcols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.dcol { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 12px; background: var(--bg); }
+.dcol header { display: flex; align-items: center; gap: 8px; }
+.dcol header b { font-size: 16px; font-weight: 600; color: var(--on-sv); }
+.dcol header span { padding: 0 8px; border-radius: 10px; background: #fff; font-size: 13px; font-weight: 600; color: var(--neutral-2); }
+.dcol p { margin: 0 0 4px; font-size: 13px; color: var(--neutral-2); }
+.dcard { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--card-line); border-radius: 10px; background: #fff; transition: transform 200ms var(--ease), box-shadow 200ms ease; }
+.dcard:hover { transform: translateY(-2px); box-shadow: var(--elev-3); }
+.dcard__who { display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; text-align: left; cursor: pointer; }
+.dcard__who > span { display: flex; flex-direction: column; }
+.dcard__who b { font-size: 15px; font-weight: 600; color: var(--on-pc); }
+.dcard__who small { font-size: 13px; color: var(--neutral-2); }
+.dcard__f { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--neutral-2); }
+.btn-o.sm { padding: 4px 10px; font-size: 13px; }
+
+/* the frame's empty monitoring card (SpO2) */
+.wempty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 8px 0; text-align: center; }
+.wempty b { font-size: 16px; font-weight: 600; color: var(--on-sv); }
+.wempty span { max-width: 280px; font-size: 14px; color: var(--neutral-2); }
+/* the frame's "View more" under Quick Actions */
+.qa__more { display: inline-flex; align-items: center; gap: 2px; margin-top: 8px; padding: 0; border: 0; background: none; color: var(--on-surface); font-size: 14px; font-weight: 600; cursor: pointer; }
+.qa__more svg { width: 20px; height: 20px; }
+@media (max-width: 1360px) { .critw__v { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dcols { grid-template-columns: 1fr; } }

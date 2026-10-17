@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Role-based Home · Web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!--
+  ROLE-BASED HOME ON THE WEB · fifth pass (owner, 11 Oct 2026: "make More
+  premium and UX wise also not at all good").
+
+  What was wrong with the fourth pass: eleven cards of the same weight, the
+  same item in four places (deworming in the urgent bar, Quick Access,
+  Sent to Me and Pending), NEW tags and switches over everything. So:
+
+  ONE ORDER, THE SAME FOR EVERY ROLE
+    1 Hero          greeting, one sentence on the day, urgent alerts (only
+                    when there are any), Up Next, and the six quick actions —
+                    the command centre, on the brand's own landscape
+    2 Pending       six counters in one row; overdue is the only red
+    3 Your work     ONE list with two tabs — Needs you / Sent to me — instead
+                    of three cards
+    4 Role tool     the one view this role works from (morning round,
+                    treatment schedule, records health, watch list, approvals)
+    5 Modules       navigation, so smaller than the work above it
+    right rail      My Day · the role's animals · Announcements
+
+  The role switch for review is the floating pill at the foot (keys 1–5).
+-->
+<style>
+:root {
+  --bg: #F1F4F2; --surface: #fff; --ink: #0F2529; --ink-2: #44554F; --mute: #7A8884; --hair: rgba(15,37,41,.08);
+  --teal: #1F515B; --teal-d: #0E353B; --mint: #43C7B5; --coral: #E0503A; --coral-bg: #FDECE7; --amber: #C98516; --amber-bg: #FCF2DF; --green: #2E8B57; --green-bg: #E5F3EA;
+  --sh: 0 1px 2px rgba(15,37,41,.04), 0 10px 30px -18px rgba(15,37,41,.22);
+  --g-medical: linear-gradient(135deg, #6FB28C, #2E8B57); --g-hospital: linear-gradient(135deg, #5A7F8B, #2F525D); --g-pharmacy: linear-gradient(135deg, #45C9BD, #12A99B);
+  --g-lab: linear-gradient(135deg, #E3C98B, #C9A65A); --g-species: linear-gradient(135deg, #4CA36C, #1E6B43); --g-mortality: linear-gradient(135deg, #F4A08A, #EE7457);
+  --g-natality: linear-gradient(135deg, #7AD9CF, #2BB5A6); --g-fetal: linear-gradient(135deg, #F48FA0, #E35D78); --g-eggs: linear-gradient(135deg, #6FD3E3, #2DB3D3);
+  --g-housing: linear-gradient(135deg, #7E9AA2, #44646E); --g-diet: linear-gradient(135deg, #F79A6B, #E8613C); --g-followup: linear-gradient(135deg, #6E9098, #3F616A);
+  --g-parivesh: linear-gradient(135deg, #7BE3D6, #3CCBBB); --g-administer: linear-gradient(135deg, #B2C2BA, #889D93); --g-users: linear-gradient(135deg, #3F6B78, #234652);
+  --g-security: linear-gradient(135deg, #9AA59F, #6A766F); --g-reports: linear-gradient(135deg, #4FD1C5, #22A99D); --g-approvals: linear-gradient(135deg, #4C7280, #24495A);
+  --g-insights: linear-gradient(135deg, #8FA7D9, #5B79B8); --g-communication: linear-gradient(135deg, #6E9098, #3F616A);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.5 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; font-feature-settings: 'cv11', 'ss01'; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+img { display: block; }
+.wrap { width: min(1392px, calc(100% - 48px)); margin: 0 auto; }
+.ico { width: 20px; height: 20px; flex: none; }
+
+/* ── top bar ──────────────────────────────────────────────────────────── */
+.top { position: sticky; top: 0; z-index: 50; background: rgba(241,244,242,.82); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); border-bottom: 1px solid var(--hair); }
+.top .wrap { display: flex; align-items: center; gap: 12px; height: 72px; }
+.brand { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; letter-spacing: .04em; color: var(--teal-d); }
+.brand img { width: 34px; height: 34px; border-radius: 10px; object-fit: cover; }
+.site { display: inline-flex; align-items: center; gap: 8px; height: 40px; margin-left: 12px; padding: 0 12px 0 14px; border-radius: 12px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--hair); font-weight: 500; }
+.site i { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); }
+.search { display: flex; align-items: center; gap: 10px; width: min(440px, 34vw); height: 44px; margin: 0 auto; padding: 0 8px 0 16px; border-radius: 14px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--hair); color: var(--mute); }
+.search span { flex: 1; }
+.search kbd { padding: 3px 8px; border-radius: 7px; background: #F1F4F2; font: 600 11.5px Inter, sans-serif; color: var(--mute); }
+.tbtn { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--hair); color: var(--ink-2); transition: background 120ms; }
+.tbtn:hover { background: #F7FAF8; }
+.tbtn em { position: absolute; top: 6px; right: 6px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--coral); color: #fff; font: 700 10px/17px Inter, sans-serif; text-align: center; font-style: normal; box-shadow: 0 0 0 2px #fff; }
+.tbtn.scan { width: auto; padding: 0 16px 0 14px; display: inline-flex; gap: 8px; background: var(--teal-d); color: #fff; box-shadow: none; font-weight: 600; }
+.tbtn.scan:hover { background: var(--teal); }
+.me { position: relative; display: flex; cursor: pointer; align-items: center; gap: 10px; margin-left: 6px; padding: 4px 10px 4px 4px; border-radius: 16px; transition: background 120ms; }
+.me:hover { background: rgba(255,255,255,.7); }
+.me img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #DDEBE9; }
+.me b { display: block; font-size: 13.5px; font-weight: 600; line-height: 1.2; }
+.me small { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--teal); font-weight: 600; }
+.menu { position: absolute; top: 54px; right: 0; z-index: 60; width: 260px; padding: 8px; border-radius: 16px; background: #fff; box-shadow: 0 24px 60px -20px rgba(15,37,41,.35), 0 0 0 1px var(--hair); text-align: left; }
+.menu[hidden] { display: none; }
+.menu p { margin: 6px 10px 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.menu button { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 40px; padding: 0 10px; border-radius: 10px; font-size: 14px; }
+.menu button:hover { background: #F3F7F5; }
+.menu button[aria-checked='true'] { color: var(--teal); font-weight: 600; }
+.menu button[aria-checked='true']::after { content: '✓'; }
+
+/* ── 1 · hero ─────────────────────────────────────────────────────────── */
+.hero { position: relative; margin-top: 24px; border-radius: 28px; overflow: hidden; color: #fff; background: #0E353B; box-shadow: 0 30px 60px -36px rgba(14,53,59,.6); }
+.hero__bg { position: absolute; inset: 0; background: url(../assets/img/hero-banner-v2.jpg) right 30% / cover no-repeat; }
+.hero__bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(11,44,49,.97) 0%, rgba(11,44,49,.92) 38%, rgba(11,44,49,.55) 70%, rgba(11,44,49,.25) 100%), linear-gradient(0deg, rgba(11,44,49,.85) 0%, rgba(11,44,49,0) 45%); }
+.hero__in { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; padding: 36px 36px 0; }
+.eyebrow { display: flex; align-items: center; gap: 10px; font-size: 12.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #9BD6CB; }
+.eyebrow i { width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: .6; }
+.hero h1 { margin: 10px 0 8px; font-size: 38px; font-weight: 600; letter-spacing: -.025em; line-height: 1.1; }
+.hero__sum { margin: 0; max-width: 640px; font-size: 16px; color: rgba(255,255,255,.78); }
+.hero__sum b { color: #fff; font-weight: 600; }
+.alerts { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; max-width: 640px; }
+.al { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto auto; align-items: center; gap: 14px; padding: 12px 12px 12px 16px; border-radius: 16px; background: rgba(224,80,58,.2); box-shadow: inset 0 0 0 1px rgba(255,140,120,.35); backdrop-filter: blur(8px); }
+.al.amber { background: rgba(214,138,28,.18); box-shadow: inset 0 0 0 1px rgba(245,190,100,.35); }
+.al > i { width: 10px; height: 10px; border-radius: 50%; background: #FF7A62; box-shadow: 0 0 0 4px rgba(255,122,98,.25); animation: pulse 2s ease-in-out infinite; }
+.al.amber > i { background: #F5B649; box-shadow: 0 0 0 4px rgba(245,182,73,.25); }
+@keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(255,122,98,0); } }
+.al b { display: block; font-size: 14.5px; font-weight: 600; }
+.al small { display: block; font-size: 12.5px; color: rgba(255,255,255,.72); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.al__t { padding: 4px 10px; border-radius: 8px; background: rgba(0,0,0,.22); font-size: 12.5px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.al button { height: 34px; padding: 0 14px; border-radius: 10px; background: #fff; color: var(--teal-d); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.calm { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; padding: 8px 14px 8px 10px; border-radius: 999px; background: rgba(255,255,255,.1); font-size: 13px; color: rgba(255,255,255,.85); }
+.calm i { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); }
+
+/* Up next */
+.next { align-self: start; padding: 14px; border-radius: 22px; background: rgba(255,255,255,.96); color: var(--ink); box-shadow: 0 24px 50px -24px rgba(0,0,0,.5); }
+.next__h { display: flex; align-items: center; justify-content: space-between; margin: 2px 4px 12px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.next__h b { padding: 3px 9px; border-radius: 999px; background: var(--green-bg); color: #1F6B42; letter-spacing: 0; text-transform: none; font-size: 12px; }
+.next__img { position: relative; height: 150px; border-radius: 14px; overflow: hidden; }
+.next__img img { width: 100%; height: 100%; object-fit: cover; }
+.next__img span { position: absolute; left: 10px; top: 10px; padding: 4px 10px; border-radius: 999px; background: rgba(15,37,41,.72); color: #fff; font-size: 12px; font-weight: 600; backdrop-filter: blur(6px); }
+.next h3 { margin: 12px 4px 2px; font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+.next p { margin: 0 4px; font-size: 13px; color: var(--ink-2); }
+.next__acts { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 14px; }
+.b { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 42px; padding: 0 16px; border-radius: 12px; font-size: 14px; font-weight: 600; transition: background 120ms, transform 120ms; }
+.b-pri { background: var(--teal-d); color: #fff; } .b-pri:hover { background: var(--teal); }
+.b-ghost { background: #F1F4F2; color: var(--ink-2); } .b-ghost:hover { background: #E7EDEA; }
+
+/* quick actions — the hero's foot */
+.qa { position: relative; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-top: 32px; padding: 0 36px 32px; }
+.qa button { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 14px 0 10px; border-radius: 16px; background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); backdrop-filter: blur(10px); text-align: left; transition: background 140ms, transform 140ms; }
+.qa button:hover { background: rgba(255,255,255,.2); transform: translateY(-2px); }
+.qa span { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; }
+.qa span svg { width: 21px; height: 21px; color: #fff; }
+.qa b { font-size: 13.5px; font-weight: 600; line-height: 1.25; }
+
+/* ── 2 · pending ──────────────────────────────────────────────────────── */
+.sec-h { display: flex; align-items: baseline; gap: 10px; margin: 36px 4px 14px; }
+.sec-h h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -.015em; }
+.sec-h span { font-size: 13px; color: var(--mute); }
+.sec-h a { margin-left: auto; font-size: 13.5px; font-weight: 500; color: var(--teal); text-decoration: none; cursor: pointer; }
+.pend { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.pc { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 18px 18px 16px; border-radius: 20px; background: var(--surface); box-shadow: var(--sh); text-align: left; transition: transform 140ms, box-shadow 140ms; }
+.pc:hover { transform: translateY(-2px); box-shadow: 0 1px 2px rgba(15,37,41,.04), 0 18px 36px -20px rgba(15,37,41,.3); }
+.pc small { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.pc b { font-size: 30px; font-weight: 600; letter-spacing: -.03em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.pc i { font-style: normal; font-size: 12px; color: var(--mute); }
+.pc.hot i { color: var(--coral); font-weight: 600; }
+.pc.hot::before { content: ''; position: absolute; top: 18px; right: 18px; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); }
+
+/* ── grid ─────────────────────────────────────────────────────────────── */
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 24px; align-items: start; padding-bottom: 120px; }
+.col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.card { padding: 24px; border-radius: 24px; background: var(--surface); box-shadow: var(--sh); }
+.card__h { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.card__h h3 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
+.card__h span { font-size: 13px; color: var(--mute); }
+.card__h a { margin-left: auto; font-size: 13.5px; font-weight: 500; color: var(--teal); cursor: pointer; }
+
+/* ── 3 · your work — one list, two tabs ───────────────────────────────── */
+.tabs { display: inline-flex; gap: 2px; padding: 4px; border-radius: 12px; background: #F1F4F2; }
+.tabs button { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-radius: 9px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); }
+.tabs button em { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: rgba(15,37,41,.08); font: 600 11.5px/20px Inter, sans-serif; font-style: normal; }
+.tabs button[aria-selected='true'] { background: #fff; color: var(--ink); font-weight: 600; box-shadow: 0 1px 3px rgba(15,37,41,.12); }
+.tabs button[aria-selected='true'] em { background: var(--teal-d); color: #fff; }
+.rows { display: flex; flex-direction: column; margin: 0 -12px; }
+.rows[hidden] { display: none; }
+.row { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto auto; align-items: center; gap: 14px; padding: 12px; border-radius: 16px; transition: background 120ms; }
+.row + .row { box-shadow: 0 -1px 0 var(--hair); }
+.row:hover { background: #F6F9F7; box-shadow: none; }
+.row:hover + .row { box-shadow: none; }
+.av { position: relative; width: 48px; height: 48px; border-radius: 14px; object-fit: cover; }
+.av-t { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: #E6EFEC; color: var(--teal); font-size: 14px; font-weight: 700; }
+.av-i { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; color: #fff; }
+.av-i svg { width: 22px; height: 22px; }
+.row b { display: block; font-size: 15px; font-weight: 600; letter-spacing: -.005em; }
+.row small { display: block; margin-top: 1px; font-size: 13px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row small strong { color: var(--ink-2); font-weight: 600; }
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill.bad { background: var(--coral-bg); color: #B83A26; } .pill.warn { background: var(--amber-bg); color: #8C5A0B; }
+.pill.ok { background: var(--green-bg); color: #1F6B42; } .pill.info { background: #E9EFF6; color: #345C86; } .pill.mute { background: #EEF2F0; color: var(--ink-2); }
+.act { height: 38px; padding: 0 16px; border-radius: 11px; background: #F1F4F2; color: var(--teal-d); font-size: 13.5px; font-weight: 600; white-space: nowrap; transition: background 120ms; }
+.act:hover { background: #E4ECE9; }
+.act.pri { background: var(--teal-d); color: #fff; } .act.pri:hover { background: var(--teal); }
+
+/* ── 4 · role tool ────────────────────────────────────────────────────── */
+.tool { padding: 0; overflow: hidden; }
+.tool .card__h { padding: 24px 24px 0; }
+.tool__body { padding: 0 24px 24px; }
+.tool__foot { display: flex; align-items: center; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--hair); background: #FAFCFB; }
+.tool__foot small { font-size: 13px; color: var(--mute); }
+.tool__foot .act { margin-left: auto; }
+.meter { flex: 1; max-width: 220px; height: 8px; border-radius: 4px; background: #E6ECE9; overflow: hidden; }
+.meter u { display: block; height: 100%; border-radius: 4px; background: var(--teal); }
+/* patient cards (vet round, zoologist watch list) */
+.pcards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.pcard { position: relative; border-radius: 18px; overflow: hidden; background: #F4F7F5; text-align: left; transition: transform 140ms; }
+.pcard:hover { transform: translateY(-2px); }
+.pcard img { width: 100%; height: 132px; object-fit: cover; }
+.pcard div { padding: 12px 14px 14px; }
+.pcard b { display: block; font-size: 14px; font-weight: 600; }
+.pcard small { display: block; font-size: 12.5px; color: var(--mute); }
+.pcard .pill { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,.94); }
+.pcard.done { opacity: .5; }
+.pcard.cur { box-shadow: 0 0 0 2px var(--teal-d); }
+/* timeline list (doctor) */
+.tl { display: flex; flex-direction: column; }
+.tl__g { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 14px 0; }
+.tl__g + .tl__g { border-top: 1px solid var(--hair); }
+.tl__t { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; padding-top: 10px; }
+.tl__t small { display: block; font-size: 11.5px; font-weight: 600; color: var(--coral); }
+.tl__items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.dose { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 8px 8px 8px; border-radius: 14px; background: #F4F7F5; }
+.dose img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }
+.dose b { display: block; font-size: 13.5px; font-weight: 600; }
+.dose small { display: block; font-size: 12px; color: var(--mute); }
+.dose.late { background: #FFF2EE; box-shadow: inset 0 0 0 1px #F7C9BE; }
+.chk { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1.5px #C9D6D1; color: transparent; transition: background 120ms; }
+.chk:hover { box-shadow: inset 0 0 0 1.5px var(--teal); color: var(--teal); }
+.dose.late .chk { box-shadow: inset 0 0 0 1.5px var(--coral); }
+.chk svg { width: 18px; height: 18px; }
+/* records health (biologist) */
+.rh { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 28px; align-items: center; }
+.ring { position: relative; width: 180px; height: 180px; }
+.ring svg { width: 180px; height: 180px; transform: rotate(-90deg); }
+.ring div { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.ring b { font-size: 38px; font-weight: 600; letter-spacing: -.03em; line-height: 1; }
+.ring small { margin-top: 6px; font-size: 12.5px; color: var(--mute); }
+.bulk { display: flex; flex-direction: column; gap: 8px; }
+.bulk__r { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 14px; padding: 12px 12px 12px 16px; border-radius: 14px; background: #F4F7F5; }
+.bulk__r b { display: block; font-size: 14px; font-weight: 600; }
+.bulk__r small { display: block; font-size: 12.5px; color: var(--mute); }
+.bulk__r strong { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+/* behaviour chips (zoologist) */
+.log { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.log > span { font-size: 13px; color: var(--mute); margin-right: 4px; }
+.log button { height: 34px; padding: 0 14px; border-radius: 999px; background: #F1F4F2; font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.log button:hover { background: #E4ECE9; }
+
+/* ── 5 · modules ──────────────────────────────────────────────────────── */
+.mods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.mod { position: relative; display: flex; align-items: center; gap: 12px; height: 72px; padding: 0 14px; border-radius: 16px; background: #F4F7F5; text-align: left; transition: background 120ms, transform 140ms; }
+.mod:hover { background: #EAF1EE; transform: translateY(-1px); }
+.mod span { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; }
+.mod span img { width: 24px; height: 24px; }
+.mod b { font-size: 14px; font-weight: 600; line-height: 1.25; }
+.mod em { margin-left: auto; min-width: 24px; height: 22px; padding: 0 7px; border-radius: 999px; background: var(--coral-bg); color: #B83A26; font: 700 11.5px/22px Inter, sans-serif; font-style: normal; text-align: center; }
+
+/* ── right rail ───────────────────────────────────────────────────────── */
+.day { position: relative; display: flex; flex-direction: column; }
+.day::before { content: ''; position: absolute; left: 61px; top: 18px; bottom: 18px; width: 2px; background: #E6ECE9; }
+.dy { position: relative; display: grid; grid-template-columns: 48px 26px minmax(0, 1fr); align-items: center; gap: 0; padding: 10px 0; }
+.dy__t { font-size: 13px; font-weight: 600; color: var(--mute); font-variant-numeric: tabular-nums; }
+.dy__d { position: relative; z-index: 1; width: 12px; height: 12px; margin-left: 1px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 2px #C9D6D1; }
+.dy b { display: block; font-size: 14px; font-weight: 600; }
+.dy small { display: block; font-size: 12.5px; color: var(--mute); }
+.dy.done b { color: var(--mute); font-weight: 500; text-decoration: line-through; text-decoration-color: rgba(122,136,132,.5); }
+.dy.done .dy__d { background: #C9D6D1; box-shadow: none; }
+.dy.now { margin: 4px -12px; padding: 12px; border-radius: 14px; background: #EAF4F1; grid-template-columns: 48px 26px minmax(0, 1fr); }
+.dy.now .dy__t { color: var(--teal-d); }
+.dy.now .dy__d { background: var(--teal-d); box-shadow: 0 0 0 4px rgba(14,53,59,.14); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ph { position: relative; height: 150px; border-radius: 16px; overflow: hidden; text-align: left; }
+.ph img { width: 100%; height: 100%; object-fit: cover; transition: transform 300ms ease; }
+.ph:hover img { transform: scale(1.04); }
+.ph::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.75)); }
+.ph div { position: absolute; left: 12px; right: 12px; bottom: 10px; z-index: 1; color: #fff; }
+.ph b { display: block; font-size: 13.5px; font-weight: 600; }
+.ph small { display: block; font-size: 11.5px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ph .pill { position: absolute; top: 10px; left: 10px; z-index: 1; background: rgba(255,255,255,.94); }
+.ann { display: flex; flex-direction: column; gap: 14px; }
+.an { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; align-items: center; }
+.an img { width: 64px; height: 64px; border-radius: 14px; object-fit: cover; }
+.an b { display: block; font-size: 14px; font-weight: 600; line-height: 1.35; }
+.an small { font-size: 12px; color: var(--mute); }
+
+/* ── review pill (mockup only) ────────────────────────────────────────── */
+.rv { position: fixed; left: 50%; bottom: 20px; z-index: 70; display: flex; align-items: center; gap: 4px; padding: 6px; border-radius: 18px; background: rgba(14,37,41,.92); backdrop-filter: blur(12px); box-shadow: 0 20px 50px -20px rgba(0,0,0,.6); transform: translateX(-50%); }
+.rv > span { padding: 0 10px 0 8px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #8FB8AE; white-space: nowrap; }
+.rv button { height: 36px; padding: 0 14px; border-radius: 12px; color: #CFE2DC; font-size: 13.5px; font-weight: 500; white-space: nowrap; }
+.rv button:hover { background: rgba(255,255,255,.08); }
+.rv button[aria-pressed='true'] { background: #fff; color: var(--teal-d); font-weight: 600; }
+
+/* scan sheet */
+.sheet { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 24px; background: rgba(10,30,34,.55); backdrop-filter: blur(8px); }
+.sheet[hidden] { display: none; }
+.sheet__box { width: min(400px, 100%); padding: 16px; border-radius: 26px; background: #fff; box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
+.vf { position: relative; height: 260px; border-radius: 18px; background: #10262C url(../assets/img/species/asiatic-lion.jpg) center/cover; overflow: hidden; }
+.vf::before { content: ''; position: absolute; inset: 50px 70px; border-radius: 18px; box-shadow: 0 0 0 999px rgba(0,0,0,.5), inset 0 0 0 3px var(--mint); }
+.vf::after { content: ''; position: absolute; left: 70px; right: 70px; top: 50%; height: 2px; background: var(--mint); box-shadow: 0 0 12px var(--mint); animation: sweep 1.6s ease-in-out infinite alternate; }
+@keyframes sweep { from { transform: translateY(-70px); } to { transform: translateY(70px); } }
+.vf span { position: absolute; left: 0; right: 0; bottom: 14px; z-index: 1; text-align: center; color: #fff; font-size: 13px; font-weight: 500; }
+.found { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 12px; margin-top: 14px; padding: 4px; }
+.found img { width: 52px; height: 52px; border-radius: 14px; object-fit: cover; }
+.found b { display: block; font-size: 15px; }
+.found small { display: block; font-size: 12.5px; color: var(--mute); }
+.sheet__acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+
+[data-in] { animation: rise 320ms cubic-bezier(.2,.7,.2,1) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { [data-in], .al > i, .vf::after { animation: none; } .pc, .qa button, .mod, .pcard, .ph img { transition: none; } }
+
+@media (max-width: 1240px) {
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .pend { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .qa { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .hero__in { grid-template-columns: minmax(0, 1fr); padding: 28px 24px 0; }
+  .qa { padding: 0 24px 24px; }
+  .search { display: none; }
+  .pcards, .mods { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tl__items { grid-template-columns: 1fr; }
+  .rh { grid-template-columns: 1fr; justify-items: center; }
+}
+@media (max-width: 640px) {
+  .wrap { width: calc(100% - 32px); }
+  .site, .me__txt, .tbtn.scan b { display: none; }
+  .hero h1 { font-size: 30px; }
+  .al { grid-template-columns: 10px minmax(0, 1fr); }
+  .al__t, .al button { grid-column: 2; justify-self: start; }
+  .qa, .pend { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row { grid-template-columns: 48px minmax(0, 1fr); }
+  .row .pill { display: none; }
+  .row .act { grid-column: 2; justify-self: start; }
+  .rv { left: 16px; right: 16px; transform: none; overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><img src="../assets/img/antz-logo.png" alt="">ANTZ</div>
+    <button class="site" type="button"><i></i>All sites<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div class="search"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search animals, modules, people</span><kbd>⌘K</kbd></div>
+    <button class="tbtn scan" type="button" id="scanBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16"/></svg><b>Scan</b></button>
+    <button class="tbtn" type="button" title="Drafts"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 13h5M10 17h3"/></svg><em>3</em></button>
+    <button class="tbtn" type="button" title="Notifications"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><em id="bellN">5</em></button>
+    <div class="me" id="meBtn" role="button" tabindex="0" aria-haspopup="menu" aria-expanded="false">
+      <img src="../assets/img/avatar.png" alt="">
+      <div class="me__txt"><b>Sourav Tambe</b><small><span id="roleName"></span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></small></div>
+      <div class="menu" id="menu" role="menu" hidden></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" id="hero"></section>
+  <div class="sec-h"><h2>Pending</h2><span id="pendSub"></span><a>View all</a></div>
+  <div class="pend" id="pend"></div>
+  <div class="sec-h" style="margin-top:40px"><h2>Today</h2></div>
+  <div class="main">
+    <div class="col" id="left"></div>
+    <div class="col" id="right"></div>
+  </div>
+</main>
+
+<nav class="rv" aria-label="Preview as role"><span>Preview as</span><div id="rvTabs" style="display:flex;gap:2px"></div></nav>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet__box" role="dialog" aria-modal="true" aria-label="Scan animal">
+    <div class="vf"><span>Hold the tag or microchip inside the frame</span></div>
+    <div class="found"><img src="../assets/img/species/asiatic-lion.jpg" alt=""><div><b>Asiatic Lion · AAID 87546</b><small>Lion House 2 · in hospital</small></div><span class="pill bad">Serious</span></div>
+    <div class="sheet__acts" id="sheetActs"></div>
+  </div>
+</div>
+
+<script>
+const IMG = (n) => `../assets/img/species/${n}.jpg`
+const ICON = (n) => `../assets/icon/m-${n}.svg`
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+const fmt = (n) => typeof n === 'number' ? n.toLocaleString('en-IN') : n
+const $ = (id) => document.getElementById(id)
+const MODS = {
+  medical: 'Medical', hospital: 'Hospital', pharmacy: 'Pharmacy', lab: 'Lab', species: 'Species', mortality: 'Mortality',
+  natality: 'Natality', fetal: 'Fetal Death', eggs: 'Eggs', housing: 'Housing', diet: 'Diet & Kitchen', followup: 'Follow Up',
+  parivesh: 'Parivesh', administer: 'Administer', users: 'Users', security: 'Security', reports: 'Reports', insights: 'Insights', communication: 'Communication',
+}
+const s = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`
+const G = {
+  patient:  s('<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20a6.5 6.5 0 0 1 13 0"/><path d="M19 8v6M16 11h6"/>'),
+  record:   s('<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M12.5 11v6M9.5 14h6"/>'),
+  bed:      s('<path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/>'),
+  syringe:  s('<path d="m18 2 4 4M17 7l-9.5 9.5-3 .5.5-3L14.5 4.5z"/><path d="m3 21 2.5-2.5M11 8l2 2M8 11l2 2"/>'),
+  deworm:   s('<path d="M4 17c2-4 4-4 6 0s4 4 6 0 3-4 4-2"/><path d="M4 7h7M7.5 3.5v7"/>'),
+  pill:     s('<rect x="3" y="9" width="18" height="7" rx="3.5" transform="rotate(-35 12 12.5)"/><path d="m9.5 8.5 5 6.5"/>'),
+  flask:    s('<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 15h9"/>'),
+  scale:    s('<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 9a4 4 0 0 1 8 0"/><path d="m12 9 1.5-2"/>'),
+  necropsy: s('<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="m10 12 4 4M14 12l-4 4"/>'),
+  fetal:    s('<circle cx="12" cy="9" r="5"/><path d="M12 14v7M9 18h6"/>'),
+  paw:      s('<circle cx="6" cy="10" r="2"/><circle cx="18" cy="10" r="2"/><circle cx="9" cy="5" r="2"/><circle cx="15" cy="5" r="2"/><path d="M7.5 17a4.5 4.5 0 0 1 9 0c0 2-2 3-4.5 3s-4.5-1-4.5-3z"/>'),
+  birth:    s('<path d="M12 21c-4 0-7-3-7-7 0-5 7-11 7-11s7 6 7 11c0 4-3 7-7 7z"/><path d="M12 11v6M9 14h6"/>'),
+  egg:      s('<path d="M12 3c3.5 0 6.5 5.5 6.5 10a6.5 6.5 0 0 1-13 0C5.5 8.5 8.5 3 12 3z"/>'),
+  transfer: s('<path d="M4 8h14l-3-3M20 16H6l3 3"/>'),
+  sex:      s('<circle cx="9" cy="14" r="5"/><path d="M13 10l7-7M15 3h5v5"/>'),
+  chip:     s('<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>'),
+  eye:      s('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+  heart:    s('<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/><path d="M8 11h2l1-2 2 4 1-2h2"/>'),
+  leaf:     s('<path d="M5 19c0-8 6-14 15-14 0 9-6 15-14 15"/><path d="M5 19 13 11"/>'),
+  alert:    s('<path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/>'),
+  note:     s('<path d="M5 3h14v14l-4 4H5z"/><path d="M15 21v-4h4M9 8h6M9 12h4"/>'),
+  user:     s('<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20a6.5 6.5 0 0 1 13 0"/><path d="M19 8v6M16 11h6"/>'),
+  megaphone:s('<path d="M3 10v4h4l7 4V6L7 10z"/><path d="M18 9a4 4 0 0 1 0 6"/>'),
+  request:  s('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'),
+  approve:  s('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 12 3 3 5-6"/>'),
+  site:     s('<path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M10 21v-6h4v6"/>'),
+  file:     s('<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 13h5M10 17h5"/>'),
+  check:    s('<path d="m5 12 5 5 9-10"/>'),
+  x:        s('<path d="M6 6l12 12M18 6 6 18"/>'),
+}
+const ANN = [
+  { img: IMG('indian-leopard'), t: 'Zara and Kian, our leopard cubs, go on exhibit from Monday', by: 'Emerson Vance · 24 Aug' },
+  { img: '../assets/img/hospital.jpg', t: 'Quarterly health checks begin 7 September', by: 'Hospital team · 22 Aug' },
+]
+const initials = (n) => n.replace(/^Dr\.\s*/, '').split(' ').map((w) => w[0]).join('').slice(0, 2)
+
+/* ══ THE FIVE ROLES ══════════════════════════════════════════════════════
+   One shape per role, read by the same page:
+     sum       one sentence on the day, in the hero
+     alerts    [title, detail, time, action, amber?]   — none: a calm line
+     next      Up Next: [time, title, place, photo, status, action]
+     qa        six actions: [glyph, colour, label]
+     pending   six counters: [label, count, foot, hot?]
+     needs     the work list: [photo|glyph, title, detail, pill, tone, action]
+     sent      what others handed over: [from, role, title, detail, action]
+     tool      which featured card, and its title
+     day       [time, what, where, done|now|'']
+     animals   the right rail's photo card: { title, rows: [photo, name, sub, pill, tone] }
+     mods      eight modules: [key, badge]                                  */
+const ROLES = {
+  vet: {
+    name: 'Veterinarian', first: 'Sourav',
+    sum: '<b>8 patients</b> in hospital, <b>2 urgent</b> items and <b>3 lab results</b> back since yesterday.',
+    alerts: [
+      ['Indian Peafowl died at 02:10 · death report to CZA', 'Schedule I species · Aviary 3 · report due within 24 hours', '22 h left', 'Write report'],
+      ['Outbreak warning · Ochre erroralis at Crimson Frosted', '72 deaths in 10 days, after 20 new animals arrived', '10 days', 'Investigate', 1],
+    ],
+    next: ['10:30', 'Wound check · Asiatic Lion', 'Lion House 2 · AAID 87546 · day 3 in hospital', 'asiatic-lion', 'Serious', 'Start check'],
+    qa: [['record', 'medical', 'New Medical Record'], ['bed', 'hospital', 'Hospitalise'], ['flask', 'lab', 'Request Lab Test'], ['pill', 'pharmacy', 'Prescribe'], ['necropsy', 'mortality', 'Add Necropsy'], ['fetal', 'fetal', 'Fetal Death']],
+    pending: [['Vaccination', 143, '21 overdue', 1], ['Deworming', 319, '48 overdue', 1], ['Necropsy reports', 14296, 'records backlog'], ['Lab results', 4, '3 new today'], ['Follow-ups', 17, 'this week'], ['Discharge review', 3, 'ready to go']],
+    needs: [
+      ['cinereous-vulture', 'Serum panel back · Cinereous Vulture', 'AAID 30871 · 2 values high · in hospital day 6', 'High', 'bad', 'Read result'],
+      ['indian-leopard', 'Weight down 15% · Indian Leopard', '51.6 → 44.0 kg · body condition 3 of 9', 'Review', 'warn', 'Open case'],
+      ['chital', 'Necropsy report not written · Chital', 'Died today · Deer Paddock · cause: trauma', 'Today', 'warn', 'Write'],
+      ['nilgai', 'Ready for discharge · Nilgai', 'Post-op day 9 · eating well', 'Stable', 'ok', 'Discharge'],
+    ],
+    sent: [
+      ['Quinn Underwood', 'Supervisor', 'Sloth Bear off feed for 2 days', 'Bear Dell · keeper note · 07:40', 'Make case'],
+      ['Jordan Brenner', 'Doctor', 'Lion refused the 10:00 dressing', 'Asks what to do next', 'Reply'],
+      ['Lab', '', 'Faecal test · Indian Rock Python', 'Parasites found', 'Read'],
+    ],
+    tool: ['round', 'Morning Round'],
+    day: [['08:00', 'Morning round', 'Hospital · 8 patients', 'done'], ['10:30', 'Wound check · Asiatic Lion', 'Lion House 2', 'now'], ['12:00', 'Necropsy · Chital', 'Post-mortem room', ''], ['15:00', 'Q4 vaccination plan', 'With the Doctor team', ''], ['17:00', 'Shift handover', 'Hospital', '']],
+    animals: { title: 'My Patients', rows: [['asiatic-lion', 'Asiatic Lion', 'Hospital · day 3', 'Serious', 'bad'], ['cinereous-vulture', 'Cinereous Vulture', 'Hospital · day 6', 'Serious', 'bad'], ['indian-rock-python', 'Indian Rock Python', 'Hospital · day 2', 'Stable', 'ok'], ['indian-peafowl', 'Indian Peafowl', 'Aviary 3 · day 1', 'Watch', 'warn']] },
+    mods: [['medical', 8], ['hospital'], ['lab', 4], ['pharmacy'], ['mortality'], ['followup', 17], ['fetal'], ['species']],
+    scan: ['New Medical Record', 'Open History'],
+  },
+  doctor: {
+    name: 'Doctor', first: 'Sourav',
+    sum: '<b>12 treatments</b> today, <b>2 doses late</b>, and the Deer Paddock deworming round is waiting.',
+    alerts: [['2 doses are late', 'Asiatic Lion dressing · Bonnet Macaque eye drops · both due 10:00', '80 min', 'Give now']],
+    next: ['11:30', 'Deworming round · Deer Paddock', '12 animals · Fenbendazole · from Dr. Kai Vance', 'sambar', '3 days overdue', 'Start round'],
+    qa: [['patient', 'hospital', 'Add Patient'], ['syringe', 'medical', 'Record Vaccination'], ['deworm', 'natality', 'Record Deworming'], ['pill', 'pharmacy', 'Dispense Medicine'], ['scale', 'eggs', 'Record Weight'], ['flask', 'lab', 'Collect Sample']],
+    pending: [['Vaccination', 143, '21 overdue', 1], ['Deworming', 319, '48 overdue', 1], ['Treatments today', 12, '2 late'], ['Follow-ups', 17, 'this week'], ['Weights due', 5, '30-day round'], ['Medicine requests', 5, '1 controlled']],
+    needs: [
+      ['asiatic-lion', 'Dressing · Asiatic Lion', 'Lion House 2 · was due 10:00', 'Late', 'bad', 'Give now'],
+      ['bonnet-macaque', 'Eye drops · Bonnet Macaque', 'Primate Island · was due 10:00', 'Late', 'bad', 'Give now'],
+      ['indian-leopard', 'Weigh the Indian Leopard', 'Hospital · asked by the curator', 'Today', 'warn', 'Record'],
+      ['blackbuck', 'Vaccination · Blackbuck AAID 10240', 'Hoofstock Barn · 9 days overdue', 'Overdue', 'warn', 'Record'],
+    ],
+    sent: [
+      ['Dr. Kai Vance', 'Veterinarian', 'Lion: change the dressing twice a day', 'New instruction from today', 'Got it'],
+      ['Dr. Kai Vance', 'Veterinarian', 'Deworming round · Deer Paddock', '12 animals · Fenbendazole', 'Start'],
+      ['Pharmacy', '', 'Ketamine ready to collect', 'Controlled drug · sign on collection', 'Collect'],
+    ],
+    tool: ['schedule', 'Treatment Schedule'],
+    day: [['08:00', 'Morning doses', 'Hospital · 6 animals', 'done'], ['10:00', 'Dressing · Asiatic Lion', 'Lion House 2 · late', 'now'], ['11:30', 'Deworming round', 'Deer Paddock · 12 animals', ''], ['14:00', 'Afternoon doses', 'Hospital · 5 animals', ''], ['16:30', 'Weighing round', '5 animals', '']],
+    animals: { title: 'My Patients', rows: [['asiatic-lion', 'Asiatic Lion', 'Dressing · 10:00', 'Late', 'bad'], ['bonnet-macaque', 'Bonnet Macaque', 'Eye drops · 10:00', 'Late', 'bad'], ['indian-peafowl', 'Indian Peafowl', 'Antibiotic · 12:00', 'Due', 'info'], ['blackbuck', 'Blackbuck', 'Antibiotic · 14:00', 'Later', 'mute']] },
+    mods: [['medical'], ['pharmacy', 5], ['hospital'], ['lab'], ['followup', 17], ['diet'], ['species'], ['mortality']],
+    scan: ['Mark Dose Given', 'Record Weight'],
+  },
+  biologist: {
+    name: 'Zoo Biologist', first: 'Sourav',
+    sum: '<b>8 new events</b> from keepers to confirm, and the <b>quarterly report</b> to CZA is due in 4 days.',
+    alerts: [['Quarterly report to CZA · due 15 October', 'Schedule I and II species · births, deaths and causes for Jul–Sep', '4 days', 'Prepare', 1]],
+    next: ['11:00', 'Sexing session · Reptile House', '40 animals · DNA samples with the lab', 'indian-rock-python', 'Planned', 'Open list'],
+    qa: [['paw', 'species', 'Add Accession'], ['birth', 'natality', 'Add Birth'], ['egg', 'eggs', 'Add Eggs'], ['transfer', 'approvals', 'Transfer Animal'], ['sex', 'fetal', 'Record Sex'], ['chip', 'housing', 'Add Microchip']],
+    pending: [['Sexing', 28532, 'for Form II', 1], ['Microchipping', 20302, 'not identified', 1], ['Transfer pending', 16, '2 need permits'], ['Births to verify', 100, 'last 10 days'], ['Necropsy reports', 14296, 'records backlog'], ['Parivesh filings', 3, 'births to register']],
+    needs: [
+      ['blackbuck', '2 Blackbuck calves born', 'Hoofstock Barn H-4 · from Emerson Vance', 'Confirm', 'info', 'Confirm'],
+      ['indian-rock-python', '3 deaths · Ochre erroralis', 'Reptile House · part of the outbreak', 'Check', 'bad', 'Review'],
+      ['barasingha', 'Permit renewal · Barasingha transfer', 'Transfer cannot move without it', 'Tomorrow', 'warn', 'Open'],
+      ['sarus-crane', 'Find a mate · Sarus Crane', 'Single for 162 days · 6-month rule', '18 days', 'warn', 'Plan'],
+    ],
+    sent: [
+      ['Dr. Jordan Brenner', 'Veterinarian', 'Necropsy done · Chital', 'Cause: trauma · add to the record', 'Update'],
+      ['Morgan Sefton', 'Curator', 'Plan a mate for the Sarus Crane', 'Before the 6-month limit', 'Plan'],
+      ['Emerson Vance', 'Supervisor', '4 rescue arrivals · Crimson Dove', 'Foxglen · need accession', 'Add'],
+    ],
+    tool: ['records', 'Records Health'],
+    day: [['09:00', 'Confirm new events', '5 births, 3 deaths', 'now'], ['11:00', 'Sexing session', 'Reptile House · 40 animals', ''], ['14:00', 'Pairing plan · Sarus Crane', 'With the curator', ''], ['16:00', 'Quarterly report draft', 'Due 15 Oct', '']],
+    animals: { title: 'Favourite Animals', rows: [['blackbuck', 'Blackbuck', 'AAID 190317 · F', 'Breeding', 'info'], ['sarus-crane', 'Sarus Crane', 'AAID 143944 · single', 'Alone', 'warn'], ['barasingha', 'Barasingha', 'AAID 169095 · M', 'Transfer', 'info'], ['indian-star-tortoise', 'Star Tortoise', 'AAID 70045 · F', 'Gravid', 'ok']] },
+    mods: [['species'], ['natality'], ['eggs'], ['mortality'], ['fetal'], ['housing'], ['parivesh', 3], ['reports']],
+    scan: ['Record Sex', 'Add Microchip'],
+  },
+  zoologist: {
+    name: 'Zoologist', first: 'Sourav',
+    sum: '<b>4 animals</b> on your watch list, <b>18 observations</b> due today and 3 notes from keepers.',
+    alerts: [],
+    next: ['10:00', 'Observation · Macaque troop', 'Primate Island P-5 · new male joined this week', 'bonnet-macaque', '45 min', 'Start observing'],
+    qa: [['eye', 'insights', 'New Observation'], ['heart', 'medical', 'Welfare Assessment'], ['leaf', 'diet', 'Add Enrichment'], ['note', 'communication', 'New Note'], ['transfer', 'approvals', 'Transfer Animal'], ['alert', 'mortality', 'Report Escape']],
+    pending: [['Observations due', 18, '6 enclosures', 1], ['Welfare assessments', 157, 'this week', 1], ['Enrichment plans', 9, 'to review'], ['Keeper flags', 7, '2 new today'], ['Behaviour reports', 3, 'for the quarter'], ['Research notes', 2, 'drafts']],
+    needs: [
+      ['asiatic-lion', 'Pacing at the fence · Asiatic Lion', 'Enclosure L-2 · 3 hours a day, rising', 'Rising', 'bad', 'Observe'],
+      ['sloth-bear', 'Welfare score falling · Sloth Bear', 'Bear Dell · score 30 after cage-mate died', 'Falling', 'bad', 'Assess'],
+      ['bonnet-macaque', 'Group tension · Bonnet Macaque troop', 'Two fights since the new male', 'Watch', 'warn', 'Observe'],
+      ['sarus-crane', 'Housed alone 162 days · Sarus Crane', 'Wetland Aviary', 'Alone', 'warn', 'Plan'],
+    ],
+    sent: [
+      ['Quinn Underwood', 'Supervisor', 'Lion pacing for 3 hours', 'Enclosure L-2 · keeper note', 'Observe'],
+      ['Dr. Kai Vance', 'Veterinarian', 'Sloth Bear may be grieving', 'Please watch this week', 'Observe'],
+      ['Indra Abernathy', 'Biologist', 'New male in the macaque troop', 'Watch for fights', 'Plan'],
+    ],
+    tool: ['watch', 'Watch List'],
+    day: [['08:30', 'Observation · Lions', 'Enclosure L-2', 'done'], ['10:00', 'Observation · Macaque troop', 'Primate Island P-5', 'now'], ['13:00', 'Enrichment · Sloth Bears', 'Bear Dell · scent trail', ''], ['15:30', 'Welfare scoring', '4 enclosures', '']],
+    animals: { title: 'Favourite Animals', rows: [['gaur', 'Gaur herd', 'H-8 · settled after move', 'Good', 'ok'], ['sumatran-orangutan', 'Sumatran Orangutan', 'Age 24 · geriatric', 'Elderly', 'warn'], ['indian-leopard', 'Indian Leopard', 'Cubs · den watch', 'Good', 'ok'], ['hill-myna', 'Hill Myna pair', 'Aviary 3 · new pair', 'Watch', 'info']] },
+    mods: [['species'], ['housing'], ['diet'], ['medical'], ['insights'], ['natality'], ['reports'], ['communication']],
+    scan: ['New Observation', 'Welfare Assessment'],
+  },
+  admin: {
+    name: 'Admin', first: 'Sourav',
+    sum: '<b>74 approvals</b> waiting, <b>1 licence</b> overdue, and 3 new staff join on Monday.',
+    alerts: [['Wildlife protection licence expired 25 days ago', 'State Forest Dept · 5 more licences are also overdue', '25 days', 'Renew']],
+    next: ['09:30', 'Clear approvals', '74 waiting · oldest is 5 days', 'blackbuck', 'In progress', 'Continue'],
+    qa: [['user', 'users', 'Add User'], ['approve', 'approvals', 'Approvals'], ['megaphone', 'reports', 'Announcement'], ['request', 'administer', 'New Request'], ['file', 'parivesh', 'Parivesh Filing'], ['site', 'housing', 'New Site']],
+    pending: [['Approvals', 74, '12 over 3 days', 1], ['Parivesh filings', 9, '3 this week', 1], ['Access requests', 6, 'new staff'], ['Transfer approvals', 16, 'need permits'], ['Locked accounts', 3, 'failed sign-ins'], ['Reports to file', 2, 'this month']],
+    needs: [
+      ['g:approvals', 'Animal transfer · 2 Blackbuck', 'Clearspring → Foxglen · waiting 5 days', '5 days', 'bad', 'Approve'],
+      ['g:pharmacy', 'Purchase · Ketamine 50 mg × 10', 'Controlled drug · ₹4,800 · waiting 3 days', '3 days', 'warn', 'Approve'],
+      ['g:users', 'New user · Keeper, Hollowpine', 'Ravi Menon · access to Section H', '1 day', 'mute', 'Approve'],
+      ['g:security', '5 failed sign-ins · account locked', 'K. Vance · Foxglen', 'Locked', 'warn', 'Unlock'],
+    ],
+    sent: [
+      ['Indra Abernathy', 'Biologist', 'Transfer permit · 2 Blackbuck', 'Needs your approval', 'Approve'],
+      ['Morgan Sefton', 'Curator', 'New keeper joins Monday', 'Ravi Menon · Hollowpine', 'Create user'],
+      ['K. Venkatesh', 'Director', 'Draft the CZA inspection reply', 'Due in 6 days', 'Open'],
+    ],
+    tool: ['compliance', 'Compliance Calendar'],
+    day: [['09:30', 'Clear approvals', '74 waiting', 'now'], ['11:00', 'New staff accounts', '3 joining Monday', ''], ['14:00', 'CZA inspection reply', 'Draft', ''], ['16:00', 'Licence renewals', 'State Forest Dept', '']],
+    animals: null,
+    mods: [['administer', 74], ['users', 6], ['security'], ['parivesh', 9], ['reports'], ['communication'], ['housing'], ['pharmacy']],
+    scan: ['Open Animal', 'Transfer Animal'],
+  },
+}
+
+/* ══ THE FEATURED TOOL OF EACH ROLE ══════════════════════════════════════ */
+const card = (title, sub, more, body, foot = '') => `<section class="card tool" data-in><div class="card__h"><h3>${title}</h3>${sub ? `<span>${sub}</span>` : ''}${more ? `<a>${more}</a>` : ''}</div><div class="tool__body">${body}</div>${foot}</section>`
+const TOOL = {
+  round: (t) => card(t, 'hospital first, then overnight flags', 'All 8 ›',
+    `<div class="pcards">${[['asiatic-lion', 'Asiatic Lion', 'Wound, day 3', 'Serious', 'bad', 'cur'], ['cinereous-vulture', 'Cinereous Vulture', 'Serum panel back', 'Serious', 'bad', ''], ['indian-rock-python', 'Indian Rock Python', 'Not feeding', 'Stable', 'ok', ''], ['sloth-bear', 'Sloth Bear', 'Keeper flag · off feed', 'New', 'info', '']].map(([i, n, d, p, t, c]) => `<button class="pcard ${c}"><img src="${IMG(i)}" alt=""><span class="pill ${t}">${p}</span><div><b>${n}</b><small>${d}</small></div></button>`).join('')}</div>`,
+    `<div class="tool__foot"><small>3 of 8 seen</small><div class="meter"><u style="width:37%"></u></div><button class="act pri">Continue round</button></div>`),
+  schedule: (t) => card(t, 'today · tap the box when given', 'Full day ›',
+    `<div class="tl">${[['10:00', 'late', [['asiatic-lion', 'Asiatic Lion', 'Dressing'], ['bonnet-macaque', 'Bonnet Macaque', 'Eye drops']]], ['12:00', '', [['indian-peafowl', 'Indian Peafowl', 'Antibiotic'], ['cinereous-vulture', 'Cinereous Vulture', 'Fluids']]], ['14:00', '', [['blackbuck', 'Blackbuck', 'Antibiotic'], ['indian-rock-python', 'Indian Rock Python', 'Sample']]]].map(([time, late, items]) => `<div class="tl__g"><div class="tl__t">${time}${late ? '<small>Late</small>' : ''}</div><div class="tl__items">${items.map(([i, n, d]) => `<div class="dose${late ? ' late' : ''}"><img src="${IMG(i)}" alt=""><div><b>${n}</b><small>${d}</small></div><button class="chk" aria-label="Mark given">${G.check}</button></div>`).join('')}</div></div>`).join('')}</div>`,
+    `<div class="tool__foot"><span class="av-i" style="width:40px;height:40px;border-radius:12px;background:var(--g-natality)">${G.deworm}</span><div><b style="display:block;font-size:14px">Group recording</b><small>Deworm a whole enclosure in one save</small></div><button class="act pri">Start · Deer Paddock</button></div>`),
+  records: (t) => card(t, 'Form II needs sex for every animal', 'Open Species ›',
+    `<div class="rh"><div class="ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#E6ECE9" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#C98516" stroke-width="3" stroke-linecap="round" stroke-dasharray="${0.41 * 97.4} 97.4"/></svg><div><b>41%</b><small>animals sexed<br>20,000 of 48,524</small></div></div>
+      <div class="bulk"><div style="font-size:13px;color:var(--mute);margin-bottom:2px">Biggest gaps · update a whole enclosure at once</div>${[['Reptile House', 'Crimson Frosted', 2489], ['Hoofstock Barn', 'Hollowpine', 663], ['Aviary 3', 'Clearspring', 654]].map(([n, site, c]) => `<div class="bulk__r"><div><b>${n}</b><small>${site}</small></div><strong>${fmt(c)}</strong><button class="act">Update all</button></div>`).join('')}</div></div>`,
+    `<div class="tool__foot"><small>Due 30 Apr 2027 · 201 days</small><div class="meter"><u style="width:41%;background:var(--amber)"></u></div><button class="act pri">Plan sexing</button></div>`),
+  watch: (t) => card(t, 'animals not coping', 'All 7 ›',
+    `<div class="pcards">${[['asiatic-lion', 'Asiatic Lion', 'Pacing 3 h a day', 'Rising', 'bad'], ['sloth-bear', 'Sloth Bear', 'Score 30 · grieving', 'Falling', 'bad'], ['bonnet-macaque', 'Macaque troop', 'Two fights', 'Tension', 'warn'], ['sarus-crane', 'Sarus Crane', 'Alone 162 days', 'Alone', 'warn']].map(([i, n, d, p, t]) => `<button class="pcard"><img src="${IMG(i)}" alt=""><span class="pill ${t}">${p}</span><div><b>${n}</b><small>${d}</small></div></button>`).join('')}</div>`,
+    `<div class="tool__foot"><div class="log"><span>Quick log · Asiatic Lion</span>${['Pacing', 'Not eating', 'Fighting', 'Hiding', 'Normal'].map((c) => `<button>${c}</button>`).join('')}</div></div>`),
+  compliance: (t) => card(t, 'licences and statutory returns', 'All 48 ›',
+    `<div class="rows">${[['g:parivesh', 'Wildlife protection licence', 'State Forest Dept', '25 d overdue', 'bad', 'Renew'], ['g:reports', 'Quarterly report to CZA', 'Schedule I and II · Jul–Sep', 'In 4 days', 'warn', 'Prepare'], ['g:users', 'Staff zoonotic screening', '18 animal-care staff', 'In 20 days', 'warn', 'Book'], ['g:housing', 'Environmental clearance', 'State Forest Dept', 'In 8 days', 'mute', 'Open']].map(row).join('')}</div>`),
+}
+
+/* ── one row of a work list ───────────────────────────────────────────── */
+function row([img, t, d, p, tone, act]) {
+  const lead = img.startsWith('g:') ? `<span class="av-i" style="background:var(--g-${img.slice(2)})"><img src="${ICON(img.slice(2))}" alt="" style="width:22px;height:22px"></span>` : `<img class="av" src="${IMG(img)}" alt="">`
+  return `<div class="row">${lead}<div style="min-width:0"><b>${esc(t)}</b><small>${esc(d)}</small></div><span class="pill ${tone}">${p}</span><button class="act${tone === 'bad' ? ' pri' : ''}">${act}</button></div>`
+}
+const sentRow = ([from, frole, t, d, act]) => `<div class="row"><span class="av-t">${initials(from)}</span><div style="min-width:0"><b>${esc(t)}</b><small><strong>${esc(from)}</strong>${frole ? ` · ${frole}` : ''} · ${esc(d)}</small></div><span></span><button class="act pri">${act}</button></div>`
+
+/* ── the page ─────────────────────────────────────────────────────────── */
+function hero(r) {
+  const [time, title, place, img, status, act] = r.next
+  return `<div class="hero__bg"></div>
+  <div class="hero__in" data-in>
+    <div>
+      <div class="eyebrow">Sunday, 11 October<i></i>${r.name}<i></i>All sites</div>
+      <h1>Good morning, ${r.first}</h1>
+      <p class="hero__sum">${r.sum}</p>
+      ${r.alerts.length ? `<div class="alerts">${r.alerts.map(([t, d, tm, a, amber]) => `<div class="al${amber ? ' amber' : ''}"><i></i><div style="min-width:0"><b>${esc(t)}</b><small>${esc(d)}</small></div><span class="al__t">${tm}</span><button>${a}</button></div>`).join('')}</div>`
+        : `<div class="calm"><i></i>Nothing urgent right now</div>`}
+    </div>
+    <aside class="next">
+      <div class="next__h">Up next<b>${time}</b></div>
+      <div class="next__img"><img src="${IMG(img)}" alt=""><span>${status}</span></div>
+      <h3>${esc(title)}</h3><p>${esc(place)}</p>
+      <div class="next__acts"><button class="b b-pri">${act}</button><button class="b b-ghost">Later</button></div>
+    </aside>
+  </div>
+  <div class="qa" data-in>${r.qa.map(([g, c, l]) => `<button><span style="background:var(--g-${c})">${G[g]}</span><b>${l}</b></button>`).join('')}</div>`
+}
+function work(r) {
+  return `<section class="card" data-in>
+    <div class="card__h"><h3>Your work</h3><div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-tab="needs">Needs you<em>${r.needs.length}</em></button><button role="tab" aria-selected="false" data-tab="sent">Sent to me<em>${r.sent.length}</em></button></div><a>View all</a></div>
+    <div class="rows" data-panel="needs">${r.needs.map(row).join('')}</div>
+    <div class="rows" data-panel="sent" hidden>${r.sent.map(sentRow).join('')}</div>
+  </section>`
+}
+function modules(r) {
+  return `<section class="card" data-in><div class="card__h"><h3>Modules</h3><span>yours first</span><a>All modules</a></div>
+    <div class="mods">${r.mods.map(([k, n]) => `<button class="mod"><span style="background:var(--g-${k})"><img src="${ICON(k)}" alt=""></span><b>${MODS[k]}</b>${n ? `<em>${fmt(n)}</em>` : ''}</button>`).join('')}</div></section>`
+}
+function myDay(r) {
+  return `<section class="card" data-in><div class="card__h"><h3>My Day</h3><span>${r.day.length} items</span><a>Calendar</a></div>
+    <div class="day">${r.day.map(([t, w, d, st]) => `<div class="dy ${st}"><span class="dy__t">${t}</span><span class="dy__d"></span><div><b>${esc(w)}</b><small>${esc(d)}</small></div></div>`).join('')}</div></section>`
+}
+function animals(r) {
+  if (!r.animals) return ''
+  return `<section class="card" data-in><div class="card__h"><h3>${r.animals.title}</h3><a>View all</a></div>
+    <div class="grid2">${r.animals.rows.map(([i, n, sub, p, t]) => `<button class="ph"><img src="${IMG(i)}" alt=""><span class="pill ${t}">${p}</span><div><b>${n}</b><small>${sub}</small></div></button>`).join('')}</div></section>`
+}
+function announcements() {
+  return `<section class="card" data-in><div class="card__h"><h3>Announcements</h3><a>View all</a></div>
+    <div class="ann">${ANN.map((a) => `<div class="an"><img src="${a.img}" alt=""><div><b>${esc(a.t)}</b><small>${a.by}</small></div></div>`).join('')}</div></section>`
+}
+
+/* ── render and wiring ────────────────────────────────────────────────── */
+let role = 'vet'
+try { const v = localStorage.getItem('antz.mock.role5'); if (ROLES[v]) role = v } catch {}
+
+function render() {
+  const r = ROLES[role]
+  $('hero').innerHTML = hero(r)
+  const hot = r.pending.filter((p) => p[3]).length
+  $('pendSub').textContent = hot ? `${hot} overdue` : ''
+  $('pend').innerHTML = r.pending.map(([l, n, foot, h]) => `<button class="pc${h ? ' hot' : ''}" data-in><small>${l}</small><b>${fmt(n)}</b><i>${foot}</i></button>`).join('')
+  $('left').innerHTML = work(r) + TOOL[r.tool[0]](r.tool[1]) + modules(r)
+  $('right').innerHTML = myDay(r) + animals(r) + announcements()
+  $('roleName').textContent = r.name
+  $('bellN').textContent = r.sent.length + r.alerts.length
+  $('sheetActs').innerHTML = r.scan.map((a, i) => `<button class="b ${i ? 'b-ghost' : 'b-pri'}">${a}</button>`).join('')
+  $('rvTabs').innerHTML = Object.entries(ROLES).map(([k, v], i) => `<button data-role="${k}" aria-pressed="${k === role}" title="Key ${i + 1}">${v.name}</button>`).join('')
+  $('menu').innerHTML = `<p>Switch role</p>` + Object.entries(ROLES).map(([k, v]) => `<button type="button" role="menuitemradio" data-role="${k}" aria-checked="${k === role}">${v.name}</button>`).join('')
+  document.title = `${r.name} · ANTZ Home`
+}
+function setRole(k) {
+  if (!ROLES[k] || k === role) return
+  role = k
+  try { localStorage.setItem('antz.mock.role5', k) } catch {}
+  render()
+}
+const closeMenu = () => { $('menu').hidden = true; $('meBtn').setAttribute('aria-expanded', 'false') }
+
+document.addEventListener('click', (e) => {
+  const pick = e.target.closest('[data-role]')
+  if (pick) { setRole(pick.dataset.role); closeMenu(); return }
+  const tab = e.target.closest('[data-tab]')
+  if (tab) {
+    const card = tab.closest('.card')
+    card.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', b === tab))
+    card.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== tab.dataset.tab })
+    return
+  }
+  if (e.target.closest('#meBtn') && !e.target.closest('#menu')) { const open = $('menu').hidden; $('menu').hidden = !open; $('meBtn').setAttribute('aria-expanded', open); return }
+  if (e.target.closest('#scanBtn')) { $('sheet').hidden = false; return }
+  if (e.target.id === 'sheet') { $('sheet').hidden = true; return }
+  if (!e.target.closest('#menu')) closeMenu()
+})
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeMenu(); $('sheet').hidden = true }
+  const i = Number(e.key) - 1, keys = Object.keys(ROLES)
+  if (!e.metaKey && !e.ctrlKey && !e.altKey && i >= 0 && i < keys.length) setRole(keys[i])
+})
+render()
+</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+/* WEB V3 MOCKUP · the modules and their widgets (13 Oct 2026)
+   Every figure here is SAMPLE, for review. Each module page is drawn in the
+   Figma "Patient Profile" frame's parts (933:2949): a summary column on the
+   left (photo card, info card, Quick Actions, links) and on the right the
+   tabbed card whose Dashboard tab holds the module's widgets.
+
+   Widget types, all one card (Figma "Monitoring Card"):
+     trend     big value + unit, "updated", area chart
+     split     big value, one stacked bar, legend rows
+     list      big value, the top rows
+     queue     three counts side by side (overdue / today / later)
+     progress  value of target, bar, caption
+     bars      big value, column chart
+     timeline  the latest events
+     note      a sentence, "last updated", dots (Figma "Behaviour")
+   `to` is the tab a widget's title opens; `add` names its + action.
+   Colours: g green · c coral · t cyan · y yellow (the Figma chart set). */
+
+const CAT = { medical: 'Medical', animal: 'Animal Management', operations: 'Operations', admin: 'Administration' }
+
+const MODULES = [
+  {
+    id: 'hospital', name: 'Hospital', cat: 'medical', icon: 'm-hospital.svg', g: '--g-hospital', photo: '../../assets/img/hospital.jpg',
+    blurb: 'Admissions, ward occupancy and active clinical cases.',
+    tabs: ['Dashboard', 'Admissions', 'Ward Occupancy', 'Active Cases', 'Critical Care', 'Discharges', 'Reports'],
+    info: [['Head of hospital', 'Dr. Kiran Iyer', 'vet'], ['On duty today', '6 vets · 11 keepers', 'team'], ['Wards', '4 wards · 50 beds', 'bed'], ['Last round', 'Today, 09:40', 'cal']],
+    actions: [['New admission', 'plus'], ['Record vitals', 'pulse'], ['Discharge patient', 'exit']],
+    links: [['View Activity Log', 'log'], ['View Ward Map', 'map']],
+    widgets: [
+      { t: 'trend', title: 'In-patients', meta: 'Updated hourly', value: '41', unit: 'animals', ago: '12 min ago', c: 'g', s: [33, 35, 34, 38, 36, 39, 41], ticks: ['7 Oct', '10 Oct', 'Today'], to: 'active-cases', add: 'New admission' },
+      { t: 'split', title: 'Patient Status', meta: 'Across 4 wards', value: '41', unit: 'in care', parts: [['Critical', 5, 'c'], ['Guarded', 12, 'y'], ['Stable', 24, 'g']], to: 'active-cases' },
+      { t: 'list', title: 'Critical Patients', meta: 'Reviewed every 2hrs • Next - 12:00 PM', value: '5', unit: 'critical', rows: [['Raja · Asiatic Lion', 'Day 2', 'c'], ['Mira · Sloth Bear', 'Day 9', 'c'], ['Kaal · Cinereous Vulture', 'Day 4', 'c'], ['Bunty · Sumatran Orangutan', 'Day 1', 'c']], to: 'critical-care', add: 'Record vitals' },
+      { t: 'progress', title: 'Ward Occupancy', meta: '50 beds across 4 wards', value: '41', of: '50', unit: 'beds', pct: 82, caption: '4 isolation beds in use', c: 't', to: 'ward-occupancy' },
+      { t: 'trend', title: 'Admissions', meta: 'Last 7 days', value: '18', unit: 'this week', ago: 'Today', c: 'c', s: [2, 3, 1, 4, 2, 3, 3], ticks: ['7 Oct', '10 Oct', 'Today'], to: 'admissions', add: 'New admission' },
+      { t: 'queue', title: 'Discharges', meta: 'Awaiting sign-off', cols: [['Ready', 6, 'g'], ['In review', 4, 'y'], ['This week', 9, '']], to: 'discharges' },
+      { t: 'bars', title: 'Admissions by Section', meta: 'This month', value: '29', unit: 'admissions', bars: [['Carniv.', 7], ['Primates', 4], ['Birds', 9], ['Reptiles', 3], ['Hoofst.', 6]], c: 't', to: 'admissions' },
+      { t: 'note', title: 'Latest Clinical Note', meta: 'Ward 2 • Dr. Meera Nair', text: 'Dheera ate 2 kg this morning, first full feed since surgery; sutures clean, temperature back to 38.4 °C.', ago: 'Last updated: 40 min ago', to: 'active-cases', add: 'Add note' },
+    ],
+  },
+  {
+    id: 'medical', name: 'Medical', cat: 'medical', icon: 'm-medical.svg', g: '--g-medical', photo: '../../assets/img/focus-animal.jpg',
+    blurb: 'Treatments, procedures and clinical requests across the collection.',
+    tabs: ['Dashboard', 'Medical Records', 'Symptoms', 'Clinical Assessment', 'Prescriptions', 'Vaccination', 'Deworming', 'Reports'],
+    info: [['Chief veterinarian', 'Dr. Kiran Iyer', 'vet'], ['Open cases', '248 across 4 sites', 'case'], ['Doses due today', '328 animals', 'pill'], ['Last record', 'Today, 10:12', 'cal']],
+    actions: [['Symptoms', 'sick'], ['Clinical Assessments', 'doc'], ['Prescription', 'pill']],
+    links: [['View Activity Log', 'log'], ['View Medical Reports', 'report']],
+    widgets: [
+      { t: 'trend', title: 'Active Cases', meta: 'All sites', value: '248', unit: 'cases', ago: '5 min ago', c: 'g', s: [231, 236, 240, 238, 244, 246, 248], ticks: ['7 Oct', '10 Oct', 'Today'], to: 'medical-records', add: 'New case' },
+      { t: 'split', title: 'Cases by Severity', meta: 'Open cases', value: '248', unit: 'open', parts: [['Critical', 12, 'c'], ['Moderate', 68, 'y'], ['Mild', 168, 'g']], to: 'medical-records' },
+      { t: 'queue', title: 'Vaccinations Due', meta: 'Every 12 months', cols: [['Overdue', 143, 'c'], ['Today', 21, 'y'], ['This week', 64, '']], to: 'vaccination', add: 'Record vaccination' },
+      { t: 'queue', title: 'Deworming Due', meta: 'Every 3 months', cols: [['Overdue', 319, 'c'], ['Today', 37, 'y'], ['This week', 112, '']], to: 'deworming', add: 'Record deworming' },
+      { t: 'timeline', title: 'Recent Treatments', meta: 'Last 24 hours', items: [['Meloxicam 0.1 mg/kg · Bengal Tiger', 'Dr. Kiran Iyer · 12 min ago'], ['Wound dressing · Sloth Bear', 'Dr. Meera Nair · 1 hr ago'], ['Fluids IV · Indian Rhino', 'Dr. Kiran Iyer · 3 hrs ago']], to: 'prescriptions', add: 'Prescription' },
+      { t: 'bars', title: 'Cases by Site', meta: 'Open cases', value: '248', unit: 'cases', bars: [['Crimson', 92], ['Clearspr.', 61], ['Hollowp.', 54], ['Foxglen', 41]], c: 'g', to: 'medical-records' },
+    ],
+  },
+  {
+    id: 'pharmacy', name: 'Pharmacy', cat: 'medical', icon: 'm-pharmacy.svg', g: '--g-pharmacy-wash',
+    blurb: 'Medicine requests, dispensing and stock levels.',
+    tabs: ['Dashboard', 'Stock Report', 'Request', 'Returns', 'Dispatch without request', 'Shipments', 'Dispense', 'Products', 'Inventory', 'Stocks Adjustment', 'Reports', 'Supplier'],
+    info: [['Pharmacist in charge', 'Anita Deshmukh', 'vet'], ['Stock lines', '1,248 items', 'box'], ['Stock value', '₹1.88 cr', 'rupee'], ['Last delivery', 'Yesterday, 16:20', 'truck']],
+    actions: [['Request medicine', 'plus'], ['Dispense', 'pill'], ['Add stock', 'box']],
+    links: [['View Activity Log', 'log'], ['View Stock Report', 'report']],
+    widgets: [
+      { t: 'queue', title: 'Medicine Requests', meta: 'All departments', cols: [['Awaiting', 18, 'y'], ['Processing', 24, ''], ['Dispatched', 16, 'g']], to: 'request', add: 'Request medicine' },
+      { t: 'split', title: 'Stock Status', meta: '1,248 stock lines', value: '1,248', unit: 'items', parts: [['Out of stock', 26, 'c'], ['Low', 42, 'y'], ['Available', 1180, 'g']], to: 'stock-report' },
+      { t: 'list', title: 'Low Stock', meta: 'Below reorder level', value: '8', unit: 'items', rows: [['Amoxicillin 500 mg', '12 left', 'c'], ['Syringes 5 ml', '40 left', 'y'], ['Vitamin B Complex', '18 left', 'y'], ['Ivermectin 1%', '9 left', 'c']], to: 'inventory', add: 'Add stock' },
+      { t: 'list', title: 'Expiring Soon', meta: 'Within 30 days', value: '12', unit: 'items', rows: [['Rabies Vaccine', '18 days', 'c'], ['Antibiotic X', '24 days', 'y'], ['Ivermectin', '31 days', '']], to: 'stock-report' },
+      { t: 'trend', title: 'Dispensed', meta: 'Every day • Last 7 days', value: '48', unit: 'today', ago: '20 min ago', c: 't', s: [39, 44, 41, 52, 46, 50, 48], ticks: ['7 Oct', '10 Oct', 'Today'], to: 'dispense', add: 'Dispense' },
+      { t: 'progress', title: 'Controlled Drug Register', meta: 'Signed entries this week', value: '38', of: '40', unit: 'entries', pct: 95, caption: '2 entries waiting for a signature', c: 'g', to: 'reports' },
+      { t: 'trend', title: 'Stock Value', meta: 'Month end', value: '₹1.88', unit: 'cr', ago: '1 Oct', c: 'y', s: [1.62, 1.7, 1.66, 1.74, 1.81, 1.79, 1.88], ticks: ['Apr', 'Jul', 'Oct'], to: 'stock-report' },
+      { t: 'queue', title: 'Shipments', meta: 'From suppliers', cols: [['Delayed', 1, 'c'], ['Arriving today', 2, 'y'], ['In transit', 6, '']], to: 'shipments' },
+    ],
+  },
+  {
+    id: 'lab', name: 'Lab', cat: 'medical', icon: 'm-lab.svg', g: '--g-lab',
+    blurb: 'Sample tracking, diagnostics and pending results.',
+    tabs: ['Dashboard', 'Sample Requests', 'Sample Collection', 'Test Results', 'Lab Tests', 'Reports'],
+    info: [['Lab in charge', 'Dr. Rohan Mehta', 'vet'], ['Samples this week', '86', 'flask'], ['Analyser', 'Online · calibrated 06:10', 'pulse'], ['Last result', 'Today, 10:05', 'cal']],
+    actions: [['New sample request', 'plus'], ['Record result', 'doc'], ['Collect sample', 'flask']],
+    links: [['View Activity Log', 'log'], ['View Lab Reports', 'report']],
+    widgets: [
+      { t: 'queue', title: 'Samples by Stage', meta: 'Open samples', cols: [['To collect', 6, 'y'], ['In lab', 14, ''], ['Ready', 9, 'g']], to: 'sample-requests', add: 'New sample request' },
+      { t: 'list', title: 'Results Ready', meta: 'Waiting for a vet to read', value: '9', unit: 'results', rows: [['CBC · Bengal Tiger', '2 hrs', ''], ['Faecal · Blackbuck herd', '4 hrs', ''], ['Biochem · Sloth Bear', '6 hrs', 'y']], to: 'test-results' },
+      { t: 'trend', title: 'Turnaround', meta: 'Average, last 7 days', value: '2.4', unit: 'days', ago: 'Today', c: 'g', s: [3.1, 3.0, 2.9, 3.2, 2.8, 2.6, 2.4], ticks: ['7 Oct', '10 Oct', 'Today'], to: 'reports' },
+      { t: 'bars', title: 'Tests by Type', meta: 'This month', value: '214', unit: 'tests', bars: [['CBC', 64], ['Biochem', 48], ['Faecal', 52], ['Urine', 22], ['Culture', 28]], c: 'y', to: 'lab-tests' },
+      { t: 'list', title: 'Overdue Results', meta: 'Over 48 hrs', value: '2', unit: 'samples', rows: [['Culture · Indian Rhino', '3 days', 'c'], ['PCR · Asiatic Lion', '2 days', 'c']], to: 'test-results' },
+      { t: 'note', title: 'Analyser', meta: 'Haematology • Bench 1', text: 'Online. Calibrated at 06:10; next QC run due at 14:00.', ago: 'Last checked: 1 hr ago', to: 'lab-tests' },
+    ],
+  },
+  {
+    id: 'species', name: 'Species Management', cat: 'animal', icon: 'm-species.svg', g: '--g-species', photo: '../../assets/img/species-cheetahs.jpg',
+    blurb: 'The living collection — species, population and holdings.',
+    tabs: ['Dashboard', 'Species List', 'Animals', 'Taxonomy', 'Transfers', 'Reports'],
+    info: [['Curator', 'Dr. Arjun Rao', 'vet'], ['Species', '2,411', 'paw'], ['Animals', '110,020', 'paw'], ['Sites', '4 sites', 'map']],
+    actions: [['Add animal', 'plus'], ['Record transfer', 'truck'], ['Update sex', 'doc']],
+    links: [['View Activity Log', 'log'], ['View Taxonomy', 'tree']],
+    widgets: [
+      { t: 'trend', title: 'Animal Population', meta: 'All sites • Month end', value: '110,020', unit: 'animals', ago: '1 Oct', c: 'g', s: [106.2, 107.0, 107.9, 108.4, 109.1, 109.6, 110.0], ticks: ['Apr', 'Jul', 'Oct'], to: 'animals', add: 'Add animal' },
+      { t: 'bars', title: 'Collection by Class', meta: 'Animals', value: '2,411', unit: 'species', bars: [['Mammals', 38], ['Birds', 31], ['Reptiles', 18], ['Fish', 9], ['Amphib.', 4]], c: 'g', to: 'species-list' },
+      { t: 'split', title: 'Sex Known', meta: 'Animals with a recorded sex', value: '48,524', unit: 'animals', parts: [['Unsexed', 28532, 'c'], ['Female', 9650, 'y'], ['Male', 10342, 'g']], to: 'animals', add: 'Update sex' },
+      { t: 'progress', title: 'Microchip Coverage', meta: 'Animals that need a chip', value: '28,222', of: '48,524', unit: 'chipped', pct: 58, caption: '20,302 still to chip', c: 't', to: 'animals' },
+      { t: 'split', title: 'IUCN Status', meta: 'Species', value: '1,737', unit: 'species', parts: [['Threatened', 336, 'c'], ['Near threatened', 112, 'y'], ['Least concern', 1103, 'g'], ['Not evaluated', 186, '']], to: 'species-list' },
+      { t: 'timeline', title: 'Recently Added', meta: 'Last 7 days', items: [['Bengal Tiger · Enclosure 12', 'Crimson Frosted · 2 days ago'], ['Scarlet Macaw · Aviary 3', 'Clearspring · 4 days ago'], ['Indian Python · Reptile House', 'Foxglen · 6 days ago']], to: 'animals' },
+    ],
+  },
+  {
+    id: 'mortality', name: 'Mortality', cat: 'animal', icon: 'm-mortality.svg', g: '--g-mortality',
+    blurb: 'Deaths, necropsy records and mortality trend.',
+    tabs: ['Dashboard', 'Deaths', 'Necropsy', 'Carcass Transfer', 'Causes', 'Reports'],
+    info: [['Pathologist', 'Dr. Sana Kapoor', 'vet'], ['Deaths this month', '12', 'case'], ['Necropsy pending', '14,296', 'doc'], ['Last record', 'Yesterday, 18:05', 'cal']],
+    actions: [['Record death', 'plus'], ['Start necropsy', 'doc'], ['Carcass transfer', 'truck']],
+    links: [['View Activity Log', 'log'], ['View Mortality Report', 'report']],
+    widgets: [
+      { t: 'trend', title: 'Deaths', meta: 'Month by month', value: '12', unit: 'this month', ago: 'Today', c: 'c', s: [18, 15, 16, 14, 15, 13, 12], ticks: ['Apr', 'Jul', 'Oct'], to: 'deaths', add: 'Record death' },
+      { t: 'split', title: 'Causes', meta: 'Last 90 days', value: '41', unit: 'deaths', parts: [['Trauma', 9, 'c'], ['Infection', 14, 'y'], ['Old age', 11, 'g'], ['Undetermined', 7, '']], to: 'causes' },
+      { t: 'queue', title: 'Necropsy Backlog', meta: 'Reports to write', cols: [['High priority', 38, 'c'], ['Pending', 14258, 'y'], ['Drafts', 2, '']], to: 'necropsy', add: 'Start necropsy' },
+      { t: 'bars', title: 'Deaths by Class', meta: 'Last 90 days', value: '41', unit: 'deaths', bars: [['Mammals', 12], ['Birds', 15], ['Reptiles', 10], ['Fish', 4]], c: 'c', to: 'deaths' },
+      { t: 'progress', title: 'Neonatal Survival', meta: 'Born this year, alive at 30 days', value: '86', of: '100', unit: '%', pct: 86, caption: '14 neonatal losses this year', c: 'g', to: 'reports' },
+      { t: 'timeline', title: 'Recent Deaths', meta: 'Last 7 days', items: [['Russet Whipsnake · Reptile House', 'Crimson Frosted · Yesterday'], ['Glacial Egret · Aviary 2', 'Clearspring · 3 days ago'], ['Slate Pangolin · Nocturnal House', 'Hollowpine · 5 days ago']], to: 'deaths' },
+    ],
+  },
+  {
+    id: 'natality', name: 'Natality', cat: 'animal', icon: 'm-natality.svg', g: '--g-natality',
+    blurb: 'Births, neonates and natality trend.',
+    tabs: ['Dashboard', 'Births', 'Neonates', 'Verification', 'Reports'],
+    info: [['Breeding coordinator', 'Dr. Arjun Rao', 'vet'], ['Births this month', '23', 'paw'], ['To verify', '100', 'doc'], ['Last birth', 'Today, 05:40', 'cal']],
+    actions: [['Record birth', 'plus'], ['Verify birth', 'doc'], ['Neonate check', 'pulse']],
+    links: [['View Activity Log', 'log'], ['View Natality Report', 'report']],
+    widgets: [
+      { t: 'trend', title: 'Births', meta: 'Month by month', value: '23', unit: 'this month', ago: 'Today', c: 'g', s: [14, 19, 17, 22, 20, 25, 23], ticks: ['Apr', 'Jul', 'Oct'], to: 'births', add: 'Record birth' },
+      { t: 'bars', title: 'Births by Class', meta: 'This year', value: '186', unit: 'births', bars: [['Mammals', 62], ['Birds', 88], ['Reptiles', 31], ['Fish', 5]], c: 'g', to: 'births' },
+      { t: 'queue', title: 'Awaiting Verification', meta: 'Recorded by keepers', cols: [['Over 7 days', 31, 'c'], ['This week', 46, 'y'], ['Today', 23, '']], to: 'verification', add: 'Verify birth' },
+      { t: 'progress', title: '30-day Survival', meta: 'Born in the last 90 days', value: '61', of: '68', unit: 'alive', pct: 90, caption: '7 neonates lost', c: 't', to: 'neonates' },
+      { t: 'timeline', title: 'Recent Births', meta: 'Last 7 days', items: [['Blackbuck · 1 calf', 'Foxglen · Today'], ['Indian Peafowl · 3 chicks', 'Clearspring · 2 days ago'], ['Bonnet Macaque · 1 infant', 'Crimson Frosted · 4 days ago']], to: 'births' },
+    ],
+  },
+  {
+    id: 'fetal', name: 'Fetal Death', cat: 'animal', icon: 'm-fetal.svg', g: '--g-fetal',
+    blurb: 'Stillbirth and neonatal loss records.',
+    tabs: ['Dashboard', 'Fetal Death Records', 'Add Fetal Death', 'Reports'],
+    info: [['Reviewed by', 'Dr. Sana Kapoor', 'vet'], ['Cases this year', '17', 'case'], ['Under review', '3', 'doc'], ['Last record', '8 Oct', 'cal']],
+    actions: [['Add fetal death', 'plus'], ['Attach report', 'doc']],
+    links: [['View Activity Log', 'log'], ['View Reports', 'report']],
+    widgets: [
+      { t: 'trend', title: 'Cases', meta: 'Month by month', value: '17', unit: 'this year', ago: '8 Oct', c: 'c', s: [3, 2, 1, 3, 2, 4, 2], ticks: ['Apr', 'Jul', 'Oct'], to: 'fetal-death-records', add: 'Add fetal death' },
+      { t: 'list', title: 'By Species', meta: 'This year', value: '9', unit: 'species', rows: [['Blackbuck', '4', ''], ['Spotted Deer', '3', ''], ['Bonnet Macaque', '2', ''], ['Indian Peafowl', '2', '']], to: 'fetal-death-records' },
+      { t: 'queue', title: 'Under Review', meta: 'Needs a vet', cols: [['Over 14 days', 1, 'c'], ['This week', 2, 'y'], ['Closed', 14, 'g']], to: 'fetal-death-records' },
+    ],
+  },
+  {
+    id: 'eggs', name: 'Eggs', cat: 'animal', icon: 'm-eggs.svg', g: '--g-eggs', photo: '../../assets/img/eggs-banner.png',
+    blurb: 'Clutches, incubation, nursery and hatch performance.',
+    tabs: ['Dashboard', 'Collection', 'Incubation', 'Nursery', 'Transfers', 'Discards', 'Reports'],
+    info: [['Incubation lead', 'Kunal Singh', 'vet'], ['In incubation', '62 eggs', 'egg'], ['Incubators', '4 · all online', 'pulse'], ['Last collection', 'Today, 07:15', 'cal']],
+    actions: [['Collect eggs', 'plus'], ['Candling', 'egg'], ['Transfer to nursery', 'truck']],
+    links: [['View Activity Log', 'log'], ['View Egg Report', 'report']],
+    widgets: [
+      { t: 'trend', title: 'Collected', meta: 'Every day • Last 7 days', value: '23', unit: 'this week', ago: 'Today', c: 'y', s: [2, 4, 3, 5, 2, 4, 3], ticks: ['7 Oct', '10 Oct', 'Today'], to: 'collection', add: 'Collect eggs' },
+      { t: 'queue', title: 'Eggs by Stage', meta: 'Open eggs', cols: [['In nest', 61, ''], ['Nursery', 32, 'y'], ['To discard', 18, 'c']], to: 'incubation' },
+      { t: 'progress', title: 'Hatch Rate', meta: 'Last 90 days', value: '41', of: '58', unit: 'hatched', pct: 71, caption: '17 failed or discarded', c: 'g', to: 'reports' },
+      { t: 'list', title: 'Candling Due', meta: 'Day 7 and day 14 checks', value: '9', unit: 'eggs', rows: [['02160/26 · Indian Peafowl', 'Today', 'y'], ['02157/26 · Sarus Crane', 'Today', 'y'], ['02151/26 · Gharial', 'Tomorrow', '']], to: 'incubation', add: 'Candling' },
+      { t: 'timeline', title: 'Batches', meta: 'Transfers and discards', items: [['EGGTRANS-00298 · 3 eggs to Nursery 2', 'Completed · Today'], ['EGGDIS-00226 · 3 eggs', 'Security check pending · Yesterday'], ['EGGTRANS-00297 · 2 eggs to Nursery 4', 'QR generated · 2 days ago']], to: 'transfers' },
+    ],
+  },
+  {
+    id: 'housing', name: 'Housing', cat: 'operations', icon: 'm-housing.svg', g: '--g-pharmacy',
+    blurb: 'Sites, sections and enclosures, and how full they are.',
+    tabs: ['Dashboard', 'Sites', 'Sections', 'Enclosures', 'Occupancy', 'Transfers', 'Reports'],
+    info: [['Estate manager', 'Vikram Shah', 'vet'], ['Enclosures', '1,284 across 4 sites', 'map'], ['Under maintenance', '7', 'tool'], ['Last inspection', 'Yesterday', 'cal']],
+    actions: [['Add enclosure', 'plus'], ['Log maintenance', 'tool'], ['Move animals', 'truck']],
+    links: [['View Activity Log', 'log'], ['View Site Map', 'map']],
+    widgets: [
+      { t: 'progress', title: 'Capacity Used', meta: 'All enclosures', value: '1,102', of: '1,284', unit: 'occupied', pct: 86, caption: '182 enclosures empty', c: 'g', to: 'occupancy' },
+      { t: 'bars', title: 'Enclosures by Type', meta: 'All sites', value: '1,284', unit: 'enclosures', bars: [['Paddock', 412], ['Aviary', 296], ['Night h.', 238], ['Aquatic', 188], ['Vivarium', 150]], c: 't', to: 'enclosures' },
+      { t: 'list', title: 'Maintenance Due', meta: 'Open work orders', value: '7', unit: 'enclosures', rows: [['North gate rail · Encl 14', 'Overdue', 'c'], ['Drinker leak · Paddock 3', '2 days', 'y'], ['Mesh repair · Aviary 6', '5 days', '']], to: 'enclosures', add: 'Log maintenance' },
+      { t: 'queue', title: 'Transfers', meta: 'Between enclosures', cols: [['Pending', 16, 'y'], ['In transit', 4, ''], ['Done this week', 22, 'g']], to: 'transfers', add: 'Move animals' },
+      { t: 'split', title: 'Occupancy by Site', meta: 'Enclosures in use', value: '1,102', unit: 'in use', parts: [['Crimson', 402, 'g'], ['Clearspring', 301, 't'], ['Hollowpine', 228, 'y'], ['Foxglen', 171, '']], to: 'sites' },
+    ],
+  },
+  {
+    id: 'diet', name: 'Diet & Kitchen', cat: 'operations', icon: 'm-diet.svg', g: '--g-diet', photo: '../../assets/img/diet-kitchen.jpg',
+    blurb: 'Diet plans, kitchen output and feed stock.',
+    tabs: ['Dashboard', 'Diet Plans', 'Feed Schedule', 'Kitchen Stock', 'Purchase Orders', 'Suppliers', 'Reports'],
+    info: [['Nutritionist', 'Dr. Priya Menon', 'vet'], ['Feeds today', '1,412', 'food'], ['Diet plans', '864 active', 'doc'], ['Browse delivery', 'Daily, 06:30', 'truck']],
+    actions: [['New diet plan', 'plus'], ['Change request', 'doc'], ['Record wastage', 'food']],
+    links: [['View Activity Log', 'log'], ['View Feed Schedule', 'cal']],
+    widgets: [
+      { t: 'progress', title: "Today's Feeds", meta: 'Every section', value: '1,086', of: '1,412', unit: 'done', pct: 77, caption: '326 feeds left today', c: 'g', to: 'feed-schedule' },
+      { t: 'split', title: 'Plan Compliance', meta: 'Last 7 days', value: '94', unit: '%', parts: [['Refused', 38, 'c'], ['Partly eaten', 61, 'y'], ['Eaten', 1313, 'g']], to: 'diet-plans' },
+      { t: 'list', title: 'Kitchen Low Stock', meta: 'Below 2 days of use', value: '5', unit: 'items', rows: [['Chicken, whole', '1.5 days', 'c'], ['Bananas', '2 days', 'y'], ['Mealworms', '2 days', 'y']], to: 'kitchen-stock' },
+      { t: 'trend', title: 'Wastage', meta: 'Every day • Last 7 days', value: '42', unit: 'kg today', ago: '1 hr ago', c: 'y', s: [58, 52, 49, 55, 47, 44, 42], ticks: ['7 Oct', '10 Oct', 'Today'], to: 'reports', add: 'Record wastage' },
+      { t: 'queue', title: 'Change Requests', meta: 'Need a nutritionist', cols: [['Overdue', 2, 'c'], ['Today', 5, 'y'], ['This week', 9, '']], to: 'diet-plans', add: 'Change request' },
+    ],
+  },
+  {
+    id: 'followup', name: 'Follow Up', cat: 'operations', icon: 'm-followup.svg', g: '--g-followup', photo: '../../assets/img/followup.jpg',
+    blurb: 'Scheduled rechecks and everything falling due.',
+    tabs: ['Dashboard', 'Due Today', 'Upcoming', 'Overdue', 'Completed'],
+    info: [['Assigned to you', '17 follow-ups', 'vet'], ['Due today', '6', 'cal'], ['Overdue', '4', 'case'], ['Completed this week', '38', 'doc']],
+    actions: [['New follow-up', 'plus'], ['Mark done', 'doc']],
+    links: [['View Activity Log', 'log'], ['View Calendar', 'cal']],
+    widgets: [
+      { t: 'queue', title: 'Follow-ups', meta: 'Assigned to you', cols: [['Overdue', 4, 'c'], ['Today', 6, 'y'], ['This week', 11, '']], to: 'due-today', add: 'New follow-up' },
+      { t: 'trend', title: 'Completion Rate', meta: 'Week by week', value: '88', unit: '%', ago: 'This week', c: 'g', s: [74, 79, 81, 77, 84, 86, 88], ticks: ['Aug', 'Sep', 'Oct'], to: 'completed' },
+      { t: 'list', title: 'Due Today', meta: 'In time order', value: '6', unit: 'due', rows: [['Wound recheck · Bengal Tiger', '10:30', 'y'], ['Weight · Sloth Bear', '12:00', ''], ['Bloods · Indian Rhino', '15:00', '']], to: 'due-today' },
+    ],
+  },
+  {
+    id: 'parivesh', name: 'Parivesh', cat: 'operations', icon: 'm-parivesh.svg', g: '--g-parivesh',
+    blurb: 'Regulatory filings, permits and statutory returns.',
+    tabs: ['Dashboard', 'Applications', 'Permits', 'Compliance', 'Documents'],
+    info: [['Compliance officer', 'Neha Joshi', 'vet'], ['Open applications', '12', 'doc'], ['Permits held', '46', 'shield'], ['Next deadline', '31 Oct', 'cal']],
+    actions: [['New application', 'plus'], ['Upload document', 'doc']],
+    links: [['View Activity Log', 'log'], ['View Compliance Calendar', 'cal']],
+    widgets: [
+      { t: 'queue', title: 'Applications', meta: 'By status', cols: [['Query raised', 2, 'c'], ['Under review', 6, 'y'], ['Approved', 4, 'g']], to: 'applications', add: 'New application' },
+      { t: 'list', title: 'Permits Expiring', meta: 'Within 90 days', value: '3', unit: 'permits', rows: [['Exhibit licence · Foxglen', '24 days', 'c'], ['Transport permit · CZA', '61 days', 'y'], ['Breeding permit · Gharial', '88 days', '']], to: 'permits' },
+      { t: 'timeline', title: 'Deadlines', meta: 'Statutory returns', items: [['Annual inventory return', '31 Oct · 18 days'], ['Mortality summary Q3', '15 Nov · 33 days'], ['Animal exchange report', '30 Nov · 48 days']], to: 'compliance' },
+      { t: 'trend', title: 'Submissions', meta: 'Month by month', value: '9', unit: 'this month', ago: 'Today', c: 't', s: [5, 7, 6, 8, 6, 10, 9], ticks: ['Apr', 'Jul', 'Oct'], to: 'applications' },
+    ],
+  },
+  {
+    id: 'audit', name: 'Audit', cat: 'operations', icon: 'm-audit.svg', g: '--g-audit', photo: '../../assets/img/hs-audit.jpg',
+    blurb: 'Audit trails, change history and inspection records.',
+    tabs: ['Dashboard', 'Animal Audit', 'Inventory Audit', 'Audit Schedule', 'Findings', 'Reports'],
+    info: [['Audit lead', 'Rahul Verma', 'vet'], ['Next audit', 'Animal count · 18 Oct', 'cal'], ['Open findings', '14', 'case'], ['Last audit', 'Pharmacy · 2 Oct', 'doc']],
+    actions: [['Schedule audit', 'plus'], ['Log finding', 'doc']],
+    links: [['View Activity Log', 'log'], ['View Audit Reports', 'report']],
+    widgets: [
+      { t: 'timeline', title: 'Upcoming Audits', meta: 'Next 30 days', items: [['Animal count · Crimson Frosted', '18 Oct · Rahul Verma'], ['Pharmacy stock · All sites', '25 Oct · Anita Deshmukh'], ['Kitchen hygiene · Clearspring', '2 Nov · Dr. Priya Menon']], to: 'audit-schedule', add: 'Schedule audit' },
+      { t: 'split', title: 'Open Findings', meta: 'By severity', value: '14', unit: 'open', parts: [['Major', 3, 'c'], ['Minor', 7, 'y'], ['Observation', 4, 'g']], to: 'findings', add: 'Log finding' },
+      { t: 'progress', title: 'Animal Count Match', meta: 'Last count against the register', value: '48,402', of: '48,524', unit: 'matched', pct: 99.7, caption: '122 animals to reconcile', c: 'g', to: 'animal-audit' },
+    ],
+  },
+  {
+    id: 'administer', name: 'Administer', cat: 'admin', icon: 'm-administer.svg', g: '--g-administer',
+    blurb: 'Doses due now, given and skipped, across every site.',
+    tabs: ['Dashboard', 'Due Now', 'Schedule', 'Given', 'Skipped', 'Reports'],
+    info: [['Rounds lead', 'Dr. Meera Nair', 'vet'], ['Doses due today', '412', 'pill'], ['Given so far', '286', 'doc'], ['Next round', '14:00', 'cal']],
+    actions: [['Administer dose', 'pill'], ['Skip with reason', 'doc']],
+    links: [['View Activity Log', 'log'], ['View Schedule', 'cal']],
+    widgets: [
+      { t: 'queue', title: 'Doses', meta: 'Today', cols: [['Late', 9, 'c'], ['Due now', 39, 'y'], ['Later today', 78, '']], to: 'due-now', add: 'Administer dose' },
+      { t: 'split', title: 'Given vs Skipped', meta: 'Today so far', value: '298', unit: 'doses', parts: [['Skipped', 12, 'c'], ['Given', 286, 'g']], to: 'given' },
+      { t: 'timeline', title: "Today's Schedule", meta: 'Rounds', items: [['Morning round · 214 doses', '07:00 · done'], ['Midday round · 92 doses', '12:00 · in progress'], ['Evening round · 106 doses', '17:00']], to: 'schedule' },
+    ],
+  },
+  {
+    id: 'users', name: 'Users', cat: 'admin', icon: 'm-users.svg', g: '--g-users-wash',
+    blurb: 'Staff accounts, roles and who is on shift.',
+    tabs: ['Dashboard', 'All Users', 'Add User', 'Roles', 'Access Requests', 'Activity Log'],
+    info: [['Administrator', 'Sourav Tambe', 'vet'], ['Accounts', '312', 'team'], ['On shift now', '84', 'pulse'], ['Last change', 'Today, 09:02', 'cal']],
+    actions: [['Add user', 'plus'], ['Review access', 'shield']],
+    links: [['View Activity Log', 'log'], ['View Roles', 'team']],
+    widgets: [
+      { t: 'trend', title: 'Active Today', meta: 'Signed in', value: '84', unit: 'people', ago: '5 min ago', c: 'g', s: [61, 72, 80, 77, 82, 79, 84], ticks: ['7 Oct', '10 Oct', 'Today'], to: 'all-users' },
+      { t: 'bars', title: 'Users by Role', meta: 'Accounts', value: '312', unit: 'accounts', bars: [['Keepers', 142], ['Vets', 15], ['Superv.', 9], ['Biolog.', 9], ['Admin', 31]], c: 't', to: 'roles' },
+      { t: 'queue', title: 'Access Requests', meta: 'Waiting for you', cols: [['Over 3 days', 2, 'c'], ['New', 6, 'y'], ['Approved today', 4, 'g']], to: 'access-requests', add: 'Review access' },
+      { t: 'timeline', title: 'Recent Sign-ins', meta: 'Last hour', items: [['Dr. Kiran Iyer', 'Hospital · 10:12'], ['Anita Deshmukh', 'Pharmacy · 10:05'], ['Kunal Singh', 'Eggs · 09:58']], to: 'activity-log' },
+    ],
+  },
+  {
+    id: 'security', name: 'Security', cat: 'admin', icon: 'm-security.svg', g: '--g-security',
+    blurb: 'Gates, patrols and site access control.',
+    tabs: ['Dashboard', 'Gate Passes', 'Security Checks', 'Incidents', 'Visitors', 'Reports'],
+    info: [['Security head', 'Major R. Singh', 'vet'], ['Guards on duty', '22', 'team'], ['Cameras online', '146 of 150', 'cam'], ['Last patrol', 'Today, 10:00', 'cal']],
+    actions: [['New gate pass', 'plus'], ['Report incident', 'case']],
+    links: [['View Activity Log', 'log'], ['View CCTV', 'cam']],
+    widgets: [
+      { t: 'queue', title: 'Gate Passes', meta: 'Today', cols: [['Awaiting check', 5, 'y'], ['Checked out', 18, ''], ['Back in', 14, 'g']], to: 'gate-passes', add: 'New gate pass' },
+      { t: 'list', title: 'Open Incidents', meta: 'Last 7 days', value: '3', unit: 'open', rows: [['Fence breach · North perimeter', 'High', 'c'], ['Lost child · Gate 2', 'Closed today', ''], ['Vehicle overstay · Service road', 'Medium', 'y']], to: 'incidents', add: 'Report incident' },
+      { t: 'trend', title: 'Visitors', meta: 'Every day • Last 7 days', value: '6,420', unit: 'today', ago: '10 min ago', c: 't', s: [4.1, 4.8, 5.2, 4.9, 7.8, 8.4, 6.4], ticks: ['7 Oct', '10 Oct', 'Today'], to: 'visitors' },
+      { t: 'progress', title: 'CCTV', meta: 'Cameras online', value: '146', of: '150', unit: 'cameras', pct: 97, caption: '4 offline at Foxglen', c: 'g', to: 'reports' },
+    ],
+  },
+  {
+    id: 'reports', name: 'Reports', cat: 'admin', icon: 'm-reports.svg', g: '--g-reports-wash',
+    blurb: 'Board reports, statutory summaries and exports.',
+    tabs: ['Dashboard', 'Animal Reports', 'Medical Reports', 'Inventory Reports', 'Scheduled Reports', 'Exports'],
+    info: [['Owner', 'Sourav Tambe', 'vet'], ['Scheduled', '14 reports', 'cal'], ['Exports this month', '62', 'doc'], ['Next run', 'Mon, 07:00', 'cal']],
+    actions: [['New report', 'plus'], ['Export data', 'doc']],
+    links: [['View Activity Log', 'log'], ['View Exports', 'report']],
+    widgets: [
+      { t: 'timeline', title: 'Scheduled Reports', meta: 'Next runs', items: [['Weekly mortality summary', 'Mon 07:00 · Board'], ['Monthly inventory return', '1 Nov · CZA'], ['Daily medical digest', 'Tomorrow 06:00 · Vets']], to: 'scheduled-reports', add: 'New report' },
+      { t: 'bars', title: 'Exports', meta: 'This month', value: '62', unit: 'exports', bars: [['Animal', 21], ['Medical', 18], ['Inventory', 14], ['Other', 9]], c: 'y', to: 'exports', add: 'Export data' },
+      { t: 'list', title: 'Most Used', meta: 'Last 30 days', value: '4', unit: 'reports', rows: [['Animal inventory by site', '48 runs', ''], ['Dose compliance', '31 runs', ''], ['Stock valuation', '22 runs', '']], to: 'animal-reports' },
+    ],
+  },
+  {
+    id: 'approvals', name: 'Approvals', cat: 'admin', icon: 'm-approvals.svg', g: '--g-approvals-wash',
+    blurb: 'One queue for everything waiting on a decision.',
+    tabs: ['Dashboard', 'Pending', 'Approved', 'Rejected', 'Transfer Approvals', 'Helpdesk'],
+    info: [['Approver', 'Sourav Tambe', 'vet'], ['Waiting on you', '32', 'doc'], ['Oldest', '6 days', 'cal'], ['Approved this week', '58', 'shield']],
+    actions: [['Review next', 'doc'], ['Delegate', 'team']],
+    links: [['View Activity Log', 'log'], ['View Helpdesk', 'chat']],
+    widgets: [
+      { t: 'bars', title: 'Pending by Type', meta: 'Waiting on you', value: '32', unit: 'pending', bars: [['Transfers', 11], ['Medicine', 8], ['Purchase', 7], ['Access', 6]], c: 'y', to: 'pending', add: 'Review next' },
+      { t: 'list', title: 'Older than 3 Days', meta: 'Oldest first', value: '5', unit: 'requests', rows: [['Transfer · 2 Blackbuck to Foxglen', '6 days', 'c'], ['Purchase · Incubator spares', '5 days', 'c'], ['Medicine · Ivermectin 1%', '4 days', 'y']], to: 'pending' },
+      { t: 'trend', title: 'Approved', meta: 'Week by week', value: '58', unit: 'this week', ago: 'Today', c: 'g', s: [41, 46, 52, 49, 55, 51, 58], ticks: ['Aug', 'Sep', 'Oct'], to: 'approved' },
+    ],
+  },
+  {
+    id: 'communication', name: 'Communication', cat: 'admin', icon: 'm-communication.svg', g: '--g-followup',
+    blurb: 'Announcements, messages and notices across the site.',
+    tabs: ['Dashboard', 'Messages', 'Groups', 'Announcements', 'Broadcasts'],
+    info: [['Signed in as', 'Sourav Tambe', 'vet'], ['Unread', '14 messages', 'chat'], ['Groups', '9 active', 'team'], ['Last announcement', '27 Sep', 'cal']],
+    actions: [['New message', 'chat'], ['Post announcement', 'plus']],
+    links: [['View Activity Log', 'log'], ['View Groups', 'team']],
+    widgets: [
+      { t: 'queue', title: 'Messages', meta: 'Your inbox', cols: [['Mentions', 3, 'c'], ['Unread', 14, 'y'], ['Today', 26, '']], to: 'messages', add: 'New message' },
+      { t: 'progress', title: 'Announcement Reach', meta: 'Read by the people notified', value: '271', of: '312', unit: 'read', pct: 87, caption: 'Latest: Monsoon hours, 27 Sep', c: 't', to: 'announcements', add: 'Post announcement' },
+      { t: 'list', title: 'Active Groups', meta: 'Most messages this week', value: '9', unit: 'groups', rows: [['Carnivore Section', '64', ''], ['Vets on call', '41', ''], ['Diet Kitchen', '28', '']], to: 'groups' },
+    ],
+  },
+]

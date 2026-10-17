@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Role Home Thinking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!--
+  ROLE-BASED HOME · THE THINKING (owner, 11 Oct 2026: "u are Showing Just
+  some Random thinks. Please make Propre thinking"). The first mockup put
+  invented widgets on each role. This page works each role out from four
+  sources instead, and the mockup (role-home-web.html) is drawn from it:
+  every card there names the line here it comes from.
+-->
+<style>
+:root { --ink: #1F2A30; --ink-2: #44544A; --mute: #6B7773; --line: #E4EAE7; --teal: #1F515B; --bg: #EFF5F2; --coral: #C2412B; --amber: #8E5A07; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.page { width: min(980px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0 80px; }
+.top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.top a { margin-left: auto; padding: 8px 14px; border-radius: 10px; background: var(--teal); color: #fff; font-size: 14px; font-weight: 600; text-decoration: none; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #2C7A6F; }
+h1 { margin: 4px 0 8px; font-size: 32px; font-weight: 600; letter-spacing: -.02em; }
+.lead { margin: 0 0 28px; font-size: 17px; color: var(--ink-2); }
+section { margin-top: 20px; padding: 26px 28px; border-radius: 20px; background: #fff; }
+h2 { margin: 0 0 4px; font-size: 21px; font-weight: 600; letter-spacing: -.01em; }
+h2 small { display: block; font-size: 13px; font-weight: 500; color: var(--mute); letter-spacing: 0; }
+h3 { margin: 22px 0 6px; font-size: 16px; font-weight: 600; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0; padding-left: 22px; }
+li { margin: 5px 0; }
+b { font-weight: 600; }
+.n { display: inline-grid; place-items: center; width: 26px; height: 26px; margin-right: 8px; border-radius: 50%; background: #E8F4F2; color: var(--teal); font-size: 13px; font-weight: 700; vertical-align: 2px; }
+table { width: 100%; margin: 12px 0 4px; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--mute); }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.yes { background: #E3F2E9; color: #1F6B42; } .no { background: #FDE4DC; color: var(--coral); } .ask { background: #FBF0DA; color: var(--amber); }
+.find { display: grid; grid-template-columns: 34px 1fr; gap: 4px 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+.find:first-of-type { border-top: 0; }
+.find .k { grid-row: span 2; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #FDE4DC; color: var(--coral); font-weight: 700; }
+.find b { font-size: 15.5px; }
+.find span { color: var(--ink-2); font-size: 14.5px; }
+.role { border-left: 4px solid var(--teal); }
+.grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.grid4 div { padding: 12px 14px; border-radius: 12px; background: #F5F8F7; font-size: 13.5px; }
+.grid4 div b { display: block; margin-bottom: 4px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.src { font-size: 12.5px; color: var(--mute); }
+code { padding: 1px 5px; border-radius: 5px; background: #F2F6F4; font: 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.rule { padding: 14px 18px; border-radius: 14px; background: #E8F4F2; color: #17424A; font-size: 16px; }
+.skel { display: grid; grid-template-columns: 1.15fr 1fr; gap: 10px; margin-top: 14px; }
+.skel div { padding: 12px 14px; border-radius: 12px; background: #F5F8F7; font-size: 14px; }
+.skel div b { display: block; }
+.skel .wide { grid-column: span 1; }
+@media (max-width: 760px) {
+  h1 { font-size: 26px; } section { padding: 20px 16px; }
+  .grid4, .skel { grid-template-columns: 1fr 1fr; }
+  table { display: block; overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top"><span class="eyebrow">ANTZ · Role-based Home · 11 Oct 2026</span><a href="role-home-web.html">Open the mockup →</a></div>
+  <h1>Role-based home: the thinking</h1>
+  <p class="lead">The first mockup put made-up widgets on each role. This page works each role out from evidence: who the users are, what their day involves, what they decide, and what data ANTZ already holds. Each card in the mockup links back to a line here.</p>
+
+  <section>
+    <h2>1 · What this is built on</h2>
+    <table>
+      <tr><th>Source</th><th>What it tells us</th></tr>
+      <tr><td><b>ANTZ v5 module spec</b><br><span class="src">docs/Modules.md Files, generated from the live config</span></td><td>12 roles, and the modules each role treats as a priority. Also the 4 numbers the Command Centre shows each role by default, and the real data names (<code>medical.criticalCases</code>, <code>population.sexRatioFlags</code>…).</td></tr>
+      <tr><td><b>V5 database</b><br><span class="src">Dump20260622.sql, anonymised, 4 sites</span></td><td>The real job titles of the 47 staff, and the real pending and backlog counts: vaccination, deworming, necropsy, sexing, microchip, births, deaths, arrivals.</td></tr>
+      <tr><td><b>The live app's own data</b><br><span class="src">care.js, necropsy.js, assessment.js, tasks.js</span></td><td>Rows for animals in care, post-mortems, the weighing round and tasks assigned to people. These already exist on the current home.</td></tr>
+      <tr><td><b>Indian zoo rules</b><br><span class="src">Recognition of Zoo Rules 2009 (RZR), CZA orders</span></td><td>Which posts a zoo must have, what each must record, and the deadlines: 24-hour death report, quarterly report, Form II, annual report.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>2 · Who the users actually are</h2>
+    <p>Before designing a home for a role, check the role exists. The five names in the brief, matched against the three sources:</p>
+    <table>
+      <tr><th>Your name</th><th>ANTZ spec</th><th>V5 database (staff)</th><th>Zoo rules</th><th>Decision</th></tr>
+      <tr><td><b>Veterinarian</b></td><td>Veterinarian</td><td class="num">15 of 47: the largest group</td><td>Mandatory post</td><td><span class="tag yes">Build first</span></td></tr>
+      <tr><td><b>Doctor</b></td><td>Paravet <span class="src">(nearest)</span></td><td class="num">not a title</td><td>Compounder, lab assistant</td><td><span class="tag ask">Means para-vet?</span></td></tr>
+      <tr><td><b>Zoo Biologist</b></td><td>Biologist</td><td class="num">9 of 47</td><td>Mandatory post (large and medium zoos)</td><td><span class="tag yes">Build</span></td></tr>
+      <tr><td><b>Zoologist</b></td><td>none</td><td class="num">none</td><td>not a post</td><td><span class="tag ask">Merge, or welfare?</span></td></tr>
+      <tr><td><b>Admin</b></td><td>Admin / Finance</td><td class="num">Management 2, Site Manager 1</td><td>Officer-in-charge</td><td><span class="tag yes">Build</span></td></tr>
+      <tr><td><i>not in the brief</i></td><td>Keeper / Animal Care</td><td class="num">Supervisor: 9 of 47</td><td>Keepers keep the daily diary</td><td><span class="tag no">Missing</span></td></tr>
+      <tr><td><i>not in the brief</i></td><td>Management</td><td class="num">Curator: 2</td><td>Curator: mandatory post</td><td><span class="tag no">Missing</span></td></tr>
+    </table>
+    <p><b>What follows:</b> Vets are the biggest group, so their home matters most. Supervisors are the second biggest and aren't in the brief. "Zoologist" isn't a separate role in any source. If your zoos do use it, the gap it fits is <b>welfare and behaviour</b>: the spec's Welfare Risk module has <b>no owner</b>, and the Welfare module is shared by five roles with no lead.</p>
+  </section>
+
+  <section>
+    <h2>3 · What the real data says the homes must handle</h2>
+    <div class="find"><span class="k">1</span><b>A death cluster that no total would show.</b><span>At Crimson Frosted, one reptile species (<i>Ochre erroralis</i>) had <b>72 deaths in 10 days</b>, and <b>20 of that species arrived</b> in the 30 days before. That pattern points to disease brought in with new animals. A tile saying "157 deaths" hides it. The Vet and Biologist homes need a <b>cluster alert</b>: deaths grouped by species and site, measured against recent arrivals. The spec already names this <code>medical.diseaseSurveillance</code>.</span></div>
+    <div class="find"><span class="k">2</span><b>A backlog is not a to-do.</b><span><b>14,296 deaths</b> have no post-mortem report, and 3,475 of them are one species at one site. No vet can act on 14,296. So split it: <b>"deaths in the last 7 days without a post-mortem"</b> goes on the Vet's home, because it is today's work and the rules require a post-mortem for every death. The <b>backlog</b> belongs to records and compliance, on the Biologist and Admin homes.</span></div>
+    <div class="find"><span class="k">3</span><b>Records gaps block the annual inventory.</b><span><b>28,532 animals have no sex recorded</b> and <b>20,302 are not microchipped</b>. Most are reptiles and birds, which usually need a DNA test to sex. Form II, the annual inventory to CZA, counts every species by male, female and unknown. These gaps are the Biologist's main records job, so they go on that home with progress toward the deadline.</span></div>
+    <div class="find"><span class="k">4</span><b>Sites are different kinds of place.</b><span>Hollowpine took in <b>605 animals in 30 days</b> (mostly snake rescues), while Clearspring took in 2. A home that only adds up all sites misses that. Every number must say which site it covers. The site chips already allow this; each card should honour them.</span></div>
+    <div class="find"><span class="k">5</span><b>Some of the spec's default numbers don't help anyone decide.</b><span>The spec opens the Vet's home with "Total animals: 1,04,382". No vet changes their day because of that number. Its gauge, the "Facility health score", is the kind of single score the owner's brief rules out. So we keep the spec's <b>sources</b> but choose numbers by the rule below.</span></div>
+  </section>
+
+  <section>
+    <h2>4 · The rule for what goes on a home</h2>
+    <p class="rule"><b>A thing goes on the home only if it changes what this person does today.</b> Anything else lives one tap away, inside its module.</p>
+    <p>This comes from the product's own principle ("one glance, then one tap; the home stays light"). Each role is worked out with the same five questions:</p>
+    <ol>
+      <li><b>Job:</b> what the person is responsible for.</li>
+      <li><b>Day:</b> what they do in the morning, during the day and at the end of the day.</li>
+      <li><b>Decisions:</b> what they choose to do today.</li>
+      <li><b>Information:</b> what they need to know to make those choices, and where ANTZ already holds it.</li>
+      <li><b>Actions:</b> where one tap should take them.</li>
+    </ol>
+    <h3>The same skeleton for every role</h3>
+    <p>The layout is the live web home's. Only the contents change, so a person who switches role isn't lost:</p>
+    <div class="skel">
+      <div><b>Needs you</b>A ranked list of the 3–6 things this person must act on today. Each says <i>why</i> and has one action.</div>
+      <div><b>Pending</b>This role's queues as counts. The coral panel already on the home.</div>
+      <div><b>Working view</b>The one picture this role works from all day.</div>
+      <div><b>Deadlines</b>Statutory and internal clocks this role answers for.</div>
+      <div><b>Your modules</b>Ordered by the spec's priority list for the role.</div>
+      <div><b>Announcements</b>Shared by everyone, unchanged.</div>
+    </div>
+  </section>
+
+  <section class="role">
+    <h2>5 · Veterinarian <small>"Who needs me clinically today?" · 15 users</small></h2>
+    <div class="grid4">
+      <div><b>Job</b>Diagnose and treat; run the hospital, isolation and quarantine; do post-mortems; set the vaccination and deworming schedules (RZR §5–7).</div>
+      <div><b>Day</b>Morning: keeper reports, then the ward round. Midday: procedures and post-mortems. Afternoon: lab results, follow-ups, records.</div>
+      <div><b>Decisions</b>Whom to see first. Change a treatment? Isolate? Discharge? Cause of death. Is something spreading?</div>
+      <div><b>Actions</b>Open the case, write the treatment, start the post-mortem, request a lab test.</div>
+    </div>
+    <h3>So the home shows</h3>
+    <ul>
+      <li><b>Needs you</b>, ranked: cluster alerts (finding 1) · critical cases · animals losing weight fast (the weighing round already flags the lion down 9% and the leopard down 15%) · new keeper flags · deaths today awaiting a post-mortem · lab results back. <span class="src">Spec: medical.criticalCases, medical.diseaseSurveillance, medical.labPending · app: care.js, assessment.js, necropsy.js</span></li>
+      <li><b>Working view: the ward</b>. Every animal in care, grouped by where it is (hospital, under medication, isolation, maternity), serious cases first. <span class="src">app: care.js · spec: medical.isolationCases</span></li>
+      <li><b>Pending</b>: Vaccination <b>143</b> · Deworming <b>319</b> · Post-mortems this week · Lab results · Follow-ups · Isolation. <span class="src">V5 database pending counts</span></li>
+      <li><b>Deadlines</b>: the 24-hour death report for Schedule I species (the peafowl that died today is one) · the vaccination and deworming rounds.</li>
+      <li><b>Modules</b>: Medical, Hospital, Lab, Pharmacy, Mortality, Follow Up. <span class="src">Spec priority: medical, pharmacy, animal-profile, alerts</span></li>
+    </ul>
+    <p class="src">Not on this home: total animals, species counts, the backlog of 14,296 (finding 2).</p>
+  </section>
+
+  <section class="role">
+    <h2>6 · Para-vet ("Doctor") <small>"What has the vet asked me to do today?"</small></h2>
+    <div class="grid4">
+      <div><b>Job</b>Carry out the vet's plan: give doses, dress wounds, collect samples, run the vaccination, deworming and weighing rounds, dispense medicine.</div>
+      <div><b>Day</b>Works through a list of timed tasks. The day is a timetable, not a dashboard.</div>
+      <div><b>Decisions</b>What to do next, and what is late. When to tell the vet a dose was refused or skipped.</div>
+      <div><b>Actions</b>Mark a dose given or skipped (with a reason), record a weight, log a sample.</div>
+    </div>
+    <h3>So the home shows</h3>
+    <ul>
+      <li><b>Needs you</b>: tasks assigned to me, overdue first. Example: "Deworming round, Deer Paddock", 3 days overdue, from the vet. <span class="src">app: tasks.js</span></li>
+      <li><b>Working view: today's treatment board</b>. Animals down the side, hours across the top; each dose shows given, late, skipped, due now or later. This is how vet hospitals run their whiteboards. <span class="src">spec: medical module; research: Vet Radar whiteboards</span></li>
+      <li><b>Rounds</b>: the deworming, vaccination and weighing rounds by enclosure, with progress. Weighing is due every 30 days. <span class="src">V5 pending · app: assessment.js</span></li>
+      <li><b>Modules</b>: Medical, Pharmacy, Lab, Diet & Kitchen, Follow Up, Hospital. <span class="src">Spec priority: medical, pharmacy, diet, animal-collection, welfare</span></li>
+    </ul>
+    <p class="src">Corrected from the first mockup: "Administer" is the admin approvals queue, not giving medicine, so it isn't on this home.</p>
+  </section>
+
+  <section class="role">
+    <h2>7 · Zoo Biologist <small>"Is the collection record right, and is the population healthy?" · 9 users</small></h2>
+    <div class="grid4">
+      <div><b>Job</b>Keep the animal records (history cards, identification, births and deaths); keep studbooks; plan breeding and avoid inbreeding; record behaviour and reproduction (RZR §9–10; CZA studbook guideline).</div>
+      <div><b>Day</b>Check the new events (births, deaths, arrivals, transfers) and correct the records. Plan pairings and exchanges. Prepare the statutory reports.</div>
+      <div><b>Decisions</b>Is this record right? Which animals still need sexing or a microchip? Which pairs to breed? Who to transfer? Is a sex ratio or group out of balance?</div>
+      <div><b>Actions</b>Verify a birth, record sex or a chip, plan a transfer, file with Parivesh.</div>
+    </div>
+    <h3>So the home shows</h3>
+    <ul>
+      <li><b>Needs you</b>: births to verify · a cluster of deaths seen from the population side (finding 1) · transfers waiting on a permit · animals kept alone too long (a mate within 6 months, RZR §9(4)) · Parivesh registrations due. <span class="src">spec: population.sexRatioFlags, welfareRisk.solitary, population.plannedTransfers · app: tasks.js</span></li>
+      <li><b>Working view: collection movement</b>. Births, deaths, arrivals and transfers over 10 days for each site, and the species behind each. <span class="src">V5: 100 births · 291 deaths · 643 arrivals in 30 days · 16 transfers in a year</span></li>
+      <li><b>Records completeness</b>: sexed and microchipped, as a percentage for each site, measured against the Form II deadline (finding 3). <span class="src">V5: 28,532 unsexed · 20,302 unchipped</span></li>
+      <li><b>Deadlines</b>: quarterly report due 15 Oct (4 days) · Parivesh birth registrations · Form II due 30 Apr.</li>
+      <li><b>Modules</b>: Species, Natality, Mortality, Eggs, Fetal Death, Parivesh, Reports. <span class="src">Spec priority: animal-collection, breeding, population, species-master</span></li>
+    </ul>
+  </section>
+
+  <section class="role">
+    <h2>8 · Zoologist: offered as Welfare & Behaviour <small>only if your zoos use it as a separate role</small></h2>
+    <p>No source defines a Zoologist. If it's the same job as Biologist, <b>merge it</b> and use section 7. If it's a separate job, the one gap in the spec it fills is <b>welfare</b>: <code>welfare-risk</code> has no owner, and the rules require recording "social behaviour, group dynamics and reproductive biology" (RZR §10).</p>
+    <ul>
+      <li><b>Needs you</b>: behavioural concerns from keepers · welfare scores falling · animals kept alone long-term · elderly animals at high risk. <span class="src">spec: welfare.concernAlerts, welfareRisk.declining, welfareRisk.solitary, welfareRisk.geriatric</span></li>
+      <li><b>Working view: behaviour watch</b>. Each flagged animal with its 7-day trend, from the keeper diary. <span class="src">spec: welfare.abnormalBehaviour, welfare.keeperDiary</span></li>
+      <li><b>Pending</b>: welfare assessments due · enrichment response · corrective actions. <span class="src">spec: welfare.assessmentsDue, welfare.enrichmentCompletion, welfareRisk.correctiveActions</span></li>
+    </ul>
+  </section>
+
+  <section class="role">
+    <h2>9 · Admin <small>"What does the office need to approve, file or fix?"</small></h2>
+    <div class="grid4">
+      <div><b>Job</b>Approvals, permits and statutory filings; user accounts and access; procurement and stock; staff compliance such as the annual zoonotic screening (RZR §5(9)).</div>
+      <div><b>Day</b>Clear the approval queue oldest-first. Chase filings before their deadlines. Handle access requests.</div>
+      <div><b>Decisions</b>Approve or send back. What to file before the next deadline. Who gets access to what.</div>
+      <div><b>Actions</b>Approve, review, file with Parivesh, unlock an account.</div>
+    </div>
+    <h3>So the home shows</h3>
+    <ul>
+      <li><b>Needs you</b>: approvals older than 3 days · permits about to lapse · filings due this week · locked accounts. <span class="src">live module: Administer · spec: compliance.expiryAlerts, compliance.pendingItems</span></li>
+      <li><b>Working view: the approvals queue</b>, oldest first, filtered by type (transfers, purchases, access). Transfers need a permit (app: "Permit renewal, Barasingha transfer").</li>
+      <li><b>Compliance calendar</b>: quarterly report, staff screening, annual report, and the post-mortem backlog as a records risk (finding 2).</li>
+      <li><b>Modules</b>: Administer, Users, Security, Parivesh, Reports. <span class="src">Spec priority: alerts, compliance, finance, procurement</span></li>
+    </ul>
+    <p class="src">Left out on purpose: the spec's "Facility health score" gauge, because the brief rules out a single score.</p>
+  </section>
+
+  <section>
+    <h2>10 · Decisions needed from you</h2>
+    <ol>
+      <li><b>Doctor</b>: is this the para-vet / compounder, or a second name for the vet?</li>
+      <li><b>Zoologist</b>: merge with Biologist, or make it the Welfare & Behaviour role in section 8?</li>
+      <li><b>Supervisor (9 users) and Curator</b>: add them now, or in a second round? Supervisors are the second-largest group.</li>
+      <li><b>Admin</b>: one role covering office and IT (approvals, filings, users, security), or two?</li>
+      <li><b>Deadline dates</b>: these come from the 2009 rules. Someone at a client zoo should confirm the current ones (amended in 2013 and 2022).</li>
+    </ol>
+  </section>
+</div>
+</body>
+</html>
