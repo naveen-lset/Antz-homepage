@@ -1,0 +1,856 @@
+<!doctype html>
+<!--
+  HOME HEADER · FIVE DIRECTIONS (19 Oct 2026)
+  The owner sent five quick-commerce references (Blinkit, Instamart, Zepto) and
+  asked for the top header and the home layout "something like these", in our
+  colours, with gradients and animation, in several variations.
+
+  Every colour below is an ANTZ token from index.html (MD3_Antz/*, the module
+  --f-* colours, the --g-* card ramps) or a tint/shade of one through
+  color-mix(). Icons are the live module marks in assets/icon, used as masks so
+  they take the header's ink. Photos are the live assets.
+
+  Serve /Users/naveen/Home Page on :8080 and open
+  http://localhost:8080/Antz-Selected-Modules/mockups/header-concepts.html
+  Wide screens show all five phones; at phone width one shows at a time and
+  the chips at the top switch between them.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home header concepts · ANTZ</title>
+<link rel="icon" href="../assets/icon/hero-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=Host+Grotesk:wght@600;700&family=Sour+Gummy:wght@300;400;500;600&family=DM+Sans:opsz,wght@9..40,400..800&display=swap">
+<style>
+/* ── registered so a header can glide from one module colour to the next ── */
+@property --t1  { syntax: '<color>'; inherits: true; initial-value: #1F515B; }
+@property --t2  { syntax: '<color>'; inherits: true; initial-value: #1F415B; }
+@property --ac  { syntax: '<color>'; inherits: true; initial-value: #00D6C9; }
+@property --lt  { syntax: '<color>'; inherits: true; initial-value: #DFF5F3; }
+@property --lt2 { syntax: '<color>'; inherits: true; initial-value: #AFEFEB; }
+@property --fg  { syntax: '<color>'; inherits: true; initial-value: #FFFFFF; }
+
+:root {
+  --ink: #1F415B;        /* OnSecondaryContainer */
+  --ink-2: #1F515B;      /* OnPrimaryContainer   */
+  --text: #44544A;       /* OnSurfaceVariant     */
+  --mute: #7A8684;       /* neutralSecondary     */
+  --sec: #00D6C9;        /* Secondary            */
+  --sec-dark: #00ABAB;   /* SecondaryDark        */
+  --add: #00AFD6;        /* addPrimary           */
+  --ter: #FA6140;        /* Tertiary             */
+  --ter-ctr: #FFBDA8;    /* TertiaryContainer    */
+  --pri: #37BD69;        /* Primary              */
+  --pri-ink: #006D35;
+  --mod: #FFE86E;        /* moderatePrimary      */
+  --sec-ctr: #AFEFEB;    /* SecondaryContainer   */
+  --page-bg:
+    linear-gradient(180deg, rgba(175, 239, 235, .5) 0%, rgba(175, 239, 235, .275) 32.386%, rgba(242, 255, 248, .5) 68.662%),
+    #fff;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --font: Inter, system-ui, -apple-system, sans-serif;
+  --gummy: 'Sour Gummy', var(--font);
+  --fig: 'DM Sans', var(--font);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--font); color: var(--ink); background: #EFF5F2; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+a { color: inherit; text-decoration: none; }
+img { display: block; }
+.mk { display: block; flex: none; width: 24px; height: 24px; background: currentColor;
+  -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+
+/* ═══ review chrome ═══════════════════════════════════════════════════════ */
+.rv { position: sticky; top: 0; z-index: 60; display: flex; align-items: center; gap: 18px; padding: 14px 32px;
+  background: rgba(239, 245, 242, .88); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom: 1px solid #DFE8E4; }
+.rv__t { font: 700 17px/1.2 var(--font); color: var(--ink); }
+.rv__s { font: 400 13px/1.3 var(--font); color: var(--mute); margin-top: 2px; }
+.rv__chips { margin-left: auto; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.rv__chip { flex: none; height: 34px; padding: 0 14px; border-radius: 17px; background: #fff; box-shadow: inset 0 0 0 1px #DFE8E4;
+  font: 600 13px/34px var(--font); color: var(--text); white-space: nowrap; transition: background .3s, color .3s; }
+.rv__chip.is-on { background: var(--ink-2); color: #fff; box-shadow: none; }
+.stage { display: flex; flex-wrap: wrap; justify-content: center; gap: 56px 44px; padding: 36px 24px 96px; }
+.cell { width: 410px; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 90px; }
+.cap { padding: 0 8px; min-height: 182px; }
+.cap__n { font: 700 11.5px/1 var(--font); letter-spacing: 1px; text-transform: uppercase; color: var(--sec-dark); }
+.cap__t { font: 700 21px/1.2 var(--font); margin: 7px 0 3px; color: var(--ink); letter-spacing: -.2px; }
+.cap__from { font: 500 13px/1.3 var(--font); color: var(--mute); }
+.cap__ul { margin: 10px 0 0; padding-left: 18px; font: 400 13px/1.5 var(--font); color: var(--text); }
+
+/* ═══ the phone ═══════════════════════════════════════════════════════════ */
+.phone { --sbh: 50px; position: relative; width: 410px; height: 864px; padding: 10px; border-radius: 56px; background: #0E0E0E;
+  box-shadow: inset 0 0 0 2px #2B2B2B, 0 40px 70px -30px rgba(31, 65, 91, .45);
+  transition: --t1 .6s var(--ease), --t2 .6s var(--ease), --ac .6s var(--ease), --lt .6s var(--ease), --lt2 .6s var(--ease), --fg .6s var(--ease); }
+.screen { position: relative; width: 100%; height: 100%; border-radius: 46px; overflow: hidden; background: var(--page-bg); isolation: isolate; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; overscroll-behavior: contain; }
+.scroll::-webkit-scrollbar { display: none; }
+.sb { position: absolute; z-index: 40; top: 0; left: 0; right: 0; height: 52px; display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 30px 0 44px; font: 600 16px/1 var(--font); color: var(--sb, #fff); pointer-events: none; transition: color .4s; }
+.sb__isl { position: absolute; left: 50%; top: 11px; width: 120px; height: 34px; margin-left: -60px; border-radius: 20px; background: #000; }
+.sb__r { display: flex; gap: 6px; align-items: center; }
+.sb__r .mk { width: 18px; height: 12px; }
+.sb__r .mk:last-child { width: 27px; }
+
+/* ═══ header parts every concept shares ═══════════════════════════════════ */
+.hdr { position: sticky; top: 0; z-index: 20; isolation: isolate; padding: calc(var(--sbh) + 10px + env(safe-area-inset-top)) 16px 0;
+  color: var(--fg); background: var(--t1); transition: box-shadow .35s, border-radius .35s; }
+.hdr.is-stuck { box-shadow: 0 12px 24px -16px rgba(0, 0, 0, .5); border-radius: 0 0 20px 20px; }
+.fx { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; border-radius: inherit; }
+.hero { position: relative; z-index: 1; isolation: isolate; overflow: hidden; color: var(--fg); padding: 18px 16px 20px;
+  background: linear-gradient(180deg, var(--t1) 0%, var(--t2) 100%); border-radius: 0 0 28px 28px; }
+
+.who { display: flex; align-items: flex-start; gap: 12px; }
+.who__txt { flex: 1; min-width: 0; }
+.who__hi { font: 600 13px/1.2 var(--font); opacity: .82; }
+.who__name { display: flex; align-items: center; gap: 8px; margin-top: 3px; font: 800 28px/1.12 var(--font); letter-spacing: -.7px; white-space: nowrap; }
+.who__site { display: flex; align-items: center; gap: 2px; margin-top: 5px; font: 500 14px/1.3 var(--font); white-space: nowrap; min-width: 0; }
+.who__site span { overflow: hidden; text-overflow: ellipsis; }
+.who__site b { font-weight: 800; margin-right: 4px; }
+.caret { flex: none; width: 0; height: 0; margin-left: 6px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor; }
+.wx { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 12px; background: rgba(255, 255, 255, .16);
+  font: 600 12.5px/1 var(--font); letter-spacing: 0; }
+.wx .mk { width: 15px; height: 15px; }
+.av { position: relative; flex: none; width: 44px; height: 44px; border-radius: 50%; background: #AFEFEB url(../assets/img/avatar.png) center / cover;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .3); }
+.av::after { content: ''; position: absolute; top: 0; right: 0; width: 11px; height: 11px; border-radius: 50%; background: var(--ter); box-shadow: 0 0 0 2px var(--t1); }
+
+.srch { display: flex; align-items: center; gap: 10px; height: 50px; margin-top: 14px; padding: 0 14px; border-radius: 14px; background: #fff; color: var(--ink);
+  box-shadow: 0 8px 20px -12px rgba(0, 0, 0, .35); }
+.srch > .mk { width: 21px; height: 21px; background: var(--ink); }
+.srch__ph { flex: 1; min-width: 0; display: flex; align-items: center; font: 400 16px/20px var(--font); color: var(--mute); white-space: nowrap; overflow: hidden; }
+.roll { display: inline-grid; height: 20px; overflow: hidden; color: var(--text); }
+.roll > span { grid-area: 1 / 1; }
+.roll .r-out { animation: rOut .45s var(--ease) forwards; }
+.roll .r-in { animation: rIn .45s var(--ease) both; }
+@keyframes rOut { to { transform: translateY(-100%); opacity: 0; } }
+@keyframes rIn { from { transform: translateY(100%); opacity: 0; } }
+.srch__div { width: 1px; height: 24px; background: #DFE5E5; }
+.srch__scan { width: 24px; height: 24px; color: var(--ink-2); }
+.srch__scan .mk { width: 24px; height: 24px; }
+
+.tabs { position: relative; display: flex; margin: 12px -16px 0; padding: 0 8px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: currentColor; opacity: .16; min-width: 100%; }
+.tab { position: relative; flex: none; display: flex; flex-direction: column; align-items: center; gap: 7px; min-width: 62px; padding: 6px 9px 12px;
+  font: 600 12.5px/1 var(--font); white-space: nowrap; opacity: .7; transition: opacity .35s; }
+.tab.is-on { opacity: 1; }
+.tab .mk { width: 26px; height: 26px; }
+.tab__new { position: absolute; top: -3px; left: 50%; margin-left: 2px; padding: 3px 6px; border-radius: 6px; background: var(--ter); color: #fff;
+  font: 700 9.5px/1 var(--font); letter-spacing: .2px; }
+.tabs__bar { position: absolute; left: 0; bottom: 0; width: 40px; height: 4px; border-radius: 4px 4px 0 0; background: currentColor;
+  transition: transform .46s var(--ease), width .46s var(--ease); }
+
+.hero__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.hero__t { font: 500 30px/1.05 var(--gummy); letter-spacing: -.2px; }
+.hero__s { margin-top: 6px; font: 400 13.5px/1.35 var(--font); opacity: .86; }
+.ghost { flex: none; display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px; border-radius: 16px; background: rgba(255, 255, 255, .16);
+  font: 600 12.5px/1 var(--font); }
+.swap { animation: swap .5s var(--ease) both; }
+@keyframes swap { from { opacity: 0; transform: translateY(8px); } }
+
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.tile { position: relative; display: flex; flex-direction: column; align-items: center; height: 138px; padding: 11px 6px 0; border-radius: 16px; overflow: hidden;
+  text-align: center; background: linear-gradient(180deg, rgba(255, 255, 255, .17), rgba(255, 255, 255, .06)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .17);
+  animation: tileIn .6s var(--ease) both; animation-delay: calc(var(--i) * 55ms); }
+.tile__t { font: 600 12.5px/1.15 var(--font); }
+.tile__n { margin-top: 4px; font: 700 13px/1 var(--fig); opacity: .92; }
+.tile__n small { font: 500 11px/1 var(--font); opacity: .85; }
+.tile__img { position: absolute; left: 8px; right: 8px; bottom: 8px; height: 72px; margin: 0; border-radius: 11px; overflow: hidden; }
+.tile__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
+.tile__img.cut img { object-fit: contain; }
+.tile:hover .tile__img img { transform: scale(1.06); }
+@keyframes tileIn { from { opacity: 0; transform: translateY(16px) scale(.96); } }
+
+/* ═══ the home below the header ═════════════════════════════════════════ */
+.body { position: relative; z-index: 0; display: flex; flex-direction: column; gap: 22px; padding: 22px 16px 132px; }
+.sec__h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.sec__t { font: 700 18px/1.2 var(--font); color: var(--ink); letter-spacing: -.2px; }
+.sec__sub { margin-top: 3px; font: 400 13px/1.3 var(--font); color: var(--mute); }
+.sec__a { flex: none; font: 600 13px/1 var(--font); color: var(--pri-ink); }
+.rail { display: flex; gap: 8px; margin: 0 -16px; padding: 0 16px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; }
+.rail::-webkit-scrollbar { display: none; }
+.rc { position: relative; flex: none; width: 132px; height: 158px; border-radius: 12px; overflow: hidden; scroll-snap-align: start; color: #fff; isolation: isolate; }
+.rc img { width: 100%; height: 100%; object-fit: cover; }
+.rc::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, .66)); }
+.sx { position: absolute; z-index: 1; top: 8px; right: 8px; min-width: 26px; height: 24px; padding: 0 6px; border-radius: 6px; font: 500 13px/24px var(--font); text-align: center; }
+.sx-f { background: #EECCC0; color: #E5603E; } .sx-m { background: #BDEDEA; color: #1F415B; } .sx-u { background: #F4E6E7; color: #D63A50; }
+.rc__id { position: absolute; z-index: 1; left: 10px; bottom: 27px; font: 500 15px/1 var(--font); }
+.rc__nm { position: absolute; z-index: 1; left: 10px; bottom: 10px; font: 400 12.5px/1 var(--font); opacity: .92; }
+
+.tick { position: relative; display: flex; align-items: center; height: 42px; border-radius: 12px; overflow: hidden; background: #FFFAE2; box-shadow: inset 0 0 0 1px #FFE86E; }
+.tick__live { position: relative; z-index: 1; flex: none; display: grid; place-items: center; width: 42px; height: 42px; background: linear-gradient(90deg, #FFFAE2 70%, transparent); }
+.tick__live i { width: 8px; height: 8px; border-radius: 50%; background: #E93353; box-shadow: 0 0 0 0 rgba(233, 51, 83, .5); animation: ping 1.6s ease-out infinite; }
+@keyframes ping { to { box-shadow: 0 0 0 9px rgba(233, 51, 83, 0); } }
+.tick__track { display: flex; gap: 26px; padding-right: 26px; white-space: nowrap; animation: marquee 26s linear infinite; }
+.tick__it { display: inline-flex; align-items: center; gap: 7px; font: 500 13px/1 var(--font); color: var(--text); }
+.tick__it img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+.tick__it b { font-weight: 700; color: var(--ink); }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+.ann { padding: 16px 16px 14px; border-radius: 18px; background: #fff; box-shadow: 0 1px 2px rgba(31, 65, 91, .06), 0 10px 26px -16px rgba(31, 65, 91, .3); }
+.ann__chip { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 12px 0 4px; border-radius: 14px; background: #E1F9ED; color: var(--pri-ink);
+  font: 500 11px/1 var(--font); letter-spacing: .4px; text-transform: uppercase; }
+.ann__chip i { width: 22px; height: 22px; border-radius: 50%; background: var(--sec-dark); position: relative; }
+.ann__chip i::after { content: ''; position: absolute; inset: 4px; background: #fff; -webkit-mask: url(../assets/icon/ann-announcement.svg) center / contain no-repeat; mask: url(../assets/icon/ann-announcement.svg) center / contain no-repeat; }
+.ann__h { margin: 12px 0 6px; font: 500 18px/1.35 var(--font); color: var(--sec-dark); }
+.ann__m { font: 400 13px/1.3 var(--font); color: var(--mute); }
+.ann__img { height: 172px; margin-top: 12px; border-radius: 12px; overflow: hidden; }
+.ann__img img { width: 100%; height: 100%; object-fit: cover; }
+
+.mods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mod { position: relative; isolation: isolate; height: 116px; padding: 12px 14px; border-radius: 14px; overflow: hidden; color: #fff; display: flex; flex-direction: column; justify-content: space-between; }
+.mod--w { grid-column: span 2; }
+.mod .mk { width: 28px; height: 28px; background: #fff; }
+.mod__t { font: 500 16px/1.2 var(--font); }
+.mod__bg { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.mod--ph::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(0, 0, 0, .5), rgba(0, 0, 0, .06)); }
+.mod__stats { display: flex; justify-content: space-between; align-items: flex-end; }
+.mod__stats b { display: block; font: 700 26px/1 var(--fig); }
+.mod__stats span { font: 400 12px/1.4 var(--font); opacity: .92; }
+
+.pend { padding: 14px 12px 12px; border-radius: 18px; background: linear-gradient(180deg, #FFE5DD, #FFD6CE); }
+.pend__t { margin: 2px 4px 12px; font: 700 18px/1 var(--font); color: #250E01; }
+.pend__rows { display: flex; flex-direction: column; gap: 6px; }
+.pend__row { display: flex; align-items: center; justify-content: space-between; height: 46px; padding: 0 14px; border-radius: 10px; background: rgba(255, 255, 255, .78);
+  font: 500 15px/1 var(--font); color: #250E01; }
+.pend__row b { font: 700 15px/1 var(--fig); }
+.pend__row.hot b { color: #E93353; }
+
+.dock { position: absolute; z-index: 30; left: 0; right: 0; bottom: calc(22px + env(safe-area-inset-bottom)); display: flex; justify-content: center; align-items: center; gap: 12px; pointer-events: none; }
+.dock > * { pointer-events: auto; }
+.dock__mod { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 18px 0 22px; border-radius: 26px; background: rgba(255, 255, 255, .9);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 10px 26px -10px rgba(31, 65, 91, .4), inset 0 0 0 1px #fff; font: 600 16px/1 var(--font); color: #000; }
+.dock__mod .mk { width: 20px; height: 20px; }
+.dock__qa { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: rgba(255, 255, 255, .9); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  box-shadow: 0 10px 26px -10px rgba(31, 65, 91, .4), inset 0 0 0 1px #fff; color: #000; }
+.dock__qa .mk { width: 22px; height: 22px; }
+.dock__chat { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #00D6C9, #00AFD6); color: #fff;
+  box-shadow: 0 10px 24px -10px rgba(0, 175, 214, .7); }
+.dock__chat .mk { width: 26px; height: 26px; }
+
+/* ═══ 1 · SKY (Blinkit) ════════════════════════════════════════════════════ */
+.v1 { --fg: #fff; --sb: #fff; }
+.aur { position: absolute; width: 300px; height: 300px; border-radius: 50%; opacity: .5;
+  background: radial-gradient(circle, color-mix(in srgb, var(--ac) 60%, transparent) 0%, transparent 66%); animation: aur 17s ease-in-out infinite alternate; }
+.aur.b { width: 260px; height: 260px; animation-duration: 23s; animation-delay: -9s; background: radial-gradient(circle, color-mix(in srgb, var(--pri) 45%, transparent), transparent 66%); }
+@keyframes aur { 0% { transform: translate(-120px, -90px); } 50% { transform: translate(190px, 10px); } 100% { transform: translate(30px, 150px); } }
+.v1 .hero .aur { opacity: .35; }
+
+/* ═══ 2 · STORES (Zepto) ══════════════════════════════════════════════════ */
+.v2 { --fg: #fff; --sb: var(--ink); }
+.v2[data-stuck] { --sb: #fff; }
+.v2 .hdr { padding-top: 0; }
+.band { margin: 0 -16px; padding: calc(var(--sbh) + 8px + env(safe-area-inset-top)) 16px 0; color: var(--ink); background: color-mix(in srgb, var(--t1) 34%, #fff); }
+.band .who__site { margin-top: 0; font-size: 13.5px; }
+.band__row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.band .av { width: 36px; height: 36px; }
+.band .av::after { box-shadow: 0 0 0 2px color-mix(in srgb, var(--t1) 34%, #fff); }
+.stores { display: grid; grid-template-columns: repeat(4, 1fr); align-items: end; gap: 8px; margin-top: 10px; }
+.store { position: relative; height: 58px; margin-bottom: 10px; border-radius: 16px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  color: var(--c); font: 800 11.5px/1.05 var(--font); text-align: center; letter-spacing: -.1px;
+  transition: background .5s var(--ease), color .5s var(--ease), height .5s var(--ease), margin .5s var(--ease), border-radius .5s var(--ease); }
+.store .mk { width: 20px; height: 20px; }
+.store__wm { font: 700 23px/1 'Host Grotesk', var(--font); letter-spacing: -.6px; }
+.store.is-on { height: 70px; margin-bottom: 0; border-radius: 16px 16px 0 0; background: var(--t1); color: #fff; }
+.store::before, .store::after { content: ''; position: absolute; bottom: 0; width: 8px; height: 8px; opacity: 0; transition: opacity .3s; }
+.store::before { left: -8px; background: radial-gradient(circle at 0 0, transparent 7.5px, var(--t1) 8px); }
+.store::after { right: -8px; background: radial-gradient(circle at 100% 0, transparent 7.5px, var(--t1) 8px); }
+.store.is-on::before, .store.is-on::after { opacity: 1; transition-delay: .2s; }
+.v2 .srch { margin-top: 12px; }
+.v2 .hero { background-color: var(--t2);
+  background-image: radial-gradient(rgba(255, 255, 255, .1) 1px, transparent 1.5px), linear-gradient(180deg, var(--t1) 0%, var(--t2) 100%);
+  background-size: 7px 7px, auto; padding-top: 10px; }
+.lock { position: relative; display: flex; align-items: center; justify-content: center; height: 118px; }
+.lock__b { position: relative; z-index: 1; overflow: hidden; padding: 11px 22px 12px; border-radius: 22px; text-align: center;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--t1) 55%, #fff), var(--t1) 70%);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .45), inset 0 -3px 0 color-mix(in srgb, var(--t2) 70%, #000), 0 12px 22px -12px rgba(0, 0, 0, .55); }
+.lock__b::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .42) 50%, transparent 62%);
+  transform: translateX(-120%); animation: sheen 3.6s ease-in-out infinite; }
+@keyframes sheen { 55%, 100% { transform: translateX(120%); } }
+.lock__a { font: 800 italic 26px/1 var(--font); letter-spacing: -.6px; color: #fff; text-shadow: 0 2px 0 color-mix(in srgb, var(--t2) 75%, #000); }
+.lock__k { display: block; margin-top: 2px; font: 800 13px/1 var(--font); letter-spacing: 3px; color: #fff; }
+.lock__sub { display: inline-block; margin-top: 7px; padding: 4px 10px; border-radius: 8px; background: rgba(255, 255, 255, .94); color: var(--t2); font: 800 10.5px/1.2 var(--font); letter-spacing: .5px; }
+.lock__img { position: absolute; top: 50%; width: 78px; height: 78px; margin-top: -39px; animation: bob 4.2s ease-in-out infinite; }
+.lock__img img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; box-shadow: 0 0 0 3px #fff, 0 10px 20px -8px rgba(0, 0, 0, .5); }
+.lock__img.cut img { object-fit: contain; border-radius: 0; box-shadow: none; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .3)); }
+.lock__img.l { left: 2px; --r: -10deg; }
+.lock__img.r { right: 2px; --r: 9deg; animation-delay: -2.1s; }
+@keyframes bob { 0%, 100% { transform: translateY(-4px) rotate(var(--r)); } 50% { transform: translateY(5px) rotate(var(--r)); } }
+.strip { display: flex; align-items: center; gap: 14px; margin-top: 10px; padding: 10px 14px; border-radius: 14px; background: rgba(255, 255, 255, .16); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .32); }
+.strip__big { display: flex; align-items: center; gap: 6px; }
+.strip__big b { font: 800 42px/1 var(--fig); letter-spacing: -1px; }
+.strip__big span { font: 800 12.5px/1.05 var(--font); letter-spacing: .3px; }
+.strip__checks { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 7px 8px; font: 500 11.5px/1.2 var(--font); }
+.chk { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.chk i { position: relative; flex: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+.chk i::after { content: ''; position: absolute; left: 4.6px; top: 2.6px; width: 3px; height: 6px; border: solid var(--t2); border-width: 0 1.8px 1.8px 0; transform: rotate(45deg); }
+.led { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 12px; font: 600 12.5px/1 var(--font); }
+.led b { padding: 5px 10px; border-radius: 10px; background: #fff; color: var(--t2); font-weight: 800; }
+.v2 .tile { height: 156px; padding-top: 11px; color: var(--ink); box-shadow: none;
+  background: linear-gradient(180deg, #fff 0%, color-mix(in srgb, var(--t1) 16%, #fff) 100%); }
+.v2 .tile__t { font-size: 13px; }
+.v2 .tile__img { bottom: 30px; height: 74px; left: 10px; right: 10px; border-radius: 10px; }
+.tile__tag { position: absolute; left: 0; right: 0; bottom: 0; height: 24px; background: var(--t2); color: #fff; font: 800 10.5px/24px var(--font); letter-spacing: .5px; text-transform: uppercase; }
+
+/* ═══ 3 · MINT (Instamart) ════════════════════════════════════════════════ */
+.v3 { --fg: var(--ink); --sb: var(--ink); }
+.v3 .hdr { background: var(--lt); }
+.v3 .who__hi { font: 400 16px/1.1 var(--gummy); color: var(--sec-dark); opacity: 1; }
+.v3 .who__name { font-size: 26px; color: var(--ink); }
+.v3 .who__site { color: var(--text); }
+.v3 .wx { background: #fff; color: var(--ink); box-shadow: inset 0 0 0 1px rgba(31, 81, 91, .1); }
+.v3 .av::after { box-shadow: 0 0 0 2px var(--lt); }
+.v3 .srch { box-shadow: inset 0 0 0 1px #D7E4E0, 0 6px 16px -12px rgba(31, 81, 91, .35); }
+.v3 .tabs { color: var(--ink-2); padding-top: 8px; margin-top: 6px; }
+.v3 .tab { color: var(--ink-2); }
+.v3 .tabs__bar { height: 3px; background: var(--ink-2); }
+.v3 .hero { color: var(--ink); background: linear-gradient(180deg, var(--lt) 0%, var(--lt2) 100%); border-radius: 0 0 28px 28px; padding-top: 16px; }
+.pat { position: absolute; inset: -132px 0 0 0; background-image: var(--pat); background-size: 132px 132px; animation: pat 48s linear infinite; }
+@keyframes pat { to { transform: translate(-132px, 132px); } }
+.pow { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.pow__k { font: 600 10.5px/1 var(--font); letter-spacing: 2.4px; color: var(--text); }
+.pow__chips { display: flex; gap: 6px; }
+.pow__chips span { height: 26px; padding: 0 11px; border-radius: 13px; background: #fff; box-shadow: inset 0 0 0 1px #C3CEC7; font: 700 11.5px/26px var(--font); color: var(--ink-2); }
+.bento { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 152px 152px; gap: 10px; margin-top: 14px; }
+.bt { position: relative; display: flex; flex-direction: column; align-items: center; padding: 12px 8px 0; border-radius: 18px; overflow: hidden; text-align: center;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .97), rgba(255, 255, 255, .8));
+  box-shadow: inset 0 0 0 1px #fff, 0 8px 18px -12px rgba(31, 81, 91, .4); animation: tileIn .6s var(--ease) both; animation-delay: calc(var(--i) * 60ms); }
+.bt--tall { grid-row: span 2; padding-top: 14px; }
+.bt__t { font: 600 14px/1.15 var(--font); color: var(--ink); }
+.bt__n { margin-top: 3px; font: 700 13px/1 var(--fig); color: var(--sec-dark); }
+.bt__img { position: absolute; left: 10px; right: 10px; bottom: 10px; height: 76px; border-radius: 12px; overflow: hidden; }
+.bt__img img { width: 100%; height: 100%; object-fit: cover; }
+.bt__img.cut img { object-fit: contain; }
+.bt--tall .bt__img { height: 136px; }
+.bt__kick { font: 500 13px/1 var(--gummy); color: var(--ter); letter-spacing: .3px; }
+.bt__was { margin-top: 10px; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: #fff; font: 600 11px/1.2 var(--font); }
+.bt__now { margin-top: 5px; padding: 5px 14px; border-radius: 10px; background: var(--mod); color: var(--ink); font: 800 30px/1 var(--fig); letter-spacing: -.5px; box-shadow: 0 6px 12px -8px rgba(138, 109, 0, .7); }
+.bt__cap { margin-top: 8px; font: 700 14px/1.2 var(--font); color: var(--ink); }
+.pc { flex: none; width: 132px; padding: 8px 8px 10px; border-radius: 16px; background: #fff; scroll-snap-align: start; box-shadow: 0 1px 2px rgba(31, 65, 91, .06), 0 8px 20px -14px rgba(31, 65, 91, .3); }
+.pc__img { position: relative; height: 100px; border-radius: 11px; overflow: hidden; }
+.pc__img img { width: 100%; height: 100%; object-fit: cover; }
+.pc__img.cut { background: #EFF5F2; }
+.pc__img.cut img { object-fit: contain; padding: 8px; }
+.pc__rib { position: absolute; top: 0; left: 0; padding: 5px 8px; border-radius: 0 0 10px 0; background: var(--mod); color: var(--ink); font: 800 11px/1 var(--font); }
+.pc__t { margin-top: 9px; font: 600 13.5px/1.2 var(--font); color: var(--ink); }
+.pc__m { margin-top: 3px; font: 400 12px/1.2 var(--font); color: var(--mute); }
+.pc__btn { display: block; width: 100%; height: 32px; margin-top: 9px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--pri-ink); color: var(--pri-ink); font: 700 12.5px/32px var(--font); text-align: center; }
+
+/* ═══ 4 · NIGHT ROUNDS (Blinkit "Single mode") ════════════════════════════ */
+.v4 { --t1: color-mix(in srgb, #1F415B 18%, #000); --t2: color-mix(in srgb, #1F415B 72%, #000); --fg: #fff; --sb: #fff; }
+.v4[data-mode='day'] { --t1: #DFF5F3; --t2: #AFEFEB; --fg: #1F415B; --sb: #1F415B; }
+.v4 .who__hi { font: 700 12px/1 var(--font); letter-spacing: 1.2px; text-transform: uppercase; opacity: .75; }
+.v4 .who__name { font-size: 30px; }
+.v4 .av { background-color: transparent; box-shadow: 0 0 0 2px var(--fg); }
+.v4 .av::after { display: none; }
+.v4 .hero { padding-top: 20px; }
+.v4 .hero__t { font-size: 30px; font-weight: 600; white-space: nowrap; }
+.v4 .hero__s { max-width: 220px; }
+.v4[data-mode='day'] .tile { background: linear-gradient(180deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .5)); box-shadow: inset 0 0 0 1px #fff, 0 8px 18px -12px rgba(31, 81, 91, .4); }
+.tgl { position: relative; flex: none; width: 122px; height: 46px; padding: 0 50px 0 14px; border-radius: 23px; text-align: left; color: var(--ter-ctr);
+  background: rgba(0, 0, 0, .35); box-shadow: inset 0 0 0 1.5px var(--ter); font: 800 11px/1.08 var(--font); letter-spacing: .3px;
+  transition: background .5s, box-shadow .5s, color .5s, padding .5s var(--ease); }
+.tgl__k { position: absolute; top: 6px; right: 6px; width: 34px; height: 34px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--ter-ctr), var(--ter) 70%); box-shadow: 0 0 16px 2px rgba(250, 97, 64, .55);
+  transition: transform .55s var(--ease), background .5s, box-shadow .5s; }
+.v4[data-mode='day'] .tgl { background: #fff; box-shadow: inset 0 0 0 1.5px var(--sec-dark); color: var(--sec-dark); padding: 0 12px 0 52px; }
+.v4[data-mode='day'] .tgl__k { transform: translateX(-76px); background: radial-gradient(circle at 35% 30%, #FFF6BE, var(--mod) 65%); box-shadow: 0 0 14px 2px rgba(255, 232, 110, .8); }
+.night, .day { position: absolute; inset: 0; transition: opacity .8s var(--ease); }
+.day { opacity: 0; }
+.v4[data-mode='day'] .night { opacity: 0; }
+.v4[data-mode='day'] .day { opacity: 1; }
+.star { position: absolute; width: var(--s); height: var(--s); border-radius: 50%; background: var(--c); animation: tw var(--d) ease-in-out infinite alternate; animation-delay: var(--dl); }
+@keyframes tw { from { opacity: .15; } to { opacity: .95; } }
+.moon { position: absolute; top: calc(var(--sbh) + 2px); right: 84px; width: 30px; height: 30px; border-radius: 50%; box-shadow: inset -7px -3px 0 0 var(--mod); transform: rotate(-20deg); opacity: .9; }
+.ff { position: absolute; bottom: -10px; left: var(--x); width: 5px; height: 5px; border-radius: 50%; background: var(--mod); box-shadow: 0 0 8px 2px rgba(255, 232, 110, .6);
+  animation: rise var(--d) linear infinite; animation-delay: var(--dl); opacity: 0; }
+@keyframes rise { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: .9; } 50% { transform: translate(12px, -150px); } 85% { opacity: .7; } 100% { transform: translate(-8px, -300px); opacity: 0; } }
+.ember { position: absolute; left: -10%; right: -10%; bottom: -70px; height: 190px;
+  background: radial-gradient(45% 60% at 28% 100%, rgba(250, 97, 64, .5), transparent 70%), radial-gradient(45% 60% at 76% 100%, rgba(0, 214, 201, .32), transparent 70%);
+  animation: flick 3.2s ease-in-out infinite alternate; }
+@keyframes flick { from { opacity: .7; transform: scaleY(.92); } to { opacity: 1; transform: scaleY(1.06); } }
+.sun { position: absolute; top: calc(var(--sbh) - 6px); right: 70px; width: 46px; height: 46px; border-radius: 50%; background: var(--mod);
+  box-shadow: 0 0 0 8px rgba(255, 232, 110, .35), 0 0 0 18px rgba(255, 232, 110, .16); animation: sunb 4s ease-in-out infinite alternate; }
+@keyframes sunb { to { box-shadow: 0 0 0 11px rgba(255, 232, 110, .3), 0 0 0 24px rgba(255, 232, 110, .1); } }
+.cloud { position: absolute; height: 18px; border-radius: 10px; background: #fff; opacity: .8; animation: drift var(--d) linear infinite; animation-delay: var(--dl); }
+.cloud::before { content: ''; position: absolute; left: 22%; bottom: 6px; width: 46%; height: 22px; border-radius: 50%; background: inherit; }
+@keyframes drift { from { transform: translateX(-120px); } to { transform: translateX(460px); } }
+.grp { flex: none; width: 150px; scroll-snap-align: start; }
+.grp__box { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; height: 150px; padding: 8px; border-radius: 16px; background: #E8F4F2; }
+.grp__box span { border-radius: 11px; overflow: hidden; background: #fff; }
+.grp__box img { width: 100%; height: 100%; object-fit: cover; }
+.grp__box.one { grid-template-columns: 1fr; padding: 0; background: none; position: relative; }
+.grp__box.one span { border-radius: 16px; }
+.grp__rib { position: absolute; top: 0; left: 10px; padding: 6px 7px 8px; border-radius: 0 0 6px 6px; background: var(--add); color: #fff; font: 800 10.5px/1.1 var(--font); text-align: center; }
+.grp__t { margin-top: 10px; font: 600 15px/1.2 var(--font); color: var(--ink); }
+.grp__m { margin-top: 3px; font: 400 13px/1.2 var(--font); color: var(--mute); }
+.grp__btn { display: block; height: 38px; margin-top: 10px; border-radius: 10px; box-shadow: inset 0 0 0 1px #C3CEC7; color: var(--pri-ink); font: 600 14px/38px var(--font); text-align: center; }
+.promo { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: linear-gradient(90deg, #E0F5FA, #fff); box-shadow: inset 0 0 0 1px #D7EEF3; }
+.promo img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; }
+.promo b { display: block; font: 600 15px/1.2 var(--font); color: var(--add); }
+.promo span { font: 400 13px/1.3 var(--font); color: var(--text); }
+.promo em { margin-left: auto; align-self: flex-start; font: 500 12px/1 var(--font); color: var(--mute); font-style: normal; }
+
+/* ═══ 5 · FESTIVAL LIGHTS (Blinkit Dhanteras) ═════════════════════════════ */
+.v5 { --t1: color-mix(in srgb, #8A4326 82%, #250E01); --t2: #250E01; --fg: #fff; --sb: #fff; }
+.v5 .hdr::before, .v5 .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background-image: var(--rang); background-size: 46px 46px; opacity: .9; }
+.v5 .av::after { box-shadow: 0 0 0 2px var(--t1); }
+.lights { position: absolute; left: 0; top: 0; width: 100%; height: 120px; overflow: visible; }
+.lights path { fill: none; stroke: rgba(255, 232, 110, .38); stroke-width: 1.1; }
+.bulb { fill: var(--b); filter: drop-shadow(0 0 3px var(--b)) drop-shadow(0 0 7px var(--b)); transition: fill .35s, filter .35s; transition-delay: var(--w, 0ms);
+  animation: tw var(--d) ease-in-out infinite alternate; animation-delay: var(--dl); }
+.festoon { display: block; width: calc(100% + 32px); height: 22px; margin: -18px -16px 4px; }
+.festoon path { fill: none; stroke: rgba(255, 232, 110, .35); stroke-width: 1; }
+.v5 .tabs::before { opacity: .12; }
+.gold { font: 600 36px/1.04 var(--gummy); letter-spacing: -.3px; color: transparent;
+  background: linear-gradient(100deg, var(--mod) 0%, var(--ter-ctr) 30%, #fff8cf 45%, var(--mod) 60%, var(--ter-ctr) 100%) 0 0 / 220% 100%;
+  -webkit-background-clip: text; background-clip: text; animation: gold 5s linear infinite; }
+@keyframes gold { to { background-position: -220% 0; } }
+.cl { flex: none; height: 46px; padding: 0 16px; border-radius: 23px; color: #250E01; font: 800 11.5px/1.05 var(--font); letter-spacing: .4px; text-align: center;
+  background: linear-gradient(180deg, #FFF3A6, var(--mod) 45%, #E4B819); box-shadow: 0 4px 0 #8A6D00, 0 10px 18px -6px rgba(0, 0, 0, .55); transition: transform .12s, box-shadow .12s; }
+.cl:active { transform: translateY(3px); box-shadow: 0 1px 0 #8A6D00, 0 6px 12px -6px rgba(0, 0, 0, .55); }
+.v5 .tile { background: linear-gradient(180deg, rgba(255, 232, 110, .14), rgba(255, 232, 110, .04)); box-shadow: inset 0 0 0 1px rgba(255, 232, 110, .22); }
+.v5 .tile__n { color: var(--mod); }
+
+/* ═══ phone width: one concept fills the screen ═══════════════════════════ */
+@media (max-width: 760px) {
+  .rv { padding: 8px 10px; }
+  .rv > div:first-child { display: none; }
+  .rv__chips { margin: 0; }
+  .stage { display: block; padding: 0; }
+  .cell { display: none; width: 100%; }
+  .cell.is-cur { display: block; }
+  .cap { display: none; }
+  .phone { --sbh: 0px; width: 100%; height: calc(100dvh - 51px); padding: 0; border-radius: 0; background: none; box-shadow: none; }
+  .screen { border-radius: 0; }
+  .sb { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="rv">
+  <div>
+    <div class="rv__t">Home header · five directions</div>
+    <div class="rv__s">From the Blinkit, Instamart and Zepto references, in Antz colours. Tap the tabs, the stores, the switch and “Change lights”. Scroll a phone to see the header pin.</div>
+  </div>
+  <nav class="rv__chips" id="chips"></nav>
+</header>
+
+<main class="stage" id="stage"></main>
+
+<script>
+/* ─── data ─────────────────────────────────────────────────────────────── */
+const IMG = p => `../assets/img/${p}`;
+const ICO = n => `url(../assets/icon/${n}.svg)`;
+const svgUrl = s => `url("data:image/svg+xml,${encodeURIComponent(s)}")`;
+const DIYA = svgUrl(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 1.5c1.7 2.3 2.5 3.9 2.5 5.3A2.5 2.5 0 0 1 12 9.3a2.5 2.5 0 0 1-2.5-2.5c0-1.4.8-3 2.5-5.3z'/><path d='M2 11.2h20c-.4 4.9-4.5 8.4-10 8.4S2.4 16.1 2 11.2z'/><rect x='8' y='20.4' width='8' height='2.1' rx='1'/></svg>`);
+const CLOUD = svgUrl(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 19a5 5 0 0 1-.6-10A6.5 6.5 0 0 1 19 9.6 4.7 4.7 0 0 1 18.5 19z'/></svg>`);
+const CHEV = svgUrl(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 5l7 7-7 7' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/></svg>`);
+const PAT = svgUrl(`<svg xmlns='http://www.w3.org/2000/svg' width='132' height='132' viewBox='0 0 132 132'>
+  <g fill='none' stroke='#00ABAB' stroke-opacity='.18' stroke-width='1.6' stroke-linecap='round'>
+    <path d='M14 44c9-15 28-17 37-6-11 13-28 15-37 6z'/><path d='M14 44l37-6'/>
+    <path d='M84 14c13 3 20 16 15 26-13-2-20-15-15-26z'/><path d='M84 14l15 26'/>
+  </g>
+  <g fill='#FFE86E' fill-opacity='.7'>
+    <ellipse cx='96' cy='100' rx='9' ry='7.2'/><circle cx='84.5' cy='88' r='3.7'/><circle cx='92.5' cy='83.5' r='3.7'/><circle cx='101' cy='83.5' r='3.7'/><circle cx='108.5' cy='88.5' r='3.7'/>
+  </g>
+  <g fill='#00D6C9' fill-opacity='.35'><path d='M36 98l2.2 5.8 5.8 2.2-5.8 2.2L36 114l-2.2-5.8-5.8-2.2 5.8-2.2z'/></g>
+</svg>`);
+const RANG = svgUrl(`<svg xmlns='http://www.w3.org/2000/svg' width='46' height='46' viewBox='0 0 46 46'><path d='M23 2L44 23 23 44 2 23z' fill='none' stroke='#FFE86E' stroke-opacity='.07'/><circle cx='23' cy='23' r='2' fill='#FFE86E' fill-opacity='.12'/><circle cx='0' cy='0' r='1.4' fill='#FFBDA8' fill-opacity='.12'/></svg>`);
+
+/* module colours: the --f-* tokens and the ends of the --g-* card ramps */
+const THEME = {
+  all:       { t1: '#1F515B', t2: '#1F415B', ac: '#00D6C9', lt: '#DFF5F3', lt2: '#AFEFEB' },
+  animals:   { t1: '#1D7E4C', t2: '#006D35', ac: '#37BD69', lt: '#E1F9ED', lt2: '#B6F3D6' },
+  medical:   { t1: '#549C76', t2: '#338A5D', ac: '#AFEFEB', lt: '#E8F4F2', lt2: '#C4EBD6' },
+  housing:   { t1: '#5A8088', t2: '#39656E', ac: '#AFEFEB', lt: '#EFF5F2', lt2: '#DDEBE9' },
+  diet:      { t1: '#FB7456', t2: '#FA6140', ac: '#FFE86E', lt: '#FFE5DD', lt2: '#FFBDA8' },
+  reports:   { t1: '#1ABEB6', t2: '#00ABAB', ac: '#FFE86E', lt: '#E5FBFA', lt2: '#AFEFEB' },
+  hospital:  { t1: '#39656E', t2: '#1F515B', ac: '#00D6C9', lt: '#E8F4F2', lt2: '#DDEBE9' },
+  eggs:      { t1: '#46CADE', t2: '#00AFD6', ac: '#FFE86E', lt: '#E0F5FA', lt2: '#BCE6EB' },
+  helpdesk:  { t1: '#2F628A', t2: '#1F415B', ac: '#00AFD6', lt: '#E0F5FA', lt2: '#C9E9F2' },
+};
+const TAB = {
+  all: ['All', ICO('qa-actions')], animals: ['Animals', ICO('m-species')], medical: ['Medical', ICO('m-medical')],
+  housing: ['Housing', ICO('m-housing')], diet: ['Diet', ICO('m-diet')], reports: ['Reports', ICO('m-reports')],
+  helpdesk: ['Help Desk', ICO('m-helpdesk')], deepavali: ['Deepavali', DIYA],
+  due: ['Due today', ICO('ki-calendar')], critical: ['Critical', ICO('v3-urgent')], births: ['Births', ICO('v3-births')],
+  transfers: ['Transfers', ICO('v3-transfers')], notes: ['Notes', ICO('v3-note-head')],
+};
+const HERO = {
+  all: ['Evening rounds', '6 lists need you before 9 PM'],
+  animals: ['Your animals', '4 favourites · 6 viewed today'],
+  medical: ['Medical today', '3 in the ward · 143 vaccinations due'],
+  housing: ['Housing check', '42 enclosures · 1 leak reported'],
+  diet: ['Feed time', '64 feeds today · fruit stock is low'],
+  reports: ['This week', '76 births · 2 audits still open'],
+  deepavali: ['Quiet Deepavali', 'Firecracker season. Keep 6 quiet zones calm for 14 sensitive animals.'],
+};
+const TILES = {
+  all: [
+    { t: 'Births this week', n: '76', u: 'births', was: '64 last week', img: 'brand/feeder.jpg' },
+    { t: 'Deworming', n: '319', u: 'due', img: 'species/chital.jpg' },
+    { t: 'Vaccinations', n: '143', u: 'due', img: 'v3-medkit.png', cut: 1 },
+    { t: 'Necropsy', n: '4', u: 'open', img: 'brand/research.jpg' },
+    { t: 'Diet plans', n: '12', u: 'to sign', img: 'diet-kitchen.jpg' },
+    { t: 'Transfers', n: '16', u: 'pending', img: 'species/gaur.jpg' },
+  ],
+  animals: [
+    { t: 'Favourites', n: '4', u: 'animals', was: '2 new this week', img: 'species/indian-leopard.jpg' },
+    { t: 'Viewed today', n: '6', u: 'animals', img: 'species/sambar.jpg' },
+    { t: 'Sexing', n: '28,532', u: '', img: 'species/sarus-crane.jpg' },
+    { t: 'Microchips', n: '20,302', u: '', img: 'species/blackbuck.jpg' },
+    { t: 'Enclosures', n: '42', u: 'active', img: 'species/bengal-tiger.jpg' },
+    { t: 'Species', n: '2,411', u: '', img: 'species/indian-peafowl.jpg' },
+  ],
+  medical: [
+    { t: 'In the ward', n: '3', u: 'animals', was: '5 yesterday', img: 'hospital.jpg' },
+    { t: 'Vaccinations', n: '143', u: 'due', img: 'v3-medkit.png', cut: 1 },
+    { t: 'Deworming', n: '319', u: 'due', img: 'species/barasingha.jpg' },
+    { t: 'Lab results', n: '9', u: 'new', img: 'brand/research.jpg' },
+    { t: 'Follow-ups', n: '21', u: 'due', img: 'brand/heart.jpg' },
+    { t: 'Necropsy', n: '4', u: 'open', img: 'brand/tick.jpg' },
+  ],
+  housing: [
+    { t: 'Enclosures', n: '42', u: 'active', was: '40 last month', img: 'species/asiatic-lion.jpg' },
+    { t: 'Vacant', n: '5', u: 'free', img: 'brand/tree.jpg' },
+    { t: 'Maintenance', n: '7', u: 'open', img: 'hs-audit.jpg' },
+    { t: 'Audits', n: '2', u: 'due', img: 'brand/tick.jpg' },
+    { t: 'Water lines', n: '1', u: 'leak', img: 'brand/school-of-fishes.jpg' },
+    { t: 'Night locks', n: '18', u: 'of 20', img: 'species/sloth-bear.jpg' },
+  ],
+  diet: [
+    { t: 'Feeds today', n: '64', u: 'feeds', was: '58 yesterday', img: 'diet-kitchen.jpg' },
+    { t: 'Fruit stock', n: 'Low', u: '', img: 'brand/fruit.jpg' },
+    { t: 'Recipes', n: '38', u: 'signed', img: 'brand/apple.jpg' },
+    { t: 'Supplements', n: '12', u: 'due', img: 'brand/banana.jpg' },
+    { t: 'Eggs', n: '120', u: 'in stock', img: 'brand/egg.jpg' },
+    { t: 'Feed refusals', n: '2', u: 'today', img: 'species/bonnet-macaque.jpg' },
+  ],
+  reports: [
+    { t: 'Animal census', n: '110,020', u: '', was: '+312 this month', img: 'v3-species.png' },
+    { t: 'Species', n: '2,411', u: '', img: 'species/indian-peafowl.jpg' },
+    { t: 'Natality', n: '76', u: '7D', img: 'brand/feeder.jpg' },
+    { t: 'Mortality', n: '9', u: '7D', img: 'brand/feather.jpg' },
+    { t: 'Audits', n: '2', u: 'open', img: 'brand/tick.jpg' },
+    { t: 'Insights', n: 'New', u: '', img: 'brand/magnifier.jpg' },
+  ],
+  helpdesk: [
+    { t: 'Open tickets', n: '7', u: 'open', was: '11 last week', img: 'brand/speech-bubble.jpg' },
+    { t: 'Assigned to me', n: '3', u: '', img: 'brand/tick.jpg' },
+    { t: 'Guides', n: '24', u: '', img: 'brand/magnifier.jpg' },
+    { t: 'Resolved', n: '31', u: 'this week', img: 'brand/heart.jpg' },
+    { t: 'Requests', n: '5', u: 'new', img: 'brand/research.jpg' },
+    { t: 'Chats', n: '2', u: 'unread', img: 'brand/speech-bubble.jpg' },
+  ],
+  deepavali: [
+    { t: 'Quiet zones', n: '6', u: 'set', img: 'brand/tree.jpg' },
+    { t: 'Stress watch', n: '14', u: 'animals', img: 'species/indian-leopard.jpg' },
+    { t: 'Vet on call', n: '3', u: 'tonight', img: 'v3-medkit.png', cut: 1 },
+    { t: 'Night patrol', n: '4', u: 'teams', img: 'species/sloth-bear.jpg' },
+    { t: 'Early feed', n: '8', u: 'enclosures', img: 'diet-kitchen.jpg' },
+    { t: 'Noise log', n: 'Live', u: '', img: 'species/indian-peafowl.jpg' },
+  ],
+  night: [
+    { t: 'Enclosure locks', n: '18', u: 'of 20', img: 'species/asiatic-lion.jpg' },
+    { t: 'Hospital ward', n: '3', u: 'in care', img: 'hospital.jpg' },
+    { t: 'Births watch', n: '2', u: 'expected', img: 'brand/feeder.jpg' },
+    { t: 'Night feed', n: '6', u: 'left', img: 'diet-kitchen.jpg' },
+    { t: 'Patrol log', n: '4', u: 'rounds', img: 'hs-audit.jpg' },
+    { t: 'Night notes', n: '5', u: 'new', img: 'v2-note-tiger.jpg' },
+  ],
+  eggs: [
+    { t: 'Incubator', n: '18', u: 'eggs', img: 'eggs-banner.png' },
+    { t: 'Nests', n: '7', u: 'watched', img: 'brand/egg.jpg' },
+    { t: 'Nursery', n: '4', u: 'chicks', img: 'v3-eggbasket.png', cut: 1 },
+    { t: 'Hatched', n: '3', u: 'this week', img: 'brand/flying-bird.jpg' },
+    { t: 'Discards', n: '2', u: 'to log', img: 'brand/feather.jpg' },
+    { t: 'Transfers', n: '1', u: 'pending', img: 'brand/swan.jpg' },
+  ],
+};
+const STORES = [
+  { k: 'all', theme: 'all', wm: 'antz', c: '#1F515B', tiles: 'all',
+    camp: { a: 'Daily', k: 'ROUNDS', sub: '6 LISTS · 4 SITES', big: '0', lbl: 'OVER-<br>DUE', checks: ['12 due today', '3 sites clear', 'Cold chain OK', '2 vets on call'], led: ['Vet team', 'Keepers'],
+      l: { img: 'v3-animal-a.png', cut: 1 }, r: { img: 'species/indian-leopard.jpg' } } },
+  { k: 'hospital', theme: 'hospital', label: 'Hospital', ico: 'm-hospital', c: '#39656E', tiles: 'medical',
+    camp: { a: 'Vaccination', k: 'DRIVE', sub: '143 DUE · ENDS SUNDAY', big: '0', lbl: 'MISSED<br>DOSES', checks: ['Cold chain OK', '38 done today', '12 enclosures', '410 vials in stock'], led: ['Hospital', 'Dr. Meera Rao'],
+      l: { img: 'v3-medkit.png', cut: 1 }, r: { img: 'species/barasingha.jpg' } } },
+  { k: 'diet', theme: 'diet', label: 'Diet &amp;<br>Kitchen', ico: 'm-diet', c: '#FA6140', tiles: 'diet',
+    camp: { a: 'Fresh Feed', k: 'WEEK', sub: '64 FEEDS TODAY', big: '2', lbl: 'FEED<br>REFUSALS', checks: ['Fruit in at 6 AM', '38 recipes signed', 'Cold room 4°', '12 supplements'], led: ['Kitchen', 'Nutrition team'],
+      l: { img: 'brand/fruit.jpg' }, r: { img: 'brand/banana.jpg' } } },
+  { k: 'eggs', theme: 'eggs', label: 'Eggs', ico: 'm-eggs', c: '#00AFD6', tiles: 'eggs',
+    camp: { a: 'Hatch', k: 'WATCH', sub: '18 IN THE INCUBATOR', big: '3', lbl: 'HATCHED<br>THIS WEEK', checks: ['37.5° steady', '7 nests watched', '4 in the nursery', '2 discards to log'], led: ['Bird section', 'Keepers'],
+      l: { img: 'v3-eggbasket.png', cut: 1 }, r: { img: 'species/sarus-crane.jpg' } } },
+];
+const RECENT = [
+  { id: '190317', nm: 'Slate Pangolin', sx: 'f', img: 'species/sambar.jpg' },
+  { id: '143944', nm: 'Glacial Egret', sx: 'u', img: 'species/sarus-crane.jpg' },
+  { id: '172277', nm: 'Russet Whipsnake', sx: 'm', img: 'species/indian-rock-python.jpg' },
+  { id: '118204', nm: 'Amber Leopard', sx: 'f', img: 'species/indian-leopard.jpg' },
+  { id: '160552', nm: 'Moss Gaur', sx: 'm', img: 'species/gaur.jpg' },
+  { id: '131870', nm: 'Dusk Chital', sx: 'f', img: 'species/chital.jpg' },
+];
+const SX = { f: 'F', m: 'M', u: 'UD' };
+const WORDS = ['Chitra', 'Sambar', 'Users', 'Vaccinations', 'Enclosure 12', 'Ira'];
+
+/* ─── shared pieces ─────────────────────────────────────────────────────── */
+const mk = (m, cls = '') => `<i class="mk ${cls}" style="--m:${m.replace(/"/g, '&quot;')}"></i>`;
+const now = new Date();
+const hh = now.getHours();
+const clock = now.toTimeString().slice(0, 5);
+const greet = hh < 12 ? 'Good morning,' : hh < 17 ? 'Good afternoon,' : hh < 21 ? 'Good evening,' : 'Good night,';
+
+const sb = () => `<div class="sb"><span>${clock}</span><i class="sb__isl"></i><span class="sb__r">${mk(ICO('status-cellular'))}${mk(ICO('status-wifi'))}${mk(ICO('status-battery'))}</span></div>`;
+const search = () => `<div class="srch" data-pin>${mk(ICO('v2-search'))}<span class="srch__ph">Search&nbsp;<span class="roll"><span>“${WORDS[0]}”</span></span></span><i class="srch__div"></i><button class="srch__scan" aria-label="Scan">${mk(ICO('scan'))}</button></div>`;
+const tabs = (keys, on, extra = {}) => `<nav class="tabs" role="tablist">${keys.map(k => `<button class="tab${k === on ? ' is-on' : ''}" data-k="${k}" role="tab">${extra[k] || ''}${mk(TAB[k][1])}<span>${TAB[k][0]}</span></button>`).join('')}<i class="tabs__bar"></i></nav>`;
+const num = (n, u) => `<span data-n="${n}">${n}</span>${u ? ` <small>${u}</small>` : ''}`;
+const tiles = (list, tagged) => list.slice(0, 6).map((x, i) => `<a class="tile" style="--i:${i}"><b class="tile__t">${x.t}</b>${tagged ? '' : `<span class="tile__n">${num(x.n, x.u)}</span>`}<figure class="tile__img${x.cut ? ' cut' : ''}"><img src="${IMG(x.img)}" alt=""></figure>${tagged ? `<span class="tile__tag">${x.n} ${x.u || ''}</span>` : ''}</a>`).join('');
+const dock = () => `<div class="dock"><button class="dock__mod">Modules ${mk(ICO('qa-actions'))}</button><button class="dock__qa" aria-label="Quick actions">${mk(ICO('qa-bolt'))}</button><button class="dock__chat" aria-label="Chat">${mk(ICO('qa-chat'))}</button></div>`;
+
+const secRecents = (title = 'Recently viewed') => `<section><div class="sec__h"><span class="sec__t">${title}</span><a class="sec__a">View all ›</a></div>
+  <div class="rail">${RECENT.map(r => `<a class="rc"><img src="${IMG(r.img)}" alt=""><span class="sx sx-${r.sx}">${SX[r.sx]}</span><span class="rc__id">AAID:${r.id}</span><span class="rc__nm">${r.nm}</span></a>`).join('')}</div></section>`;
+const tickItems = [['species/indian-leopard.jpg', 'Crimson Frosted', '72%'], ['species/sambar.jpg', 'Clearspring', '64%'], ['species/gaur.jpg', 'Ironwood', '58%'], ['species/sarus-crane.jpg', 'Sunfield', '81%']];
+const secTicker = () => { const it = tickItems.map(([i, s, p]) => `<span class="tick__it"><img src="${IMG(i)}" alt="">${s} <b>${p}</b></span>`).join('');
+  return `<div class="tick"><span class="tick__live"><i></i></span><div class="tick__track">${it}${it}</div></div>`; };
+const secAnn = () => `<article class="ann"><span class="ann__chip"><i></i>Announcement</span><h3 class="ann__h">Zara and Kian, our leopard cubs, go on exhibit from Monday</h3>
+  <div class="ann__m">Emerson Vance · 24 Aug · 2 images, 1 document</div><div class="ann__img"><img src="${IMG('hero-leopard.jpg')}" alt=""></div></article>`;
+const secMods = () => `<section><div class="sec__h"><span class="sec__t">Modules</span><a class="sec__a">Edit</a></div><div class="mods">
+  <a class="mod mod--w mod--ph"><img class="mod__bg" src="${IMG('species-cheetahs.jpg')}" alt=""><span style="display:flex;gap:8px;align-items:center">${mk(ICO('m-species'))}<span class="mod__t">Species Management</span></span>
+    <span class="mod__stats"><span><b>2,411</b><span>Species</span></span><span style="text-align:right"><b>110,020</b><span>Animal population</span></span></span></a>
+  <a class="mod" style="background:linear-gradient(127.7deg,#8EBEA5 6%,#338A5D 74%)">${mk(ICO('m-medical'))}<span class="mod__t">Medical</span></a>
+  <a class="mod" style="background:linear-gradient(128deg,#779B9F 6%,#48737A 74%)">${mk(ICO('m-housing'))}<span class="mod__t">Housing</span></a>
+  <a class="mod mod--w" style="background:linear-gradient(128deg,#5CD6CE 6%,#24BAB2 74%)"><span style="display:flex;gap:8px;align-items:center">${mk(ICO('m-natality'))}<span class="mod__t">Natality</span></span><span class="mod__stats"><b style="font-size:40px">76</b><span>last 7 days</span></span></a>
+  <a class="mod mod--w mod--ph"><img class="mod__bg" src="${IMG('hospital.jpg')}" alt="">${mk(ICO('m-hospital'))}<span class="mod__t">Hospital</span></a>
+  <a class="mod" style="background:linear-gradient(128deg,#A4B8AC 6%,#839D8D 74%)">${mk(ICO('m-administer'))}<span class="mod__t">Administer</span></a>
+  <a class="mod" style="background:linear-gradient(128deg,#FB9984 6%,#FB8066 74%)">${mk(ICO('m-mortality'))}<span class="mod__t">Mortality</span></a>
+</div></section>`;
+const PEND = [['Deworming', '319', 1], ['Vaccinations', '143', 1], ['Necropsy reports', '14,296'], ['Sexing', '28,532'], ['Microchipping', '20,302'], ['Transfer pending', '16']];
+const secPend = () => `<section class="pend"><div class="pend__t">Pending</div><div class="pend__rows">${PEND.map(([l, n, h]) => `<div class="pend__row${h ? ' hot' : ''}">${l}<b>${n}</b></div>`).join('')}</div></section>`;
+const secDue = () => `<section><div class="sec__h"><div><div class="sec__t">Due before you leave</div><div class="sec__sub">Deworming, vaccinations and 4 more</div></div><a class="sec__a">See all ›</a></div>
+  <div class="rail">${[['319 DUE', 'Deworming', 'Carnivore section', 'species/chital.jpg'], ['143 DUE', 'Vaccinations', 'All sites', 'v3-medkit.png', 1], ['12 TO SIGN', 'Diet plans', 'Kitchen', 'diet-kitchen.jpg'], ['4 OPEN', 'Necropsy', 'Hospital', 'brand/research.jpg'], ['16', 'Transfers', 'Inter-site', 'species/gaur.jpg']]
+    .map(([r, t, m, i, c]) => `<div class="pc"><div class="pc__img${c ? ' cut' : ''}"><img src="${IMG(i)}" alt=""><span class="pc__rib">${r}</span></div><div class="pc__t">${t}</div><div class="pc__m">${m}</div><a class="pc__btn">Open</a></div>`).join('')}</div></section>`;
+const secGroups = () => `<section><div class="sec__h"><span class="sec__t">Pick up again</span><a class="sec__a">see all</a></div><div class="rail">
+  <div class="grp"><div class="grp__box">${['species/indian-leopard.jpg', 'species/bengal-tiger.jpg', 'species/asiatic-lion.jpg'].map(i => `<span><img src="${IMG(i)}" alt=""></span>`).join('')}</div><div class="grp__t">Carnivores</div><div class="grp__m">3 animals</div><a class="grp__btn">See all</a></div>
+  <div class="grp"><div class="grp__box">${['species/sarus-crane.jpg', 'species/indian-peafowl.jpg'].map(i => `<span><img src="${IMG(i)}" alt=""></span>`).join('')}</div><div class="grp__t">Birds</div><div class="grp__m">2 animals</div><a class="grp__btn">See all</a></div>
+  <div class="grp"><div class="grp__box one"><span><img src="${IMG('species/sambar.jpg')}" alt=""></span><i class="grp__rib">DUE<br>TODAY</i></div><div class="grp__t">Slate Pangolin</div><div class="grp__m">AAID:190317 · deworming</div><a class="grp__btn">Open</a></div>
+  <div class="grp"><div class="grp__box">${['species/indian-rock-python.jpg', 'species/indian-star-tortoise.jpg'].map(i => `<span><img src="${IMG(i)}" alt=""></span>`).join('')}</div><div class="grp__t">Reptiles</div><div class="grp__m">2 animals</div><a class="grp__btn">See all</a></div>
+</div></section>`;
+const secPromo = () => `<div class="promo"><img src="${IMG('brand/feeder.jpg')}" alt=""><div><b>2 births expected tonight</b><span>Barasingha and Sambar, Enclosures 4 and 9</span></div><em>1/2</em></div>`;
+
+/* ─── the five headers ──────────────────────────────────────────────────── */
+const V = {};
+
+V.sky = {
+  n: '1', name: 'Sky header', from: 'From Blinkit',
+  notes: ['Name and site sit large on the module colour; the site line opens the site picker.', 'Each tab recolours the whole header (Medical green, Diet coral…) on one 600 ms curve.', 'On scroll the name rows fold away; search and tabs stay pinned.'],
+  html: () => `<div class="hdr"><div class="fx"><i class="aur"></i><i class="aur b"></i></div>
+      <div class="who"><div class="who__txt"><div class="who__hi">${greet}</div><div class="who__name">Sourav Tambe <span class="wx">${mk(CLOUD)}23°</span></div>
+        <div class="who__site"><b>SITE –</b><span>Crimson Frosted Wildlife Estate</span><i class="caret"></i></div></div><span class="av"></span></div>
+      ${search()}${tabs(['all', 'animals', 'medical', 'housing', 'diet', 'reports'], 'all')}</div>
+    <div class="hero"><div class="fx"><i class="aur" style="animation-delay:-6s"></i></div><div class="hero__in"></div></div>
+    <div class="body">${secRecents()}${secTicker()}${secAnn()}${secMods()}${secPend()}</div>`,
+  hero: k => `<div class="hero__row"><div><div class="hero__t">${HERO[k][0]}</div><div class="hero__s">${HERO[k][1]}</div></div><button class="ghost">See all ${mk(CHEV)}</button></div><div class="tiles">${tiles(TILES[k])}</div>`,
+  init(p) {
+    const pick = k => { theme(p, k); fill(p.querySelector('.hero__in'), this.hero(k)); };
+    bindTabs(p.querySelector('.tabs'), pick); pick('all');
+  },
+};
+
+V.stores = {
+  n: '2', name: 'Module stores', from: 'From Zepto',
+  notes: ['Modules sit on top as stores; the picked one folds into the header like a folder tab.', 'Each store brings its own campaign: Vaccination Drive, Fresh Feed Week, Hatch Watch.', 'Tiles carry a status strip along the foot (319 DUE).'],
+  html: () => `<div class="hdr"><div class="band"><div class="band__row"><div class="who__site"><b>SITE ·</b><span>Crimson Frosted, Bengaluru</span><i class="caret"></i></div><span class="av"></span></div>
+        <div class="stores">${STORES.map((s, i) => `<button class="store${i ? '' : ' is-on'}" data-k="${s.k}" style="--c:${s.c}">${s.wm ? `<span class="store__wm">${s.wm}</span>` : `${mk(ICO(s.ico))}<span>${s.label}</span>`}</button>`).join('')}</div></div>
+      ${search()}${tabs(['all', 'due', 'critical', 'births', 'transfers', 'notes'], 'all')}</div>
+    <div class="hero"><div class="hero__in"></div></div>
+    <div class="body">${secTicker()}${secRecents()}${secMods()}${secPend()}</div>`,
+  hero(s, shift = 0) {
+    const c = s.camp, list = TILES[s.tiles], rot = list.slice(shift).concat(list.slice(0, shift));
+    const im = (o, side) => `<span class="lock__img ${side}${o.cut ? ' cut' : ''}"><img src="${IMG(o.img)}" alt=""></span>`;
+    return `<div class="lock">${im(c.l, 'l')}<div class="lock__b"><div class="lock__a">${c.a}</div><span class="lock__k">${c.k}</span><span class="lock__sub">${c.sub}</span></div>${im(c.r, 'r')}</div>
+      <div class="strip"><div class="strip__big"><b data-n="${c.big}">${c.big}</b><span>${c.lbl}</span></div><div class="strip__checks">${c.checks.map(x => `<span class="chk"><i></i>${x}</span>`).join('')}</div></div>
+      <div class="led">Led by <b>${c.led[0]}</b> with <b>${c.led[1]}</b></div><div class="tiles">${tiles(rot, true)}</div>`;
+  },
+  init(p) {
+    let store = STORES[0];
+    const inn = p.querySelector('.hero__in');
+    p.querySelectorAll('.store').forEach(b => b.addEventListener('click', () => {
+      p.querySelectorAll('.store').forEach(x => x.classList.toggle('is-on', x === b));
+      store = STORES.find(s => s.k === b.dataset.k); theme(p, store.theme); fill(inn, this.hero(store));
+      const t = p.querySelector('.tabs'); t.querySelectorAll('.tab').forEach((x, i) => x.classList.toggle('is-on', !i)); bar(t);
+    }));
+    bindTabs(p.querySelector('.tabs'), (k, i) => fill(inn, this.hero(store, i)));
+    theme(p, 'all'); fill(inn, this.hero(store));
+  },
+};
+
+V.mint = {
+  n: '3', name: 'Mint bento', from: 'From Instamart · closest to today’s home',
+  notes: ['Today’s light mint, with a slow drifting paw-and-leaf pattern in Secondary and moderate yellow.', 'One tall hero tile (76 births vs 64 last week) and four small ones; the tint follows the tab.', 'A “New” badge on a tab and the dark-teal bar from the live Recents tabs.'],
+  html: () => `<div class="hdr">
+      <div class="who"><div class="who__txt"><div class="who__hi">${greet}</div><div class="who__name">Sourav Tambe 👋🏻</div>
+        <div class="who__site"><span>Crimson Frosted Wildlife Estate</span><i class="caret"></i></div></div>
+        <span style="display:flex;gap:8px;align-items:center"><span class="wx">${mk(CLOUD)}23°</span><span class="av"></span></span></div>
+      ${search()}${tabs(['all', 'animals', 'medical', 'diet', 'housing', 'helpdesk'], 'all', { helpdesk: '<span class="tab__new">New</span>' })}</div>
+    <div class="hero"><div class="fx"><i class="pat"></i></div>
+      <div class="pow"><span class="pow__k">TODAY ACROSS</span><span class="pow__chips"><span>Crimson Frosted</span><span>Clearspring</span><span>+2</span></span></div>
+      <div class="hero__in"></div></div>
+    <div class="body">${secDue()}${secRecents()}${secAnn()}${secMods()}</div>`,
+  hero(k) {
+    const [a, ...r] = TILES[k];
+    const img = x => `<figure class="bt__img${x.cut ? ' cut' : ''}" style="margin:0"><img src="${IMG(x.img)}" alt=""></figure>`;
+    return `<div class="bento"><a class="bt bt--tall" style="--i:0"><span class="bt__kick">✦ This week</span><span class="bt__was">${a.was}</span><span class="bt__now" data-n="${a.n}">${a.n}</span><span class="bt__cap">${a.t}</span>${img(a)}</a>
+      ${r.slice(0, 4).map((x, i) => `<a class="bt" style="--i:${i + 1}"><span class="bt__t">${x.t}</span><span class="bt__n">${num(x.n, x.u)}</span>${img(x)}</a>`).join('')}</div>`;
+  },
+  init(p) {
+    p.style.setProperty('--pat', PAT);
+    const pick = k => { theme(p, k); fill(p.querySelector('.hero__in'), this.hero(k)); };
+    bindTabs(p.querySelector('.tabs'), pick); pick('all');
+  },
+};
+
+V.night = {
+  n: '4', name: 'Night rounds', from: 'From Blinkit “Single mode on”',
+  notes: ['A mode switch in the header: Night ⇄ Day re-themes the whole top and swaps the tiles.', 'Stars and fireflies in moderate yellow, an ember glow in Tertiary; day brings a sun and clouds.', '“Pick up again” groups below, like “Order again”.'],
+  html: () => `<div class="hdr"><div class="fx"><div class="night">${stars(26, 150)}<i class="moon"></i></div><div class="day"><i class="sun"></i></div></div>
+      <div class="who"><div class="who__txt"><div class="who__hi" data-mode-hi>Night shift · ${clock}</div><div class="who__name">Sourav Tambe</div>
+        <div class="who__site"><b>SITE -</b><span>Crimson Frosted, Carnivore Section</span><i class="caret"></i></div></div><span class="av"></span></div>
+      ${search()}</div>
+    <div class="hero"><div class="fx"><div class="night">${stars(18, 300)}${flies(14)}<i class="ember"></i></div><div class="day">${clouds()}</div></div>
+      <div class="hero__row"><div><div class="hero__t" data-mode-t>Night mode on!</div><div class="hero__s" data-mode-s>The zoo sleeps, you don’t. 6 checks left before 6 AM.</div></div>
+      <button class="tgl" aria-pressed="true"><span data-mode-k>NIGHT<br>MODE ON</span><i class="tgl__k"></i></button></div>
+      <div class="tiles"></div></div>
+    <div class="body">${secGroups()}${secPromo()}${secAnn()}${secMods()}</div>`,
+  init(p) {
+    const T = p.querySelector('.hero .tiles');
+    const set = day => {
+      p.dataset.mode = day ? 'day' : 'night';
+      const q = s => p.querySelector(s);
+      q('[data-mode-hi]').textContent = day ? `Day shift · ${clock}` : `Night shift · ${clock}`;
+      q('[data-mode-t]').textContent = day ? 'Day mode on!' : 'Night mode on!';
+      q('[data-mode-s]').textContent = day ? 'Sunny, 31°. 6 lists need you before 9 PM.' : 'The zoo sleeps, you don’t. 6 checks left before 6 AM.';
+      q('[data-mode-k]').innerHTML = day ? 'DAY<br>MODE ON' : 'NIGHT<br>MODE ON';
+      q('.tgl').setAttribute('aria-pressed', String(!day));
+      fill(T, tiles(day ? TILES.all : TILES.night));
+    };
+    p.querySelector('.tgl').addEventListener('click', () => set(p.dataset.mode !== 'day'));
+    set(false);
+  },
+};
+
+V.lights = {
+  n: '5', name: 'Festival lights', from: 'From Blinkit “Shubh Dhanteras”',
+  notes: ['Light strings in Antz colours twinkle across the top; “Change lights” runs a wave through four sets.', 'A Deepavali tab and a seasonal campaign: quiet zones, stress watch, vet on call.', 'Shimmering gold title; the tiles swap with the tab.'],
+  html: () => `<div class="hdr"><div class="fx"><svg class="lights" viewBox="0 0 390 120" preserveAspectRatio="none"><path id="lA" d="M-12 2 Q 110 132 236 10"/><path id="lB" d="M168 -6 Q 300 118 404 24"/></svg></div>
+      <div class="who"><div class="who__txt"><div class="who__hi">${greet}</div><div class="who__name">Sourav Tambe <span class="wx">${mk(DIYA)}20 days</span></div>
+        <div class="who__site"><b>SITE –</b><span>Crimson Frosted Wildlife Estate</span><i class="caret"></i></div></div><span class="av"></span></div>
+      ${search()}${tabs(['all', 'deepavali', 'medical', 'housing', 'diet', 'reports'], 'deepavali')}</div>
+    <div class="hero"><svg class="festoon" viewBox="0 0 422 22" preserveAspectRatio="none"></svg><div class="hero__in"></div></div>
+    <div class="body">${secRecents()}${secAnn()}${secMods()}${secPend()}</div>`,
+  hero: k => `<div class="hero__row"><div><div class="gold">${HERO[k][0]}</div><div class="hero__s">${HERO[k][1]}</div></div><button class="cl">CHANGE<br>LIGHTS</button></div><div class="tiles">${tiles(TILES[k])}</div>`,
+  sets: [['#FFE86E'], ['#FFE86E', '#FA6140', '#00D6C9', '#37BD69'], ['#00D6C9', '#AFEFEB'], ['#FA6140', '#FFBDA8', '#FFE86E']],
+  init(p) {
+    p.style.setProperty('--rang', RANG);
+    const svg = p.querySelector('.lights'), NS = 'http://www.w3.org/2000/svg';
+    const bulbs = [];
+    ['lA', 'lB'].forEach(id => { const path = svg.querySelector('#' + id), L = path.getTotalLength();
+      for (let d = 10; d < L; d += 19) { const pt = path.getPointAtLength(d), c = document.createElementNS(NS, 'circle');
+        c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y + 3.2); c.setAttribute('r', 3.1); c.setAttribute('class', 'bulb'); svg.appendChild(c); bulbs.push(c); } });
+    const fe = p.querySelector('.festoon'); let d = '';
+    for (let x = 0; x < 422; x += 26) d += `${x ? '' : 'M0 2'} Q ${x + 13} 18 ${x + 26} 2`;
+    fe.innerHTML = `<path d="${d}"/>`;
+    for (let x = 13; x < 422; x += 26) { const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', x); c.setAttribute('cy', 12.5); c.setAttribute('r', 2.4); c.setAttribute('class', 'bulb'); fe.appendChild(c); bulbs.push(c); }
+    bulbs.forEach((b, i) => { b.style.setProperty('--d', `${1.2 + (i * 37 % 13) / 10}s`); b.style.setProperty('--dl', `${-(i * 53 % 17) / 10}s`); });
+    let set = 0;
+    const paint = wave => bulbs.forEach((b, i) => { const s = this.sets[set]; b.style.setProperty('--w', wave ? `${i * 18}ms` : '0ms'); b.style.setProperty('--b', s[i % s.length]); });
+    paint(false);
+    const inn = p.querySelector('.hero__in');
+    const pick = k => { fill(inn, this.hero(k)); inn.querySelector('.cl').addEventListener('click', () => { set = (set + 1) % this.sets.length; paint(true); }); };
+    bindTabs(p.querySelector('.tabs'), pick); pick('deepavali');
+  },
+};
+
+/* ─── ambient builders ──────────────────────────────────────────────────── */
+const rnd = (a, b) => a + Math.random() * (b - a);
+function stars(n, h) { let s = ''; for (let i = 0; i < n; i++) s += `<i class="star" style="left:${rnd(2, 98)}%;top:${rnd(2, h)}px;--s:${rnd(1.4, 3).toFixed(1)}px;--c:${i % 3 ? '#FFE86E' : '#AFEFEB'};--d:${rnd(1.4, 3.6).toFixed(1)}s;--dl:${-rnd(0, 3).toFixed(1)}s"></i>`; return s; }
+function flies(n) { let s = ''; for (let i = 0; i < n; i++) s += `<i class="ff" style="--x:${rnd(4, 94)}%;--d:${rnd(6, 11).toFixed(1)}s;--dl:${-rnd(0, 10).toFixed(1)}s"></i>`; return s; }
+function clouds() { return [[30, 70, 26, 0], [120, 54, 34, -11], [200, 84, 30, -20]].map(([t, w, d, dl]) => `<i class="cloud" style="top:${t}px;width:${w}px;--d:${d}s;--dl:${dl}s"></i>`).join(''); }
+
+/* ─── behaviour ─────────────────────────────────────────────────────────── */
+function theme(p, k) { const t = THEME[k]; if (!t) return; for (const [n, v] of Object.entries(t)) p.style.setProperty('--' + n, v); }
+function fill(el, html) { el.innerHTML = html; el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap'); countUp(el); }
+function countUp(root) {
+  root.querySelectorAll('[data-n]').forEach(el => {
+    const raw = el.dataset.n; if (!/^[\d,]+$/.test(raw)) return;
+    const n = +raw.replace(/,/g, ''), t0 = performance.now(), dur = 900;
+    const step = t => { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(n * e).toLocaleString('en-US'); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+function bar(nav) {
+  const on = nav.querySelector('.tab.is-on'), b = nav.querySelector('.tabs__bar'); if (!on) return;
+  const label = on.querySelector('span'), w = Math.max(label.offsetWidth + 12, 34);
+  b.style.width = w + 'px'; b.style.transform = `translateX(${on.offsetLeft + (on.offsetWidth - w) / 2}px)`;
+}
+function bindTabs(nav, onPick) {
+  const all = [...nav.querySelectorAll('.tab')];
+  all.forEach((t, i) => t.addEventListener('click', () => {
+    if (t.classList.contains('is-on')) return;
+    all.forEach(x => x.classList.toggle('is-on', x === t)); bar(nav);
+    nav.scrollTo({ left: t.offsetLeft - (nav.clientWidth - t.offsetWidth) / 2, behavior: 'smooth' });
+    onPick(t.dataset.k, i);
+  }));
+  requestAnimationFrame(() => bar(nav));
+}
+function sticky(p) {
+  const sc = p.querySelector('.scroll'), hdr = p.querySelector('.hdr'), pin = hdr.querySelector('[data-pin]');
+  let cut = 0;
+  const on = () => { const s = sc.scrollTop > 2 && sc.scrollTop >= cut - 1; hdr.classList.toggle('is-stuck', s); p.toggleAttribute('data-stuck', s); };
+  const measure = () => { const sbh = parseFloat(getComputedStyle(p).getPropertyValue('--sbh')) || 0;
+    cut = Math.max(0, pin.offsetTop - sbh - 8); hdr.style.top = -cut + 'px'; on(); };
+  sc.addEventListener('scroll', on, { passive: true });
+  measure(); return measure;
+}
+
+/* ─── mount ─────────────────────────────────────────────────────────────── */
+const stage = document.getElementById('stage'), chips = document.getElementById('chips');
+const keys = Object.keys(V), measures = [];
+keys.forEach((k, i) => {
+  const v = V[k];
+  stage.insertAdjacentHTML('beforeend', `<section class="cell${i ? '' : ' is-cur'}" id="c-${k}"><div class="cap"><div class="cap__n">Concept ${v.n}</div><div class="cap__t">${v.name}</div><div class="cap__from">${v.from}</div><ul class="cap__ul">${v.notes.map(x => `<li>${x}</li>`).join('')}</ul></div>
+    <div class="phone v${v.n}" data-v="${k}"><div class="screen">${sb()}<div class="scroll">${v.html()}</div>${dock()}</div></div></section>`);
+  chips.insertAdjacentHTML('beforeend', `<button class="rv__chip${i ? '' : ' is-on'}" data-k="${k}">${v.n} · ${v.name}</button>`);
+  const p = stage.lastElementChild.querySelector('.phone');
+  v.init(p); measures.push(sticky(p));
+});
+chips.addEventListener('click', e => {
+  const b = e.target.closest('.rv__chip'); if (!b) return;
+  chips.querySelectorAll('.rv__chip').forEach(x => x.classList.toggle('is-on', x === b));
+  stage.querySelectorAll('.cell').forEach(c => c.classList.toggle('is-cur', c.id === 'c-' + b.dataset.k));
+  const narrow = matchMedia('(max-width: 760px)').matches;
+  if (narrow) { measures.forEach(m => m()); document.querySelectorAll('.tabs').forEach(bar); }
+  else document.getElementById('c-' + b.dataset.k).scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
+});
+const remeasure = () => { measures.forEach(m => m()); document.querySelectorAll('.tabs').forEach(bar); };
+document.fonts && document.fonts.ready.then(remeasure);
+addEventListener('resize', remeasure);
+
+/* the search placeholder rolls through names, as on the live home */
+let wi = 0;
+setInterval(() => {
+  wi = (wi + 1) % WORDS.length;
+  document.querySelectorAll('.roll').forEach(r => { const old = r.lastElementChild.textContent; r.innerHTML = `<span class="r-out">${old}</span><span class="r-in">“${WORDS[wi]}”</span>`; });
+  setTimeout(() => document.querySelectorAll('.roll').forEach(r => { r.innerHTML = `<span>“${WORDS[wi]}”</span>`; }), 480);
+}, 2600);
+</script>
+</body>
+</html>

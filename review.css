@@ -439,34 +439,47 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
   html:root[data-review][data-home='v2'] .search__hint { left: 48px; max-width: calc(100% - 64px); font-size: 14px; }
   html:root[data-review][data-home='v2'] :is(.search__hint-lead, .search__cycle) { font-size: 14px; }
 
-  /* ── Recents · 993:2502 (owner, 19 Oct 2026: "build top bar like these"): 12
-     under the search and 16 over the band's foot, so the sky ends 382 down;
-     the tabs and the rail in one card at 70% white, r12, 4 apart; the rail 4
-     inside its own r16 clip; 132 × 158 cards 6 apart at r10; AAID:n 14
-     Medium, the species 12 at 90% ── */
+  /* ── Recents · SOFT PILLS AND A WHITE FOLDER (owner, 19 Oct 2026: "implement
+     the Soft Pills", variant A of mockups/recents-folder-tabs.html, after
+     "background has to white, don't add too much outline, make more
+     premium"). 12 under the search and 16 over the band's foot, as before.
+     The four tabs are soft white pills, 54 tall, 6 apart (the mockup's 8,
+     "pills between, can you reduce little"), each its 20 mark over its 12.5
+     name, at r8 (owner: "corner radius 8 or 6px"). The picked one turns white and opens into the rail as one folder:
+     the band's script draws it as one SVG path (.fav__fold) — white with a
+     soft shadow under the tabs and the cards, a 7% hairline over them — and
+     glides it to the next tab on the tabs' 460ms curve. No bar and no stroke
+     of colour. The rail sits 8 inside the folder; 132 × 158 cards 6 apart at
+     r10; AAID:n 14 Medium, the species 12 at 90% ── */
   html:root[data-review][data-home='v2'] .fav-band:not([hidden]) { padding-top: 12px; padding-bottom: 16px; gap: 0; }
-  html:root[data-review][data-home='v2'] .fav__box { display: flex; flex-direction: column; gap: 4px; min-width: 0; border-radius: 12px; background: rgba(255, 255, 255, .7); }
-  html:root[data-review][data-home='v2'] .fav__head { height: 19px; }
-  html:root[data-review][data-home='v2'] .fav__rail { gap: 6px; margin: 0; padding: 4px; border-radius: 16px; scroll-padding-inline: 4px; }
+  html:root[data-review][data-home='v2'] .fav__box { position: relative; isolation: isolate; display: flex; flex-direction: column; gap: 0; min-width: 0; border-radius: 0; background: none; }
+  html:root[data-review][data-home='v2'] .fav__head { position: relative; z-index: 1; height: auto; }
+  html:root[data-review][data-home='v2'] .fav__rail { position: relative; z-index: 1; gap: 6px; margin: 0; padding: 8px; border-radius: 16px; scroll-padding-inline: 8px; }
   html:root[data-review][data-home='v2'] .fav__card { width: 132px; flex-basis: 132px; height: 158px; padding: 12px; border-radius: 10px; background: #EEF5F6; }
-  /* the tabs · 993:2503: a 49 row on a .05 hairline, 29 apart; each 16 over,
-     12 under and 12 a side. The picked one hugs its 18 mark and its 14 Medium
-     name, 4 apart, in OnPrimaryContainer over a 2px bar on the hairline; the
-     others are a 20 mark in OnSurfaceVariant and share the rest (the widths:
-     place(), in the band's script). One clock for all of it, 460ms on the
-     tabs' settle curve, so the row, the names, the marks and the bar move as one */
-  html:root[data-review][data-home='v2'] .fav__tabs { --tab-hug: 1; gap: 29px; height: 49px; align-items: flex-start; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .05); }
-  html:root[data-review][data-home='v2'] .fav__tab { --tab-gap: 4px; --tab-mark: 18px; flex: none; width: 56.67px; height: 48px; padding: 16px 12px 12px; overflow: hidden;
-    color: var(--c-on-surface-var, #44544A); font: 500 14px/17px Inter, var(--font); letter-spacing: .1px;
-    transition: width 460ms cubic-bezier(.32, .72, 0, 1), color 260ms ease; }
-  html:root[data-review][data-home='v2'] .fav__tab svg { width: 20px; height: 20px; transition: width 460ms cubic-bezier(.32, .72, 0, 1), height 460ms cubic-bezier(.32, .72, 0, 1); }
-  html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] { color: var(--c-on-primary-ctr, #1F515B); }
-  html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] svg { width: 18px; height: 18px; }
-  html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] .fav__tabl { max-width: var(--lw, 120px); font-weight: 500; }
-  html:root[data-review][data-home='v2'] .fav__tabbar { height: 2px; border-radius: 0; background: var(--c-on-primary-ctr, #1F515B);
-    transition: transform 460ms cubic-bezier(.32, .72, 0, 1), width 460ms cubic-bezier(.32, .72, 0, 1); }
+  html:root[data-review][data-home='v2'] .fav__tabs { --tab-hug: 0; gap: 6px; height: auto; align-items: flex-end; box-shadow: none; }
+  html:root[data-review][data-home='v2'] .fav__tab { --tab-gap: 6px; flex: 1 1 0; width: auto; min-width: 0; height: 54px; margin-bottom: 8px; padding: 0 4px; overflow: visible;
+    flex-direction: column; justify-content: center; gap: 6px; border-radius: 8px; background-color: rgba(255, 255, 255, .55);
+    color: rgba(68, 84, 74, .88); font: 500 12.5px/1 Inter, var(--font); letter-spacing: .1px;
+    transition: background-color .3s ease .14s, color .26s ease; }   /* the pill comes back once the folder has left it */
+  html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] { color: var(--c-on-primary-ctr, #1F515B); background-color: transparent; transition: background-color .1s, color .26s ease; }
+  html:root[data-review][data-home='v2'] .fav__tab:focus-visible { outline-offset: -3px; border-radius: 8px; }
+  html:root[data-review][data-home='v2'] .fav__tab svg { width: 20px; height: 20px; transition: none; }
+  html:root[data-review][data-home='v2'] .fav__tabl { max-width: none; margin: 0; opacity: 1; transition: none; }
+  html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] .fav__tabl { max-width: none; margin: 0; font-weight: 600; }
+  html:root[data-review][data-home='v2'] .fav__tabbar { display: none; }
+  html:root[data-review][data-home='v2'] .fav__fold { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  html:root[data-review][data-home='v2'] .fav__fold--fill { z-index: 0; filter: drop-shadow(0 1px 2px rgba(31, 65, 91, .06)) drop-shadow(0 10px 22px rgba(31, 65, 91, .09)); }
+  html:root[data-review][data-home='v2'] .fav__fold--fill path { fill: #fff; }
+  html:root[data-review][data-home='v2'] .fav__fold--line { z-index: 2; }   /* over the rail, so a card scrolled to the edge never covers it */
+  html:root[data-review][data-home='v2'] .fav__fold--line path { fill: none; stroke: rgba(31, 81, 91, .07); stroke-width: 1; stroke-linejoin: round; }
+  /* under the climate header's dark sky the soft pills go glassy and their ink white; the folder stays white */
+  html:root[data-review][data-home='v2'].has-wsky[data-sky-tone='dark'] .fav__tab:not([aria-selected='true']) { background-color: rgba(255, 255, 255, .18); color: rgba(255, 255, 255, .88); }
   @media (prefers-reduced-motion: reduce) {
-    html:root[data-review][data-home='v2'] :is(.fav__tab, .fav__tab svg, .fav__tabbar) { transition: none; }
+    html:root[data-review][data-home='v2'] .fav__tab { transition: none; }
+  }
+  /* a 320–359 phone: a quarter is under 70, so "Bookmarks" steps down to fit its pill */
+  @media (max-width: 359px) {
+    html:root[data-review][data-home='v2'] .fav__tab { padding: 0 2px; font-size: 11px; letter-spacing: 0; }
   }
   html:root[data-review][data-home='v2'] .fav__txt { gap: 2px; }
   html:root[data-review][data-home='v2'] .fav__name { font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; text-shadow: none; }
@@ -1274,6 +1287,7 @@ html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__head { he
    put; the bar then spans the name (place(), in the band's script). */
 html:root[data-review][data-home='v2'] .fav-band.has-tabs .fav__head { display: flex; align-items: center; height: auto; min-height: 22px; }
 .fav__box { display: contents; }   /* the phone's card around the tabs and the rail (993:2564, the phone block) */
+.fav__fold { display: none; }      /* the phone's white folder (the phone block); nothing from 744 up */
 .fav-band.has-tabs .fav__edit { display: none; }
 .fav__tabs { flex: 1; min-width: 0; position: relative; display: flex; margin: 0; box-shadow: inset 0 -1px 0 rgba(31, 65, 91, .14); }
 .fav__tab { --tab-gap: 8px; position: relative; z-index: 1; flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; height: 52px; padding: 0 3px 6px; border: 0; background: none;

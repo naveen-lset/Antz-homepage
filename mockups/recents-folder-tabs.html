@@ -1,0 +1,215 @@
+<!doctype html>
+<!--
+  RECENTS · OUTLINED FOLDER TABS (owner, 19 Oct 2026)
+  From the header concepts the owner kept one idea: Zepto's store pills, where
+  the picked pill opens into the panel under it like a folder tab. They want it
+  for the Recents · Favourites · Bookmarks · Folders card, "instead full colour
+  give outlined version", with the picked tab and its cards inside one outline.
+
+  Each phone is the live ../index.html. Only the Recents card is restyled, by
+  the CSS and the outline script below, which are put into the frame once the
+  card has mounted. The live mountAnimals still runs the tabs and the cards.
+
+    A  Soft pills   the other tabs are soft white pills; the picked one opens into the cards
+    B  Open tabs    only the white folder is drawn; the other tabs are their mark and name
+    C  Icons only   the picked tab hugs its name; the others keep only their icon (today's rule)
+
+  Round 2 (owner, same day: "Background has to white. Don't add too much
+  outline. Make more premium"): the folder is solid white with a soft shadow
+  and a 7% hairline instead of the 1.5px #1F515B line, and no tab has a line.
+
+  The outline is one SVG path: the picked tab's top corners, two inverse
+  fillets where it meets the panel, and the panel's corners. When the picked
+  tab changes, the path glides to the new tab on the tabs' own 460 ms curve,
+  cubic-bezier(.32, .72, 0, 1). Colours are the live ones: #1F515B
+  (OnPrimaryContainer) for the picked ink, #44544A (OnSurfaceVariant) for
+  the rest, white for the folder.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Recents folder tabs · ANTZ</title>
+<link rel="icon" href="../assets/icon/hero-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { display: flex; flex-direction: column; background: #EFF5F2; font: 14px/1.4 Inter, system-ui, sans-serif; color: #1F415B; -webkit-font-smoothing: antialiased; }
+.bar { flex: none; display: flex; align-items: center; gap: 16px; min-height: 60px; padding: 10px 28px; border-bottom: 1px solid #DFE8E4; background: rgba(255, 255, 255, .6); }
+.bar__t { font-weight: 700; font-size: 16px; white-space: nowrap; }
+.bar__s { font-size: 12.5px; color: #7A8684; }
+.bar nav { display: flex; gap: 6px; margin-left: auto; }
+.bar button { flex: none; height: 34px; padding: 0 14px; border: 0; border-radius: 17px; background: #fff; box-shadow: inset 0 0 0 1px #DFE8E4;
+  font: 600 13px/34px Inter, sans-serif; color: #44544A; cursor: pointer; white-space: nowrap; }
+.bar button[aria-pressed='true'] { background: #1F515B; color: #fff; box-shadow: none; }
+.stage { flex: 1; min-height: 0; display: flex; justify-content: center; gap: 40px; padding: 22px 24px 0; }
+.cell { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: 0; }
+.cap { width: 390px; text-align: left; }
+.cap b { display: block; font-size: 15px; }
+.cap small { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.4; color: #7A8684; }
+.fit { width: calc(410px * var(--k, 1)); }
+/* zoom, not a scale transform: under a transform the live page's fixed header
+   escapes the round corners and its stuck-search observer never sees 100% */
+.phone { zoom: var(--k, 1); width: 410px; height: 864px; padding: 10px; border-radius: 56px; background: #0E0E0E; box-shadow: inset 0 0 0 2px #2B2B2B, 0 30px 60px -30px rgba(31, 65, 91, .45); }
+/* clip-path too: the live page's closed profile drawer is its own layer and slips past a plain radius */
+.scr { width: 390px; height: 844px; border-radius: 46px; overflow: hidden; clip-path: inset(0 round 46px); background: #E6F6F5; }
+.phone iframe { display: block; width: 100%; height: 100%; border: 0; }
+@media (max-width: 900px) {
+  .bar { padding: 8px 10px; }
+  .bar > div { display: none; }
+  .bar nav { margin: 0; overflow-x: auto; }
+  .stage { padding: 0; gap: 0; }
+  .cell { display: none; flex: 1; }
+  .cell.is-cur { display: flex; }
+  .cap { display: none; }
+  .fit, .phone { zoom: 1; width: 100%; height: 100%; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+  .scr { width: 100%; height: 100%; border-radius: 0; clip-path: none; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div>
+    <div class="bar__t">Recents · folder tabs</div>
+    <div class="bar__s">The live home in each phone; only the Recents card changes. Tap the tabs.</div>
+  </div>
+  <nav id="pick"></nav>
+</header>
+<main class="stage" id="stage"></main>
+
+<script>
+const VARIANTS = [
+  { id: 'a', name: 'A · Soft pills', note: 'The other tabs are soft white pills. The picked one turns white and opens into the cards as one folder.' },
+  { id: 'b', name: 'B · Open tabs', note: 'Only the white folder is drawn; the other tabs are just their mark and name on the sky.' },
+  { id: 'c', name: 'C · Icons only', note: 'The picked tab shows its name; the others keep only their icon, as on the live home today.' },
+]
+
+/* ── what goes into each frame ─────────────────────────────────────────── */
+const P = "html:root[data-review][data-home='v2'][data-ft]"
+const AB = "html:root[data-review][data-home='v2']:is([data-ft='a'], [data-ft='b'])"
+const C = "html:root[data-review][data-home='v2'][data-ft='c']"
+const EASE = 'cubic-bezier(.32, .72, 0, 1)'
+const CSS = `
+@media (max-width: 743px) {
+  /* the card: no fill of its own any more; the outline draws the picked tab and the panel as one shape */
+  ${P} .fav__box { position: relative; isolation: isolate; gap: 0; border-radius: 0; background: none; }
+  ${P} .fav__head { position: relative; z-index: 1; height: auto; }
+  ${P} .fav__tabs { gap: 8px; height: auto; align-items: flex-end; box-shadow: none; }
+  ${P} .fav__tabbar { display: none; }
+  ${P} .fav__tab { height: 54px; margin-bottom: 8px; padding: 0 4px; border-radius: 14px; overflow: visible; color: rgba(68, 84, 74, .88);
+    background: rgba(255, 255, 255, .55); box-shadow: none;
+    transition: background-color .3s ease .14s, box-shadow .3s ease .14s, color .26s ease; }
+  ${P} .fav__tab[aria-selected='true'] { color: #1F515B; background-color: transparent; box-shadow: none; transition: background-color .1s, box-shadow .1s, color .26s ease; }
+  ${P} .fav__tab:focus-visible { outline-offset: -3px; border-radius: 14px; }
+  ${P} .fav__tab svg { width: 20px; height: 20px; transition: none; }
+  ${P} .fav__rail { position: relative; z-index: 1; margin: 0; padding: 8px; border-radius: 16px; scroll-padding-inline: 8px; }
+  ${P} .ft-svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  ${P} .ft-fill { z-index: 0; filter: drop-shadow(0 1px 2px rgba(31, 65, 91, .06)) drop-shadow(0 10px 22px rgba(31, 65, 91, .09)); }
+  ${P} .ft-fill path { fill: #fff; }
+  ${P} .ft-line { z-index: 2; }
+  ${P} .ft-line path { fill: none; stroke: rgba(31, 81, 91, .07); stroke-width: 1; stroke-linejoin: round; }
+
+  /* A and B: four equal pills, the mark over the name (Zepto's stores) */
+  ${AB} .fav__tabs { --tab-hug: 0; }
+  ${AB} .fav__tab { flex: 1 1 0; width: auto !important; min-width: 0; flex-direction: column; justify-content: center; gap: 6px; font: 500 12.5px/1 Inter, sans-serif; letter-spacing: .1px; }
+  ${AB} .fav__tabl { max-width: none; margin: 0; opacity: 1; transition: none; }
+  ${AB} .fav__tab[aria-selected='true'] .fav__tabl { max-width: none; margin: 0; font-weight: 600; }
+  html:root[data-review][data-home='v2'][data-ft='b'] .fav__tab:not([aria-selected='true']) { background-color: transparent; }
+
+  /* C: the picked tab hugs its mark and name, the other three share the rest (place(), --tab-hug) */
+  ${C} .fav__tabs { --tab-hug: 1; }
+  ${C} .fav__tab { --tab-gap: 6px; --tab-mark: 20px; flex: none; flex-direction: row; justify-content: center; padding: 0 14px; font: 500 14px/17px Inter, sans-serif;
+    transition: width 460ms ${EASE}, background-color .3s ease .14s, box-shadow .3s ease .14s, color .26s ease; }
+  ${C} .fav__tab[aria-selected='true'] { transition: width 460ms ${EASE}, background-color .1s, box-shadow .1s, color .26s ease; }
+  ${C} .fav__tab[aria-selected='true'] .fav__tabl { font-weight: 600; }
+}`
+
+function inject(frame, v) {
+  const win = frame.contentWindow, doc = frame.contentDocument
+  doc.documentElement.dataset.ft = v
+  const st = doc.createElement('style'); st.textContent = CSS; doc.head.append(st)
+  const box = doc.querySelector('.fav__box'), tabs = box.querySelector('.fav__tabs'), rail = box.querySelector('.fav__rail')
+  box.querySelectorAll('.fav__fold').forEach((el) => el.remove())   // variant A is now the live home's own; this page draws its own folder over each variant
+  const NS = 'http://www.w3.org/2000/svg'
+  const layer = (cls) => { const s = doc.createElementNS(NS, 'svg'), p = doc.createElementNS(NS, 'path'); s.setAttribute('class', `ft-svg ${cls}`); s.setAttribute('aria-hidden', 'true'); s.append(p); return [s, p] }
+  const [sf, pf] = layer('ft-fill'), [sl, pl] = layer('ft-line')
+  box.prepend(sf); box.append(sl)
+
+  /* the picked tab and the panel under it, as one closed path */
+  const geo = () => {
+    const b = box.getBoundingClientRect(), t = tabs.querySelector('[aria-selected="true"]').getBoundingClientRect(), r = rail.getBoundingClientRect()
+    return { W: b.width, B: b.height, T: t.top - b.top, H: r.top - b.top, x: t.left - b.left, w: t.width }
+  }
+  const clamp = (n, a, b) => Math.min(b, Math.max(a, n))
+  const shape = ({ W, B, T, H, x, w }) => {
+    const s = .75, L = s, R = W - s, Tt = T + s, Bt = B - s, r = 14, P = 16, f = 8
+    const x1 = Math.max(L, x + s), x2 = Math.min(R, x + w - s)
+    const fl = clamp((x1 - L) / 2, 0, f), Pl = clamp(x1 - L - fl, 0, P)    // a tab at the card's edge runs straight down
+    const fr = clamp((R - x2) / 2, 0, f), Pr = clamp(R - x2 - fr, 0, P)
+    return `M${L} ${Bt - P}L${L} ${H + Pl}A${Pl} ${Pl} 0 0 1 ${L + Pl} ${H}L${x1 - fl} ${H}A${fl} ${fl} 0 0 0 ${x1} ${H - fl}` +
+      `L${x1} ${Tt + r}A${r} ${r} 0 0 1 ${x1 + r} ${Tt}L${x2 - r} ${Tt}A${r} ${r} 0 0 1 ${x2} ${Tt + r}` +
+      `L${x2} ${H - fr}A${fr} ${fr} 0 0 0 ${x2 + fr} ${H}L${R - Pr} ${H}A${Pr} ${Pr} 0 0 1 ${R} ${H + Pr}` +
+      `L${R} ${Bt - P}A${P} ${P} 0 0 1 ${R - P} ${Bt}L${L + P} ${Bt}A${P} ${P} 0 0 1 ${L} ${Bt - P}Z`
+  }
+  let at = null, run = 0
+  const draw = (g) => { at = g; const d = shape(g); pf.setAttribute('d', d); pl.setAttribute('d', d) }
+
+  /* the tabs' settle curve, cubic-bezier(.32, .72, 0, 1), solved for x */
+  const ease = (t) => { let u = t
+    for (let i = 0; i < 8; i++) { const x = 3 * (1 - u) ** 2 * u * .32 + 3 * (1 - u) * u * u * 0 + u ** 3 - t, dx = 3 * (1 - u) ** 2 * .32 + 6 * (1 - u) * u * (0 - .32) + 3 * u * u * (1 - 0)
+      if (Math.abs(dx) < 1e-6) break; u = clamp(u - x / dx, 0, 1) }
+    return 3 * (1 - u) ** 2 * u * .72 + 3 * (1 - u) * u * u * 1 + u ** 3 }
+  const still = () => win.matchMedia('(prefers-reduced-motion: reduce)').matches
+  /* glide from where the folder is to where the picked tab is — read every
+     frame, so C's tabs, which change width on the same curve, are followed */
+  const glide = () => {
+    if (!at || still()) return draw(geo())
+    const from = at, t0 = win.performance.now(), id = ++run
+    const step = (now) => { if (id !== run) return
+      const k = Math.min(1, (now - t0) / 460), e = ease(k), g = geo()
+      draw({ ...g, x: from.x + (g.x - from.x) * e, w: from.w + (g.w - from.w) * e })
+      if (k < 1) win.requestAnimationFrame(step) }
+    win.requestAnimationFrame(step)
+  }
+  new win.MutationObserver(glide).observe(tabs, { subtree: true, attributes: true, attributeFilter: ['aria-selected'] })
+  new win.ResizeObserver(() => { run++; draw(geo()) }).observe(box)
+  win.dispatchEvent(new win.Event('resize'))            // the live place() measures the tabs again in their new form
+  win.requestAnimationFrame(() => draw(geo()))
+  doc.fonts?.ready.then(() => { win.dispatchEvent(new win.Event('resize')); draw(geo()) })
+}
+
+/* ── the page ──────────────────────────────────────────────────────────── */
+const stage = document.getElementById('stage'), pick = document.getElementById('pick')
+VARIANTS.forEach((v, i) => {
+  stage.insertAdjacentHTML('beforeend', `<figure class="cell${i ? '' : ' is-cur'}" data-ft="${v.id}"><figcaption class="cap"><b>${v.name}</b><small>${v.note}</small></figcaption>
+    <div class="fit"><div class="phone"><div class="scr"><iframe title="${v.name}" src="../index.html?v=2"></iframe></div></div></div></figure>`)
+  pick.insertAdjacentHTML('beforeend', `<button type="button" data-ft="${v.id}" aria-pressed="${!i}">${v.name}</button>`)
+  const frame = stage.lastElementChild.querySelector('iframe')
+  frame.addEventListener('load', () => {
+    const win = frame.contentWindow
+    let tries = 0
+    const wait = () => { const box = frame.contentDocument.querySelector('.fav__box .fav__tab[aria-selected="true"]')
+      /* the live home jumps 208px down on load (a known bug); put it back at the top. Zoomed, its search row's
+         observer (threshold 1) never sees the row whole and calls it stuck, so that is cleared at the top too */
+      const top = () => { win.scrollTo(0, 0); if (!win.scrollY) frame.contentDocument.querySelector('.search-row')?.classList.remove('is-stuck') }
+      if (box) { inject(frame, v.id); [300, 1200, 2600].forEach((ms) => setTimeout(top, ms)) }
+      else if (tries++ < 100) setTimeout(wait, 100) }
+    wait()
+  })
+})
+pick.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  for (const x of pick.children) x.setAttribute('aria-pressed', x === b)
+  for (const c of stage.children) c.classList.toggle('is-cur', c.dataset.ft === b.dataset.ft)
+  if (!matchMedia('(max-width: 900px)').matches) stage.querySelector(`[data-ft="${b.dataset.ft}"] iframe`).focus()
+})
+/* three phones side by side, scaled to the window's height */
+const fit = () => { const cap = stage.querySelector('.cap').offsetHeight || 0
+  const k = Math.min(1, (stage.clientHeight - 22 - cap - 14 - 16) / 864); document.documentElement.style.setProperty('--k', Math.max(.5, k).toFixed(3)) }
+addEventListener('resize', fit); fit()
+</script>
+</body>
+</html>
