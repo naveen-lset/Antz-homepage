@@ -424,7 +424,10 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
   html:root[data-review][data-home='v2'] .greeting { gap: 4px; }
   html:root[data-review][data-home='v2'] .greeting__word { font-size: 12px; font-weight: 400; line-height: 15px; color: #7A8684; }
   html:root[data-review][data-home='v2'] :is(.greeting__name, #greetName) { font-size: 16px; font-weight: 500; line-height: normal; letter-spacing: 0; color: #1F415B; }
-  html:root[data-review][data-home='v2'] .greeting__wave { font-size: 20px; font-weight: 600; letter-spacing: -.2px; margin-left: 2.4px; }
+  html:root[data-review][data-home='v2'] .greeting__wave { font-size: 20px; font-weight: 600; letter-spacing: -.2px; margin-left: 0; }
+  /* 993:1734: the name and the wave a 20 row, 2.4 apart — a flex row drops the
+     markup's space before the wave, which had set it 4 further out */
+  html:root[data-review][data-home='v2'] .greeting__name { display: flex; align-items: center; gap: 2.4px; height: 20px; white-space: nowrap; }
   html:root[data-review][data-home='v2'] .header-actions .wx { gap: 0 4px; }
   html:root[data-review][data-home='v2'] .header-actions .wx__t { font-size: 16px; font-weight: 500; line-height: normal; color: #4A5550; }
   html:root[data-review][data-home='v2'] .header-actions .icon-btn--bell { background: none; box-shadow: none; }
@@ -436,12 +439,35 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
   html:root[data-review][data-home='v2'] .search__hint { left: 48px; max-width: calc(100% - 64px); font-size: 14px; }
   html:root[data-review][data-home='v2'] :is(.search__hint-lead, .search__cycle) { font-size: 14px; }
 
-  /* ── Recently viewed · 903:48: 16 over, 20 under, 12 under the head; 132 × 158
-     cards 8 apart at r12; AAID:n 14 Medium, the species 12 at 90% ── */
-  html:root[data-review][data-home='v2'] .fav-band:not([hidden]) { padding-top: 16px; padding-bottom: 20px; gap: 12px; }
+  /* ── Recents · 993:2502 (owner, 19 Oct 2026: "build top bar like these"): 12
+     under the search and 16 over the band's foot, so the sky ends 382 down;
+     the tabs and the rail in one card at 70% white, r12, 4 apart; the rail 4
+     inside its own r16 clip; 132 × 158 cards 6 apart at r10; AAID:n 14
+     Medium, the species 12 at 90% ── */
+  html:root[data-review][data-home='v2'] .fav-band:not([hidden]) { padding-top: 12px; padding-bottom: 16px; gap: 0; }
+  html:root[data-review][data-home='v2'] .fav__box { display: flex; flex-direction: column; gap: 4px; min-width: 0; border-radius: 12px; background: rgba(255, 255, 255, .7); }
   html:root[data-review][data-home='v2'] .fav__head { height: 19px; }
-  html:root[data-review][data-home='v2'] .fav__rail { gap: 8px; }
-  html:root[data-review][data-home='v2'] .fav__card { width: 132px; flex-basis: 132px; height: 158px; padding: 12px; border-radius: 12px; }
+  html:root[data-review][data-home='v2'] .fav__rail { gap: 6px; margin: 0; padding: 4px; border-radius: 16px; scroll-padding-inline: 4px; }
+  html:root[data-review][data-home='v2'] .fav__card { width: 132px; flex-basis: 132px; height: 158px; padding: 12px; border-radius: 10px; background: #EEF5F6; }
+  /* the tabs · 993:2503: a 49 row on a .05 hairline, 29 apart; each 16 over,
+     12 under and 12 a side. The picked one hugs its 18 mark and its 14 Medium
+     name, 4 apart, in OnPrimaryContainer over a 2px bar on the hairline; the
+     others are a 20 mark in OnSurfaceVariant and share the rest (the widths:
+     place(), in the band's script). One clock for all of it, 460ms on the
+     tabs' settle curve, so the row, the names, the marks and the bar move as one */
+  html:root[data-review][data-home='v2'] .fav__tabs { --tab-hug: 1; gap: 29px; height: 49px; align-items: flex-start; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .05); }
+  html:root[data-review][data-home='v2'] .fav__tab { --tab-gap: 4px; --tab-mark: 18px; flex: none; width: 56.67px; height: 48px; padding: 16px 12px 12px; overflow: hidden;
+    color: var(--c-on-surface-var, #44544A); font: 500 14px/17px Inter, var(--font); letter-spacing: .1px;
+    transition: width 460ms cubic-bezier(.32, .72, 0, 1), color 260ms ease; }
+  html:root[data-review][data-home='v2'] .fav__tab svg { width: 20px; height: 20px; transition: width 460ms cubic-bezier(.32, .72, 0, 1), height 460ms cubic-bezier(.32, .72, 0, 1); }
+  html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] { color: var(--c-on-primary-ctr, #1F515B); }
+  html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] svg { width: 18px; height: 18px; }
+  html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] .fav__tabl { max-width: var(--lw, 120px); font-weight: 500; }
+  html:root[data-review][data-home='v2'] .fav__tabbar { height: 2px; border-radius: 0; background: var(--c-on-primary-ctr, #1F515B);
+    transition: transform 460ms cubic-bezier(.32, .72, 0, 1), width 460ms cubic-bezier(.32, .72, 0, 1); }
+  @media (prefers-reduced-motion: reduce) {
+    html:root[data-review][data-home='v2'] :is(.fav__tab, .fav__tab svg, .fav__tabbar) { transition: none; }
+  }
   html:root[data-review][data-home='v2'] .fav__txt { gap: 2px; }
   html:root[data-review][data-home='v2'] .fav__name { font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; text-shadow: none; }
   html:root[data-review][data-home='v2'] .fav__idsep { font-size: 0; }
@@ -453,7 +479,7 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
      a .5 #FFE86E edge on rgba(252,244,174,.5); "AUDIT SCORE 68%" 12/600; a
      site 12 Regular #44544A with its figure 12/600 #250E01, 8 to the photo,
      13 to the rule ── */
-  html:root[data-review][data-home='v2'] .hstrip { margin-top: 16px; border-radius: 12px; box-shadow: inset 0 0 0 .5px #FFE86E; }
+  html:root[data-review][data-home='v2'] .hstrip { margin-top: 14px; border-radius: 12px; box-shadow: inset 0 0 0 .5px #FFE86E; }   /* 993:1828: 14 under the sky's foot (455 − 441) */
   html:root[data-review][data-home='v2'] .hstrip__lane { height: 42px; border-radius: 12px; }
   /* THE OUTLINE RUNS (owner, 6 Oct 2026: "here outline has to animate" — the
      running light, picked over a pulse and a one-off draw). The .5 #FFE86E
@@ -1247,6 +1273,7 @@ html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__head { he
    and spreads into the empty room beside its neighbours' marks, which stay
    put; the bar then spans the name (place(), in the band's script). */
 html:root[data-review][data-home='v2'] .fav-band.has-tabs .fav__head { display: flex; align-items: center; height: auto; min-height: 22px; }
+.fav__box { display: contents; }   /* the phone's card around the tabs and the rail (993:2564, the phone block) */
 .fav-band.has-tabs .fav__edit { display: none; }
 .fav__tabs { flex: 1; min-width: 0; position: relative; display: flex; margin: 0; box-shadow: inset 0 -1px 0 rgba(31, 65, 91, .14); }
 .fav__tab { --tab-gap: 8px; position: relative; z-index: 1; flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; height: 52px; padding: 0 3px 6px; border: 0; background: none;

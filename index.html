@@ -13914,7 +13914,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261019b">
+<link rel="stylesheet" href="review.css?v=20261019c">
 </head>
 
 <style>
@@ -43440,7 +43440,7 @@ function mountAnimals(root) {
     back: TSV('<path d="M19 12H5M11 6l-6 6 6 6"/>'),
   }
   const TABS = [
-    { id: 'recent', label: 'Recent', noun: 'animals' },
+    { id: 'recent', label: 'Recents', noun: 'animals' },
     { id: 'fav', label: 'Favourites', noun: 'favourites' },
     { id: 'book', label: 'Bookmarks', noun: 'bookmarks' },
     { id: 'folders', label: 'Folders', noun: 'folders' },
@@ -43512,21 +43512,45 @@ function mountAnimals(root) {
   tabs.innerHTML = `<span class="fav__tabbar" aria-hidden="true"></span>` + TABS.map((t) =>
     `<button type="button" class="fav__tab" role="tab" data-tab="${t.id}" aria-controls="favRail" aria-label="${t.label}" title="${t.label}">${TI[t.id]}<span class="fav__tabl" aria-hidden="true">${t.label}</span></button>`).join('')
   head.append(tabs); rail.id = 'favRail'; rail.setAttribute('role', 'tabpanel')
+  /* the tabs and the rail share one card on a phone (Figma 993:2564); from
+     744 up the box is display: contents and changes nothing */
+  const box = document.createElement('div'); box.className = 'fav__box'
+  head.before(box); box.append(head, rail)
   const bar = tabs.querySelector('.fav__tabbar')
   const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches
   const anim = (el, kf, o) => (still() || !el.animate ? null : el.animate(kf, { fill: 'both', ...o }))
   const mark = () => { for (const b of tabs.querySelectorAll('.fav__tab')) { const on = b.dataset.tab === cur; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1 } }
   /* the bar spans the picked tab — or its mark and name, where those are wider
      (a phone's quarter under Favourites or Bookmarks), centred under them and
-     kept inside the row. The name's full width is read even while it opens. */
+     kept inside the row. The name's full width is read even while it opens.
+     ON A PHONE THE PICKED TAB HUGS ITS NAME (Figma 993:2503; owner, 19 Oct
+     2026: "build top bar like these — it has to animate smoothly"): it is
+     12 + its mark + 4 + its name + 12 wide, and the other three share what is
+     left, 29 apart (--tab-hug, review.css). Every width is set here in px, so
+     the tabs, the names, the marks and the bar run on one clock and one curve:
+     a flex basis cannot be tweened, a width can. */
   const place = (instant) => {
-    const b = tabs.querySelector(`[data-tab="${cur}"]`); if (!b.offsetWidth) return
-    const l = b.querySelector('.fav__tabl'), gap = parseFloat(getComputedStyle(b).getPropertyValue('--tab-gap')) || 0
-    const w = Math.max(b.offsetWidth, b.querySelector('svg').getBoundingClientRect().width + gap + l.scrollWidth + 12)
-    const x = Math.min(Math.max(0, b.offsetLeft + (b.offsetWidth - w) / 2), tabs.clientWidth - w)
-    if (instant) bar.style.transition = 'none'
+    const b = tabs.querySelector(`[data-tab="${cur}"]`); if (!tabs.clientWidth) return
+    const all = [...tabs.querySelectorAll('.fav__tab')]
+    const moving = [bar, ...all, ...tabs.querySelectorAll('.fav__tabl, .fav__tab svg')]
+    if (instant) for (const el of moving) el.style.transition = 'none'
+    for (const t of all) { const l = t.querySelector('.fav__tabl'); l.style.setProperty('--lw', `${Math.ceil(l.scrollWidth)}px`) }
+    let w, x
+    if (getComputedStyle(tabs).getPropertyValue('--tab-hug').trim() === '1') {
+      const cs = getComputedStyle(b), gap = parseFloat(getComputedStyle(tabs).columnGap) || 0
+      w = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + (parseFloat(cs.getPropertyValue('--tab-mark')) || 18) +
+        (parseFloat(cs.getPropertyValue('--tab-gap')) || 0) + Math.ceil(b.querySelector('.fav__tabl').scrollWidth)
+      const rest = (tabs.clientWidth - w - gap * (all.length - 1)) / (all.length - 1)
+      let at = 0
+      for (const t of all) { const tw = t === b ? w : rest; if (t === b) x = at; t.style.width = `${tw}px`; at += tw + gap }
+    } else {
+      for (const t of all) t.style.width = ''
+      const l = b.querySelector('.fav__tabl'), gap = parseFloat(getComputedStyle(b).getPropertyValue('--tab-gap')) || 0
+      w = Math.max(b.offsetWidth, b.querySelector('svg').getBoundingClientRect().width + gap + l.scrollWidth + 12)
+      x = Math.min(Math.max(0, b.offsetLeft + (b.offsetWidth - w) / 2), tabs.clientWidth - w)
+    }
     bar.style.width = `${w}px`; bar.style.transform = `translateX(${x}px)`
-    if (instant) { bar.offsetWidth; bar.style.transition = '' }
+    if (instant) { bar.offsetWidth; for (const el of moving) el.style.transition = '' }
   }
   const draw = () => { rail.innerHTML = railHTML(); rail.scrollLeft = 0; mark(); place(true) }
   const onScreen = (el) => { const a = el.getBoundingClientRect(), b = rail.getBoundingClientRect(); return a.right > b.left - 4 && a.left < b.right + 4 }
@@ -43553,6 +43577,9 @@ function mountAnimals(root) {
     e.preventDefault(); go(TABS[i].id); tabs.querySelector(`[data-tab="${TABS[i].id}"]`)?.focus()
   })
   addEventListener('resize', () => place(true))
+  /* the names are measured: measure again once Inter has arrived, and when the row's width changes */
+  document.fonts?.ready.then(() => place(true))
+  if ('ResizeObserver' in window) new ResizeObserver(() => place(true)).observe(tabs)
   /* what is not part of this preview says so, in the page's own notice */
   const tip = document.createElement('div'); tip.className = 'mview__toast is-page'; tip.setAttribute('role', 'status'); document.body.append(tip)
   let tipT = 0

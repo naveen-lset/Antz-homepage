@@ -216,3 +216,55 @@ They use existing layouts in different module gradients (gold, cyan, deep teal, 
   - review Natality's widgets in the Add Module sheet;
   - review the Hospital module pages;
   - answer the "same level" and side-menu questions above.
+
+# Session 19 Oct 2026: Figma push and phone top bar
+
+## Run it
+`python3 -m http.server 8080` from `/Users/naveen/Home Page`, then open <http://localhost:8080/Antz-Selected-Modules/?v=2> at phone width (390 in the browser's device toolbar).
+
+## Earlier the same day (commit ad3947a)
+- Recently viewed became four tabs (Recent / Favourites / Bookmarks / Folders). This is `mountAnimals` in `index.html`.
+- The Your Modules sheet now shows only the owner's 20 modules.
+- Bottom row: Modules wears the grid mark, Quick Actions the bolt.
+- These were deployed at the time, but committed only now.
+
+## Pushed to Figma
+- **File:** CNhiaOGCLdnlNxj7x2Ohrd.
+- **Frame:** `977:581` "Mobile · Home (19 Oct)" at (2667, −552). It is the live phone home, 390 × 3221: the top-of-page state with the dock pinned to the bottom.
+- **Build:** 433 editable layers, made from Chrome's rendering of the page. A pixel diff against Chrome shows only text smoothing and photo resampling.
+- **Outlined numbers:** 76, 192, 2,411 and 110,020. The page pins DM Sans to `opsz 14`, which Figma can't set.
+- **Live icon:** still frame 14 of `hs-live.gif`, because frame 0 is blank.
+- A frame named "Working" (`985:581`) appeared during the build. We didn't make it, so it was left alone.
+
+## Phone top bar, from Figma `993:1725` (top section `993:2563`)
+- **Card:** the Recents tabs and the rail share one card, 70% white with r12, 12 under the search and 16 over the band's foot. The sky now ends at 382.
+- **Tabs:**
+  - The picked tab hugs its 18px mark and its name ("Recents"), with a 2px #1F515B bar.
+  - The other three show a 20px mark and share the rest of the row, 29 apart.
+- **Rail:** 4 inside the card, with 132 × 158 cards 6 apart at r10.
+- **Animation:** `place()` sets every tab width in px, so the tabs, names, marks and bar move on one 460ms curve. Measured on a phone viewport: about 2ms per tap, no long tasks.
+- **Other changes:**
+  - The ticker is 14 under the sky.
+  - The 👋🏻 is 2.4 after the name, in a flex row.
+- **Files:**
+  - `index.html`, in `mountAnimals`: the `.fav__box` wrapper, `place()`, and the re-measure on fonts and resize.
+  - `review.css`, in the phone block (≤743px): the "Recents · 993:2502" and "the tabs · 993:2503" rules.
+  - `review.css`: `.fav__box { display: contents }` keeps 744px and up unchanged.
+  - The stylesheet is now `review.css?v=20261019c`.
+- **Deployed:**
+  - Production deployment `home-page-changes-j23fee1y5` serves <https://home-page-changes.vercel.app/?v=2>. Vercel project `home-page-changes`, scope `naveen-lsets-projects`.
+  - It was uploaded from a clean copy (`git ls-files -co`) and matches this session's commit.
+
+## Live bugs found (reported, not fixed)
+1. On load, `scrollIntoView({block:'nearest'})` on the active site tab jumps the phone page down 208px.
+2. `html.v2-tabs-stuck` stays set after an instant jump to the top, so the sky band covers the deck's dots and "View all".
+3. The closed profile drawer's shadow bleeds about 20px into the left edge.
+
+## Open questions for the owner
+- Fix the three bugs above?
+- Should tablet and web get the same Recents card? Only phones have it now.
+- An enclosure card's species line wraps to two lines ("Marbled Phantom / Saki"). This predates this session.
+
+## Not done
+- **Not pushed:** `CleanUp` is ahead of `origin`. Push with the work SSH URL (`github-work`).
+- **Not synced:** `mockups/web-v3/widgets-preview.html` still has the morning's tabs, not this top bar.
