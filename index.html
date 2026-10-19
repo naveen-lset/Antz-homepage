@@ -13914,7 +13914,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261017c">
+<link rel="stylesheet" href="review.css?v=20261019b">
 </head>
 
 <style>
@@ -43408,28 +43408,155 @@ function mountAnimals(root) {
   const title = root.querySelector('.fav__title'), rail = root.querySelector('.fav__rail'), edit = root.querySelector('.fav__edit')
   const pages = () => __req('js/components/ModulePages.js')
   const img = (r) => r.img || photo(r.sp)
-  const aCard = (r) =>
+  const aCard = (r, badge = '') =>
     `<div class="fav__item" role="listitem"><button type="button" class="fav__card" data-aaid="${r.aaid}" data-sp="${esc(r.sp)}" aria-label="${esc(r.sp)}, AAID ${r.aaid}">` +
-      pic(r.sp, 'fav__img', img(r)) +
+      pic(r.sp, 'fav__img', img(r)) + badge +
       /* the sex as the species page tags an animal photo, in the corner (owner,
          5 Oct 2026); the AAID leads, the species under it on one line */
       `<span class="fav__sex" data-s="${SEX_TAG[r.sex]?.[1] || 'u'}" title="${SEX_A[r.sex] || 'Undetermined'}">${SEX_TAG[r.sex]?.[0] || 'UD'}</span>` +
       `<span class="fav__txt"><b class="fav__name">AAID<span class="fav__idsep"> </span>${r.aaid}</b><small class="fav__meta fav__meta--sp">${esc(r.sp)}</small></span>` +
     `</button></div>`
-  const draw = () => {
-    const fav = favAnimals(), seen = seenAnimals(), mine = fav.length > 0, list = mine ? fav : seen
-    title.textContent = mine || !seen.length ? 'My animals' : 'Recently viewed'
-    /* the pencil edits favourites, so it is there only over them (owner,
-       5 Oct 2026: "if Recently viewed, no need to show Edit; if Favourite
-       animals, the edit option is there"); Find animals at the rail's end
-       still starts a list */
-    edit.hidden = !(mine || !seen.length)
-    edit.setAttribute('aria-label', 'Edit my animals')
-    rail.innerHTML = list.map(aCard).join('') +
-      `<div class="fav__item" role="listitem"><button type="button" class="fav__card fav__card--add" data-browse>` +
-        `<span class="fav__plus" aria-hidden="true">${icon('plus')}</span>` +
-        `<b class="fav__name">${list.length ? 'Find animals' : 'Find an animal'}</b></button></div>`
+  /* ══ FOUR TABS · Recent · Favourites · Bookmarks · Folders ══════════════════
+     Owner, 19 Oct 2026: "implement in the live" — concept 6 "Strip" of
+     mockups/animals-tabs.html as it was approved over that day: Swiggy's top
+     tabs in this page's style — four equal tabs inside the page padding, one
+     colour (OnSurfaceVariant), a 3px bar and no glow under the picked one;
+     the others only their icon, which never moves; six cards, then View all;
+     Favourites (animals and enclosures) and Bookmarks (notes, medical
+     records, lab requests) open on their folders, and Folders lists them all.
+     Recent and the favourite animals are this browser's own (sawAnimal,
+     setFavAnimal). SAMPLE: the app keeps no bookmarks, folders or favourite
+     enclosures yet, so those stand on the four seed animals and their real
+     enclosures; tapping one says it is not part of this preview. */
+  const TSV = (d, fill) => `<svg viewBox="0 0 24 24" width="18" height="18" fill="${fill ? 'currentColor' : 'none'}" stroke="${fill ? 'none' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`
+  const TI = {
+    recent: TSV('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
+    fav: TSV('<path d="M12 3.8l2.5 5.1 5.6.8-4.05 3.95.96 5.6L12 16.6l-5.01 2.65.96-5.6L3.9 9.7l5.6-.8z"/>'),
+    book: TSV('<path d="M7 3.8h10a1 1 0 0 1 1 1V20l-6-3.8L6 20V4.8a1 1 0 0 1 1-1z"/>'),
+    folders: TSV('<path d="M3.5 7.2a2 2 0 0 1 2-2h3.8l2 2.2h7.2a2 2 0 0 1 2 2v7.6a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'),
+    star: TSV('<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2L9.19 8.62L2 9.24l5.45 4.73L5.82 21z"/>', true),
+    mark: TSV('<path d="M7 3h10a1.5 1.5 0 0 1 1.5 1.5V21l-6.5-4.1L5.5 21V4.5A1.5 1.5 0 0 1 7 3z"/>', true),
+    next: TSV('<path d="M5 12h14M13 6l6 6-6 6"/>'),
+    back: TSV('<path d="M19 12H5M11 6l-6 6 6 6"/>'),
   }
+  const TABS = [
+    { id: 'recent', label: 'Recent', noun: 'animals' },
+    { id: 'fav', label: 'Favourites', noun: 'favourites' },
+    { id: 'book', label: 'Bookmarks', noun: 'bookmarks' },
+    { id: 'folders', label: 'Folders', noun: 'folders' },
+  ]
+  const SEEDR = new Map(A_SEED.map((r) => [r.aaid, r]))
+  const ENC = {   /* SAMPLE favourite enclosures · [name, the seed animal there] */
+    'e-ridge': ['Ridge Path Enclosure', 190317], 'e-thistle': ['Thistle Spring Den', 143944],
+    'e-cedar': ['Cedar Ridge Habitat', 172277], 'e-ivy': ['Ivy Marsh Terrarium', 169095],
+  }
+  const RECS = {  /* SAMPLE bookmarks · [kind, title, the animal it is about] */
+    'n-feed': ['Note', 'Feeding change', 190317], 'm-2291': ['Medical', 'MC-2291 · Open', 143944],
+    'l-0457': ['Lab', 'Blood panel', 172277], 'n-gait': ['Note', 'Limping', 169095],
+    'm-2307': ['Medical', 'MC-2307 · Review', 190317], 'l-0462': ['Lab', 'Faecal screen', 143944],
+  }
+  const FOLDERS = [  /* SAMPLE folders, two in each */
+    { id: 'f-watch', tab: 'fav', name: 'Watch list', items: ['a190317', 'a169095', 'e-ridge', 'e-ivy'] },
+    { id: 'f-birds', tab: 'fav', name: 'Birds & reptiles', items: ['a143944', 'a172277', 'e-thistle', 'e-cedar'] },
+    { id: 'f-vet', tab: 'book', name: 'Vet follow-up', items: ['m-2291', 'l-0457', 'n-gait', 'm-2307'] },
+    { id: 'f-labs', tab: 'book', name: 'Weekly labs', items: ['l-0457', 'l-0462', 'm-2307', 'n-feed'] },
+  ]
+  const SHOW = 6
+  let cur = 'recent', folder = null, busy = false
+  const recOf = (aaid) => all().get(+aaid) || SEEDR.get(+aaid)
+  const aaidOf = (k) => (k[0] === 'a' ? +k.slice(1) : (ENC[k] || RECS[k])?.at(-1))
+  const keysOf = (tab) => {
+    if (tab === 'recent') return seenAnimals().map((r) => `a${r.aaid}`)
+    if (tab === 'book') return [...FOLDERS.filter((f) => f.tab === 'book').map((f) => f.id), ...Object.keys(RECS)]
+    if (tab === 'folders') return FOLDERS.map((f) => f.id)
+    /* favourites: the folders, then the starred animals and the enclosures, alternating */
+    const an = favAnimals().map((r) => `a${r.aaid}`), en = Object.keys(ENC), mix = []
+    for (let i = 0; i < Math.max(an.length, en.length); i++) { if (an[i]) mix.push(an[i]); if (en[i]) mix.push(en[i]) }
+    return [...FOLDERS.filter((f) => f.tab === 'fav').map((f) => f.id), ...mix]
+  }
+  const badge = (tab) => tab === 'fav' ? `<span class="fav__mark fav__mark--star" title="Favourite">${TI.star}</span>`
+    : tab === 'book' ? `<span class="fav__mark" title="Bookmarked">${TI.mark}</span>` : ''
+  /* an enclosure or a bookmarked record: its animal's photo, the badge, a type tag, its name over one line */
+  const thing = (k, tag, name, aaid, tab) => { const r = SEEDR.get(aaid)
+    return `<div class="fav__item" role="listitem"><button type="button" class="fav__card" data-sample="${esc(`${tag}: ${name}`)}" aria-label="${esc(`${tag}: ${name}`)}">` +
+      pic(r.sp, 'fav__img', img(r)) + badge(tab) + `<span class="fav__tag">${esc(tag)}</span>` +
+      `<span class="fav__txt"><b class="fav__name">${esc(name)}</b><small class="fav__meta">${esc(r.sp)}</small></span></button></div>` }
+  const folderCard = (f, tab) => { const n = f.items.length
+    const meta = tab === 'folders' ? `In ${f.tab === 'fav' ? 'Favourites' : 'Bookmarks'} · ${n}` : `${n} items`
+    return `<div class="fav__item" role="listitem"><button type="button" class="fav__card fav__card--folder" data-folder="${f.id}" aria-label="Folder ${esc(f.name)}, ${n} items">` +
+      `<span class="fav__mosaic">${f.items.slice(0, 4).map((k) => { const r = recOf(aaidOf(k)); return r ? pic(r.sp, 'fav__mimg', img(r)) : '<i></i>' }).join('')}</span>` +
+      `<span class="fav__tag fav__tag--n">${TI.folders}${n}</span>` +
+      `<span class="fav__txt"><b class="fav__name">${esc(f.name)}</b><small class="fav__meta">${esc(meta)}</small></span></button></div>` }
+  const cardOf = (k, tab) => {
+    if (k[0] === 'f') return folderCard(FOLDERS.find((x) => x.id === k), tab)
+    if (k[0] === 'a') { const r = recOf(k.slice(1)); return r ? aCard(r, badge(tab)) : '' }
+    if (ENC[k]) return thing(k, 'Enclosure', ENC[k][0], ENC[k][1], tab)
+    return thing(k, RECS[k][0], RECS[k][1], RECS[k][2], tab)
+  }
+  /* the white card the page uses for "add": View all at a row's end, Back at an open folder's start */
+  const whiteCard = (attr, glyph, name, sub, label) => `<div class="fav__item" role="listitem"><button type="button" class="fav__card fav__card--add fav__card--all" ${attr} aria-label="${esc(label)}">` +
+    `<span class="fav__plus" aria-hidden="true">${glyph}</span><b class="fav__name">${esc(name)}</b><small class="fav__alln">${esc(sub)}</small></button></div>`
+  const railHTML = () => {
+    const f = folder && FOLDERS.find((x) => x.id === folder)
+    const keys = f ? f.items : keysOf(cur), tab = f ? f.tab : cur, noun = f ? 'items' : TABS.find((t) => t.id === cur).noun
+    if (!keys.length) return `<div class="fav__item" role="listitem"><button type="button" class="fav__card fav__card--add" data-browse>` +
+      `<span class="fav__plus" aria-hidden="true">${icon('plus')}</span><b class="fav__name">Find an animal</b></button></div>`
+    return (f ? whiteCard('data-folder-back', TI.back, f.name, `${keys.length} items`, `Back from ${f.name}`) : '') +
+      keys.slice(0, SHOW).map((k) => cardOf(k, tab)).join('') +
+      (keys.length > SHOW ? whiteCard('data-all', TI.next, 'View all', `${keys.length} ${noun}`, `View all ${keys.length} ${noun}`) : '')
+  }
+  /* the tabs, where the title was: the title stays for the band's name, unseen */
+  const head = root.querySelector('.fav__head')
+  root.classList.add('has-tabs'); title.textContent = 'My animals'; title.classList.add('sr-only'); edit.hidden = true
+  const tabs = document.createElement('div'); tabs.className = 'fav__tabs'; tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Animals')
+  tabs.innerHTML = `<span class="fav__tabbar" aria-hidden="true"></span>` + TABS.map((t) =>
+    `<button type="button" class="fav__tab" role="tab" data-tab="${t.id}" aria-controls="favRail" aria-label="${t.label}" title="${t.label}">${TI[t.id]}<span class="fav__tabl" aria-hidden="true">${t.label}</span></button>`).join('')
+  head.append(tabs); rail.id = 'favRail'; rail.setAttribute('role', 'tabpanel')
+  const bar = tabs.querySelector('.fav__tabbar')
+  const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches
+  const anim = (el, kf, o) => (still() || !el.animate ? null : el.animate(kf, { fill: 'both', ...o }))
+  const mark = () => { for (const b of tabs.querySelectorAll('.fav__tab')) { const on = b.dataset.tab === cur; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1 } }
+  /* the bar spans the picked tab — or its mark and name, where those are wider
+     (a phone's quarter under Favourites or Bookmarks), centred under them and
+     kept inside the row. The name's full width is read even while it opens. */
+  const place = (instant) => {
+    const b = tabs.querySelector(`[data-tab="${cur}"]`); if (!b.offsetWidth) return
+    const l = b.querySelector('.fav__tabl'), gap = parseFloat(getComputedStyle(b).getPropertyValue('--tab-gap')) || 0
+    const w = Math.max(b.offsetWidth, b.querySelector('svg').getBoundingClientRect().width + gap + l.scrollWidth + 12)
+    const x = Math.min(Math.max(0, b.offsetLeft + (b.offsetWidth - w) / 2), tabs.clientWidth - w)
+    if (instant) bar.style.transition = 'none'
+    bar.style.width = `${w}px`; bar.style.transform = `translateX(${x}px)`
+    if (instant) { bar.offsetWidth; bar.style.transition = '' }
+  }
+  const draw = () => { rail.innerHTML = railHTML(); rail.scrollLeft = 0; mark(); place(true) }
+  const onScreen = (el) => { const a = el.getBoundingClientRect(), b = rail.getBoundingClientRect(); return a.right > b.left - 4 && a.left < b.right + 4 }
+  /* the cards on screen slip out toward where you came from, the new ones slide in from where you are going */
+  const swap = async (dir, lift) => {
+    busy = true
+    const out = [...rail.children].filter(onScreen)
+    await Promise.all(out.map((el, i) => el === lift
+      ? anim(el, [{ transform: 'none', opacity: 1 }, { transform: 'scale(1.06)', opacity: 0 }], { duration: 200, easing: 'ease-in' })?.finished
+      : anim(el, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${-dir * 14}px)` }], { duration: 130, delay: i * 12, easing: 'ease-in' })?.finished))
+    rail.innerHTML = railHTML(); rail.scrollLeft = 0
+    ;[...rail.children].forEach((el, i) => anim(el, [{ opacity: 0, transform: `translate(${dir * 22}px, 8px)` }, { opacity: 1, transform: 'none' }], { duration: 420, delay: Math.min(i, 6) * 32, easing: 'cubic-bezier(.16,1,.3,1)' }))
+    busy = false
+  }
+  const go = (id) => {
+    if (id === cur || busy) return
+    const dir = Math.sign(TABS.findIndex((t) => t.id === id) - TABS.findIndex((t) => t.id === cur))
+    cur = id; folder = null; mark(); place(); swap(dir)
+  }
+  tabs.addEventListener('click', (e) => { const b = e.target.closest('.fav__tab'); if (b) go(b.dataset.tab) })
+  tabs.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+    const i = (TABS.findIndex((t) => t.id === cur) + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length
+    e.preventDefault(); go(TABS[i].id); tabs.querySelector(`[data-tab="${TABS[i].id}"]`)?.focus()
+  })
+  addEventListener('resize', () => place(true))
+  /* what is not part of this preview says so, in the page's own notice */
+  const tip = document.createElement('div'); tip.className = 'mview__toast is-page'; tip.setAttribute('role', 'status'); document.body.append(tip)
+  let tipT = 0
+  const say = (t) => { tip.textContent = t; tip.classList.add('is-on'); clearTimeout(tipT); tipT = setTimeout(() => tip.classList.remove('is-on'), 2600) }
   const openAnimal = (r) => pages().go(`species/${encodeURIComponent(r.sp)}/population?aaid=${r.aaid}`)
 
   /* the pencil: both lists in one sheet; a star moves an animal in or out of
@@ -43470,7 +43597,12 @@ function mountAnimals(root) {
   rail.addEventListener('click', (e) => {
     const b = e.target.closest('.fav__card'); if (!b) return
     if (b.hasAttribute('data-browse')) { pages().go('species'); return }
-    const r = all().get(+b.dataset.aaid); if (r) openAnimal(r)
+    /* a folder opens in place, behind a Back card; Back closes it */
+    if (b.dataset.folder || b.hasAttribute('data-folder-back')) { if (!busy) { folder = b.dataset.folder || null; swap(folder ? 1 : -1, folder ? b.closest('.fav__item') : null) } return }
+    /* View all: the animals' own sheet for Recent and Favourites */
+    if (b.hasAttribute('data-all')) { if (!folder && (cur === 'recent' || cur === 'fav')) openSheet(); else say('The full list opens in the ANTZ app — not part of this preview'); return }
+    if (b.dataset.sample) { say(`${b.dataset.sample} opens in the ANTZ app — not part of this preview`); return }
+    const r = recOf(b.dataset.aaid); if (r) openAnimal(r)
   })
   edit.addEventListener('click', openSheet)
   addEventListener('antz:animals', () => { draw(); if (sh && sh.body.isConnected && sh.body.closest('.gsx-sheet:not([hidden])')) fill() })
@@ -50912,7 +51044,8 @@ function modulesHint() {
     chip.type = 'button'; chip.className = 'mhint is-off'
     chip.innerHTML =
       `<span class="mhint__n">Modules</span>` +
-      `<img class="mhint__chev" src="assets/icon/v2-modules-chevron.svg" alt="" width="20" height="20">`
+      /* the grid mark Quick Actions wore, in place of the double chevron (owner, 19 Oct 2026, from mockups/animals-tabs.html) */
+      `<span class="mhint__g" aria-hidden="true"></span>`
     row.prepend(chip)   /* in the row: the three are centred as one group */
     const count = () => grid.querySelectorAll('.card').length
     /* the chip says "Modules"; the count lives in its name for a screen reader */
@@ -50930,7 +51063,9 @@ function modulesHint() {
       chip.classList.toggle('is-compact', need > innerWidth)
     }
     let raf = 0
-    const update = () => { raf = 0; label(); chip.classList.toggle('is-off', reached()); place() }
+    /* it stays when the Modules head is reached (owner, 19 Oct 2026: "when I scroll don't hide"): it opens
+       the modules sheet now, which is no less use down there; the build without the sheet still folds it */
+    const update = () => { raf = 0; label(); chip.classList.toggle('is-off', !window.__antzModulesSheet && reached()); place() }
     const soon = () => { if (!raf) raf = requestAnimationFrame(update) }
     addEventListener('scroll', soon, { passive: true })
     addEventListener('resize', soon)
@@ -53756,8 +53891,43 @@ if (document.documentElement.dataset.review && isV2()) {
   }
   const GRID_I = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>'
   const LIST_I = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="4" y="5" width="4.5" height="4.5" rx="1.5"/><rect x="11" y="5.75" width="9" height="3" rx="1.5"/><rect x="4" y="14.5" width="4.5" height="4.5" rx="1.5"/><rect x="11" y="15.25" width="9" height="3" rx="1.5"/></svg>'
+  /* THE OWNER'S TWENTY (19 Oct 2026: "In Your Modules: Pharmacy, Necropsy,
+     Collection, Animals, Training, Mortality, Natality, Fetal Death, Eggs,
+     My Focus Hub, Housing, Diet, Audit, Help Desk, Announcements, Users,
+     Security, Reports, Approvals, Communication. That's all, don't add
+     anything. For mobile & tablet" — then "implement in the live"). This
+     sheet lists those, in that order, under the catalogue's categories, and
+     no other module; Recent keeps to them too. Three names are the owner's
+     here only: Species Management is Collection, Diet & Kitchen is Diet,
+     Helpdesk is Help Desk. Three modules are new (FRESH): drawn in the same
+     tile, in gradients the twenty leave free, and with no card or page yet a
+     tap says so and they do not swipe. */
+  const VIEW = [
+    ['medical', ['pharmacy', 'necropsy']],
+    ['animal', ['species', 'animals', 'training', 'mortality', 'natality', 'fetal', 'eggs', 'focus']],
+    ['operations', ['housing', 'diet', 'audit']],
+    ['admin', ['helpdesk', 'announcements', 'users', 'security', 'reports', 'approvals', 'communication']],
+  ]
+  const VIEW_IDS = new Set(VIEW.flatMap(([, ids]) => ids))
+  const RENAME = { species: 'Collection', diet: 'Diet', helpdesk: 'Help Desk' }
+  const FSV = (d) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`
+  const FRESH = {
+    animals: { name: 'Animals', gradient: '--g-hospital', keywords: ['animal', 'aaid', 'record', 'individual'], blurb: 'Every animal in the collection: its record, its history, its home.',
+      svg: FSV('<path d="M3.5 12.6V5.5a2 2 0 0 1 2-2h7.1a2 2 0 0 1 1.4.6l6.9 6.9a2 2 0 0 1 0 2.8l-7.1 7.1a2 2 0 0 1-2.8 0L4.1 14a2 2 0 0 1-.6-1.4z"/><circle cx="8.5" cy="8.5" r="1.6"/>') },
+    training: { name: 'Training', gradient: '--g-lab', keywords: ['training', 'behaviour', 'session', 'enrichment'], blurb: 'Training sessions, behaviours and each animal’s progress.',
+      svg: FSV('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>') },
+    announcements: { name: 'Announcements', gradient: '--g-v3-quick', keywords: ['announcement', 'notice', 'broadcast', 'news'], blurb: 'Notices for every site, pinned and scheduled.',
+      svg: FSV('<path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>') },
+  }
+  const modOf = (id) => {
+    if (FRESH[id]) return { id, fresh: true, ...FRESH[id] }
+    const m = QM.find((x) => x.id === id)
+    return m && { ...m, name: RENAME[id] || m.name }
+  }
+  const onHome = (m) => !m.fresh && placed(defaultCard(m))
+  const glyphOf = (m) => m.svg || (m.icon ? `<img src="assets/icon/${qesc(m.icon)}" alt="">` : icon(m.sprite))
   const tile = (m, on) => `<button type="button" class="mview__tile" data-mod="${qesc(m.id)}" aria-label="Open ${qesc(m.name)}${on ? ', on Home' : ''}">` +
-    `<span class="mview__ico" style="background:var(${m.gradient})">${m.icon ? `<img src="assets/icon/${qesc(m.icon)}" alt="">` : icon(m.sprite)}${on ? HOME_BADGE : ''}</span>` +
+    `<span class="mview__ico" style="background:var(${m.gradient})">${glyphOf(m)}${on ? HOME_BADGE : ''}</span>` +
     /* a name with a space wraps at it, not at the soft hyphen the 1×1 card needs ("Species Manage-ment") */
     `<span class="mview__lbl">${qesc(/\s/.test(m.name) ? m.name.replace(/\u00AD/g, '') : m.name)}</span></button>`
   /* RECENT IN PLACE OF ON HOME (owner, 17 Oct 2026: "Remove On Home
@@ -53766,17 +53936,26 @@ if (document.documentElement.dataset.review && isV2()) {
      module page — newest first, one row (4 on a phone, 5 on a tablet). The
      list is the web's Recent row's own; until it has one, nothing is drawn. */
   const recent = () => __req('js/components/ModulePages.js').recentModules()
-    .map((id) => QM.find((m) => m.id === id)).filter((m) => m && defaultCard(m)).slice(0, 5)
+    .filter((id) => VIEW_IDS.has(id)).map(modOf).filter((m) => m && (m.fresh || defaultCard(m))).slice(0, 5)
 
   function render() {
     const q = query.trim().toLowerCase()
     const hit = (m) => !q || m.name.toLowerCase().includes(q) || (m.keywords || []).some((k) => k.includes(q))
     const tiles = mode === 'grid'
-    const cats = QC.map((c) => {
-      const ms = QM.filter((m) => m.category === c.id && hit(m)).map((m) => ({ m, v: defaultCard(m) })).filter((x) => x.v)
+    const cats = VIEW.map(([cid, ids]) => {
+      const c = QC.find((x) => x.id === cid) || { name: cid }
+      const ms = ids.map(modOf).filter((m) => m && hit(m)).map((m) => ({ m, v: m.fresh ? null : defaultCard(m) })).filter((x) => x.m.fresh || x.v)
       if (!ms.length) return ''
-      if (tiles) return `<h3 class="mview__cat">${qesc(c.name)}</h3><div class="mview__grid">${ms.map(({ m, v }) => tile(m, placed(v))).join('')}</div>`
+      if (tiles) return `<h3 class="mview__cat">${qesc(c.name)}</h3><div class="mview__grid">${ms.map(({ m, v }) => tile(m, !!v && placed(v))).join('')}</div>`
       return `<h3 class="mview__cat">${qesc(c.name)}</h3>` + ms.map(({ m, v }) => {
+        /* a new module: the same row, no swipe (is-core only shrugs) — it has no card to add yet */
+        if (m.fresh) return `<div class="mview__item is-core" role="listitem" data-mod="${qesc(m.id)}">
+          <div class="mview__row" role="button" tabindex="0" aria-label="Open ${qesc(m.name)}">
+            <span class="mview__ico" style="background:var(${m.gradient})">${m.svg}</span>
+            <span class="mview__txt"><b>${qesc(m.name)}</b><small>${qesc(m.blurb)}</small></span>
+            <span class="mview__chev" aria-hidden="true">${icon('chev-right')}</span>
+          </div>
+        </div>`
         /* 1 Oct 2026 (owner: "each module one line explanation need … remove
            from home interaction has to give"): the module's blurb under its
            name, and the swipe offers Add to Home or, on a module already
@@ -53787,7 +53966,7 @@ if (document.documentElement.dataset.review && isV2()) {
         return `<div class="mview__item${on ? ' is-placed' : ''}${core ? ' is-core' : ''}" role="listitem" data-mod="${qesc(m.id)}">
           ${core ? '' : `<button type="button" class="mview__act${on ? ' is-remove' : ''}" tabindex="-1">${on ? `${icon('minus')}<span>Remove</span>` : `${icon('plus')}<span>Add to Home</span>`}</button>`}
           <div class="mview__row" role="button" tabindex="0" aria-label="Open ${qesc(m.name)}${on ? ', on Home' : ''}">
-            <span class="mview__ico" style="background:var(${m.gradient})">${m.icon ? `<img src="assets/icon/${qesc(m.icon)}" alt="">` : icon(m.sprite)}${on ? HOME_BADGE : ''}</span>
+            <span class="mview__ico" style="background:var(${m.gradient})">${glyphOf(m)}${on ? HOME_BADGE : ''}</span>
             <span class="mview__txt"><b>${qesc(m.name)}</b>${m.blurb ? `<small>${qesc(m.blurb)}</small>` : ''}</span>
             <span class="mview__chev" aria-hidden="true">${icon('chev-right')}</span>
           </div>
@@ -53797,7 +53976,7 @@ if (document.documentElement.dataset.review && isV2()) {
     }).join('')
     const rec = q ? [] : recent()
     list.innerHTML =
-      (rec.length ? `<h3 class="mview__sec">Recent</h3><div class="mview__grid mview__grid--recent">${rec.map((m) => tile(m, placed(defaultCard(m)))).join('')}</div>` : '') +
+      (rec.length ? `<h3 class="mview__sec">Recent</h3><div class="mview__grid mview__grid--recent">${rec.map((m) => tile(m, onHome(m))).join('')}</div>` : '') +
       `<div class="mview__bar"><h3 class="mview__sec">${q ? 'Results' : 'All Modules'}</h3>` +
         `<div class="mview__mode" role="group" aria-label="Show modules as">` +
           `<button type="button" data-mode="grid" aria-pressed="${tiles}" aria-label="Grid" title="Grid">${GRID_I}</button>` +
@@ -53822,7 +54001,7 @@ if (document.documentElement.dataset.review && isV2()) {
      does; Remove takes every copy of that card off the page. Either can be
      undone from the notice. */
   function toggle(item) {
-    const m = QM.find((x) => x.id === item.dataset.mod), v = m && defaultCard(m)
+    const m = modOf(item.dataset.mod), v = m && !m.fresh && defaultCard(m)
     if (!v) return
     openRow = null
     if (placed(v)) {
@@ -53871,6 +54050,9 @@ if (document.documentElement.dataset.review && isV2()) {
   list.addEventListener('pointerup', end); list.addEventListener('pointercancel', end)
 
   function openModule(item) {
+    /* a new module has nowhere to go yet: the sheet stays and says so */
+    const fresh = FRESH[item.dataset.mod]
+    if (fresh) { say(`${fresh.name} is coming to the ANTZ app — not part of this preview`); return }
     const m = QM.find((x) => x.id === item.dataset.mod), v = defaultCard(m)
     closeView()
     setTimeout(() => {

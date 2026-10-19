@@ -1234,3 +1234,61 @@ html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .card [class*='fol
 html:root[data-review][data-home='v2'][data-v2desk] .main-frame { padding-left: 24px; padding-right: 24px; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__curl { display: none; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__head { height: 23px; line-height: 23px; }
+
+/* ══ THE ANIMALS BAND'S FOUR TABS (owner, 19 Oct 2026: "implement in the live",
+   from mockups/animals-tabs.html, concept 6 "Strip") ═══════════════════════
+   Recent · Favourites · Bookmarks · Folders where the title was: four equal
+   tabs inside the page padding on a hairline, one colour — MD3_Antz
+   OnSurfaceVariant — and under the picked one a 3px bar, no glow. The others
+   show only their icon, which never moves; the picked one opens to its name
+   beside it. Sizes (owner, 19 Oct 2026: "icon & text too small, make a little
+   bigger"): a 22px mark and a 16px name, 20 and 14 on a phone — where the
+   picked Favourites or Bookmarks is a little wider than its 89.5px quarter
+   and spreads into the empty room beside its neighbours' marks, which stay
+   put; the bar then spans the name (place(), in the band's script). */
+html:root[data-review][data-home='v2'] .fav-band.has-tabs .fav__head { display: flex; align-items: center; height: auto; min-height: 22px; }
+.fav-band.has-tabs .fav__edit { display: none; }
+.fav__tabs { flex: 1; min-width: 0; position: relative; display: flex; margin: 0; box-shadow: inset 0 -1px 0 rgba(31, 65, 91, .14); }
+.fav__tab { --tab-gap: 8px; position: relative; z-index: 1; flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; height: 52px; padding: 0 3px 6px; border: 0; background: none;
+  color: var(--c-on-surface-var, #44544A); font: 500 16px/1 Inter, var(--font); letter-spacing: .1px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.fav__tab svg { flex: none; width: 22px; height: 22px; }
+.fav__tabl { flex: none; max-width: 0; margin-left: 0; overflow: hidden; white-space: nowrap; opacity: 0;   /* flex: none — it may spread past a phone's quarter, never be squeezed */
+  transition: max-width 460ms cubic-bezier(.32, .72, 0, 1), margin-left 460ms cubic-bezier(.32, .72, 0, 1), opacity 150ms ease; }
+.fav__tab[aria-selected='true'] .fav__tabl { max-width: 120px; margin-left: var(--tab-gap); opacity: 1; font-weight: 600; transition-delay: 0s, 0s, 130ms; transition-duration: 460ms, 460ms, 240ms; }
+.fav__tab:focus-visible { outline: 2px solid #1F415B; outline-offset: -4px; border-radius: 10px; }
+.fav__tabbar { position: absolute; z-index: 0; left: 0; bottom: 0; height: 3px; border-radius: 3px; background: var(--c-on-surface-var, #44544A); pointer-events: none;
+  transition: transform 480ms cubic-bezier(.32, .72, 0, 1), width 480ms cubic-bezier(.32, .72, 0, 1); }
+@media (max-width: 479px) { .fav__tab { --tab-gap: 6px; height: 50px; padding: 0 0 6px; font-size: 14px; letter-spacing: 0; } .fav__tab svg { width: 20px; height: 20px; } }
+@media (prefers-reduced-motion: reduce) { .fav__tabl, .fav__tabbar { transition: none; } }
+:root.has-wsky[data-sky-tone='dark'] .fav__tab { color: rgba(255, 255, 255, .8); }
+:root.has-wsky[data-sky-tone='dark'] .fav__tab[aria-selected='true'] { color: #fff; }
+:root.has-wsky[data-sky-tone='dark'] .fav__tabbar { background: #fff; }
+:root.has-wsky[data-sky-tone='dark'] .fav__tabs { box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .16); }
+/* the cards the tabs add: a Favourite star or a Bookmark mark on the corner the
+   sex tag leaves free (its 24 by 24, 6 round), a type tag on the other */
+.fav__mark { position: absolute; z-index: 2; top: 8px; left: 8px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: rgba(255, 255, 255, .92); color: #1F515B; }
+.fav__mark--star { color: #F2B01E; }
+.fav__mark svg { width: 14px; height: 14px; }
+.fav__tag { position: absolute; z-index: 2; top: 8px; right: 8px; display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 7px; border-radius: 6px; background: rgba(255, 255, 255, .92); color: #1F415B; font: 600 11px/1 Inter, var(--font); letter-spacing: .1px; }
+.fav__tag svg { width: 13px; height: 13px; }
+/* a folder: its first four photos as the cover, the card's own scrim over them */
+.fav__mosaic { position: absolute; inset: 0; display: grid; grid-template: 1fr 1fr / 1fr 1fr; gap: 2px; background: rgba(255, 255, 255, .85); }
+.fav__mosaic > * { position: relative; width: 100%; height: 100%; min-height: 0; overflow: hidden; }
+.fav__mosaic img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* View all and Back: the add card, kept beside other cards (the page hides an
+   add card that is not alone, and the web hides it outright) */
+.fav__item > .fav__card--all { display: flex !important; gap: 8px; }
+html:root[data-review][data-home='v2'] .fav__item:has(> .fav__card--all) { display: block !important; }
+.fav__alln { position: relative; z-index: 1; font: 400 12px/1 Inter, var(--font); color: var(--c-on-surface-var, #44544A); }
+
+/* ══ THE BOTTOM ROW'S MARKS (owner, 19 Oct 2026, from the same mockup: "put the
+   menu icon on the arrow; instead of Quick Actions icon show thunder icon",
+   then "icon has previously added Quick Access icon") ══════════════════════
+   Modules wears the grid mark Quick Actions wore (qa-actions.svg, 18.33 in its
+   20 box); Quick Actions a bolt, on the same mask, so it still turns to the ×. */
+.mhint__g { flex: none; display: block; width: 20px; height: 20px; background: currentColor;
+  -webkit-mask: url(assets/icon/qa-actions.svg) 1.042px 1.042px / 18.33px 18.33px no-repeat;
+          mask: url(assets/icon/qa-actions.svg) 1.042px 1.042px / 18.33px 18.33px no-repeat; }
+html:root[data-home='v2'] .qa-pill__grid {
+  -webkit-mask: url(assets/icon/qa-bolt.svg) center / 20px 20px no-repeat;
+          mask: url(assets/icon/qa-bolt.svg) center / 20px 20px no-repeat; }

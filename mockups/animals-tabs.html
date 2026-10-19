@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Animals Tabs · Mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!--
+  RECENTLY VIEWED BECOMES FOUR TABS — Folders a tab of its own and inside
+  Favourites and Bookmarks too (19 Oct 2026) — (owner, 19 Oct 2026: "Tab System, Four
+  thing to be done. 1. Recent Animals, 2. Favourites, 3. Bookmarks,
+  4. Folders. Smooth animation with new concept of design. Create 3 Mockups").
+
+  Drawn by the live home itself, as role-home-live.html is: the page under the
+  bar is ../index.html in a frame, and only the Recently viewed band
+  (#favSpecies) changes — its title becomes the tabs and its rail is refilled
+  with the live card (.fav__card: photo, sex tag, AAID over species). The three
+  concepts share the data and differ in the tabs and the motion:
+
+    1 · Glide   pill tabs, the site tabs' own; the dark pill glides to the tab
+                picked, the cards slide in from the side you moved toward
+    2 · Roll    the title is the tab: it rolls to the next name, beside a glass
+                icon switch; cards rise in one by one; a folder opens in place
+    3 · Lens    text tabs with an elastic underline; a card two tabs share
+                stays and glides to its new place, and in Folders the photos
+                fly from the cards into the folder covers
+    4 · Dropdown  no chips (owner, 19 Oct: "Instead of chips need dropdown"):
+                the title is a dropdown; the page's own menu unfolds from it
+    5 · Shelf   after Swiggy Instamart (19 Oct): colour tiles over labels, an
+                indicator on a hairline, the header washed in the tab's colour
+    6 · Strip   Swiggy's top-tab structure in the current UI (19 Oct): dividers
+                and a hairline; the other tabs icons only, the picked one opens
+                to its name; a glow and a teal bar glide to it
+
+    7 · Expand  the current UI's pills (19 Oct): the other tabs icons only, the
+                picked one opens to its icon and name
+
+  In every concept the bottom row's Modules pill wears Quick Actions' former
+  grid mark and stays when you scroll, and Quick Actions shows a bolt (19 Oct),
+  drawn over the live page from here.
+
+  Mockup data only — nothing here is saved.
+-->
+<style>
+:root { --bar: #13303A; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { display: flex; flex-direction: column; background: #CFDCD8; font: 14px/1.4 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.bar { flex: none; display: flex; align-items: center; gap: 14px; min-height: 56px; padding: 8px 20px; background: var(--bar); color: #CFE2DC; flex-wrap: wrap; }
+.bar > span { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #8FB8AE; }
+.bar nav { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: rgba(255,255,255,.07); }
+.bar button { height: 32px; padding: 0 14px; border: 0; border-radius: 9px; background: none; color: #CFE2DC; font: 500 13.5px Inter, sans-serif; cursor: pointer; white-space: nowrap; }
+.bar button:hover { background: rgba(255,255,255,.08); }
+.bar button[aria-pressed='true'] { background: #fff; color: #1F515B; font-weight: 600; }
+.bar button b { font-weight: 600; opacity: .55; margin-right: 6px; }
+.bar small { flex: 1 1 260px; font-size: 12.5px; color: #8FB8AE; }
+.stage { flex: 1; min-height: 0; display: flex; justify-content: center; overflow: auto; padding: 0; }
+.stage.is-device { padding: 20px; }
+iframe { display: block; width: 100%; height: 100%; border: 0; background: #EFF5F2; }
+.stage.is-device iframe { flex: none; height: min(1180px, 100%); border-radius: 22px; box-shadow: 0 30px 80px -30px rgba(16,45,52,.55), 0 0 0 1px rgba(16,45,52,.08); }
+</style>
+</head>
+<body>
+<div class="bar">
+  <span>Animals tabs</span>
+  <nav id="concepts" aria-label="Concept"></nav>
+  <nav id="devices" aria-label="Width"></nav>
+  <small id="note"></small>
+</div>
+<div class="stage" id="stage"><iframe id="app" title="ANTZ home"></iframe></div>
+
+<script>
+/* ══ THE THREE CONCEPTS AND THE WIDTHS ════════════════════════════════════ */
+const CONCEPTS = {
+  glide: { n: 1, name: 'Glide', note: 'Pill tabs, as the site tabs · the highlight glides · cards slide in from the side you moved toward' },
+  roll:  { n: 2, name: 'Roll',  note: 'The title is the tab · glass icon switch · cards rise in · a folder opens in place' },
+  lens:  { n: 3, name: 'Lens',  note: 'Text tabs · elastic underline · a card two tabs share glides to its new place · photos fly into folders' },
+  menu:  { n: 4, name: 'Dropdown', note: 'No chips: the title is a dropdown · the menu unfolds from it · the title rolls and the cards rise in' },
+  shelf: { n: 5, name: 'Shelf', note: 'After Swiggy Instamart: icon tiles over labels · an indicator glides on a hairline · the header takes each tab’s colour' },
+  strip: { n: 6, name: 'Strip', note: 'Swiggy’s tab structure in the current UI · inside the page padding · one colour (OnSurfaceVariant), a bar, no glow · six cards, then View all' },
+  expand: { n: 7, name: 'Expand', note: 'The current UI’s pills · the other tabs are icons only · the picked one opens to its name and count' },
+}
+const DEVICES = { tablet: ['Tablet', 820], phone: ['Phone', 390], full: ['Full width', 0] }
+
+/* ══ THE DATA · the live band's four animals first, then mockup ones ══════
+   [species, sex tag (m · f · u), photo in assets/img/species/]            */
+const A = {
+  190317: ['Slate Pangolin', 'f', 'sambar'],
+  143944: ['Glacial Egret', 'u', 'sarus-crane'],
+  172277: ['Russet Whipsnake', 'u', 'indian-rock-python'],
+  169095: ['Marbled Phantom Saki', 'f', 'sloth-bear'],
+  151208: ['Amber Ridge Tiger', 'm', 'bengal-tiger'],
+  158833: ['Dusk Leopard', 'f', 'indian-leopard'],
+  147520: ['Saffron Lion', 'f', 'asiatic-lion'],
+  162017: ['Crested Peafowl', 'm', 'indian-peafowl'],
+  139904: ['Ivory Blackbuck', 'm', 'blackbuck'],
+  166342: ['Highland Gaur', 'm', 'gaur'],
+  171180: ['Moss Star Tortoise', 'u', 'indian-star-tortoise'],
+  145561: ['Jade Parakeet', 'm', 'rose-ringed-parakeet'],
+  160073: ['Cinder Vulture', 'u', 'cinereous-vulture'],
+  153390: ['Copper Macaque', 'f', 'rhesus-macaque'],
+  168812: ['Orchard Orangutan', 'f', 'sumatran-orangutan'],
+  149377: ['Marsh Barasingha', 'm', 'barasingha'],
+}
+/* FOUR TABS, FOLDERS ALSO INSIDE TWO (owner, 19 Oct 2026: "Favourites —
+   Animals & Enclosures. Bookmarks: Notes, Medical Records, Lab Requests.
+   Folders inside Favourites & Bookmarks", then "where is the Folders tab"):
+   every item is a key —
+     a<AAID>  an animal          e-…  an enclosure
+     n-…      a note             m-…  a medical record      l-…  a lab request
+     f-…      a folder, which holds keys of its own tab's kinds
+   Favourites and Bookmarks open on their folders, then their items. */
+const ENCL = {   // [name, meta, photo]
+  'e-thistle': ['Thistle Den', 'Hoofstock · 3 animals', 'barasingha'],
+  'e-cedar':   ['Cedar Ridge', 'Big cats · 2 animals', 'indian-leopard'],
+  'e-ivy':     ['Ivy Marsh', 'Primates · 4 animals', 'sumatran-orangutan'],
+  'e-ridge':   ['Ridge Path', 'Pangolins · 2 animals', 'sambar'],
+}
+const RECS = {   // [tag, title, meta, photo]
+  'n-feed': ['Note', 'Feeding change', 'Saffron Lion', 'asiatic-lion'],
+  'n-gait': ['Note', 'Limping', 'Ivory Blackbuck', 'blackbuck'],
+  'm-2291': ['Medical', 'MC-2291 · Open', 'Amber Ridge Tiger', 'bengal-tiger'],
+  'm-2307': ['Medical', 'MC-2307 · Review', 'Highland Gaur', 'gaur'],
+  'l-0457': ['Lab', 'Blood panel', 'Dusk Leopard', 'indian-leopard'],
+  'l-0462': ['Lab', 'Faecal screen', 'Copper Macaque', 'rhesus-macaque'],
+}
+const FOLDERS = [
+  { id: 'f-bigcats', tab: 'fav',  name: 'Big cats',      items: ['a151208', 'a158833', 'a147520', 'e-cedar'] },
+  { id: 'f-hoof',    tab: 'fav',  name: 'Hoofstock',     items: ['a139904', 'a149377', 'a166342', 'e-thistle', 'e-ridge'] },
+  { id: 'f-vet',     tab: 'book', name: 'Vet follow-up', items: ['m-2291', 'l-0457', 'n-gait', 'm-2307'] },
+  { id: 'f-labs',    tab: 'book', name: 'Weekly labs',   items: ['l-0457', 'l-0462', 'm-2307', 'n-feed'] },
+]
+const TABS = [
+  { id: 'recent', label: 'Recent',     title: 'Recently viewed', noun: 'animals',
+    items: ['a190317', 'a143944', 'a172277', 'a169095', 'a151208', 'a158833', 'a147520', 'a162017', 'a139904', 'a166342', 'a171180', 'a145561'] },
+  { id: 'fav',    label: 'Favourites', title: 'Favourites',      noun: 'favourites',
+    items: ['f-bigcats', 'f-hoof', 'a151208', 'e-thistle', 'a190317', 'a147520', 'e-cedar', 'a162017', 'e-ivy', 'a168812'] },
+  { id: 'book',   label: 'Bookmarks',  title: 'Bookmarks',       noun: 'bookmarks',
+    items: ['f-vet', 'f-labs', 'n-feed', 'm-2291', 'l-0457', 'n-gait', 'm-2307', 'l-0462'] },
+  /* …and every folder, in a tab of its own (owner, 19 Oct 2026: "where is the
+     Folders tab") — each says which of the two it lives in */
+  { id: 'folders', label: 'Folders',   title: 'Folders',         noun: 'folders',
+    items: ['f-bigcats', 'f-hoof', 'f-vet', 'f-labs'] },
+]
+const countOf = (t) => t.items.length
+
+/* ══ GLYPHS · 24-grid line icons in the page's own weight ═════════════════ */
+const sv = (d, fill) => `<svg viewBox="0 0 24 24" width="18" height="18" fill="${fill ? 'currentColor' : 'none'}" stroke="${fill ? 'none' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`
+const I = {
+  recent: sv('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
+  fav: sv('<path d="M12 3.8l2.5 5.1 5.6.8-4.05 3.95.96 5.6L12 16.6l-5.01 2.65.96-5.6L3.9 9.7l5.6-.8z"/>'),
+  book: sv('<path d="M7 3.8h10a1 1 0 0 1 1 1V20l-6-3.8L6 20V4.8a1 1 0 0 1 1-1z"/>'),
+  folders: sv('<path d="M3.5 7.2a2 2 0 0 1 2-2h3.8l2 2.2h7.2a2 2 0 0 1 2 2v7.6a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'),
+  starFill: sv('<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2L9.19 8.62L2 9.24l5.45 4.73L5.82 21z"/>', true),
+  bookFill: sv('<path d="M7 3h10a1.5 1.5 0 0 1 1.5 1.5V21l-6.5-4.1L5.5 21V4.5A1.5 1.5 0 0 1 7 3z"/>', true),
+  plus: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  back: sv('<path d="m14.5 6-6 6 6 6"/>'),
+  down: sv('<path d="m6 9 6 6 6-6"/>'),
+  check: sv('<path d="m5 12 5 5 9-10"/>'),
+  arrow: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  backArrow: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+}
+const IMG = (f) => `assets/img/species/${f}.jpg`
+const SEX = { m: 'M', f: 'F', u: 'UD' }
+
+/* ══ THE CARDS · the live .fav__card, refilled ═════════════════════════════ */
+const BADGE = { fav: () => `<span class="tmk-star" title="Favourite">${I.starFill}</span>`, book: () => `<span class="tmk-mark" title="Bookmarked">${I.bookFill}</span>` }
+const badgeOf = (tab) => (BADGE[tab] ? BADGE[tab]() : '')
+const imgOf = (k) => k[0] === 'a' ? A[k.slice(1)][2] : ENCL[k] ? ENCL[k][2] : RECS[k][3]
+function animalCard(aaid, badge = '') {
+  const [sp, s, ph] = A[aaid]
+  return `<div class="fav__item" role="listitem" data-flip="a${aaid}"><button type="button" class="fav__card" data-open="AAID ${aaid} · ${sp}" aria-label="${sp}, AAID ${aaid}">` +
+    `<img class="fav__img" src="${IMG(ph)}" alt="" decoding="async">${badge}` +
+    `<span class="fav__sex" data-s="${s}">${SEX[s]}</span>` +
+    `<span class="fav__txt"><b class="fav__name">AAID<span class="fav__idsep"> </span>${aaid}</b><small class="fav__meta fav__meta--sp">${sp}</small></span></button></div>`
+}
+/* an enclosure, a note, a medical record or a lab request: its photo, the
+   tab's badge, a type tag, its name over one line */
+function thingCard(k, tag, title, meta, photo, badge) {
+  return `<div class="fav__item" role="listitem" data-flip="${k}"><button type="button" class="fav__card" data-open="${tag} · ${title}" aria-label="${tag}: ${title}">` +
+    `<img class="fav__img" src="${IMG(photo)}" alt="" decoding="async">${badge}<span class="tmk-type">${tag}</span>` +
+    `<span class="fav__txt"><b class="fav__name">${title}</b><small class="fav__meta">${meta}</small></span></button></div>`
+}
+function folderCard(f, tab) {
+  const n = f.items.length, meta = tab === 'folders' ? `In ${f.tab === 'fav' ? 'Favourites' : 'Bookmarks'} · ${n}` : `${n} items`
+  return `<div class="fav__item" role="listitem" data-flip="${f.id}"><button type="button" class="fav__card tmk-folder" data-folder="${f.id}" aria-label="Folder ${f.name}, ${n} items">` +
+    `<span class="tmk-mosaic">${f.items.slice(0, 4).map((k) => `<img src="${IMG(imgOf(k))}" alt="" data-from="${k}" decoding="async">`).join('')}</span>` +
+    `<span class="tmk-type tmk-type--n">${I.folders}${n}</span>` +
+    `<span class="fav__txt"><b class="fav__name">${f.name}</b><small class="fav__meta">${meta}</small></span></button></div>`
+}
+function cardOf(k, tab) {
+  if (k[0] === 'f') return folderCard(FOLDERS.find((x) => x.id === k), tab)
+  if (k[0] === 'a') return animalCard(k.slice(1), badgeOf(tab))
+  if (ENCL[k]) { const [t, m, p] = ENCL[k]; return thingCard(k, 'Enclosure', t, m, p, badgeOf(tab)) }
+  const [tag, t, m, p] = RECS[k]; return thingCard(k, tag, t, m, p, badgeOf(tab))
+}
+
+/* SIX, THEN VIEW ALL (owner, 19 Oct 2026: "each things 5 or 6 things will
+   show, then you have to show View all. That's all."): a tab shows its first
+   six and, when it holds more, ends on a View all card in the add card's
+   material, saying how many there are */
+const SHOW = 6
+const viewAll = (n, noun, what) => `<div class="fav__item" role="listitem" data-flip="view-all"><button type="button" class="fav__card fav__card--add tmk-all" data-open="all ${n} ${what}" aria-label="View all ${n} ${noun}">` +
+  `<span class="fav__plus" aria-hidden="true">${I.arrow}</span><b class="fav__name">View all</b><small class="tmk-all__n">${n} ${noun}</small></button></div>`
+const capped = (keys, tab, noun, what) => keys.slice(0, SHOW).map((k) => cardOf(k, tab)).join('') + (keys.length > SHOW ? viewAll(keys.length, noun, what) : '')
+/* a folder opened in place leads with a way back, in the same white card
+   (Roll says it in its title instead, so it has none) */
+const backCard = (f) => `<div class="fav__item" role="listitem" data-flip="folder-back"><button type="button" class="fav__card fav__card--add tmk-all" data-folder-back aria-label="Back from ${f.name}">` +
+  `<span class="fav__plus" aria-hidden="true">${I.backArrow}</span><b class="fav__name">${f.name}</b><small class="tmk-all__n">${f.items.length} items</small></button></div>`
+function railHTML(tabId, folderId, withBack) {
+  if (folderId) { const f = FOLDERS.find((x) => x.id === folderId); return (withBack ? backCard(f) : '') + capped(f.items, f.tab, 'items', f.name) }
+  const t = TABS.find((x) => x.id === tabId)
+  return capped(t.items, t.id, t.noun, t.title.toLowerCase())
+}
+
+/* ══ THE STYLES, INSIDE THE FRAME · scoped to the band ════════════════════ */
+const CSS = `
+#favSpecies.tmk .fav__title, #favSpecies.tmk .fav__edit, #favSpecies.tmk .fav__rail:not(.tmk-rail) { display: none !important; }
+/* the live head is a 19–20px line for a title; the tabs set its height here */
+#favSpecies.tmk .fav__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: auto; min-height: 22px; }
+#favSpecies.tmk .tmk-rail { scroll-behavior: auto; }
+#favSpecies.tmk .fav__item { will-change: transform, opacity; }
+/* View all: the live add card (white, Antz green ring), its count under the name */
+.tmk-all { gap: 8px; }
+.tmk-all__n { position: relative; z-index: 1; font: 400 12px/1 Inter, sans-serif; color: var(--c-on-surface-var, #44544A); }
+/* the live page hides the add card beside other cards (index.html: .fav__item:not(:only-child) > .fav__card--add)
+   and the web build hides its item; View all borrows that card's look, so it is shown again here */
+#favSpecies .fav__item:has(> .tmk-all) { display: block !important; }
+#favSpecies .fav__item > .tmk-all { display: flex !important; }
+/* the badges: the sex tag's geometry (24 high, 6 round), on the other corner */
+.tmk-star, .tmk-mark { position: absolute; z-index: 2; top: 8px; left: 8px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: rgba(255, 255, 255, .92); }
+.tmk-star { color: #F2B01E; } .tmk-mark { color: #1F515B; }
+.tmk-star svg, .tmk-mark svg { width: 14px; height: 14px; }
+.tmk-type { position: absolute; z-index: 2; top: 8px; right: 8px; display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 7px; border-radius: 6px; background: rgba(255, 255, 255, .92); color: #1F415B; font: 600 11px/1 Inter, sans-serif; letter-spacing: .1px; }
+.tmk-type svg { width: 13px; height: 13px; }
+/* a folder: its first four photos as the cover, the card's own scrim over it */
+.tmk-mosaic { position: absolute; inset: 0; display: grid; grid-template: 1fr 1fr / 1fr 1fr; gap: 2px; background: rgba(255, 255, 255, .85); }
+.tmk-mosaic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tmk-toast { position: fixed; left: 50%; bottom: 110px; z-index: 900; padding: 10px 16px; border-radius: 12px; background: #1F415B; color: #fff; font: 500 14px Inter, sans-serif; white-space: nowrap; transform: translate(-50%, 12px); opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
+.tmk-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+.tmk-ghost { position: fixed; z-index: 30; margin: 0; pointer-events: none; }
+
+/* ── 1 · GLIDE · the site tabs' pills; one dark pill glides under them ── */
+.tmk-pills, .tmk-lens { flex: 1; min-width: 0; }
+.tmk-pills { position: relative; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-right: calc(var(--pad-page, 16px) * -1); padding: 2px var(--pad-page, 16px) 2px 0; }
+.tmk-pills::-webkit-scrollbar { display: none; }
+.tmk-pill { position: relative; z-index: 1; flex: none; display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px 0 12px; border: 0; border-radius: 100px; background: rgba(0, 0, 0, .07); color: #44544A; font: 500 14px Inter, sans-serif; letter-spacing: .1px; cursor: pointer; transition: color 260ms ease, background-color 260ms ease; -webkit-tap-highlight-color: transparent; }
+.tmk-pill em { font-style: normal; font-size: 12px; font-weight: 600; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; display: inline-grid; place-items: center; background: rgba(0, 0, 0, .07); transition: background-color 260ms ease; }
+.tmk-pill[aria-selected='true'] { color: #fff; background: transparent; }
+.tmk-pill[aria-selected='true'] em { background: rgba(255, 255, 255, .18); }
+.tmk-pill:focus-visible { outline: 2px solid #1F415B; outline-offset: 2px; }
+.tmk-thumb { position: absolute; z-index: 0; top: 2px; left: 0; height: 38px; border-radius: 100px; background: #1F515B; box-shadow: 0 6px 16px -8px rgba(31, 81, 91, .7);
+  transition: transform 480ms cubic-bezier(.32, .72, 0, 1), width 480ms cubic-bezier(.32, .72, 0, 1); }
+
+/* ── 2 · ROLL · the title is the tab, the switch is glass ── */
+.tmk-rollhead { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.tmk-back { display: grid; place-items: center; width: 0; height: 30px; margin-left: -4px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .6); color: #1F415B; opacity: 0; overflow: hidden; cursor: pointer; transition: width 320ms cubic-bezier(.32, .72, 0, 1), opacity 220ms ease, margin 320ms cubic-bezier(.32, .72, 0, 1); }
+.tmk-back.is-on { width: 30px; margin-left: 0; opacity: 1; }
+.tmk-roll { position: relative; display: grid; margin: 0; overflow: hidden; height: 24px; font: 500 16px/24px Inter, sans-serif; color: #000; white-space: nowrap; }
+.tmk-roll > span { grid-area: 1 / 1; display: inline-flex; align-items: baseline; gap: 6px; }
+.tmk-roll small { font-size: 13px; font-weight: 500; color: #7A8684; }
+.tmk-seg { position: relative; flex: none; display: flex; padding: 3px; border-radius: 12px; background: var(--glass-fill, rgba(255, 255, 255, .4));
+  -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .75), inset 0 0 0 1px rgba(255, 255, 255, .22), 0 2px 6px -2px rgba(16, 45, 52, .18); }
+.tmk-segb { position: relative; z-index: 1; display: grid; place-items: center; width: 42px; height: 34px; padding: 0; border: 0; border-radius: 9px; background: none; color: #44544A; cursor: pointer; transition: color 240ms ease; -webkit-tap-highlight-color: transparent; }
+.tmk-segb[aria-selected='true'] { color: #006D35; }
+.tmk-segb:focus-visible { outline: 2px solid #1F415B; outline-offset: -2px; }
+.tmk-segthumb { position: absolute; z-index: 0; top: 3px; left: 0; width: 42px; height: 34px; border-radius: 9px; background: #fff; box-shadow: 0 2px 8px -2px rgba(16, 45, 52, .25);
+  transition: transform 460ms cubic-bezier(.32, .72, 0, 1); }
+
+/* ── 3 · LENS · text tabs, an elastic underline ── */
+.tmk-lens { position: relative; display: flex; gap: 22px; padding-bottom: 9px; overflow-x: auto; scrollbar-width: none; }
+.tmk-lens::-webkit-scrollbar { display: none; }
+.tmk-ltab { flex: none; display: inline-flex; align-items: baseline; gap: 5px; padding: 0; border: 0; background: none; color: #7A8684; font: 500 16px/22px Inter, sans-serif; cursor: pointer; transition: color 280ms ease; -webkit-tap-highlight-color: transparent; }
+.tmk-ltab em { font-style: normal; font-size: 12px; font-weight: 600; color: inherit; opacity: .7; }
+.tmk-ltab[aria-selected='true'] { color: #000; }
+.tmk-ltab:focus-visible { outline: 2px solid #1F415B; outline-offset: 3px; border-radius: 4px; }
+.tmk-line { position: absolute; bottom: 0; left: 0; height: 3px; border-radius: 3px; background: #1F515B; }
+/* a phone: the four names fit only without their counts */
+@media (max-width: 479px) { .tmk-lens { gap: 20px; } .tmk-ltab em { display: none; } }
+
+/* ── 4 · DROPDOWN · the title opens the page's own menu (.pmenu) ── */
+.tmk-dd { display: inline-flex; align-items: center; gap: 8px; min-width: 0; margin: -5px 0 -5px -10px; padding: 5px 6px 5px 10px; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color 200ms ease; }
+.tmk-dd:hover, .tmk-dd[aria-expanded='true'] { background: rgba(0, 0, 0, .05); }
+.tmk-dd:focus-visible { outline: 2px solid #1F415B; outline-offset: 2px; }
+.tmk-dd__chev { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--glass-fill, rgba(255, 255, 255, .4)); color: #1F415B;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .75), inset 0 0 0 1px rgba(255, 255, 255, .22), 0 1px 3px rgba(16, 45, 52, .18); transition: transform 360ms cubic-bezier(.32, .72, 0, 1); }
+.tmk-dd__chev svg { width: 16px; height: 16px; }
+.tmk-dd[aria-expanded='true'] .tmk-dd__chev { transform: rotate(180deg); }
+.tmk-menu { width: min(300px, calc(100vw - 24px)); transform-origin: top left; }
+.tmk-menu .pmenu__item[aria-selected='true'] { background: var(--petrol-050, #EEF5F6); }
+.tmk-menu .pmenu__icon svg { width: 17px; height: 17px; }
+.tmk-menu__n { font-style: normal; font-size: 12px; font-weight: 600; color: #7A8684; margin-left: 3px; }
+
+/* ── THE BOTTOM ROW, IN EVERY CONCEPT (owner, 19 Oct 2026: "put the Menu
+   icon on the Arrow; instead of Quick Actions icon show thunder icon", then
+   "icon has previously added Quick Access icon … when I scroll don't hide") ──
+   The Modules pill's double chevron becomes the grid mark Quick Actions wore
+   (qa-actions.svg, at its own 18.33 in a 20 box); Quick Actions takes a bolt
+   on the same mask, so it still turns into the × when the panel opens. */
+.mhint__chev { display: none !important; }
+.mhint::after { content: ''; flex: none; width: 20px; height: 20px; background: currentColor;
+  -webkit-mask: url(assets/icon/qa-actions.svg) 1.042px 1.042px / 18.33px 18.33px no-repeat;
+          mask: url(assets/icon/qa-actions.svg) 1.042px 1.042px / 18.33px 18.33px no-repeat; }
+/* …and it no longer folds away when the Modules head scrolls into view. It
+   still steps aside, as before, while Quick Actions is open, the keyboard is
+   up, the page is in edit mode, or a note or hold menu is open. */
+body:not(.is-editing):not(.dpop-open):not(.v2ctx-open) .qa:not(.is-open):not(.is-kb) .mhint.is-off {
+  max-width: 160px; padding: 0 16px; margin-right: 0; opacity: 1; pointer-events: auto;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25), inset 0 1px 0 0 var(--glass-spec), inset 0 -1px 0 0 var(--glass-bounce), inset 0 0 0 1px var(--glass-rim), inset 0 -6px 12px -6px var(--glass-depth); }
+#qaPill .qa-pill__grid {
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M13.6 1.8 4.2 13.4c-.4.5 0 1.2.6 1.2h5.9l-1.3 7.2c-.1.7.8 1.1 1.2.5l9.3-11.6c.4-.5 0-1.2-.6-1.2h-5.9l1.3-7.2c.1-.7-.8-1.1-1.2-.5z'/></svg>") center / 20px 20px no-repeat;
+          mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M13.6 1.8 4.2 13.4c-.4.5 0 1.2.6 1.2h5.9l-1.3 7.2c-.1.7.8 1.1 1.2.5l9.3-11.6c.4-.5 0-1.2-.6-1.2h-5.9l1.3-7.2c.1-.7-.8-1.1-1.2-.5z'/></svg>") center / 20px 20px no-repeat; }
+
+/* ── 7 · EXPAND · the current UI's own pills (the site tabs': 41 high, round,
+   rgba(0,0,0,.07) at rest, #1F515B picked). The tabs not picked are icons
+   only; the picked one opens to its icon, name and count, and the one left
+   closes as it opens, so the row keeps its length (owner, 19 Oct 2026: "match
+   the current UI style … other tabs show only icons, after clicking name with
+   icon you can show") ── */
+.tmk-xp { flex: 1; min-width: 0; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+.tmk-xp::-webkit-scrollbar { display: none; }
+.tmk-xb { flex: none; display: inline-flex; align-items: center; height: 41px; padding: 0 11.5px; border: 0; border-radius: 100px; background: rgba(0, 0, 0, .07); color: #44544A; font: 500 14px/1 Inter, sans-serif; letter-spacing: .1px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background-color 300ms ease, color 300ms ease, padding 480ms cubic-bezier(.32, .72, 0, 1), box-shadow 300ms ease, transform 160ms ease; }
+.tmk-xb svg { flex: none; width: 18px; height: 18px; }
+.tmk-xb__l { display: inline-flex; align-items: center; gap: 7px; max-width: 0; margin-left: 0; opacity: 0; overflow: hidden; white-space: nowrap;
+  transition: max-width 480ms cubic-bezier(.32, .72, 0, 1), margin-left 480ms cubic-bezier(.32, .72, 0, 1), opacity 160ms ease; }
+.tmk-xb__l em { font-style: normal; font-size: 12px; font-weight: 600; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; display: inline-grid; place-items: center; background: rgba(255, 255, 255, .18); }
+.tmk-xb[aria-selected='true'] { padding: 0 12px 0 12px; background: #1F515B; color: #fff; box-shadow: 0 6px 16px -8px rgba(31, 81, 91, .7); }
+.tmk-xb[aria-selected='true'] .tmk-xb__l { max-width: 170px; margin-left: 8px; opacity: 1; transition-delay: 0s, 0s, 140ms; transition-duration: 480ms, 480ms, 260ms; }
+.tmk-xb:active { transform: scale(.95); }
+.tmk-xb:focus-visible { outline: 2px solid #1F415B; outline-offset: 2px; }
+:root.has-wsky[data-sky-tone='dark'] .tmk-xb { background: rgba(255, 255, 255, .16); color: #fff; }
+:root.has-wsky[data-sky-tone='dark'] .tmk-xb[aria-selected='true'] { background: #fff; color: #1F515B; }
+:root.has-wsky[data-sky-tone='dark'] .tmk-xb__l em { background: rgba(31, 81, 91, .12); }
+
+/* ── 6 · STRIP · Swiggy's top-tab structure in the current UI (owner, 19 Oct
+   2026: "Top tabs I want like these", then "match the current UI style",
+   "other tabs show only icons, after clicking name with icon", and "revert
+   the old, but match the UI"). Thin dividers between the tabs and a hairline
+   under them, as Swiggy; the words are the page's own — Inter 14, sentence
+   case, #44544A at rest and #1F415B picked — and the tabs not picked show
+   only their icon. The picked one opens to icon, name and count, and a soft
+   glow rising from a thick teal bar glides to it, following it as it opens. */
+/* EDGE TO EDGE, STILL ICONS, NO NUMBERS (owner, 19 Oct 2026: "make it edge
+   to edge, don't move icons, don't show numbers"): four equal tabs across the
+   whole width, the hairline from screen edge to screen edge; each tab keeps
+   its quarter, so opening one never pushes another. */
+/* inside the page's padding, left and right alike (19 Oct 2026: "tabs section
+   need same padding for left & right") — it starts where the cards start */
+.tmk-strip { flex: 1; min-width: 0; position: relative; display: flex; margin: 0; box-shadow: inset 0 -1px 0 rgba(31, 65, 91, .14); }
+/* ICON AND NAME ON ONE ROW (19 Oct 2026: "icons & text should be same row"):
+   the picked tab's name opens beside its icon, inside the tab's own quarter;
+   only that icon eases aside for it, no other tab moves */
+.tmk-sw { position: relative; z-index: 1; flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; height: 48px; padding: 0 3px 6px; border: 0; background: none; color: #44544A; font: 500 14px/1 Inter, sans-serif; letter-spacing: .1px; cursor: pointer; transition: color 280ms ease; -webkit-tap-highlight-color: transparent; }   /* 14, the site tabs' size (19 Oct 2026: "can you increase the font") */
+.tmk-sw svg { flex: none; width: 20px; height: 20px; }
+/* no dividers between the tabs (19 Oct 2026: "remove the in-between line") — the hairline under the row stays */
+.tmk-sw__l { max-width: 0; margin-left: 0; overflow: hidden; white-space: nowrap; opacity: 0;
+  transition: max-width 460ms cubic-bezier(.32, .72, 0, 1), margin-left 460ms cubic-bezier(.32, .72, 0, 1), opacity 150ms ease; }
+/* THE PICKED TAB'S COLOUR, --sw-c: OnSurfaceVariant for every tab (19 Oct
+   2026, after per-tab colours were tried: "same for all, use Surface Variant
+   only"); the picked one differs by its name, its weight and its bar */
+.tmk-sw[aria-selected='true'] { color: var(--sw-c, #1F415B); }
+.tmk-sw[aria-selected='true'] .tmk-sw__l { max-width: 96px; margin-left: 7px; opacity: 1; font-weight: 600; transition-delay: 0s, 0s, 130ms; transition-duration: 460ms, 460ms, 240ms; }
+/* a phone's quarter is ~97px: the longest name fits beside a smaller mark */
+/* four tabs: a phone's quarter is 89.5px, and 12.5 is the largest size at
+   which the longest name (Bookmarks, 68px) fits beside a 16px mark */
+@media (max-width: 479px) { .tmk-sw { padding: 0 0 6px; font-size: 12.5px; letter-spacing: 0; } .tmk-sw svg { width: 16px; height: 16px; } .tmk-sw[aria-selected='true'] .tmk-sw__l { margin-left: 4px; } }
+.tmk-sw:focus-visible { outline: 2px solid #1F415B; outline-offset: -4px; border-radius: 10px; }
+@property --sw-c { syntax: '<color>'; inherits: true; initial-value: #1F515B; }
+/* one tab wide, it glides from tab to tab — and its colour turns on the way */
+.tmk-swlit { position: absolute; z-index: 0; top: 0; bottom: 0; left: 0; pointer-events: none; transition: transform 480ms cubic-bezier(.32, .72, 0, 1), width 480ms cubic-bezier(.32, .72, 0, 1), --sw-c 480ms ease; }
+/* THE GLOW TAKES THE BACKGROUND'S COLOUR (19 Oct 2026: "white gradient has to
+   change based on the background"): not a white paint but a lift of whatever
+   sky is behind it — brighter and a little richer, faded in from the top by a
+   mask — so it glows mint on a mint sky, warm on a warm one, soft on a dark one */
+/* NO GLOW behind the picked tab (19 Oct 2026: "remove the background, I can
+   see some white") — its name, its weight and its bar are the whole mark */
+/* the bar: a solid OnSurfaceVariant line, 3px (19 Oct 2026: "line weight can
+   you reduce", then "use Surface Variant only") */
+.tmk-swlit::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; border-radius: 3px; background: var(--sw-c, #44544A); }
+:root.has-wsky[data-sky-tone='dark'] .tmk-sw { color: rgba(255, 255, 255, .6); }
+:root.has-wsky[data-sky-tone='dark'] .tmk-sw[aria-selected='true'] { color: color-mix(in srgb, var(--sw-c) 45%, #fff); }
+:root.has-wsky[data-sky-tone='dark'] .tmk-swlit::after { background: color-mix(in srgb, var(--sw-c) 45%, #fff); }
+:root.has-wsky[data-sky-tone='dark'] .tmk-strip { box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .16); }
+
+/* ── 5 · SHELF · after Swiggy Instamart's category bar: a colour tile over
+   each label, a hairline under the row with the tab's own indicator gliding
+   on it, and the header washed in the tab's colour ── */
+.tmk-shelf { flex: 1; min-width: 0; position: relative; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding: 10px 10px 0 2px; box-shadow: inset 0 -1px 0 rgba(31, 65, 91, .12); }   /* 10 over the tiles: the count badges stand 7 above them */
+.tmk-shelf::-webkit-scrollbar { display: none; }
+.tmk-st { flex: none; display: flex; flex-direction: column; align-items: center; gap: 7px; min-width: 76px; padding: 0 6px 11px; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.tmk-st__ico { position: relative; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 15px; background: var(--st-g); color: #fff;
+  box-shadow: 0 4px 10px -6px rgba(16, 45, 52, .45), inset 0 1px 0 rgba(255, 255, 255, .25); transition: transform 380ms cubic-bezier(.34, 1.56, .64, 1), box-shadow 300ms ease; }
+.tmk-st__ico svg { width: 23px; height: 23px; stroke-width: 2.2; }
+.tmk-st:active .tmk-st__ico { transform: scale(.92); }
+.tmk-st[aria-selected='true'] .tmk-st__ico { transform: translateY(-2px) scale(1.07); box-shadow: 0 12px 20px -10px var(--st-c), inset 0 1px 0 rgba(255, 255, 255, .3); }
+.tmk-st__n { position: absolute; top: -7px; right: -9px; min-width: 21px; height: 21px; padding: 0 5px; border-radius: 11px; background: #fff; color: var(--st-c); font: 700 11px/21px Inter, sans-serif; font-style: normal; text-align: center; box-shadow: 0 1px 3px rgba(16, 45, 52, .22); }
+.tmk-st__l { font: 500 12.5px/16px Inter, sans-serif; letter-spacing: .1px; color: #44544A; white-space: nowrap; transition: color 240ms ease; }
+.tmk-st[aria-selected='true'] .tmk-st__l { color: #1F415B; font-weight: 600; }
+.tmk-st:focus-visible { outline: 2px solid #1F415B; outline-offset: 2px; border-radius: 12px; }
+.tmk-st__bar { position: absolute; left: 0; bottom: 0; height: 4px; border-radius: 4px 4px 0 0;
+  transition: transform 460ms cubic-bezier(.32, .72, 0, 1), width 460ms cubic-bezier(.32, .72, 0, 1), background-color 320ms ease; }
+/* the wash: one layer per tab inside the live sky (.wsky), cross-faded */
+.tmk-wash { position: absolute; inset: 0; pointer-events: none; }
+.tmk-wash i { position: absolute; inset: 0; opacity: 0; transition: opacity 560ms ease; }
+.tmk-wash i.is-on { opacity: 1; }
+:root.has-wsky[data-sky-tone='dark'] .tmk-st__l { color: rgba(255, 255, 255, .78); }
+:root.has-wsky[data-sky-tone='dark'] .tmk-st[aria-selected='true'] .tmk-st__l { color: #fff; }
+
+/* under a dark live sky the band's words are white, as #favTitle is */
+:root.has-wsky[data-sky-tone='dark'] .tmk-pill { background: rgba(255, 255, 255, .16); color: #fff; }
+:root.has-wsky[data-sky-tone='dark'] .tmk-pill em { background: rgba(255, 255, 255, .16); }
+:root.has-wsky[data-sky-tone='dark'] .tmk-thumb { background: #fff; }
+:root.has-wsky[data-sky-tone='dark'] .tmk-pill[aria-selected='true'] { color: #1F515B; }
+:root.has-wsky[data-sky-tone='dark'] .tmk-roll, :root.has-wsky[data-sky-tone='dark'] .tmk-ltab[aria-selected='true'] { color: #fff; }
+:root.has-wsky[data-sky-tone='dark'] .tmk-ltab, :root.has-wsky[data-sky-tone='dark'] .tmk-roll small { color: rgba(255, 255, 255, .7); }
+:root.has-wsky[data-sky-tone='dark'] .tmk-line { background: #fff; }
+@media (prefers-reduced-motion: reduce) { .tmk-thumb, .tmk-segthumb, .tmk-back, .tmk-pill, .tmk-ltab { transition: none; } }
+`
+
+/* ══ YOUR MODULES · the owner's twenty, and nothing else ══════════════════
+   Owner, 19 Oct 2026: "In Your Modules: Pharmacy, Necropsy, Collection,
+   Animals, Training, Mortality, Natality, Fetal Death, Eggs, My Focus Hub,
+   Housing, Diet, Audit, Help Desk, Announcements, Users, Security, Reports,
+   Approvals, Communication. That's all, don't add anything. For mobile and
+   tablet."
+   The live sheet (.mview) still draws itself; each time it does, this redraws
+   its list with the twenty, in this order, in the live categories. A live
+   module keeps everything the sheet gave it — its own tile and icon, the On
+   Home badge, the row with its swipe, and its tap, which opens it as before —
+   copied from what the sheet just drew; only three are new here, drawn in the
+   same tile (Animals, Training, Announcements), in the gradients of modules the
+   twenty leave out (Hospital, Lab) or the file's green. Renamed: Species Management
+   is Collection, Diet & Kitchen is Diet, Helpdesk is Help Desk. */
+const MSV = (d) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`
+const MODS = [
+  { cat: 'Medical', id: 'pharmacy', name: 'Pharmacy', blurb: 'Medicine requests, dispensing and stock levels.' },
+  { cat: 'Medical', id: 'necropsy', name: 'Necropsy', blurb: 'Post-mortems, causes and the reports still pending.' },
+  { cat: 'Animal Management', id: 'species', name: 'Collection', blurb: 'The living collection — species, population and holdings.' },
+  { cat: 'Animal Management', id: 'animals', name: 'Animals', fresh: true, g: '--g-hospital', blurb: 'Every animal in the collection: its record, its history, its home.',
+    svg: MSV('<path d="M3.5 12.6V5.5a2 2 0 0 1 2-2h7.1a2 2 0 0 1 1.4.6l6.9 6.9a2 2 0 0 1 0 2.8l-7.1 7.1a2 2 0 0 1-2.8 0L4.1 14a2 2 0 0 1-.6-1.4z"/><circle cx="8.5" cy="8.5" r="1.6"/>') },
+  { cat: 'Animal Management', id: 'training', name: 'Training', fresh: true, g: '--g-lab', blurb: 'Training sessions, behaviours and each animal’s progress.',
+    svg: MSV('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>') },
+  { cat: 'Animal Management', id: 'mortality', name: 'Mortality', blurb: 'Deaths, necropsy records and mortality trend.' },
+  { cat: 'Animal Management', id: 'natality', name: 'Natality', blurb: 'Births, neonates and natality trend.' },
+  { cat: 'Animal Management', id: 'fetal', name: 'Fetal Death', blurb: 'Stillbirth and neonatal loss records.' },
+  { cat: 'Animal Management', id: 'eggs', name: 'Eggs', blurb: 'Clutches, incubation, nursery and hatch performance.' },
+  { cat: 'Animal Management', id: 'focus', name: 'My Focus Hub', blurb: 'The animals you are watching, and what has happened to them.' },
+  { cat: 'Operations', id: 'housing', name: 'Housing', blurb: 'Every Site, and the workspace for operating one.' },
+  { cat: 'Operations', id: 'diet', name: 'Diet', blurb: 'Diet plans, kitchen output and feed stock.' },
+  { cat: 'Operations', id: 'audit', name: 'Audit', blurb: 'Audit trails, change history and inspection records.' },
+  { cat: 'Administration', id: 'helpdesk', name: 'Help Desk', blurb: 'Raise a ticket, follow it and see it resolved.' },
+  { cat: 'Administration', id: 'announcements', name: 'Announcements', fresh: true, g: '--g-v3-quick', blurb: 'Notices for every site, pinned and scheduled.',
+    svg: MSV('<path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>') },
+  { cat: 'Administration', id: 'users', name: 'Users', blurb: 'Staff accounts, roles and who is on shift.' },
+  { cat: 'Administration', id: 'security', name: 'Security', blurb: 'Gates, patrols and site access control.' },
+  { cat: 'Administration', id: 'reports', name: 'Reports', blurb: 'Board reports, statutory summaries and exports.' },
+  { cat: 'Administration', id: 'approvals', name: 'Approvals', blurb: 'One queue for everything waiting on a decision.' },
+  { cat: 'Administration', id: 'communication', name: 'Commu­nication', blurb: 'Announcements, messages and notices across the site.' },
+]
+const MCATS = ['Medical', 'Animal Management', 'Operations', 'Administration']
+const MSAMPLE = ['mortality', 'eggs', 'pharmacy', 'helpdesk', 'species']   // Recent, until this browser has its own
+function mountModules(doc, win) {
+  const list = doc.querySelector('.mview__list'); if (!list || list.dataset.mockMods) return
+  list.dataset.mockMods = '1'
+  const ico = new Map(), row = new Map()
+  let bar = '', hint = '', chev = ''
+  const plain = (n) => n.replace(/­/g, '')
+  /* what the live sheet just drew: each module's tile icon and row, the bar, the hint */
+  const harvest = () => {
+    for (const el of list.querySelectorAll('[data-mod] .mview__ico')) ico.set(el.closest('[data-mod]').dataset.mod, el.outerHTML)
+    for (const el of list.querySelectorAll('.mview__item[data-mod]')) row.set(el.dataset.mod, el.outerHTML)
+    const b = list.querySelector('.mview__bar'); if (b) bar = b.outerHTML
+    hint = list.querySelector('.mview__hint')?.outerHTML || ''
+    const c = list.querySelector('.mview__chev'); if (c) chev = c.outerHTML
+  }
+  const icoOf = (m) => (!m.fresh && ico.get(m.id)) || `<span class="mview__ico" style="background:var(${m.g || '--g-users'})">${m.svg || ''}</span>`
+  /* the sheet's own name rule: a name with a space wraps at it, not at a soft hyphen */
+  const label = (n) => (/\s/.test(plain(n)) ? plain(n) : n)
+  const tile = (m) => `<button type="button" class="mview__tile" data-mod="${m.id}"${m.fresh ? ' data-mock-new' : ''} aria-label="Open ${plain(m.name)}">${icoOf(m)}<span class="mview__lbl">${label(m.name)}</span></button>`
+  const rowOf = (m) => {
+    const live = !m.fresh && row.get(m.id)
+    if (live) {   /* the live row — its swipe and its tap — under the owner's name */
+      const t = doc.createElement('template'); t.innerHTML = live.trim()
+      const el = t.content.firstElementChild, b = el.querySelector('.mview__txt b'), r = el.querySelector('.mview__row')
+      if (b) b.textContent = m.name
+      if (r) r.setAttribute('aria-label', r.getAttribute('aria-label').replace(/^Open [^,]+/, `Open ${plain(m.name)}`))
+      for (const k of el.querySelectorAll('.mview__kbd')) k.textContent = k.textContent.replace(/: .*$/, `: ${plain(m.name)}`)
+      return el.outerHTML
+    }
+    /* a new one: the same row, without a swipe (it has no card to add yet) */
+    return `<div class="mview__item is-core" role="listitem" data-mod="${m.id}"${m.fresh ? ' data-mock-new' : ''}>` +
+      `<div class="mview__row" role="button" tabindex="0" aria-label="Open ${plain(m.name)}">${icoOf(m)}` +
+      `<span class="mview__txt"><b>${m.name}</b><small>${m.blurb}</small></span>${chev}</div></div>`
+  }
+  const recent = () => {
+    let ids = []
+    try { ids = JSON.parse(win.localStorage.getItem('antz.home.recentModules') || '[]') } catch { /* none */ }
+    const mine = ids.map((id) => MODS.find((m) => m.id === id)).filter(Boolean)
+    return (mine.length ? mine : MSAMPLE.map((id) => MODS.find((m) => m.id === id))).slice(0, 5)
+  }
+  const render = () => {
+    harvest()
+    const q = (doc.querySelector('.mview__search input')?.value || '').trim().toLowerCase()
+    let mode = 'grid'; try { if (win.localStorage.getItem('antz.mview.mode') === 'list') mode = 'list' } catch { /* tiles */ }
+    const hit = (m) => !q || plain(m.name).toLowerCase().includes(q) || m.blurb.toLowerCase().includes(q)
+    const cats = MCATS.map((c) => {
+      const ms = MODS.filter((m) => m.cat === c && hit(m)); if (!ms.length) return ''
+      return `<h3 class="mview__cat">${c}</h3>` + (mode === 'grid' ? `<div class="mview__grid">${ms.map(tile).join('')}</div>` : ms.map(rowOf).join(''))
+    }).join('')
+    const rec = q ? [] : recent()
+    /* the marker goes last: the sheet spaces its first heading with :first-child */
+    list.innerHTML =
+      (rec.length ? `<h3 class="mview__sec">Recent</h3><div class="mview__grid mview__grid--recent">${rec.map(tile).join('')}</div>` : '') +
+      bar + (cats && mode === 'list' ? hint : '') + (cats || '<p class="mview__empty">No module matches that.</p>') + '<i data-mock-sheet hidden></i>'
+  }
+  /* the sheet redrew (opened, searched, switched grid/list, a swipe added one): draw the twenty again */
+  new win.MutationObserver(() => { if (!list.querySelector(':scope > [data-mock-sheet]')) render() }).observe(list, { childList: true })
+  /* a new module has nowhere to go yet: the sheet's own notice says so */
+  const toast = list.closest('.mview')?.querySelector('.mview__toast')
+  let tt = 0
+  const say = (t) => { if (!toast) return; toast.innerHTML = `<span>${t}</span>`; toast.classList.add('is-on'); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove('is-on'), 2600) }
+  const fresh = (e) => {
+    const n = e.target.closest('[data-mock-new]'); if (!n) return false
+    e.stopPropagation(); e.preventDefault()
+    say(`${plain(MODS.find((m) => m.id === n.dataset.mod).name)} is new in this mockup`)
+    return true
+  }
+  list.addEventListener('click', fresh, true)
+  list.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') fresh(e) }, true)
+}
+
+/* ══ THE MOUNT · runs from here against the frame's document ══════════════ */
+function mount(doc, win, concept) {
+  const sec = doc.getElementById('favSpecies'), head = sec?.querySelector('.fav__head'), live = sec?.querySelector('.fav__rail')
+  if (!sec || !head || !live || sec.classList.contains('tmk')) return !!sec?.classList.contains('tmk')
+  const calm = win.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const anim = (el, kf, o) => (calm || !el.animate ? null : el.animate(kf, { fill: 'both', ...o }))
+  const style = doc.createElement('style'); style.id = 'tmkStyle'; style.textContent = CSS; doc.head.append(style)
+  sec.classList.add('tmk', `tmk--${concept}`)
+  const rail = doc.createElement('div'); rail.className = 'fav__rail tmk-rail'; rail.setAttribute('role', 'tabpanel'); rail.id = 'tmkRail'
+  live.after(rail)
+  const ui = doc.createElement('div'); ui.className = 'tmk-ui'; ui.style.cssText = 'display:contents'; head.append(ui)
+  const toast = doc.createElement('div'); toast.className = 'tmk-toast'; doc.body.append(toast)
+  let toastT = 0
+  const say = (t) => { toast.textContent = t; toast.classList.add('is-on'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('is-on'), 1800) }
+
+  /* the tab it opens on: ?t=fav or ?t=book links straight to the folders */
+  let cur = TABS.some((t) => t.id === START) ? START : 'recent', folder = null, busy = false
+  const idx = (id) => TABS.findIndex((t) => t.id === id)
+  /* a folder belongs to its tab (or to Folders): moving to another tab closes it */
+  const fill = () => {
+    if (folder && cur !== 'folders' && FOLDERS.find((x) => x.id === folder)?.tab !== cur) folder = null
+    rail.innerHTML = railHTML(cur, folder, concept !== 'roll'); rail.scrollLeft = 0
+  }
+  const items = () => [...rail.children]
+  const onScreen = (el) => { const r = el.getBoundingClientRect(), rr = rail.getBoundingClientRect(); return r.right > rr.left - 4 && r.left < rr.right + 4 }
+
+  /* a tab bar's ARIA and its arrow keys, shared */
+  const wireTabs = (bar, sel, go) => {
+    bar.setAttribute('role', 'tablist'); bar.setAttribute('aria-label', 'Animals')
+    bar.addEventListener('click', (e) => { const b = e.target.closest(sel); if (b) go(b.dataset.tab) })
+    bar.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return
+      const i = (idx(cur) + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length
+      e.preventDefault(); go(TABS[i].id); bar.querySelector(`[data-tab="${TABS[i].id}"]`)?.focus()
+    })
+  }
+  const mark = (bar, sel) => { for (const b of bar.querySelectorAll(sel)) { const on = b.dataset.tab === cur; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1 } }
+
+  /* shared by Roll and Dropdown · the title rolls: the old words up and away,
+     the new up from below (down when going back) */
+  const rollTitle = (title, html, up = true) => {
+    const old = title.firstElementChild, nu = doc.createElement('span'); nu.innerHTML = html; title.append(nu)
+    const d = up ? 1 : -1
+    anim(old, [{ transform: 'none', opacity: 1, filter: 'blur(0)' }, { transform: `translateY(${-d * 100}%)`, opacity: 0, filter: 'blur(2px)' }], { duration: 300, easing: 'cubic-bezier(.4,0,.2,1)' })
+    const a = anim(nu, [{ transform: `translateY(${d * 100}%)`, opacity: 0, filter: 'blur(2px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], { duration: 420, delay: 60, easing: 'cubic-bezier(.16,1,.3,1)' })
+    ;(a ? a.finished : Promise.resolve()).then(() => old.remove())
+  }
+  /* … and the cards settle out — a tapped folder lifts toward you — and the new ones rise in, one by one */
+  const rise = async (from) => {
+    const out = items().filter(onScreen)
+    await Promise.all(out.map((el, i) => el === from
+      ? anim(el, [{ transform: 'none', opacity: 1 }, { transform: 'scale(1.06)', opacity: 0 }], { duration: 220, easing: 'ease-in' })?.finished
+      : anim(el, [{ transform: 'none', opacity: 1 }, { transform: 'translateY(10px) scale(.94)', opacity: 0 }], { duration: 160, delay: i * 16, easing: 'ease-in' })?.finished))
+    fill()
+    items().forEach((el, i) => anim(el, [{ transform: 'translateY(26px) scale(.94)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 620, delay: 40 + Math.min(i, 6) * 48, easing: 'cubic-bezier(.34,1.36,.64,1)' }))
+  }
+
+  /* ── 4 · DROPDOWN ────────────────────────────────────────────────────────
+     No chips (owner, 19 Oct 2026: "Instead of chips need dropdown"): the title
+     is the control, with a glass chevron; it opens the page's own menu
+     (.pmenu — the profile and modules menus' material), unfolding from the
+     title's corner, rows arriving one by one, a tick on the one showing. */
+  if (concept === 'menu') {
+    const NOTE = { recent: 'Animals you opened lately', fav: 'Animals and enclosures, in folders', book: 'Notes, medical records, lab requests', folders: 'Every folder you have made' }
+    ui.innerHTML = `<button type="button" class="tmk-dd" aria-haspopup="listbox" aria-expanded="false" aria-controls="tmkMenu">` +
+      `<span class="tmk-roll" aria-live="polite"><span>${TABS.find((t) => t.id === cur).title} <small>${countOf(TABS.find((t) => t.id === cur))}</small></span></span><span class="tmk-dd__chev" aria-hidden="true">${I.down}</span></button>`
+    const btn = ui.querySelector('.tmk-dd'), title = ui.querySelector('.tmk-roll')
+    const menu = doc.createElement('div'); menu.className = 'pmenu tmk-menu'; menu.id = 'tmkMenu'
+    menu.setAttribute('role', 'listbox'); menu.setAttribute('aria-label', 'Show'); menu.hidden = true
+    doc.body.append(menu)
+    const draw = () => {
+      menu.innerHTML = TABS.map((t) => `<button type="button" class="pmenu__item" role="option" data-tab="${t.id}" aria-selected="${t.id === cur}">` +
+        `<span class="pmenu__icon">${I[t.id]}</span><span class="pmenu__text"><span class="pmenu__label">${t.title}<em class="tmk-menu__n">${countOf(t)}</em></span>` +
+        `<span class="pmenu__note">${NOTE[t.id]}</span></span>${t.id === cur ? `<span class="pmenu__tick">${I.check}</span>` : ''}</button>`).join('')
+    }
+    let open = false
+    const show = () => {
+      draw()
+      const r = btn.getBoundingClientRect()
+      menu.style.left = `${Math.max(12, Math.min(r.left, win.innerWidth - 312))}px`; menu.style.top = `${r.bottom + 8}px`
+      menu.hidden = false; open = true; btn.setAttribute('aria-expanded', 'true')
+      win.requestAnimationFrame(() => menu.classList.add('is-open'))
+      ;[...menu.children].forEach((el, i) => anim(el, [{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], { duration: 280, delay: 50 + i * 38, easing: 'cubic-bezier(.16,1,.3,1)' }))
+      menu.querySelector('[aria-selected="true"]')?.focus({ preventScroll: true })
+    }
+    const hide = (focus) => {
+      if (!open) return
+      open = false; btn.setAttribute('aria-expanded', 'false'); menu.classList.remove('is-open')
+      setTimeout(() => { if (!open) menu.hidden = true }, 220)
+      if (focus) btn.focus({ preventScroll: true })
+    }
+    const go = async (id) => {
+      if (id === cur || busy) return
+      busy = true
+      const up = idx(id) >= idx(cur); cur = id
+      const t = TABS[idx(id)]; rollTitle(title, `${t.title} <small>${countOf(t)}</small>`, up)
+      await rise(); busy = false
+    }
+    btn.addEventListener('click', () => (open ? hide() : show()))
+    menu.addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (!b) return; hide(true); go(b.dataset.tab) })
+    doc.addEventListener('pointerdown', (e) => { if (open && !menu.contains(e.target) && !btn.contains(e.target)) hide() }, true)
+    doc.addEventListener('keydown', (e) => {
+      if (!open) return
+      if (e.key === 'Escape') { e.preventDefault(); hide(true) }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault()
+        const opts = [...menu.children], i = opts.indexOf(doc.activeElement)
+        opts[(i + (e.key === 'ArrowDown' ? 1 : opts.length - 1) + opts.length) % opts.length].focus()
+      }
+    })
+    /* a scroll closes it, as the live menus do — but only a real one: a late
+       scroll event from the tap that opened it must not shut it again */
+    let y0 = 0
+    btn.addEventListener('click', () => { y0 = win.scrollY }, true)
+    win.addEventListener('scroll', () => { if (Math.abs(win.scrollY - y0) > 24) hide() }, { passive: true })
+    win.addEventListener('resize', () => hide())
+    fill()
+  }
+
+  /* ── 7 · EXPAND ──────────────────────────────────────────────────────────
+     The site tabs' pills; icons only, the picked one opens to its name. The
+     cards slide in from the side you moved toward, as in Glide. */
+  if (concept === 'expand') {
+    ui.innerHTML = `<div class="tmk-xp">` + TABS.map((t) =>
+      `<button type="button" class="tmk-xb" role="tab" data-tab="${t.id}" aria-label="${t.label}, ${countOf(t)}" title="${t.label}">${I[t.id]}` +
+        `<span class="tmk-xb__l" aria-hidden="true"><span>${t.label}</span><em>${countOf(t)}</em></span></button>`).join('') + `</div>`
+    const bar = ui.querySelector('.tmk-xp')
+    const go = async (id) => {
+      if (id === cur || busy) return
+      busy = true
+      const dir = Math.sign(idx(id) - idx(cur)); cur = id; mark(bar, '.tmk-xb')
+      const out = items().filter(onScreen)
+      await Promise.all(out.map((el, i) => anim(el, [{ transform: 'none', opacity: 1 }, { transform: `translateX(${-dir * 30}px)`, opacity: 0 }], { duration: 160, delay: i * 16, easing: 'cubic-bezier(.4,0,1,1)' })?.finished))
+      fill()
+      items().forEach((el, i) => anim(el, [{ transform: `translateX(${dir * 56}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 500, delay: Math.min(i, 6) * 40, easing: 'cubic-bezier(.16,1,.3,1)' }))
+      busy = false
+    }
+    wireTabs(bar, '.tmk-xb', go); mark(bar, '.tmk-xb'); fill()
+  }
+
+  /* ── 6 · STRIP ───────────────────────────────────────────────────────────
+     After Swiggy's top tabs (owner, 19 Oct 2026: "Top tabs I want like
+     these"): the glow and the bar are one piece that glides to the tab picked;
+     the row scrolls when it is wider than the screen, as Swiggy's does. */
+  if (concept === 'strip') {
+    /* ANTZ COLOURS ONLY (19 Oct 2026: "use only Antz colours"): each tab's
+       colour is one of the MD3_Antz tokens, by name — SecondaryDark, Tertiary,
+       addPrimary, and the Antz green the page's actions use */
+    /* ONE COLOUR FOR EVERY TAB (19 Oct 2026: "tabs colours should be same for
+       all, use Surface Variant only"): MD3_Antz OnSurfaceVariant, #44544A —
+       the only Surface Variant token Antz has, the section titles' colour */
+    const SV = 'var(--c-on-surface-var, #44544A)'
+    const SW_C = { recent: SV, fav: SV, book: SV, folders: SV }
+    ui.innerHTML = `<div class="tmk-strip"><span class="tmk-swlit" aria-hidden="true"></span>` +
+      TABS.map((t) => `<button type="button" class="tmk-sw" role="tab" data-tab="${t.id}" aria-label="${t.label}" title="${t.label}" style="--sw-c: ${SW_C[t.id]}">${I[t.id]}` +
+        `<span class="tmk-sw__l" aria-hidden="true">${t.label}</span></button>`).join('') + `</div>`
+    const bar = ui.querySelector('.tmk-strip'), lit = ui.querySelector('.tmk-swlit')
+    const place = (instant) => {
+      const b = bar.querySelector(`[data-tab="${cur}"]`)
+      if (instant) lit.style.transition = 'none'
+      lit.style.width = `${b.offsetWidth}px`; lit.style.transform = `translateX(${b.offsetLeft}px)`; lit.style.setProperty('--sw-c', SW_C[cur])
+      if (instant) { lit.offsetWidth; lit.style.transition = '' }
+    }
+    const go = async (id) => {
+      if (id === cur || busy) return
+      busy = true
+      const dir = Math.sign(idx(id) - idx(cur)); cur = id; mark(bar, '.tmk-sw'); place()
+      const out = items().filter(onScreen)
+      await Promise.all(out.map((el, i) => anim(el, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${-dir * 14}px)` }], { duration: 130, delay: i * 12, easing: 'ease-in' })?.finished))
+      fill()
+      items().forEach((el, i) => anim(el, [{ opacity: 0, transform: `translate(${dir * 22}px, 8px)` }, { opacity: 1, transform: 'none' }], { duration: 420, delay: Math.min(i, 6) * 32, easing: 'cubic-bezier(.16,1,.3,1)' }))
+      busy = false
+    }
+    wireTabs(bar, '.tmk-sw', go); mark(bar, '.tmk-sw'); fill(); place(true)
+    win.addEventListener('resize', () => place(true))
+  }
+
+  /* ── 5 · SHELF ───────────────────────────────────────────────────────────
+     After Swiggy Instamart (owner, 19 Oct 2026: "refer the Swiggy, Instamart
+     like those apps"): each tab a colour tile over its label, in the module
+     gradients the file already has; the picked one pops and lifts, an
+     indicator in its colour glides on the row's hairline, the header behind
+     takes its colour, and the cards swap with a quick slide. */
+  if (concept === 'shelf') {
+    /* [tile gradient, header wash, the tab's deep colour] */
+    const TH = {
+      recent:  ['--g-v3-medical',  'rgba(0, 190, 180, .30)',   '#0E9188'],
+      fav:     ['--g-lab',         'rgba(214, 186, 112, .46)', '#A88430'],
+      book:    ['--g-v3-helpdesk', 'rgba(66, 138, 193, .32)',  '#2F628A'],
+      folders: ['--g-v3-quick',    'rgba(55, 170, 100, .30)',  '#0B7A3E'],
+    }
+    ui.innerHTML = `<div class="tmk-shelf">` + TABS.map((t) =>
+      `<button type="button" class="tmk-st" role="tab" data-tab="${t.id}" style="--st-g: var(${TH[t.id][0]}); --st-c: ${TH[t.id][2]}">` +
+        `<span class="tmk-st__ico">${I[t.id]}<i class="tmk-st__n">${countOf(t)}</i></span><span class="tmk-st__l">${t.label}</span></button>`).join('') +
+      `<span class="tmk-st__bar" aria-hidden="true"></span></div>`
+    const bar = ui.querySelector('.tmk-shelf'), ind = ui.querySelector('.tmk-st__bar')
+    const wash = doc.createElement('div'); wash.className = 'tmk-wash'; wash.setAttribute('aria-hidden', 'true')
+    wash.innerHTML = TABS.map((t) => `<i data-tab="${t.id}" style="background: linear-gradient(180deg, rgba(255, 255, 255, 0) 28%, ${TH[t.id][1]} 100%)"></i>`).join('')
+    /* the live sky may redraw itself (weather, resize); the wash goes back in */
+    const keepWash = () => { const s = doc.querySelector('.wsky'); if (s && wash.parentElement !== s) s.append(wash) }
+    keepWash(); new win.MutationObserver(keepWash).observe(doc.body, { childList: true, subtree: true })
+    const tint = () => { for (const l of wash.children) l.classList.toggle('is-on', l.dataset.tab === cur) }
+    const place = (instant) => {
+      const b = bar.querySelector(`[data-tab="${cur}"]`)
+      if (instant) ind.style.transition = 'none'
+      ind.style.width = `${b.offsetWidth - 16}px`; ind.style.transform = `translateX(${b.offsetLeft + 8}px)`; ind.style.backgroundColor = TH[cur][2]
+      if (instant) { ind.offsetWidth; ind.style.transition = '' }
+      const l = b.offsetLeft - 12, r = b.offsetLeft + b.offsetWidth + 12
+      if (l < bar.scrollLeft || r > bar.scrollLeft + bar.clientWidth) bar.scrollTo({ left: Math.max(0, l), behavior: calm ? 'auto' : 'smooth' })
+    }
+    const go = async (id) => {
+      if (id === cur || busy) return
+      busy = true
+      const dir = Math.sign(idx(id) - idx(cur)); cur = id; mark(bar, '.tmk-st'); place(); tint()
+      /* the picked tile pops, past its lifted size and back */
+      anim(bar.querySelector(`[data-tab="${id}"] .tmk-st__ico`), [{ transform: 'scale(1)' }, { transform: 'translateY(-3px) scale(1.16)', offset: .4 }, { transform: 'translateY(-2px) scale(1.07)' }], { duration: 440, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'none' })
+      const out = items().filter(onScreen)
+      await Promise.all(out.map((el, i) => anim(el, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${-dir * 16}px)` }], { duration: 130, delay: i * 12, easing: 'ease-in' })?.finished))
+      fill()
+      items().forEach((el, i) => anim(el, [{ opacity: 0, transform: `translate(${dir * 28}px, 10px)` }, { opacity: 1, transform: 'none' }], { duration: 440, delay: Math.min(i, 6) * 34, easing: 'cubic-bezier(.16,1,.3,1)' }))
+      busy = false
+    }
+    wireTabs(bar, '.tmk-st', go); mark(bar, '.tmk-st'); fill(); tint(); place(true)
+    win.addEventListener('resize', () => place(true))
+  }
+
+  /* ── 1 · GLIDE ───────────────────────────────────────────────────────── */
+  if (concept === 'glide') {
+    ui.innerHTML = `<div class="tmk-pills"><span class="tmk-thumb" aria-hidden="true"></span>` +
+      TABS.map((t) => `<button type="button" class="tmk-pill" role="tab" data-tab="${t.id}">${I[t.id]}<span>${t.label}</span><em>${countOf(t)}</em></button>`).join('') + `</div>`
+    const bar = ui.querySelector('.tmk-pills'), thumb = ui.querySelector('.tmk-thumb')
+    const place = (instant) => {
+      const b = bar.querySelector(`[data-tab="${cur}"]`)
+      if (instant) thumb.style.transition = 'none'
+      thumb.style.width = `${b.offsetWidth}px`; thumb.style.transform = `translateX(${b.offsetLeft}px)`
+      if (instant) { thumb.offsetWidth; thumb.style.transition = '' }
+      const l = b.offsetLeft - 16, r = b.offsetLeft + b.offsetWidth + 16
+      if (l < bar.scrollLeft || r > bar.scrollLeft + bar.clientWidth) bar.scrollTo({ left: Math.max(0, l), behavior: calm ? 'auto' : 'smooth' })
+    }
+    const go = async (id) => {
+      if (id === cur || busy) return
+      busy = true
+      const dir = Math.sign(idx(id) - idx(cur)); cur = id; mark(bar, '.tmk-pill'); place()
+      /* the cards leave toward the side you came from … */
+      const out = items().filter(onScreen)
+      await Promise.all(out.map((el, i) => anim(el, [{ transform: 'none', opacity: 1 }, { transform: `translateX(${-dir * 36}px)`, opacity: 0 }], { duration: 170, delay: i * 18, easing: 'cubic-bezier(.4,0,1,1)' })?.finished))
+      fill()
+      /* … and the new ones arrive from the side you moved toward */
+      items().forEach((el, i) => anim(el, [{ transform: `translateX(${dir * 64}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, delay: Math.min(i, 6) * 42, easing: 'cubic-bezier(.16,1,.3,1)' }))
+      busy = false
+    }
+    wireTabs(bar, '.tmk-pill', go); mark(bar, '.tmk-pill'); fill(); place(true)
+    win.addEventListener('resize', () => place(true))
+  }
+
+  /* ── 2 · ROLL ────────────────────────────────────────────────────────── */
+  if (concept === 'roll') {
+    ui.innerHTML = `<div class="tmk-rollhead"><button type="button" class="tmk-back" aria-label="Back to Folders" tabindex="-1">${I.back}</button>` +
+      `<h2 class="tmk-roll" aria-live="polite"><span>${TABS.find((t) => t.id === cur).title} <small>${countOf(TABS.find((t) => t.id === cur))}</small></span></h2></div>` +
+      `<div class="tmk-seg"><span class="tmk-segthumb" aria-hidden="true"></span>` +
+      TABS.map((t) => `<button type="button" class="tmk-segb" role="tab" data-tab="${t.id}" aria-label="${t.label}" title="${t.label}">${I[t.id]}</button>`).join('') + `</div>`
+    const seg = ui.querySelector('.tmk-seg'), thumb = ui.querySelector('.tmk-segthumb'), title = ui.querySelector('.tmk-roll'), back = ui.querySelector('.tmk-back')
+    const place = () => { const b = seg.querySelector(`[data-tab="${cur}"]`); thumb.style.transform = `translateX(${b.offsetLeft - 3}px)` }
+    const roll = (html, up = true) => rollTitle(title, html, up), swap = rise
+    const go = async (id) => {
+      if ((id === cur && !folder) || busy) return
+      busy = true
+      const up = idx(id) >= idx(cur); cur = id; folder = null; back.classList.remove('is-on'); back.tabIndex = -1
+      mark(seg, '.tmk-segb'); place()
+      const t = TABS[idx(id)]; roll(`${t.title} <small>${countOf(t)}</small>`, up)
+      await swap(); busy = false
+    }
+    const openFolder = async (card) => {
+      if (busy) return
+      busy = true
+      const f = FOLDERS.find((x) => x.id === card.dataset.folder); folder = f.id
+      back.classList.add('is-on'); back.tabIndex = 0
+      roll(`${f.name} <small>${f.items.length}</small>`, true)
+      await swap(card.closest('.fav__item')); busy = false
+    }
+    back.addEventListener('click', async () => {
+      if (!folder || busy) return
+      busy = true; folder = null; back.classList.remove('is-on'); back.tabIndex = -1
+      const t = TABS[idx(cur)]; roll(`${t.title} <small>${countOf(t)}</small>`, false)   /* back to the tab the folder is in */
+      await swap(); busy = false
+    })
+    rail.addEventListener('click', (e) => { const f = e.target.closest('[data-folder]'); if (f) { e.stopPropagation(); openFolder(f) } }, true)
+    wireTabs(seg, '.tmk-segb', go); mark(seg, '.tmk-segb'); fill()
+    thumb.style.transition = 'none'; place(); thumb.offsetWidth; thumb.style.transition = ''
+  }
+
+  /* ── 3 · LENS ────────────────────────────────────────────────────────── */
+  if (concept === 'lens') {
+    ui.innerHTML = `<div class="tmk-lens">` + TABS.map((t) => `<button type="button" class="tmk-ltab" role="tab" data-tab="${t.id}">${t.label}<em>${countOf(t)}</em></button>`).join('') +
+      `<span class="tmk-line" aria-hidden="true"></span></div>`
+    const bar = ui.querySelector('.tmk-lens'), line = ui.querySelector('.tmk-line')
+    const box = (id) => { const b = bar.querySelector(`[data-tab="${id}"]`); return [b.offsetLeft, b.offsetWidth] }
+    const set = ([l, w]) => { line.style.left = `${l}px`; line.style.width = `${w}px` }
+    /* the underline is elastic: its leading edge runs to the new tab, then the trailing edge catches up */
+    const stretch = (from, to) => {
+      const [l0, w0] = box(from), [l1, w1] = box(to), lo = Math.min(l0, l1), hi = Math.max(l0 + w0, l1 + w1)
+      set([l1, w1])
+      anim(line, [{ left: `${l0}px`, width: `${w0}px` }, { left: `${lo}px`, width: `${hi - lo}px`, offset: .45 }, { left: `${l1}px`, width: `${w1}px` }], { duration: 560, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'none' })
+    }
+    /* FLIP: what was on screen is measured, the new tab drawn, and each card
+       that both tabs hold glides from where it was; the rest leave as ghosts
+       and arrive with a fade; a folder's cover photo flies in from its card */
+    const go = (id) => {
+      if (id === cur || busy) return
+      busy = true
+      const from = cur; cur = id; mark(bar, '.tmk-ltab'); stretch(from, id)
+      const was = new Map()
+      for (const el of items()) if (onScreen(el)) was.set(el.dataset.flip, { r: el.getBoundingClientRect(), el })
+      const keep = new Set()
+      fill()
+      const now = items()
+      for (const el of now) if (was.has(el.dataset.flip)) keep.add(el.dataset.flip)
+      /* the leavers: a ghost of each, where it stood, fading down */
+      for (const [k, { r, el }] of was) {
+        if (keep.has(k)) continue
+        const g = el.cloneNode(true); g.classList.add('tmk-ghost'); Object.assign(g.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` })
+        doc.body.append(g)
+        const a = anim(g, [{ transform: 'none', opacity: 1 }, { transform: 'scale(.9)', opacity: 0 }], { duration: 240, easing: 'ease-in' })
+        ;(a ? a.finished : Promise.resolve()).then(() => g.remove())
+      }
+      now.forEach((el, i) => {
+        const prev = was.get(el.dataset.flip)
+        if (prev) {
+          const r = el.getBoundingClientRect(), dx = prev.r.left - r.left, dy = prev.r.top - r.top
+          anim(el, [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 560, easing: 'cubic-bezier(.16,1,.3,1)' })
+        } else anim(el, [{ transform: 'scale(.92)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 420, delay: 150 + Math.min(i, 6) * 34, easing: 'cubic-bezier(.16,1,.3,1)' })
+        /* the photos of a folder's cover fly in from the animal cards they came from */
+        for (const im of el.querySelectorAll('[data-from]')) {
+          const src = was.get(im.dataset.from); if (!src) continue
+          const t = im.getBoundingClientRect(), s = src.r
+          im.style.transformOrigin = '0 0'
+          anim(im, [{ transform: `translate(${s.left - t.left}px, ${s.top - t.top}px) scale(${s.width / t.width}, ${s.height / t.height})`, borderRadius: '12px' }, { transform: 'none', borderRadius: '0' }], { duration: 640, easing: 'cubic-bezier(.16,1,.3,1)' })
+        }
+      })
+      setTimeout(() => { busy = false }, 260)
+    }
+    wireTabs(bar, '.tmk-ltab', go); mark(bar, '.tmk-ltab'); fill(); set(box(cur))
+    win.addEventListener('resize', () => set(box(cur)))
+  }
+
+  /* A FOLDER OPENS IN PLACE, in every concept but Roll (which opens it in its
+     title): the cards settle out, the folder's rise in behind a back card */
+  if (concept !== 'roll') rail.addEventListener('click', async (e) => {
+    const fc = e.target.closest('[data-folder]'), bk = e.target.closest('[data-folder-back]')
+    if (!fc && !bk) return
+    e.stopPropagation()
+    if (busy) return
+    busy = true; folder = fc ? fc.dataset.folder : null
+    await rise(fc ? fc.closest('.fav__item') : null); busy = false
+  }, true)
+
+  mountModules(doc, win)
+
+  /* a card's tap, in a mockup: say where it would go */
+  rail.addEventListener('click', (e) => { const c = e.target.closest('[data-open]'); if (c) say(`Opens ${c.dataset.open} — mockup`) })
+  return true
+}
+
+/* ══ THE BAR · pick a concept and a width ═════════════════════════════════ */
+const qs = new URLSearchParams(location.search)
+let concept = CONCEPTS[qs.get('c')] ? qs.get('c') : ({ 1: 'glide', 2: 'roll', 3: 'lens', 4: 'menu', 5: 'shelf', 6: 'strip', 7: 'expand' })[qs.get('c')] || 'glide'
+let device = DEVICES[qs.get('w')] ? qs.get('w') : (innerWidth > 1000 ? 'tablet' : 'full')
+const START = qs.get('t') || 'recent'
+const frame = document.getElementById('app'), stage = document.getElementById('stage')
+function drawBar() {
+  document.getElementById('concepts').innerHTML = Object.entries(CONCEPTS).map(([k, v]) => `<button type="button" data-c="${k}" aria-pressed="${k === concept}"><b>${v.n}</b>${v.name}</button>`).join('')
+  document.getElementById('devices').innerHTML = Object.entries(DEVICES).map(([k, [n]]) => `<button type="button" data-w="${k}" aria-pressed="${k === device}">${n}</button>`).join('')
+  document.getElementById('note').textContent = CONCEPTS[concept].note
+  document.title = `${CONCEPTS[concept].n} · ${CONCEPTS[concept].name} — Animals Tabs`
+  const w = DEVICES[device][1]
+  stage.classList.toggle('is-device', !!w); frame.style.width = w ? `${w}px` : '100%'
+  history.replaceState(null, '', `?c=${concept}&w=${device}${START !== 'recent' ? `&t=${START}` : ''}`)
+}
+function load() { drawBar(); frame.src = `../index.html?v=2&mock=animals-tabs` }
+frame.addEventListener('load', () => {
+  const doc = frame.contentDocument, win = frame.contentWindow
+  let tries = 0
+  const tick = () => { if (!(doc.querySelector('#favSpecies .fav__rail .fav__card') && mount(doc, win, concept)) && tries++ < 60) setTimeout(tick, 100) }
+  tick()
+})
+document.addEventListener('click', (e) => {
+  const c = e.target.closest('[data-c]'), w = e.target.closest('[data-w]')
+  if (c && c.dataset.c !== concept) { concept = c.dataset.c; load() }
+  if (w && w.dataset.w !== device) { device = w.dataset.w; load() }
+})
+load()
+</script>
+</body>
+</html>
