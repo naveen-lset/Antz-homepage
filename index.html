@@ -52,18 +52,24 @@
 <html lang="en">
 <head>
 <script>try{var nl=new URLSearchParams(location.search).get('notelines');if(/^[1-9]$/.test(nl||''))document.documentElement.style.setProperty('--obs-lines',nl)}catch(e){}</script>
-<script>try{var __dk=matchMedia('(min-width: 1200px) and (hover: hover) and (pointer: fine)'),__df=function(){if(__dk.matches)document.documentElement.dataset.v2desk='';else delete document.documentElement.dataset.v2desk};__df();__dk.addEventListener('change',__df)}catch(e){}document.documentElement.dataset.review='1';document.documentElement.dataset.profileDrawer='1';try{var u=new URL(location.href);if(u.searchParams.get('v')!=='2'){u.searchParams.set('v','2');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}try{if(localStorage.getItem('rv-hdr')==='climate')document.documentElement.dataset.hdrStyle='climate'}catch(e){}window.__rvHdr=function(v){var r=document.documentElement;if(v==='climate')r.dataset.hdrStyle='climate';else delete r.dataset.hdrStyle;try{localStorage.setItem('rv-hdr',v)}catch(e){}dispatchEvent(new Event('resize'))};</script>
+<script>try{var __dk=matchMedia('(min-width: 1200px) and (hover: hover) and (pointer: fine)'),__df=function(){if(__dk.matches)document.documentElement.dataset.v2desk='';else delete document.documentElement.dataset.v2desk};__df();__dk.addEventListener('change',__df)}catch(e){}document.documentElement.dataset.review='1';document.documentElement.dataset.profileDrawer='1';try{var u=new URL(location.href);if(u.searchParams.get('v')!=='2'){u.searchParams.set('v','2');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}try{if(localStorage.getItem('rv-hdr')==='climate')document.documentElement.dataset.hdrStyle='climate'}catch(e){}window.__rvHdr=function(v){var r=document.documentElement;if(v==='climate')r.dataset.hdrStyle='climate';else delete r.dataset.hdrStyle;try{localStorage.setItem('rv-hdr',v)}catch(e){}dispatchEvent(new Event('resize'))};try{history.scrollRestoration='manual'}catch(e){}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- ADDED TO THE HOME SCREEN, THE PAGE IS THE APP. The owner reviews this on
      an iPad and asked for the address bar and tab strip to go: Safari only
      drops them for a page saved to the home screen that declares itself
-     standalone, so these three say so. In a tab they change nothing. -->
+     standalone, so these three say so. In a tab they change nothing.
+     THE STATUS BAR STAYS DEFAULT (owner, 19 Oct 2026: "the background has to
+     cover the notch"). black-translucent would run the page under the notch,
+     but from iOS 26.1 a home-screen app set that way gets a forced dark scrim
+     and blur over its top edge and a short safe-area inset. On default, iOS
+     paints the bar in the page's colour, so the page is given the sky's
+     colour there instead (:root.has-wsky, THE STATUS BAR'S COLOUR). -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="ANTZ">
-<meta name="theme-color" content="#DFF5F3">
+<meta name="theme-color" content="#E6EEED">
 <title>Home Page Redesign · ANTZ</title>
 <link rel="icon" href="assets/icon/hero-logo.svg">
 
@@ -15136,8 +15142,14 @@ body.is-site .card:active { transform: scale(.978); }
    strip and My Species with its 20px foot corners. A z-index -1 layer paints
    over the ROOT's background but under the body's, so the page's white moves
    to the root and the band's three mint tints go transparent while it is on.
-   The readout is the one element it adds to the header. */
-:root.has-wsky { background: #fff; }
+   The readout is the one element it adds to the header.
+   THE STATUS BAR'S COLOUR (owner, 19 Oct 2026: "the background has to cover
+   the notch"). A home-screen app on iOS paints its status bar, the strip round
+   the notch, in the page's background colour, so that colour is the sky's top
+   edge (#D8E2E1 at the sides to #F5F8F4 mid, met at #E6EEED, the theme-color
+   too). A white layer over it keeps every pixel of the page as it was; the
+   colour shows only in the bar and when the page is pulled past its top. */
+:root.has-wsky { background: linear-gradient(#fff, #fff) no-repeat, #E6EEED; }
 :root.has-wsky body { background: transparent; }
 :root.has-wsky[data-home='v2'] .home-header,
 :root.has-wsky[data-home='v2'] .search-row:not(.is-stuck),
@@ -53483,7 +53495,17 @@ if (PAGE_VERSION === '1' || hasV4Top()) {
         `<div class="site-tabs__track">` + opts.map((o) =>
         `<button type="button" role="tab" class="site-tabs__tab" data-site="${o.id}" aria-selected="${o.id === scope.get()}"` +
         ` tabindex="${o.id === scope.get() ? 0 : -1}">${label(o)}</button>`).join('') + `</div>`
-      bar.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+      /* the chosen site slides into its own track only. scrollIntoView with
+         block: 'nearest' also scrolled the PAGE to bring this bar on screen —
+         on a phone the bar sits a fold down, so the home opened 208px down,
+         on the Recents rail (owner, 19 Oct 2026: "when I open the app it's
+         showing this place, it has to open at the top") */
+      const on = bar.querySelector('[aria-selected="true"]'), track = bar.querySelector('.site-tabs__track')
+      if (on && track) {
+        const t = on.getBoundingClientRect(), k = track.getBoundingClientRect()
+        if (t.left < k.left) track.scrollLeft += t.left - k.left
+        else if (t.right > k.right) track.scrollLeft += t.right - k.right
+      }
     }
     draw()
     /* the sticky offset is the search row's own stuck height, measured; and
