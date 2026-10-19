@@ -13914,7 +13914,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261019f">
+<link rel="stylesheet" href="review.css?v=20261019h">
 </head>
 
 <style>
@@ -43558,23 +43558,24 @@ function mountAnimals(root) {
      A of mockups/recents-folder-tabs.html). On a phone the picked tab and the
      rail are one white shape: the tab's top corners, two inverse fillets where
      it meets the rail, the rail's corners; a tab at the row's end runs straight
-     down into the rail's side. One SVG path, laid twice — the fill and its
-     shadow under the tabs and the cards, a 7% hairline over them — and when
-     the pick moves it glides to the new tab on the tabs' 460ms curve, read
-     against the tab every frame. From 744 up both layers are display: none
-     (review.css) and nothing is drawn. */
+     down into the rail's side. One SVG path, white with a soft shadow, under
+     the tabs and the cards — no outline (owner: "remove the outline"; a 7%
+     hairline was laid over it at first) — and when the pick moves it glides
+     to the new tab on the tabs' 460ms curve, read against the tab every
+     frame. From 744 up the layer is display: none (review.css) and nothing is
+     drawn. */
   const NS = 'http://www.w3.org/2000/svg'
   const layer = (cls) => { const s = document.createElementNS(NS, 'svg'), p = document.createElementNS(NS, 'path')
     s.setAttribute('class', `fav__fold ${cls}`); s.setAttribute('aria-hidden', 'true'); s.append(p); return p }
-  const foldFill = layer('fav__fold--fill'), foldLine = layer('fav__fold--line')
-  box.prepend(foldFill.parentNode); box.append(foldLine.parentNode)
+  const foldFill = layer('fav__fold--fill')
+  box.prepend(foldFill.parentNode)
   const clampN = (n, a, b) => Math.min(b, Math.max(a, n))
   const foldGeo = () => {
     const bx = box.getBoundingClientRect(), t = tabs.querySelector(`[data-tab="${cur}"]`).getBoundingClientRect(), r = rail.getBoundingClientRect()
     return { W: bx.width, B: bx.height, T: t.top - bx.top, H: r.top - bx.top, x: t.left - bx.left, w: t.width }
   }
   const foldPath = ({ W, B, T, H, x, w }) => {
-    const s = .5, L = s, R = W - s, Tt = T + s, Bt = B - s, r = 8, P = 16, f = 6   // tab r8 (owner: "corner radius 8 or 6px"), rail r16, fillets r6
+    const s = .5, L = s, R = W - s, Tt = T + s, Bt = B - s, r = 12, P = 12, f = 8   // tab and rail r12, as the page's other containers; fillets r8
     const x1 = Math.max(L, x + s), x2 = Math.min(R, x + w - s)
     const fl = clampN((x1 - L) / 2, 0, f), Pl = clampN(x1 - L - fl, 0, P), fr = clampN((R - x2) / 2, 0, f), Pr = clampN(R - x2 - fr, 0, P)
     return `M${L} ${Bt - P}L${L} ${H + Pl}A${Pl} ${Pl} 0 0 1 ${L + Pl} ${H}L${x1 - fl} ${H}A${fl} ${fl} 0 0 0 ${x1} ${H - fl}` +
@@ -43583,7 +43584,7 @@ function mountAnimals(root) {
       `L${R} ${Bt - P}A${P} ${P} 0 0 1 ${R - P} ${Bt}L${L + P} ${Bt}A${P} ${P} 0 0 1 ${L} ${Bt - P}Z`
   }
   let foldAt = null, foldRun = 0
-  const foldDraw = (g) => { foldAt = g; const d = foldPath(g); foldFill.setAttribute('d', d); foldLine.setAttribute('d', d) }
+  const foldDraw = (g) => { foldAt = g; foldFill.setAttribute('d', foldPath(g)) }
   /* the tabs' settle curve, cubic-bezier(.32, .72, 0, 1), solved for x by Newton's method */
   const settle = (t) => { let u = t
     for (let i = 0; i < 8; i++) { const x = 3 * (1 - u) ** 2 * u * .32 + u ** 3 - t, dx = 3 * (1 - u) ** 2 * .32 - 6 * (1 - u) * u * .32 + 3 * u * u

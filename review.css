@@ -445,24 +445,29 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
      premium"). 12 under the search and 16 over the band's foot, as before.
      The four tabs are soft white pills, 54 tall, 6 apart (the mockup's 8,
      "pills between, can you reduce little"), each its 20 mark over its 12.5
-     name, at r8 (owner: "corner radius 8 or 6px"). The picked one turns white and opens into the rail as one folder:
+     name. Every corner is r12 like the page's other containers — the search,
+     Announcements, Observation Notes, the module cards (owner, 19 Oct 2026:
+     "follow the corner radius of other containers"; an r8 pass came first).
+     The picked one turns white and opens into the rail as one folder:
      the band's script draws it as one SVG path (.fav__fold) — white with a
-     soft shadow under the tabs and the cards, a 7% hairline over them — and
-     glides it to the next tab on the tabs' 460ms curve. No bar and no stroke
-     of colour. The rail sits 8 inside the folder; 132 × 158 cards 6 apart at
-     r10; AAID:n 14 Medium, the species 12 at 90% ── */
+     soft shadow under the tabs and the cards, and no outline at all ("remove
+     the outline"; a 7% hairline came first) — and glides it to the next tab
+     on the tabs' 460ms curve. No bar. The rail sits 12 inside the folder,
+     the inset those containers keep ("there is no breathing space");
+     132 × 158 cards 6 apart at r10;
+     AAID:n 14 Medium, the species 12 at 90% ── */
   html:root[data-review][data-home='v2'] .fav-band:not([hidden]) { padding-top: 12px; padding-bottom: 16px; gap: 0; }
   html:root[data-review][data-home='v2'] .fav__box { position: relative; isolation: isolate; display: flex; flex-direction: column; gap: 0; min-width: 0; border-radius: 0; background: none; }
   html:root[data-review][data-home='v2'] .fav__head { position: relative; z-index: 1; height: auto; }
-  html:root[data-review][data-home='v2'] .fav__rail { position: relative; z-index: 1; gap: 6px; margin: 0; padding: 8px; border-radius: 16px; scroll-padding-inline: 8px; }
+  html:root[data-review][data-home='v2'] .fav__rail { position: relative; z-index: 1; gap: 6px; margin: 0; padding: 12px; border-radius: 12px; scroll-padding-inline: 12px; }
   html:root[data-review][data-home='v2'] .fav__card { width: 132px; flex-basis: 132px; height: 158px; padding: 12px; border-radius: 10px; background: #EEF5F6; }
   html:root[data-review][data-home='v2'] .fav__tabs { --tab-hug: 0; gap: 6px; height: auto; align-items: flex-end; box-shadow: none; }
   html:root[data-review][data-home='v2'] .fav__tab { --tab-gap: 6px; flex: 1 1 0; width: auto; min-width: 0; height: 54px; margin-bottom: 8px; padding: 0 4px; overflow: visible;
-    flex-direction: column; justify-content: center; gap: 6px; border-radius: 8px; background-color: rgba(255, 255, 255, .55);
+    flex-direction: column; justify-content: center; gap: 6px; border-radius: 12px; background-color: rgba(255, 255, 255, .55);
     color: rgba(68, 84, 74, .88); font: 500 12.5px/1 Inter, var(--font); letter-spacing: .1px;
     transition: background-color .3s ease .14s, color .26s ease; }   /* the pill comes back once the folder has left it */
   html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] { color: var(--c-on-primary-ctr, #1F515B); background-color: transparent; transition: background-color .1s, color .26s ease; }
-  html:root[data-review][data-home='v2'] .fav__tab:focus-visible { outline-offset: -3px; border-radius: 8px; }
+  html:root[data-review][data-home='v2'] .fav__tab:focus-visible { outline-offset: -3px; border-radius: 12px; }
   html:root[data-review][data-home='v2'] .fav__tab svg { width: 20px; height: 20px; transition: none; }
   html:root[data-review][data-home='v2'] .fav__tabl { max-width: none; margin: 0; opacity: 1; transition: none; }
   html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] .fav__tabl { max-width: none; margin: 0; font-weight: 600; }
@@ -470,8 +475,6 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
   html:root[data-review][data-home='v2'] .fav__fold { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
   html:root[data-review][data-home='v2'] .fav__fold--fill { z-index: 0; filter: drop-shadow(0 1px 2px rgba(31, 65, 91, .06)) drop-shadow(0 10px 22px rgba(31, 65, 91, .09)); }
   html:root[data-review][data-home='v2'] .fav__fold--fill path { fill: #fff; }
-  html:root[data-review][data-home='v2'] .fav__fold--line { z-index: 2; }   /* over the rail, so a card scrolled to the edge never covers it */
-  html:root[data-review][data-home='v2'] .fav__fold--line path { fill: none; stroke: rgba(31, 81, 91, .07); stroke-width: 1; stroke-linejoin: round; }
   /* under the climate header's dark sky the soft pills go glassy and their ink white; the folder stays white */
   html:root[data-review][data-home='v2'].has-wsky[data-sky-tone='dark'] .fav__tab:not([aria-selected='true']) { background-color: rgba(255, 255, 255, .18); color: rgba(255, 255, 255, .88); }
   @media (prefers-reduced-motion: reduce) {
