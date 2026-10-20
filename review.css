@@ -1274,7 +1274,6 @@ html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__t { font-
 html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__head b { font-size: 19px; font-weight: 700; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .card [class*='fold'], html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn::after { display: none; }
 html:root[data-review][data-home='v2'][data-v2desk] .main-frame { padding-left: 24px; padding-right: 24px; }
-html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__curl { display: none; }
 html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__head { height: 23px; line-height: 23px; }
 
 /* ══ THE ANIMALS BAND'S FOUR TABS (owner, 19 Oct 2026: "implement in the live",

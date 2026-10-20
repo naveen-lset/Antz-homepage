@@ -336,3 +336,38 @@ Each deploy was made from a clean copy (`git ls-files -co`) with `vercel deploy 
 - **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Every commit from 19 Oct (ad3947a → 6653229, plus this handoff) exists only on this Mac. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
 - **Not built:** the sky doodles exist only in the mockup.
 - **Not synced:** `mockups/web-v3/widgets-preview.html` still has the older tabs.
+
+# Session 20 Oct 2026 (later): Design Links hub, Pending card curl
+
+## Run it
+Same as above: `python3 -m http.server 8080` from `/Users/naveen/Home Page`, then <http://localhost:8080/Antz-Selected-Modules/?v=2> at 390 wide.
+
+## Built and live
+- **Pending card: no page curl.** The owner pointed at the peeled bottom-right corner of the Pending sticky note ("Remove this & Deploy again").
+  - `index.html`: the `.l-v2sn__curl` span is gone from the `v2-sticky` renderer in `LAYOUTS`, and so is its CSS rule.
+  - `review.css`: its desktop `display: none` rule is gone. The working tree loads `review.css?v=20261020g`.
+  - The old curl is still in `mockups/web-v3/widgets-preview.html` and `mockups/round1-rejected/`. Those are not live and were left alone.
+- **Deployed:** production `home-page-changes-a84u35h6d` (<https://home-page-changes.vercel.app/?v=2>), from a clean copy of the working tree (`git ls-files -co --exclude-standard`, without `.hub.json`). That copy also carries the morning's uncommitted sheet and Quick Actions work (see "Not done").
+
+## Design Links hub
+- **What it is:** Sourav's page of the team's latest prototype links, at <https://design-links.grc-antz-systems.workers.dev>. The kit is in `/Users/naveen/Home Page/design-links-kit 2` (`SETUP.md`, plus `register-link/SKILL.md`, which documents the API).
+- **Set up on this Mac:**
+  - The key is in `~/.config/design-link-hub/keys.env`. Never print it or commit it.
+  - The identity is in `me.json`: Naveen Kumar, naveen@lifesciencetrust.com.
+- **New module:** the owner created `home` ("App home: greeting, recents, modules and quick actions"). The hub's look-alike check matched it to VVMS, a false match, so it was sent with `force_new`.
+- **The entry:** `home/antz-home/mobile`, "ANTZ Home page", mobile, linked to the production URL. `.hub.json` (committed) holds its `entry_id`. Page: <https://design-links.grc-antz-systems.workers.dev/e/home/antz-home/mobile>.
+- **The skill is not installed.** Claude Code's auto mode blocked the copy into `~/.claude/skills`, so "update the hub" only works by following `SKILL.md` by hand: `POST $HUB_URL/api/agent/entries` with the `entry_id`.
+- **Per-deploy URLs need a login:** they are behind Vercel SSO on `naveen-lsets-projects`, so the production URL is sent as both `url` and `deploy_url`.
+  - Because of this, re-posting after the a84u35h6d deploy returned `unchanged`, and the hub still shows rev 1 with the first screenshot. The hub only counts a new revision when the link changes.
+
+## Open questions for the owner
+- **Hub revisions:** turn off Vercel Deployment Protection so each deploy has a public URL, or ask Sourav to count a new deploy of the same URL as a new revision?
+- **Feedback already given to Sourav:**
+  - SETUP step 2 is blocked in auto mode.
+  - The VVMS look-alike match was wrong.
+  - Per-deploy links redirect to a Vercel login.
+- **Install the `register-link` skill?** It needs the owner's explicit go-ahead.
+
+## Not done
+- **Not committed:** the morning's sheet and Quick Actions work in `index.html` and `review.css`, made by another session and live since hk1keyz0x. This commit takes only the curl removal. The `review.css?v=20261020g` bump stays in the working tree with that work.
+- **Not pushed:** GitHub `CleanUp` is still `a8b0179`.
