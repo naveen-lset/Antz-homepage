@@ -203,6 +203,8 @@
 .mview.is-on { transform: translate(-50%, var(--mv-drag, 0px)); }
 /* the finger has it: no easing while it is pulled down (`--mv-drag`) */
 .mview.is-pulling { transition: none; }
+/* grown out of the Modules button: no slide or scale — the circle is the open (see reveal() in the sheet's script) */
+.mview.is-grow { transition: none; }
 /* CLOSED IS GONE (1 Oct 2026). `display: flex` above outranks the UA's
    [hidden], so the closed sheet stayed laid out and took every tap over it. */
 .mview[hidden] { display: none; }
@@ -238,7 +240,11 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
 .mview__x .icon { width: 18px; height: 18px; stroke-width: 2.2; }
 @media (hover: hover) { .mview__x:hover { background: rgba(0, 0, 0, .08); } }
 .mview__x:focus-visible { outline: 2px solid #00AFD6; outline-offset: 2px; }
-.mview__search { flex: none; display: flex; align-items: center; gap: 10px; margin: 12px 16px 4px; height: 44px; padding: 0 14px; border-radius: 12px; background: rgba(0, 0, 0, .05); color: #7A8684; }
+/* the search and the grid / list switch share one row (owner, 20 Oct 2026), both 44 tall on the same grey */
+.mview__tools { flex: none; display: flex; align-items: center; gap: 8px; margin: 12px 16px 4px; }
+.mview__tools .mview__mode { height: 44px; padding: 4px; border-radius: 12px; }
+.mview__tools .mview__mode button { width: 40px; height: 36px; border-radius: 9px; }
+.mview__search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; margin: 0; height: 44px; padding: 0 14px; border-radius: 12px; background: rgba(0, 0, 0, .05); color: #7A8684; }
 .mview__search .icon { width: 18px; height: 18px; }
 .mview__search input { flex: 1; min-width: 0; border: 0; background: none; font: 400 16px Inter, sans-serif; color: #44544A; outline: 0; }
 .mview__hint { flex: none; margin: 6px 20px 0; font-size: 12px; color: #7A8684; }
@@ -253,10 +259,16 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
 .mview__act .icon { width: 22px; height: 22px; stroke-width: 2.4; }
 .mview__row { position: relative; display: flex; align-items: center; gap: 14px; min-height: 68px; padding: 12px 14px; background: #fff; border-radius: 14px; cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
 .mview__row:focus-visible { outline: 2px solid #00AFD6; outline-offset: -2px; }
-.mview__ico { position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; }
-.mview__badge { position: absolute; right: -5px; bottom: -5px; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #006D35; color: #fff; box-shadow: 0 0 0 2px #fff; }
+/* ONE INK, AN OPEN RING (owner, 20 Oct 2026: "I dont want Fill inside Circle … All module Colours have to same
+   here. Now its too Colourful", then "Use our Antz primary green Colour"): no fill, and the ring and every mark
+   in MD3_Antz/Primary #37BD69 (`--c-primary`) — the module art through `.mview__mark`'s mask, the line icons by
+   currentColor. No house badge on it any more. */
+.mview__ico { position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  color: var(--c-primary, #37BD69); box-shadow: inset 0 0 0 1px var(--c-primary, #37BD69); }
+.mview__mark { display: block; width: 24px; height: 24px; background: currentColor; pointer-events: none;
+  -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 .mview__ico img { width: 26px; height: 26px; pointer-events: none; }
-.mview__ico .icon { width: 24px; height: 24px; color: #fff; }
+.mview__ico .icon { width: 22px; height: 22px; color: inherit; }
 /* the name (Antz_Body_Title, a size up) over its one line (Antz_Body_Regular, grey, cut with an ellipsis) */
 .mview__txt { flex: 1; min-width: 0; display: grid; gap: 3px; }
 .mview__txt b { display: block; font-size: 15px; font-weight: 600; line-height: normal; color: #1F415B; }
@@ -284,9 +296,9 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
 .mview__tile { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; padding: 4px 2px; border: 0; border-radius: 12px; background: none; font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 160ms ease; }
 .mview__tile:active { transform: scale(.94); }
 .mview__tile:focus-visible { outline: 2px solid #00AFD6; outline-offset: 2px; }
-.mview__tile .mview__ico { width: 56px; height: 56px; border-radius: 16px; transition: transform 200ms ease; }
-.mview__tile .mview__ico img { width: 32px; height: 32px; }
-.mview__tile .mview__ico .icon { width: 28px; height: 28px; }
+.mview__tile .mview__ico { width: 56px; height: 56px; border-radius: 50%; transition: transform 200ms ease; }
+.mview__tile .mview__ico img, .mview__tile .mview__mark { width: 28px; height: 28px; }
+.mview__tile .mview__ico .icon { width: 26px; height: 26px; }
 @media (hover: hover) { .mview__tile:hover .mview__ico { transform: translateY(-2px); } }
 .mview__lbl { max-width: 100%; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: break-word; font-size: 12.5px; font-weight: 500; line-height: 1.25; text-align: center; color: #1F415B; }
 @media (prefers-reduced-motion: reduce) { .mview__tile, .mview__tile .mview__ico { transition: none; } }
@@ -1335,3 +1347,7 @@ html:root[data-review][data-home='v2'] .fav__item:has(> .fav__card--all) { displ
 html:root[data-home='v2'] .qa-pill__grid {
   -webkit-mask: url(assets/icon/qa-bolt.svg) center / 20px 20px no-repeat;
           mask: url(assets/icon/qa-bolt.svg) center / 20px 20px no-repeat; }
+/* Quick Actions keeps its full size on scroll, as Modules does (owner,
+   20 Oct 2026: "Dont Reduce the Size when I scrolling time") */
+html:root[data-home='v2'] .qa.is-scrolled .qa-pill { gap: var(--s2); }
+html:root[data-home='v2'] .qa.is-scrolled .qa-pill__t { max-width: 12em; opacity: 1; }

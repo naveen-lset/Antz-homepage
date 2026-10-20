@@ -13919,7 +13919,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261019h">
+<link rel="stylesheet" href="review.css?v=20261020g">
 </head>
 
 <style>
@@ -51163,7 +51163,7 @@ function modulesHint() {
          services sheet as the picture: "When i select Module … page down
          Going"). Your Modules is that sheet; scrolling down to the grid is
          kept for a build without it. */
-      if (window.__antzModulesSheet) { window.__antzModulesSheet(); return }
+      if (window.__antzModulesSheet) { window.__antzModulesSheet(chip); return }   /* it grows out of the chip */
       /* land the head under the sticky search row, not beneath it */
       const bar = document.querySelector('.search-row')
       /* its height once STUCK, which is taller than at rest (it gains its
@@ -53945,9 +53945,9 @@ if (document.documentElement.dataset.review && isV2()) {
   const placed = (v) => layoutStore.get().cards.some((c) => c.variantId === v.id)
   const picked = new Set()
   const ACT = 104                       // the revealed action's width
-  /* "if it's already in the home, in the icon container show icon" (owner, 30 Sep 2026): a house on the tile's corner —
-     and a module MARKED to add wears the same, nothing else ("if added it has to show like other already added") */
-  const HOME_BADGE = '<i class="mview__badge" title="On Home"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M12 3.2 2.8 11a1 1 0 0 0 1.3 1.5l.9-.8V19a2 2 0 0 0 2 2h3v-5.5h4V21h3a2 2 0 0 0 2-2v-7.3l.9.8A1 1 0 0 0 21.2 11Z"/></svg></i>'
+  /* NO HOUSE ON THE MARK ANY MORE (owner, 20 Oct 2026: "remove the home icon from the all modules"). It came in
+     on 30 Sep ("if it's already in the home, in the icon container show icon"); a module on Home is still
+     named so to a screen reader, and its swipe still offers Remove. */
   let query = '', nudged = false
 
   const scrim = document.createElement('div'); scrim.className = 'mview-scrim'; scrim.hidden = true
@@ -53957,10 +53957,14 @@ if (document.documentElement.dataset.review && isV2()) {
   sheet.innerHTML = `
     <span class="mview__handle" aria-hidden="true"></span>
     <div class="mview__head">
-      <h2 id="mviewTitle" class="mview__title">Your Modules</h2>
+      <h2 id="mviewTitle" class="mview__title">All Modules</h2>
       <button type="button" class="mview__x" aria-label="Close">${icon('close')}</button>
     </div>
-    <label class="mview__search">${icon('search')}<input type="search" placeholder="Search" aria-label="Search your modules" autocomplete="off" spellcheck="false"></label>
+    <!-- SEARCH AND THE GRID / LIST SWITCH ON ONE ROW (owner, 20 Oct 2026: "Search & View change in the Same Row");
+         the switch is put in beside the field once its marks are defined, below -->
+    <div class="mview__tools">
+      <label class="mview__search">${icon('search')}<input type="search" placeholder="Search" aria-label="Search modules" autocomplete="off" spellcheck="false"></label>
+    </div>
     <div class="mview__list" role="list" aria-label="Modules"></div>
     <div class="mview__toast" role="status" aria-live="polite"></div>`
   document.body.append(scrim, sheet)
@@ -53988,6 +53992,12 @@ if (document.documentElement.dataset.review && isV2()) {
   }
   const GRID_I = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>'
   const LIST_I = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="4" y="5" width="4.5" height="4.5" rx="1.5"/><rect x="11" y="5.75" width="9" height="3" rx="1.5"/><rect x="4" y="14.5" width="4.5" height="4.5" rx="1.5"/><rect x="11" y="15.25" width="9" height="3" rx="1.5"/></svg>'
+  const modeSw = document.createElement('div')
+  modeSw.className = 'mview__mode'; modeSw.setAttribute('role', 'group'); modeSw.setAttribute('aria-label', 'Show modules as')
+  modeSw.innerHTML = `<button type="button" data-mode="grid" aria-label="Grid" title="Grid">${GRID_I}</button>` +
+    `<button type="button" data-mode="list" aria-label="List" title="List">${LIST_I}</button>`
+  modeSw.addEventListener('click', (e) => { const b = e.target.closest('[data-mode]'); if (b) setMode(b.dataset.mode) })
+  sheet.querySelector('.mview__tools').append(modeSw)
   /* THE OWNER'S TWENTY (19 Oct 2026: "In Your Modules: Pharmacy, Necropsy,
      Collection, Animals, Training, Mortality, Natality, Fetal Death, Eggs,
      My Focus Hub, Housing, Diet, Audit, Help Desk, Announcements, Users,
@@ -54022,9 +54032,14 @@ if (document.documentElement.dataset.review && isV2()) {
     return m && { ...m, name: RENAME[id] || m.name }
   }
   const onHome = (m) => !m.fresh && placed(defaultCard(m))
-  const glyphOf = (m) => m.svg || (m.icon ? `<img src="assets/icon/${qesc(m.icon)}" alt="">` : icon(m.sprite))
+  /* ONE COLOUR, IN AN OPEN CIRCLE (owner, 20 Oct 2026: first "Flat Colours only With Filled or normal
+     icons With Circle", then over the coloured discs "I dont want Fill inside Circle … All module
+     Colours have to same here. Now its too Colourful"): every mark is drawn in the one ink (review.css,
+     `.mview__ico`) inside a ring with nothing in it. The module art is white on its gradient, so it is
+     used as a MASK — its shape, the ink's colour, its cut-outs left open. */
+  const glyphOf = (m) => m.svg || (m.icon ? `<i class="mview__mark" style="-webkit-mask-image:url(assets/icon/${qesc(m.icon)});mask-image:url(assets/icon/${qesc(m.icon)})" aria-hidden="true"></i>` : icon(m.sprite))
   const tile = (m, on) => `<button type="button" class="mview__tile" data-mod="${qesc(m.id)}" aria-label="Open ${qesc(m.name)}${on ? ', on Home' : ''}">` +
-    `<span class="mview__ico" style="background:var(${m.gradient})">${glyphOf(m)}${on ? HOME_BADGE : ''}</span>` +
+    `<span class="mview__ico">${glyphOf(m)}</span>` +
     /* a name with a space wraps at it, not at the soft hyphen the 1×1 card needs ("Species Manage-ment") */
     `<span class="mview__lbl">${qesc(/\s/.test(m.name) ? m.name.replace(/\u00AD/g, '') : m.name)}</span></button>`
   /* RECENT IN PLACE OF ON HOME (owner, 17 Oct 2026: "Remove On Home
@@ -54048,7 +54063,7 @@ if (document.documentElement.dataset.review && isV2()) {
         /* a new module: the same row, no swipe (is-core only shrugs) — it has no card to add yet */
         if (m.fresh) return `<div class="mview__item is-core" role="listitem" data-mod="${qesc(m.id)}">
           <div class="mview__row" role="button" tabindex="0" aria-label="Open ${qesc(m.name)}">
-            <span class="mview__ico" style="background:var(${m.gradient})">${m.svg}</span>
+            <span class="mview__ico">${m.svg}</span>
             <span class="mview__txt"><b>${qesc(m.name)}</b><small>${qesc(m.blurb)}</small></span>
             <span class="mview__chev" aria-hidden="true">${icon('chev-right')}</span>
           </div>
@@ -54063,7 +54078,7 @@ if (document.documentElement.dataset.review && isV2()) {
         return `<div class="mview__item${on ? ' is-placed' : ''}${core ? ' is-core' : ''}" role="listitem" data-mod="${qesc(m.id)}">
           ${core ? '' : `<button type="button" class="mview__act${on ? ' is-remove' : ''}" tabindex="-1">${on ? `${icon('minus')}<span>Remove</span>` : `${icon('plus')}<span>Add to Home</span>`}</button>`}
           <div class="mview__row" role="button" tabindex="0" aria-label="Open ${qesc(m.name)}${on ? ', on Home' : ''}">
-            <span class="mview__ico" style="background:var(${m.gradient})">${glyphOf(m)}${on ? HOME_BADGE : ''}</span>
+            <span class="mview__ico">${glyphOf(m)}</span>
             <span class="mview__txt"><b>${qesc(m.name)}</b>${m.blurb ? `<small>${qesc(m.blurb)}</small>` : ''}</span>
             <span class="mview__chev" aria-hidden="true">${icon('chev-right')}</span>
           </div>
@@ -54072,13 +54087,9 @@ if (document.documentElement.dataset.review && isV2()) {
       }).join('')
     }).join('')
     const rec = q ? [] : recent()
+    sheet.querySelectorAll('.mview__mode [data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)))
     list.innerHTML =
       (rec.length ? `<h3 class="mview__sec">Recent</h3><div class="mview__grid mview__grid--recent">${rec.map((m) => tile(m, onHome(m))).join('')}</div>` : '') +
-      `<div class="mview__bar"><h3 class="mview__sec">${q ? 'Results' : 'All Modules'}</h3>` +
-        `<div class="mview__mode" role="group" aria-label="Show modules as">` +
-          `<button type="button" data-mode="grid" aria-pressed="${tiles}" aria-label="Grid" title="Grid">${GRID_I}</button>` +
-          `<button type="button" data-mode="list" aria-pressed="${!tiles}" aria-label="List" title="List">${LIST_I}</button>` +
-        `</div></div>` +
       (cats && !tiles ? '<p class="mview__hint">Tap to open · swipe left to add to Home or remove</p>' : '') +
       (cats || '<p class="mview__empty">No module matches that.</p>')
   }
@@ -54162,7 +54173,6 @@ if (document.documentElement.dataset.review && isV2()) {
     }, 200)
   }
   list.addEventListener('click', (e) => {
-    const sw = e.target.closest('.mview__mode [data-mode]'); if (sw) { setMode(sw.dataset.mode); return }
     const tl = e.target.closest('.mview__tile'); if (tl) { openModule(tl); return }
     const item = e.target.closest('.mview__item'); if (!item) return
     if (e.target.closest('.mview__act, .mview__kbd')) { toggle(item); return }
@@ -54182,14 +54192,47 @@ if (document.documentElement.dataset.review && isV2()) {
 
   /* the page behind never scrolls while this is up (owner rule, 30 Sep 2026) */
   const refuse = (e) => { if (!e.target.closest?.('.mview__list')) e.preventDefault() }
+  /* ── OPENED FROM THE MODULES BUTTON IT GROWS OUT OF IT, as the chat page
+     grows out of its disc (owner, 20 Oct 2026: "Same Animation when I click
+     the Chat … for Module icon when I click") ──
+     A circle the button's size, centred on it, opens until it covers the
+     sheet (and its shadow, so the last frame is the sheet unclipped), while
+     the head rises in and the list settles behind it; the button swells as
+     it is covered. Closing folds it back into the button, faster. A pull
+     down still slides it away, and the + beside Edit keeps the plain sheet.
+     The button is measured at each end; if it is not on screen, the open's
+     measure stands. Reduced motion: the sheet's own (motionless) open. */
+  let grow = null, growing = null, shown = false
+  function reveal(opening) {
+    growing?.forEach((a) => a.cancel())
+    const sr = sheet.getBoundingClientRect(), now = grow.from.getBoundingClientRect()
+    const r = now.width && now.bottom > 0 && now.top < innerHeight ? (grow.rect = now) : grow.rect
+    const x = r.left + r.width / 2 - sr.left, y = r.top + r.height / 2 - sr.top
+    const r0 = Math.min(r.width, r.height) / 2
+    const R = Math.hypot(Math.max(x, sr.width - x), Math.max(y, sr.height - y)) + 120
+    const small = `circle(${r0}px at ${x}px ${y}px)`, big = `circle(${R}px at ${x}px ${y}px)`
+    const anims = [sheet.animate(opening ? [{ clipPath: small }, { clipPath: big }] : [{ clipPath: big }, { clipPath: small, opacity: 1, offset: .82 }, { clipPath: small, opacity: 0 }],
+      opening ? { duration: 560, easing: 'cubic-bezier(.32, .72, 0, 1)' } : { duration: 360, easing: 'cubic-bezier(.55, 0, .75, .2)', fill: 'forwards' })]
+    if (opening) {
+      for (const el of sheet.querySelectorAll('.mview__handle, .mview__head, .mview__search')) anims.push(el.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: 90, easing: 'cubic-bezier(.32, .72, 0, 1)', fill: 'backwards' }))
+      anims.push(list.animate([{ opacity: 0, transform: 'scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: 160, easing: 'cubic-bezier(.32, .72, 0, 1)', fill: 'backwards' }))
+      grow.from.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 360, easing: 'cubic-bezier(.32, .72, 0, 1)' })
+    }
+    growing = anims
+    return anims[0].finished.catch(() => {}).then(() => { if (growing === anims) growing = null })
+  }
   let back = null
-  function openView() {
+  function openView(from) {
     back = document.activeElement; query = ''; input.value = ''; openRow = null; render()
+    growing?.forEach((a) => a.cancel()); growing = null
+    grow = from instanceof Element && !prefersReducedMotion() ? { from, rect: from.getBoundingClientRect() } : null
+    shown = true
+    sheet.classList.toggle('is-grow', !!grow)   /* is-grow: no slide, the circle is the open (review.css) */
     sheet.style.removeProperty('--mv-drag'); scrim.style.opacity = ''
     scrim.hidden = false; sheet.hidden = false
     document.documentElement.classList.add('pmenu-lock', 'mview-on')   /* mview-on: the bottom row steps out (review.css) */
     for (const t of ['touchmove', 'wheel']) addEventListener(t, refuse, { passive: false })
-    requestAnimationFrame(() => { scrim.classList.add('is-on'); sheet.classList.add('is-on') })
+    requestAnimationFrame(() => { scrim.classList.add('is-on'); sheet.classList.add('is-on'); if (grow && shown) reveal(true) })
     list.scrollTop = 0
     /* FOCUS INTO THE LIST (17 Oct 2026): left on the button behind, the page
        lock refused the arrow and Page keys and Escape never reached the sheet */
@@ -54204,14 +54247,21 @@ if (document.documentElement.dataset.review && isV2()) {
       }, 520)
     }
   }
-  function closeView() {
+  /* `slide` is true only from the pull: a sheet the finger has moved goes on down, it does not fold */
+  function closeView(slide) {
     shut()
-    scrim.classList.remove('is-on'); sheet.classList.remove('is-on')
+    shown = false
+    const fold = !!grow && slide !== true && !prefersReducedMotion()
+    scrim.classList.remove('is-on')
+    if (!fold) { growing?.forEach((a) => a.cancel()); growing = null; sheet.classList.remove('is-grow', 'is-on') }
     document.documentElement.classList.remove('pmenu-lock', 'mview-on')
     for (const t of ['touchmove', 'wheel']) removeEventListener(t, refuse, { passive: false })
     document.removeEventListener('keydown', onEsc, true)
+    const hide = () => { scrim.hidden = true; sheet.hidden = true; sheet.style.removeProperty('--mv-drag') }
+    /* the fold holds its last frame until the sheet is hidden, then lets go — unless it was opened again meanwhile */
+    if (fold) reveal(false).then(() => { if (!shown) { sheet.classList.remove('is-on'); hide(); sheet.getAnimations().forEach((a) => a.cancel()) } })
     /* not if it was opened again inside the 260ms: the late hide would blank a live sheet */
-    setTimeout(() => { if (!sheet.classList.contains('is-on')) { scrim.hidden = true; sheet.hidden = true; sheet.style.removeProperty('--mv-drag') } }, 260)
+    else setTimeout(() => { if (!sheet.classList.contains('is-on')) hide() }, 260)
     back?.focus?.({ preventScroll: true })
   }
   const onEsc = (e) => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeView() } }
@@ -54243,7 +54293,7 @@ if (document.documentElement.dataset.review && isV2()) {
     if (!pull) return
     const p = pull; pull = null
     sheet.classList.remove('is-pulling'); scrim.style.opacity = ''
-    if (p.dy > 120 || (p.dy > 24 && p.v > .5)) { closeView(); return }
+    if (p.dy > 120 || (p.dy > 24 && p.v > .5)) { closeView(true); return }
     sheet.style.removeProperty('--mv-drag')
   }
   for (const el of [sheet.querySelector('.mview__handle'), sheet.querySelector('.mview__head')]) {
@@ -54258,7 +54308,7 @@ if (document.documentElement.dataset.review && isV2()) {
   /* a plus, alone (owner, 30 Sep 2026: "for Edit show pencil icon, for View show plus icon"); the name stays for screen readers */
   viewBtn.type = 'button'; viewBtn.className = 'link-btn mview-btn'
   viewBtn.innerHTML = `${icon('plus')}<span class="sr-only">View</span>`
-  viewBtn.setAttribute('aria-label', 'View your modules'); viewBtn.title = 'View your modules'
+  viewBtn.setAttribute('aria-label', 'View all modules'); viewBtn.title = 'View all modules'
   viewBtn.setAttribute('aria-haspopup', 'dialog')
   viewBtn.addEventListener('click', openView)
   document.querySelector('#modulesHead .section-head__actions')?.prepend(viewBtn)

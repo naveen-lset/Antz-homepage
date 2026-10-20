@@ -371,3 +371,40 @@ Same as above: `python3 -m http.server 8080` from `/Users/naveen/Home Page`, the
 ## Not done
 - **Not committed:** the morning's sheet and Quick Actions work in `index.html` and `review.css`, made by another session and live since hk1keyz0x. This commit takes only the curl removal. The `review.css?v=20261020g` bump stays in the working tree with that work.
 - **Not pushed:** GitHub `CleanUp` is still `a8b0179`.
+
+# Session 20 Oct 2026: bottom row and the All Modules sheet
+
+## Run it
+`python3 -m http.server 8080` from `/Users/naveen/Home Page`, then <http://localhost:8080/Antz-Selected-Modules/?v=2> at phone width (390). Tap the round Modules button (bottom left) to open the sheet.
+
+## Built and live
+All of this is in production as `home-page-changes-hk1keyz0x` (<https://home-page-changes.vercel.app/?v=2>). It was deployed from a clean copy before the commit; the copy matched this commit's `index.html` and `review.css`.
+
+- **Quick Actions keeps its size on scroll** (owner: "Dont Reduce the Size when I scrolling time"). `review.css`, end of THE BOTTOM ROW'S MARKS: two V2 rules cancel `.qa.is-scrolled` (label stays, 160×52). The fold rules in `index.html` are untouched.
+- **The Modules button opens the sheet with the Chat animation** (owner: "Same Animation when I click the Chat … for Module icon").
+  - `reveal()` beside `openView()` in the sheet's script is a copy of ChatPage's `reveal()`: a circle the button's size grows to cover the sheet, while the head rises in and the list settles. The button swells. Closing folds it back into the button (360ms).
+  - `openView(from)`: only the Modules chip passes itself (`window.__antzModulesSheet(chip)` in `modulesHint()`). The + beside Edit still gets the plain slide. A pull down calls `closeView(true)` and slides away.
+  - `.mview.is-grow { transition: none; }` in `review.css` stops the slide while the circle runs.
+- **The sheet's icons: one Antz colour, open rings.** Three rounds with the owner:
+  1. Flat coloured discs. Rejected: "I dont want Fill inside Circle … All module Colours have to same … too Colourful".
+  2. Petrol #1F515B, then #006D35.
+  3. Final: "Use our Antz primary green Colour", which is MD3_Antz/Primary #37BD69 (`--c-primary`).
+  - `.mview__ico` is a 1px ring and the mark is drawn in that colour. The white module SVGs are drawn as CSS masks through `.mview__mark` (in `glyphOf()`); the line icons use `currentColor`.
+  - The art loses its second colours: Communication's back bubble shows lighter, and the small accents on Eggs and Diet are gone.
+- **No home badge** (owner: "remove the home icon from the all modules"). `HOME_BADGE` and `.mview__badge` are removed. A module on Home still says so to a screen reader, and its swipe still offers Remove.
+- **The title is "All Modules"; search and the grid/list switch share one row** (`.mview__tools`). The switch is built once (`modeSw`), and `render()` syncs `aria-pressed`. The in-list "All Modules" / "Results" bar is gone.
+
+## Deploying
+- The Vercel CLI (`~/.local/node/bin`) is logged in as `naveen-lset`. Run `vercel link --yes --project home-page-changes --scope naveen-lsets-projects`, delete the `.env.local` it writes, then `vercel deploy --prod --yes`.
+- **`~/.vercel-token` no longer works** (Vercel answers "Not authorized" for `naveen-lsets-projects`). Don't pass `--token`. The file can be deleted.
+- Make the clean copy with `git ls-files -co --exclude-standard`, minus `.hub.json`.
+
+## Open questions for the owner
+- Should the + beside Edit also open the sheet with the circle?
+- The sheet's grid/list switch still marks its chosen view in #006D35. Should it be Primary #37BD69 too?
+- The earlier questions still stand: which sky-doodle variant, the iPhone check, and live bugs 2 and 3.
+
+## Not done
+- **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Every commit from 19 Oct onwards, including this one, is on this Mac only. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
+- **Not synced:** `mockups/web-v3/widgets-preview.html` still has the older sheet and tabs.
+- `.hub.json` (untracked, not from these sessions) is left out of git and out of the deploy.
