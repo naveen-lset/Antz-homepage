@@ -268,3 +268,71 @@ They use existing layouts in different module gradients (gold, cyan, deep teal, 
 ## Not done
 - **Not pushed:** `CleanUp` is ahead of `origin`. Push with the work SSH URL (`github-work`).
 - **Not synced:** `mockups/web-v3/widgets-preview.html` still has the morning's tabs, not this top bar.
+
+# Session 19–20 Oct 2026: Recents folder tabs, iPhone fixes, sky doodles
+
+## Run it
+`python3 -m http.server 8080` from `/Users/naveen/Home Page`, then <http://localhost:8080/Antz-Selected-Modules/?v=2> at phone width (390).
+- Open the mockups through localhost, not from the file. The iframes, and the masks in header-concepts.html, fail on `file://`.
+
+## Built and live
+
+### Recents card: soft pills and a white folder (phone only, ≤743px)
+- **Look:**
+  - The four tabs (Recents, Favourites, Bookmarks, Folders) are soft white pills: 54 tall, 6 apart, r12.
+  - The picked tab turns white and opens into the rail as one folder: white, with a soft shadow and no outline.
+  - The rail sits 12 inside the folder.
+- **Motion:** the folder glides to the next tab on the tabs' 460ms curve, `cubic-bezier(.32, .72, 0, 1)`.
+- **Tablet and desktop:** unchanged; they keep the old underlined tabs.
+- **Files:**
+  - `review.css`, phone block: "Recents · SOFT PILLS AND A WHITE FOLDER", plus `.fav__fold { display: none }` outside the phone block and a step down to 11px below 360px.
+  - `index.html`, `mountAnimals`: "THE WHITE FOLDER", made of `foldPath()`, `foldTo()` and `settle()`. `place()` calls `foldTo()`, and the ResizeObserver also watches the box.
+- **How it got here** (owner's words):
+  - "implement the Soft Pills" (variant A of `mockups/recents-folder-tabs.html`).
+  - "pills between, reduce little" (gap 8 → 6).
+  - "corner radius 8 or 6px", then "follow the corner radius of other containers" (r12).
+  - "no breathing space" (inset 12).
+  - "remove the outline".
+
+### iPhone fixes (owner's screenshot: the app opened scrolled down, with a white strip above it)
+- **Opens at the top:**
+  - The site tabs' `draw()` used `scrollIntoView({block:'nearest'})`, which scrolled the page 208–222px down on load. This was live bug 1 from the earlier 19 Oct session.
+  - It now scrolls only `.site-tabs__track` sideways.
+  - The head script sets `history.scrollRestoration = 'manual'`.
+- **Notch / status bar:**
+  - `apple-mobile-web-app-status-bar-style` stays `default`. From iOS 26.1, home-screen apps on `black-translucent` get a forced dark scrim and blur over the top, and a short safe-area inset (WebKit bug 301108).
+  - iOS paints the default bar in the page's colour. So `:root.has-wsky` is now `linear-gradient(#fff, #fff) no-repeat, #E6EEED` (the sky's top edge), and `theme-color` is `#E6EEED`. The page itself stays white.
+  - **Not yet confirmed on a device.**
+
+### Deploys (Vercel project `home-page-changes`, scope `naveen-lsets-projects`)
+| Commit | What | Deployment |
+|---|---|---|
+| `8f9950c` | soft pills, r8 | `home-page-changes-ol155h5xy` |
+| `a7dba3e` | r12, 12 inset, no outline | `home-page-changes-7iz7rsya4` |
+| `6653229` | opens at the top; status bar colour | `home-page-changes-5oawoga01` (current production) |
+
+Each deploy was made from a clean copy (`git ls-files -co`) with `vercel deploy --prod`. Delete the `.env.local` that `vercel link` writes before deploying.
+
+## Mockups (review only)
+- **`mockups/header-concepts.html`:** five header directions from the owner's Blinkit, Instamart and Zepto references (Sky, Module stores, Mint bento, Night rounds, Festival lights). The owner set these aside ("leave this concept now") and kept only Zepto's folder-tab idea.
+- **`mockups/recents-folder-tabs.html`:** variants A Soft pills, B Open tabs and C Icons only, over the live home. A is now live; this page strips the live folder and draws its own.
+- **`mockups/sky-doodles.html`** (new, waiting for the owner): subtle animal doodles and sparkles in the sky band behind the greeting.
+  - **How:** one `.dd` layer is added inside `.wsky`.
+  - **Variants:**
+    - A Floating doodles: they sway in place.
+    - B Drawn one by one: each draws itself in, sparkles pop, then it fades; at most 3 at once.
+    - C Wanderers: a paw trail, a gull and a butterfly on an `offset-path`.
+  - **Colours:** ink #1F515B at 16–24%; sparkles #00ABAB and #FFE86E.
+- **Gotchas for these mockups:**
+  - Scale the phones with `zoom`, not a transform. Under a transform the live fixed layers escape the rounded clip.
+  - When zoomed, the live search-row observer (threshold 1) reads "stuck", so the mockups clear `.search-row.is-stuck` at the top.
+
+## Open questions for the owner
+- Which sky-doodle variant (A, B or C), and stronger or fainter?
+- After closing and reopening the home-screen app: does it open at the top, and is the strip behind the notch now mint-grey?
+- Live bugs 2 and 3 from the earlier 19 Oct session are still open.
+
+## Not done
+- **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Every commit from 19 Oct (ad3947a → 6653229, plus this handoff) exists only on this Mac. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
+- **Not built:** the sky doodles exist only in the mockup.
+- **Not synced:** `mockups/web-v3/widgets-preview.html` still has the older tabs.

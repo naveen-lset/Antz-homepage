@@ -1,0 +1,228 @@
+<!doctype html>
+<!--
+  SKY DOODLES (owner, 19 Oct 2026: "background some animation like animal
+  doodles, sparkle kind animal, not full, light way to show — make mockup").
+
+  Each phone is the live ../index.html. One layer is added inside the header's
+  sky band (.wsky, z-index -1), so the doodles sit behind the greeting, the
+  search and the Recents folder and show only where the sky does. Nothing
+  else on the page changes.
+
+    A  Floating doodles  ten line doodles drift and sway in place; small sparkles twinkle
+    B  Drawn one by one  a doodle draws itself in a free spot, sparkles pop, it fades
+    C  Wanderers         a paw trail walks across, a gull flies over, a butterfly flutters
+
+  Line work is #1F515B (OnPrimaryContainer) at 14–20%; sparkles are #00ABAB
+  (SecondaryDark) and #FFE86E (moderatePrimary). No white glows. With reduced
+  motion the doodles stand still.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sky doodles · ANTZ</title>
+<link rel="icon" href="../assets/icon/hero-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { display: flex; flex-direction: column; background: #EFF5F2; font: 14px/1.4 Inter, system-ui, sans-serif; color: #1F415B; -webkit-font-smoothing: antialiased; }
+.bar { flex: none; display: flex; align-items: center; gap: 16px; min-height: 60px; padding: 10px 28px; border-bottom: 1px solid #DFE8E4; background: rgba(255, 255, 255, .6); }
+.bar__t { font-weight: 700; font-size: 16px; white-space: nowrap; }
+.bar__s { font-size: 12.5px; color: #7A8684; }
+.bar nav { display: flex; gap: 6px; margin-left: auto; }
+.bar button { flex: none; height: 34px; padding: 0 14px; border: 0; border-radius: 17px; background: #fff; box-shadow: inset 0 0 0 1px #DFE8E4;
+  font: 600 13px/34px Inter, sans-serif; color: #44544A; cursor: pointer; white-space: nowrap; }
+.bar button[aria-pressed='true'] { background: #1F515B; color: #fff; box-shadow: none; }
+.stage { flex: 1; min-height: 0; display: flex; justify-content: center; gap: 40px; padding: 22px 24px 0; }
+.cell { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: 0; }
+.cap { width: 390px; text-align: left; }
+.cap b { display: block; font-size: 15px; }
+.cap small { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.4; color: #7A8684; }
+.fit { width: calc(410px * var(--k, 1)); }
+/* zoom, not a scale transform: under a transform the live page's fixed layers
+   escape the round corners and its stuck-search observer never sees 100% */
+.phone { zoom: var(--k, 1); width: 410px; height: 864px; padding: 10px; border-radius: 56px; background: #0E0E0E; box-shadow: inset 0 0 0 2px #2B2B2B, 0 30px 60px -30px rgba(31, 65, 91, .45); }
+.scr { width: 390px; height: 844px; border-radius: 46px; overflow: hidden; clip-path: inset(0 round 46px); background: #E6F6F5; }
+.phone iframe { display: block; width: 100%; height: 100%; border: 0; }
+@media (max-width: 900px) {
+  .bar { padding: 8px 10px; }
+  .bar > div { display: none; }
+  .bar nav { margin: 0; overflow-x: auto; }
+  .stage { padding: 0; gap: 0; }
+  .cell { display: none; flex: 1; }
+  .cell.is-cur { display: flex; }
+  .cap { display: none; }
+  .fit, .phone { zoom: 1; width: 100%; height: 100%; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+  .scr { width: 100%; height: 100%; border-radius: 0; clip-path: none; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div>
+    <div class="bar__t">Sky doodles</div>
+    <div class="bar__s">The live home in each phone; only the sky behind the greeting gets the animation.</div>
+  </div>
+  <nav id="pick"></nav>
+</header>
+<main class="stage" id="stage"></main>
+
+<script>
+const VARIANTS = [
+  { id: 'a', name: 'A · Floating doodles', note: 'Ten line doodles (paw, turtle, butterfly, gull, fish, elephant, giraffe…) sway gently in place; small sparkles twinkle.' },
+  { id: 'b', name: 'B · Drawn one by one', note: 'Every few seconds a doodle draws itself in a free spot, a few sparkles pop, then it fades. Never more than three at once.' },
+  { id: 'c', name: 'C · Wanderers', note: 'A paw-print trail walks across, a gull flies over now and then, a butterfly flutters along the sky.' },
+]
+
+/* ── the doodles: 48 × 48 line drawings, every stroke a path so it can draw itself ── */
+const E = (cx, cy, rx, ry, rot = 0) => `<path d="M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0"${rot ? ` transform="rotate(${rot} ${cx} ${cy})"` : ''}/>`
+const EYE = (cx, cy) => `<circle class="eye" cx="${cx}" cy="${cy}" r="1.1"/>`
+const D = {
+  paw: E(24, 31, 8.5, 7) + E(13.5, 20.5, 3.4, 4.4, -20) + E(20.5, 13.5, 3.4, 4.6, -6) + E(28, 13.5, 3.4, 4.6, 6) + E(34.5, 20.5, 3.4, 4.4, 20),
+  gull: '<path d="M5 26c5-7 12-8 19-1 7-7 14-6 19 1"/>',
+  butterfly: '<path d="M24 15v20"/><path d="M24 19c-3-7-14-11-15-3-1 6 7 9 15 6"/><path d="M24 19c3-7 14-11 15-3 1 6-7 9-15 6"/>' +
+    '<path d="M24 25c-4 1-11 5-9 10 2 4 8 0 9-6"/><path d="M24 25c4 1 11 5 9 10-2 4-8 0-9-6"/><path d="M24 15c-1-3-3-5-5-6"/><path d="M24 15c1-3 3-5 5-6"/>',
+  leaf: '<path d="M9 39C9 22 21 9 39 9c0 17-12 30-30 30z"/><path d="M9 39 30 18"/><path d="M16 32l7 .5"/><path d="M21 27l.5-7"/>',
+  fish: '<path d="M7 24c6-8 18-10 27 0-9 10-21 8-27 0z"/><path d="M34 24l8-7v14z"/><path d="M21 19c2 3 2 7 0 10"/>' + EYE(14.5, 22.5),
+  turtle: '<path d="M9 31c0-9 7-15 15-15s15 6 15 15z"/><path d="M39 29c3 0 6-1.5 6-4.5S42 21 40 23"/><path d="M14 31l-2 5"/><path d="M34 31l2 5"/>' +
+    '<path d="M15 25h18"/><path d="M20 17l4 8 4-8"/><path d="M9 31H5"/>',
+  elephant: E(24, 21, 9, 9) + '<path d="M15.5 18c-6-4-11 0-11 6s5 9 10 5"/><path d="M32.5 18c6-4 11 0 11 6s-5 9-10 5"/><path d="M24 29v7c0 3 3 4 5 2"/>' + EYE(20.5, 20) + EYE(27.5, 20),
+  feather: '<path d="M12 40 36 9"/><path d="M36 9c4 11-3 22-16 24"/><path d="M36 9C25 11 16 20 14 31"/><path d="M27 21l5 3"/><path d="M23 26l5 3"/><path d="M30 16l4 2"/>',
+  bird: '<path d="M11 30c0-8 6-13 13-13 5 0 9 3 10 8l6 1-6 2c-1 6-6 10-12 10-7 0-11-3-11-8z"/><path d="M17 27c3 3 8 3 11 0"/><path d="M21 38v4"/><path d="M26 38v4"/>' + EYE(29, 22),
+  giraffe: '<path d="M20 46V24c-4-1-7-4-7-8 0-3 3-5 7-5h6c4 0 7 3 7 6 0 3-2 5-5 6v23"/><path d="M19 11V6"/><path d="M27 11V6"/>' +
+    E(19, 4.5, 1.6, 1.6) + E(27, 4.5, 1.6, 1.6) + '<path d="M22 31c2 1 3 3 2 5"/><path d="M25 38c1 2 0 3-1 4"/>' + EYE(21, 16),
+}
+const STAR = '<path d="M24 4l4.2 15.8L44 24l-15.8 4.2L24 44l-4.2-15.8L4 24l15.8-4.2z"/>'
+const svg = (name, x, y, s, extra = '', style = '') =>
+  `<svg class="ln ${extra}" viewBox="0 0 48 48" style="left:${x}px;top:${y}px;width:${s}px;height:${s}px;${style}" aria-hidden="true">${D[name]}</svg>`
+const star = (x, y, s, c, style = '') =>
+  `<svg class="sp" viewBox="0 0 48 48" style="left:${x}px;top:${y}px;width:${s}px;height:${s}px;--c:${c};${style}" aria-hidden="true">${STAR}</svg>`
+const TEAL = '#00ABAB', GOLD = '#FFE86E'
+
+/* where the sky shows on a 390 phone: around the greeting (0–80), the strips
+   either side of the search and the folder (x < 16, x > 374), the band's foot */
+const FLOAT = [
+  ['turtle', 96, 0, 26, -8, 9], ['paw', 196, 6, 22, -18, 7], ['butterfly', 232, 44, 28, 10, 6.5], ['gull', 300, 2, 26, 0, 8],
+  ['fish', 150, 54, 24, -6, 10], ['leaf', 0, 58, 22, 30, 8.5], ['elephant', 338, 48, 26, 6, 9.5], ['feather', 370, 150, 24, 20, 7.5],
+  ['giraffe', -8, 150, 30, -8, 11], ['bird', 58, 56, 22, 0, 8], ['paw', 376, 320, 18, 40, 9],
+]
+const SPARKS = [[182, 38, 10, GOLD], [270, 16, 8, TEAL], [40, 6, 9, GOLD], [326, 72, 8, TEAL], [122, 70, 7, GOLD], [6, 250, 8, TEAL], [378, 230, 7, GOLD]]
+const SPOTS = [[100, 0, 28], [196, 4, 26], [236, 44, 28], [300, 0, 26], [150, 52, 24], [0, 58, 24], [334, 50, 26], [58, 58, 22], [368, 150, 24], [-6, 170, 28]]
+
+const CSS = `
+.dd { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.dd svg { position: absolute; display: block; overflow: visible; }
+.dd .ln :is(path, circle) { fill: none; stroke: #1F515B; stroke-width: 1.4px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.dd .ln .eye { fill: #1F515B; stroke: none; }
+.dd .sp { fill: var(--c); transform-box: fill-box; transform-origin: center; }
+
+/* A · float: each doodle sways on its own clock; the sparkles twinkle */
+.dd--a .ln { opacity: .18; transform-origin: center; animation: ddFloat var(--d, 8s) ease-in-out infinite alternate; animation-delay: var(--dl, 0s); }
+@keyframes ddFloat { from { transform: translate(-2px, -3px) rotate(calc(var(--r, 0deg) - 5deg)); } to { transform: translate(3px, 4px) rotate(calc(var(--r, 0deg) + 5deg)); } }
+.dd .sp.tw { opacity: 0; animation: ddTw var(--d, 2.8s) ease-in-out infinite; animation-delay: var(--dl, 0s); }
+@keyframes ddTw { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0deg); } 50% { opacity: .85; transform: scale(1) rotate(45deg); } }
+
+/* B · drawn one by one: the strokes draw in, hold, and the doodle lifts away */
+.dd--b .ln { opacity: .2; animation: ddLife 6.4s ease forwards; }
+.dd--b .ln path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ddDraw 1.7s cubic-bezier(.45, .05, .3, 1) forwards; animation-delay: calc(var(--k, 0) * 110ms); }
+.dd--b .ln .eye { opacity: 0; animation: ddIn .3s ease 1.5s forwards; }
+@keyframes ddDraw { to { stroke-dashoffset: 0; } }
+@keyframes ddIn { to { opacity: 1; } }
+@keyframes ddLife { 0%, 80% { opacity: .2; transform: rotate(var(--r, 0deg)); } 100% { opacity: 0; transform: translateY(-8px) rotate(var(--r, 0deg)); } }
+.dd--b .sp.pop { opacity: 0; animation: ddPop .9s ease-out forwards; animation-delay: var(--dl, 0s); }
+@keyframes ddPop { 0% { opacity: 0; transform: scale(.2) rotate(0deg); } 40% { opacity: .9; transform: scale(1) rotate(30deg); } 100% { opacity: 0; transform: scale(.4) rotate(90deg); } }
+
+/* C · wanderers */
+.dd--c .trail .ln { opacity: 0; animation: ddStep 10s ease-in-out infinite; animation-delay: calc(var(--i) * .5s); }
+/* each print shows for about 1.5s, so three or four are down at once, the oldest fading as the next lands */
+@keyframes ddStep { 0% { opacity: 0; } 2% { opacity: .24; } 15% { opacity: .24; } 24%, 100% { opacity: 0; } }
+.dd--c .fly { left: 0; top: 10px; opacity: .2; animation: ddFly 16s linear infinite; animation-delay: -3s; }
+@keyframes ddFly { 0% { transform: translate(430px, 12px); } 50% { transform: translate(190px, -2px); } 70%, 100% { transform: translate(-70px, 10px); } }
+.dd--c .flap { transform-box: fill-box; transform-origin: center; animation: ddFlap .42s ease-in-out infinite alternate; }
+@keyframes ddFlap { to { transform: scaleY(.35); } }
+.dd--c .bfly { left: 0; top: 0; opacity: .22; offset-path: path('M -40 70 C 40 12, 110 88, 190 36 S 320 2, 440 58'); offset-rotate: 0deg;
+  animation: ddPath 22s linear infinite; animation-delay: -7s; }
+@keyframes ddPath { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+.dd--c .wing { transform-box: fill-box; transform-origin: center; animation: ddWing .26s ease-in-out infinite alternate; }
+@keyframes ddWing { to { transform: scaleX(.45); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dd *, .dd { animation: none !important; }
+  .dd .sp.tw, .dd--c .trail .ln { opacity: .5; }
+}`
+
+function inject(frame, v) {
+  const win = frame.contentWindow, doc = frame.contentDocument
+  const st = doc.createElement('style'); st.textContent = CSS; doc.head.append(st)
+  const sky = doc.querySelector('.wsky')
+  const dd = doc.createElement('div'); dd.className = `dd dd--${v}`; dd.setAttribute('aria-hidden', 'true'); sky.append(dd)
+  const rnd = (a, b) => a + Math.random() * (b - a)
+
+  if (v === 'a') {
+    dd.innerHTML = FLOAT.map(([n, x, y, s, r, d], i) => svg(n, x, y, s, '', `--r:${r}deg;--d:${d}s;--dl:${-i * 1.3}s`)).join('') +
+      SPARKS.map(([x, y, s, c], i) => star(x, y, s, c, `--d:${2.4 + (i % 3) * .7}s;--dl:${-i * .8}s`).replace('class="sp"', 'class="sp tw"')).join('')
+  }
+
+  if (v === 'b') {
+    const names = Object.keys(D), busy = new Set(); let last = ''
+    const one = () => {
+      if (busy.size >= 3) return
+      const free = SPOTS.map((s, i) => i).filter((i) => !busy.has(i)); if (!free.length) return
+      const i = free[Math.floor(Math.random() * free.length)], [x, y, s] = SPOTS[i]
+      let n; do n = names[Math.floor(Math.random() * names.length)]; while (n === last); last = n
+      busy.add(i)
+      const wrap = doc.createElement('div')
+      wrap.innerHTML = svg(n, x, y, s, '', `--r:${rnd(-14, 14).toFixed(0)}deg`) +
+        [0, 1, 2].map((k) => star(x + s / 2 + rnd(-s * .9, s * .9) - 4, y + s / 2 + rnd(-s * .8, s * .6) - 4, rnd(6, 10), k % 2 ? TEAL : GOLD, `--dl:${1.4 + k * .15}s`).replace('class="sp"', 'class="sp pop"')).join('')
+      wrap.querySelectorAll('.ln path').forEach((p, k) => { p.setAttribute('pathLength', '1'); p.style.setProperty('--k', k) })
+      const kids = [...wrap.children]; dd.append(...kids)
+      setTimeout(() => { kids.forEach((el) => el.remove()); busy.delete(i) }, 6600)
+    }
+    one(); setTimeout(one, 900); setInterval(one, 2300)
+  }
+
+  if (v === 'c') {
+    /* left, right, left: a walk, prints 26 apart and 9 either side of the line */
+    const trail = Array.from({ length: 9 }, (_, i) => svg('paw', 120 + i * 30, 60 + (i % 2 ? -9 : 3), 13, '', `--i:${i};transform:rotate(${i % 2 ? 80 : 100}deg)`)).join('')
+    dd.innerHTML = `<div class="trail">${trail}</div>` +
+      `<svg class="ln fly" viewBox="0 0 48 48" style="width:28px;height:28px" aria-hidden="true"><g class="flap">${D.gull}</g></svg>` +
+      `<svg class="ln bfly" viewBox="0 0 48 48" style="width:24px;height:24px" aria-hidden="true"><g class="wing">${D.butterfly}</g></svg>` +
+      SPARKS.slice(0, 5).map(([x, y, s, c], i) => star(x, y, s, c, `--d:${2.6 + (i % 3) * .8}s;--dl:${-i * 1.1}s`).replace('class="sp"', 'class="sp tw"')).join('')
+  }
+}
+
+/* ── the page ──────────────────────────────────────────────────────────── */
+const stage = document.getElementById('stage'), pick = document.getElementById('pick')
+VARIANTS.forEach((v, i) => {
+  stage.insertAdjacentHTML('beforeend', `<figure class="cell${i ? '' : ' is-cur'}" data-v="${v.id}"><figcaption class="cap"><b>${v.name}</b><small>${v.note}</small></figcaption>
+    <div class="fit"><div class="phone"><div class="scr"><iframe title="${v.name}" src="../index.html?v=2"></iframe></div></div></div></figure>`)
+  pick.insertAdjacentHTML('beforeend', `<button type="button" data-v="${v.id}" aria-pressed="${!i}">${v.name}</button>`)
+  const frame = stage.lastElementChild.querySelector('iframe')
+  frame.addEventListener('load', () => {
+    const win = frame.contentWindow
+    let tries = 0
+    const wait = () => {
+      const ready = frame.contentDocument.querySelector('.wsky') && frame.contentDocument.querySelector('.fav__box')
+      /* zoomed, the live search row's observer (threshold 1) never sees the row whole and calls it stuck; cleared at the top */
+      const top = () => { win.scrollTo(0, 0); if (!win.scrollY) frame.contentDocument.querySelector('.search-row')?.classList.remove('is-stuck') }
+      if (ready) { inject(frame, v.id); [300, 1200, 2600].forEach((ms) => setTimeout(top, ms)) }
+      else if (tries++ < 100) setTimeout(wait, 100)
+    }
+    wait()
+  })
+})
+pick.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  for (const x of pick.children) x.setAttribute('aria-pressed', x === b)
+  for (const c of stage.children) c.classList.toggle('is-cur', c.dataset.v === b.dataset.v)
+})
+/* three phones side by side, scaled to the window's height */
+const fit = () => { const cap = stage.querySelector('.cap').offsetHeight || 0
+  const k = Math.min(1, (stage.clientHeight - 22 - cap - 14 - 16) / 864); document.documentElement.style.setProperty('--k', Math.max(.5, k).toFixed(3)) }
+addEventListener('resize', fit); fit()
+</script>
+</body>
+</html>
