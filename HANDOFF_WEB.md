@@ -372,13 +372,13 @@ Same as above: `python3 -m http.server 8080` from `/Users/naveen/Home Page`, the
 - **Not committed:** the morning's sheet and Quick Actions work in `index.html` and `review.css`, made by another session and live since hk1keyz0x. This commit takes only the curl removal. The `review.css?v=20261020g` bump stays in the working tree with that work.
 - **Not pushed:** GitHub `CleanUp` is still `a8b0179`.
 
-# Session 20 Oct 2026: bottom row and the All Modules sheet
+# Session 20 Oct 2026 (morning, committed after the section above): bottom row and the All Modules sheet
 
 ## Run it
 `python3 -m http.server 8080` from `/Users/naveen/Home Page`, then <http://localhost:8080/Antz-Selected-Modules/?v=2> at phone width (390). Tap the round Modules button (bottom left) to open the sheet.
 
 ## Built and live
-All of this is in production as `home-page-changes-hk1keyz0x` (<https://home-page-changes.vercel.app/?v=2>). It was deployed from a clean copy before the commit; the copy matched this commit's `index.html` and `review.css`.
+First deployed as `home-page-changes-hk1keyz0x` (12:22). Production is now the later session's `home-page-changes-a84u35h6d` (<https://home-page-changes.vercel.app/?v=2>), which carries all of it. Its live `index.html` and `review.css?v=20261020g` match commit `a6d4f0d` byte for byte.
 
 - **Quick Actions keeps its size on scroll** (owner: "Dont Reduce the Size when I scrolling time"). `review.css`, end of THE BOTTOM ROW'S MARKS: two V2 rules cancel `.qa.is-scrolled` (label stays, 160×52). The fold rules in `index.html` are untouched.
 - **The Modules button opens the sheet with the Chat animation** (owner: "Same Animation when I click the Chat … for Module icon").
@@ -407,4 +407,4 @@ All of this is in production as `home-page-changes-hk1keyz0x` (<https://home-pag
 ## Not done
 - **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Every commit from 19 Oct onwards, including this one, is on this Mac only. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
 - **Not synced:** `mockups/web-v3/widgets-preview.html` still has the older sheet and tabs.
-- `.hub.json` (untracked, not from these sessions) is left out of git and out of the deploy.
+- `.hub.json` is committed (in `8d1a398`) but kept out of deploys.
