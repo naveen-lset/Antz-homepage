@@ -1,0 +1,498 @@
+<!doctype html>
+<!--
+  QUICK ACTIONS WITHOUT ITS FOOT (owner, 21 Oct 2026: "Work on the need More
+  UI & UX Approaches. remove Search Everything & Edit Modules. Something
+  different").
+
+  Both phones are the live ../index.html?v=2 with the Quick Actions panel open.
+  The left one is the panel as it is today. In the right one the foot (Search
+  everything, Edit Modules) is gone and one concept is drawn into the live
+  panel: its own title, field, drafts strip, folders, rows and icons, plus the
+  few pieces each concept adds. Taps run the live panel's own code: a row
+  fires its action, a folder door opens the live sub-list, the field runs the
+  live search.
+
+    1  Search below   the field moves down to where the foot was, by the thumb;
+                      it already searches everything, and gains Scan
+    2  Most used      the four actions you use most, one tap, above Close
+    3  Tabs           one category at a time; the four sit at the foot as the
+                      Recents strip tabs; swipe the card to move
+    4  Folders        the four categories as 2 × 2 folder tiles; all on one
+                      screen; a tile opens into its list
+    5  Continue       the drafts strip moves to the foot and shows the newest
+                      draft itself, with its progress
+    6  Accordion      the folders fold to their headings; one open at a time
+
+  Antz tokens and the panel's own tints only: the four category grounds, the
+  drafts amber, #1F515B for the picked tab. No new colours, no glows.
+  Mockup only — nothing here is saved, and the live index.html is untouched.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quick Actions · concepts</title>
+<link rel="icon" href="../assets/icon/qa-bolt.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" media="print" onload="this.media='all'">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { display: flex; flex-direction: column; background: #EFF5F2; font: 14px/1.4 Inter, system-ui, sans-serif; color: #1F415B; -webkit-font-smoothing: antialiased; }
+.bar { flex: none; display: flex; align-items: center; gap: 16px; min-height: 60px; padding: 10px 28px; border-bottom: 1px solid #DFE8E4; background: rgba(255, 255, 255, .6); }
+.bar__t { font-weight: 700; font-size: 16px; white-space: nowrap; }
+.bar__s { font-size: 12.5px; color: #7A8684; }
+.bar nav { display: flex; gap: 6px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+.bar button { flex: none; height: 34px; padding: 0 14px; border: 0; border-radius: 17px; background: #fff; box-shadow: inset 0 0 0 1px #DFE8E4;
+  font: 600 13px/34px Inter, sans-serif; color: #44544A; cursor: pointer; white-space: nowrap; }
+.bar button b { font-weight: 600; opacity: .5; margin-right: 6px; }
+.bar button[aria-pressed='true'] { background: #1F515B; color: #fff; box-shadow: none; }
+.stage { flex: 1; min-height: 0; display: flex; justify-content: center; gap: 40px; padding: 22px 24px 0; }
+.cell { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: 0; }
+.bar > div { flex: 1 1 auto; min-width: 0; }
+.bar nav { flex: none; max-width: 70%; }
+.cap { flex: none; width: calc(410px * var(--k, 1)); min-width: 300px; min-height: var(--cap-h, 58px); text-align: left; }
+.fit { flex: none; }
+.cap b { display: block; font-size: 15px; }
+.cap small { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.45; color: #7A8684; }
+.cap i { font-style: normal; color: #1F515B; font-weight: 600; }
+.cell--now { opacity: .9; }
+.fit { width: calc(410px * var(--k, 1)); }
+/* zoom, not a scale transform: under a transform the live page's fixed layers
+   escape the round corners and its stuck-search observer never sees 100% */
+.phone { zoom: var(--k, 1); width: 410px; height: 864px; padding: 10px; border-radius: 56px; background: #0E0E0E; box-shadow: inset 0 0 0 2px #2B2B2B, 0 30px 60px -30px rgba(31, 65, 91, .45); }
+.scr { position: relative; width: 390px; height: 844px; border-radius: 46px; overflow: hidden; clip-path: inset(0 round 46px); background: #E6F6F5; }
+.phone iframe { display: block; width: 100%; height: 100%; border: 0; }
+.toast { position: absolute; left: 50%; top: 58px; z-index: 5; translate: -50% -8px; opacity: 0; pointer-events: none;
+  padding: 9px 14px; border-radius: 12px; background: #1F515B; color: #fff; font: 500 13px/1.3 Inter, sans-serif; white-space: nowrap;
+  box-shadow: 0 10px 24px -12px rgba(16, 45, 52, .6); transition: opacity 200ms, translate 260ms cubic-bezier(.25, .46, .45, .94); }
+.toast.is-on { opacity: 1; translate: -50% 0; }
+@media (max-width: 900px) {
+  .bar { padding: 8px 10px; }
+  .bar > div { display: none; }
+  .bar nav { margin: 0; max-width: none; flex: 1 1 auto; }
+  .stage { padding: 0; gap: 0; }
+  .cell--now, .cap { display: none; }
+  .cell { flex: 1; }
+  .fit, .phone { zoom: 1; width: 100%; height: 100%; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+  .scr { width: 100%; height: 100%; border-radius: 0; clip-path: none; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div>
+    <div class="bar__t">Quick Actions · without the foot</div>
+    <div class="bar__s">Left: today. Right: the foot removed, one new idea in its place.</div>
+  </div>
+  <nav id="pick" aria-label="Concept"></nav>
+</header>
+<main class="stage" id="stage">
+  <figure class="cell cell--now">
+    <figcaption class="cap"><b>Now</b><small>The live panel. Its foot, Search everything and Edit Modules, is what goes.</small></figcaption>
+    <div class="fit"><div class="phone"><div class="scr"><iframe id="now" title="Quick Actions today" data-src="../index.html?v=2"></iframe></div></div></div>
+  </figure>
+  <figure class="cell">
+    <figcaption class="cap" id="cap"></figcaption>
+    <div class="fit"><div class="phone"><div class="scr"><iframe id="app" title="Quick Actions concept" data-src="../index.html?v=2"></iframe><div class="toast" id="toast" role="status"></div></div></div></div>
+  </figure>
+</main>
+
+<script>
+const CONCEPTS = [
+  { id: 'below', name: 'Search below',
+    note: 'The field moves down to where the foot was, under the thumb. It already searches actions, modules, animals and enclosures, so “Search everything” was a second door to the same room. Scan sits in the field.',
+    tryit: 'Type “leo”: results rise above the field.' },
+  { id: 'usual', name: 'Most used',
+    note: 'The foot becomes your four most-used actions, one tap each, right above Close. Tile grounds are the categories’ own tints. The folders above stay as they are.',
+    tryit: 'Tap a tile: it fires the action.' },
+  { id: 'tabs', name: 'Tabs',
+    note: 'One category at a time, so the panel is short and never scrolls. The four sit at the foot as the Recents strip tabs: icons, the picked one opens to its name, a 2px #1F515B bar glides.',
+    tryit: 'Tap a tab, or swipe the card sideways.' },
+  { id: 'folders', name: 'Folders',
+    note: 'The four categories as iOS-style folder tiles, each showing its four marks. Everything is on one screen with no scroll; a tile grows into its list, and the back chevron folds it away.',
+    tryit: 'Tap Animal Management.' },
+  { id: 'continue', name: 'Continue',
+    note: 'The drafts strip moves to the foot and shows the newest draft itself — what, where and how far — so finishing work is one tap. “+4” opens the other drafts.',
+    tryit: 'Tap +4 for the full list.' },
+  { id: 'accordion', name: 'Accordion',
+    note: 'The folders fold to their headings; one is open at a time, the one you used last. Four headings and one open list fit on one screen without a scroll.',
+    tryit: 'Tap a heading to open it.' },
+]
+
+/* ══ WHAT EACH CONCEPT ADDS, AS ITS OWN STYLES ═══════════════════════════════
+   Everything is scoped by html[data-cx] inside the frame, so a switch is: drop
+   the added elements, change one attribute, draw the next. The live nodes are
+   never moved; only CSS reorders or hides them. */
+const CSS = `
+/* every concept · the foot goes (its "no match" line stays, it is the empty state) */
+html[data-cx] .qa-foot { display: none; }
+html[data-cx] .qa-foot:has(.qa-foot__none:not([hidden])) { display: flex; margin: 0; padding: 0; border: 0; }
+html[data-cx] .qa-foot__b { display: none; }
+/* added pieces open with the panel's own rows, and hide while a search or a sub-list runs */
+.cx-el { opacity: 0; transform: translateY(12px) scale(.98);
+  transition: opacity var(--qa-t-row) var(--qa-ease), transform var(--qa-t-row) var(--qa-ease);
+  transition-delay: var(--cx-d, 40ms); }
+.qa.is-open .cx-el { opacity: 1; transform: none; }
+.qa.is-closing .cx-el { transition-delay: 0ms; }
+.qa-menu:has(.qa-res:not([hidden]), .qa-sub:not([hidden]), .qa-stage:not([hidden])) .cx-hide { display: none; }
+
+/* 1 · SEARCH BELOW ────────────────────────────────────────────────────── */
+html[data-cx="below"] .qa-search { order: 3; padding: 0 8px 0 46px; }
+html[data-cx="below"] .qa-foot { order: 4; }
+.cx-sg { position: absolute; left: 16px; top: 50%; width: 20px; height: 20px; margin-top: -10px; opacity: .6; pointer-events: none; }
+.cx-scan { flex: none; display: grid; place-items: center; width: 40px; height: 40px; margin-left: 4px; border: 0; border-radius: 10px; background: none; cursor: pointer; }
+.cx-scan:hover { background: rgba(31, 65, 91, .06); }
+.cx-scan img { width: 22px; height: 22px; display: block; }
+html[data-cx="below"] .qa-search__x:not([hidden]) ~ .cx-scan { display: none; }
+
+/* 2 · MOST USED ───────────────────────────────────────────────────────── */
+.cx-use { flex: none; display: flex; flex-direction: column; gap: 10px; margin-top: -4px; padding-top: 14px; border-top: 1px solid rgba(31, 65, 91, .08); }
+.cx-use__t { margin: 0; padding-left: 2px; font-size: 12px; font-weight: 600; letter-spacing: .02em; color: #7a8684; }
+.cx-use__row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.cx-use .qa-frow { flex-direction: column; justify-content: flex-start; gap: 8px; min-height: 0; padding: 0 0 2px; border-radius: 12px; text-align: center; background: none; }
+.cx-use .qa-frow::before { display: none; }
+.cx-use .qa-frow:hover, .cx-use .qa-frow:active { background: none; }
+.cx-use__g { display: grid; place-items: center; width: 100%; max-width: 64px; aspect-ratio: 1; border-radius: 12px; background: var(--qa-fold-bg);
+  transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1); }
+.cx-use .qa-frow:active .cx-use__g { transform: scale(.94); }
+.cx-use .qa-frow__g { width: 24px; height: 24px; }
+.cx-use .qa-frow__t { padding: 0; font-size: 12px; line-height: 15px; font-weight: 500; overflow-wrap: normal; }
+
+/* 3 · TABS ────────────────────────────────────────────────────────────── */
+html[data-cx="tabs"] .qa-fold { display: none; }
+html[data-cx="tabs"] .qa-fold.cx-on { display: flex; animation: cx-in 340ms cubic-bezier(.25, .46, .45, .94) both; }
+html[data-cx="tabs"] .qa-fold.cx-on.cx-from-l { animation-name: cx-in-l; }
+html[data-cx="tabs"] .qa-fold__hd { display: none; }
+html[data-cx="tabs"] .qa-fold { touch-action: pan-y; user-select: none; }
+html[data-cx="tabs"] .qa-body { --qa-res-fade: 0px; }
+@keyframes cx-in { from { opacity: 0; transform: translateX(22px); } }
+@keyframes cx-in-l { from { opacity: 0; transform: translateX(-22px); } }
+.cx-tabs { position: relative; flex: none; display: flex; align-items: stretch; margin-top: -4px; border-top: 1px solid rgba(31, 65, 91, .08); }
+.cx-tab { position: relative; flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; height: 50px; padding: 0 6px; border: 0; background: none;
+  font: inherit; font-size: 14px; font-weight: 600; color: #44544a; cursor: pointer; transition: flex-grow 460ms cubic-bezier(.25, .46, .45, .94); }
+.cx-tab img { flex: none; width: 22px; height: 22px; opacity: .72; transition: opacity 200ms; }
+.cx-tab span { min-width: 0; overflow: hidden; white-space: nowrap; max-width: 0; opacity: 0; transition: max-width 460ms cubic-bezier(.25, .46, .45, .94), opacity 260ms; }
+.cx-tab[aria-selected="true"] { flex-grow: 2.6; color: #1F515B; }
+.cx-tab[aria-selected="true"] img { opacity: 1; }
+.cx-tab[aria-selected="true"] span { max-width: 140px; opacity: 1; }
+.cx-tab + .cx-tab::before { content: ""; position: absolute; left: 0; top: 16px; bottom: 16px; width: 1px; background: rgba(31, 65, 91, .08); }
+.cx-tabs__bar { position: absolute; top: -1px; height: 2px; border-radius: 0 0 2px 2px; background: #1F515B;
+  transition: left 460ms cubic-bezier(.25, .46, .45, .94), width 460ms cubic-bezier(.25, .46, .45, .94); }
+
+/* 4 · FOLDERS ─────────────────────────────────────────────────────────── */
+html[data-cx="folders"] .qa-folders { display: none; }
+html[data-cx="folders"] .qa-body { --qa-res-fade: 0px; }
+.cx-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.cx-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; min-width: 0; padding: 12px; border: 0; border-radius: 12px; background: var(--qa-fold-bg);
+  font: inherit; color: var(--ink-head); text-align: left; cursor: pointer; transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1); }
+.cx-tile:active { transform: scale(.97); }
+.cx-tile__m { align-self: stretch; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 8px; border-radius: 10px; background: #fff; box-shadow: 0 1px 2px rgba(31, 65, 91, .06); }
+.cx-tile__m i { display: grid; place-items: center; height: 40px; border-radius: 8px; background: var(--qa-fold-bg); }
+.cx-tile__m img { width: 20px; height: 20px; display: block; }
+.cx-tile b { display: block; font-size: 14px; line-height: 18px; font-weight: 600; letter-spacing: -.005em; }
+.cx-tile small { display: block; margin-top: 2px; font-size: 12px; color: #7a8684; }
+
+/* 5 · CONTINUE ────────────────────────────────────────────────────────── */
+html[data-cx="continue"] .qa-todo { display: none; }
+.cx-cont { flex: none; display: flex; align-items: center; gap: 12px; margin-top: -4px; padding: 10px 10px 10px 12px; border-radius: 12px; background: rgba(255, 183, 29, .16); }
+.cx-cont__go { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.cx-ring { position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, .8); }
+.cx-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.cx-ring circle { fill: none; stroke-width: 2.5; }
+.cx-ring .bg { stroke: rgba(138, 90, 0, .14); }
+.cx-ring .fg { stroke: #8a5a00; stroke-linecap: round; stroke-dasharray: 125.66; stroke-dashoffset: 125.66; transition: stroke-dashoffset 900ms cubic-bezier(.25, .46, .45, .94) 260ms; }
+.qa.is-open .cx-ring .fg { stroke-dashoffset: calc(125.66 * (1 - var(--p))); }
+.cx-ring img { width: 20px; height: 20px; }
+.cx-cont__b { min-width: 0; }
+.cx-cont__k { display: block; font-size: 11.5px; font-weight: 600; letter-spacing: .02em; color: #8a5a00; }
+.cx-cont__b b { display: block; font-size: 14.5px; line-height: 19px; font-weight: 600; color: var(--ink-head); }
+.cx-cont__b small { display: block; font-size: 12.5px; line-height: 16px; color: #7a8684; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cx-cont__more { flex: none; height: 32px; padding: 0 11px; border: 0; border-radius: 16px; background: rgba(255, 255, 255, .8); font: inherit; font-size: 13px; font-weight: 600; color: #8a5a00; cursor: pointer; }
+.cx-cont__more:hover { background: #fff; }
+
+/* 6 · ACCORDION ───────────────────────────────────────────────────────── */
+html[data-cx="accordion"] .qa-fold { display: grid; grid-template-rows: auto 0fr; row-gap: 0;
+  transition: grid-template-rows 380ms cubic-bezier(.25, .46, .45, .94), row-gap 380ms cubic-bezier(.25, .46, .45, .94), opacity var(--qa-t-row) var(--qa-ease), transform var(--qa-t-row) var(--qa-ease);
+  transition-delay: 0ms, 0ms, var(--qa-delay, 0ms), var(--qa-delay, 0ms); }
+html[data-cx="accordion"] .qa-fold.cx-on { grid-template-rows: auto 1fr; row-gap: 8px; }
+html[data-cx="accordion"] .qa-fold:not(.cx-on) { padding-block: 6px; }
+html[data-cx="accordion"] .qa-menu__grid--folders { gap: 10px; }
+html[data-cx="accordion"] .qa-fold__list { min-height: 0; }
+html[data-cx="accordion"] .qa-fold__hd { cursor: pointer; border-radius: 8px; }
+html[data-cx="accordion"] .qa-frow { min-height: 46px; }
+html[data-cx="accordion"] .qa-frow__t { padding-block: 11px; }
+html[data-cx="accordion"] .qa-folders { gap: 10px; }
+html[data-cx="accordion"] .qa-body { --qa-res-fade: 0px; }
+.cx-chev { flex: none; width: 18px; height: 18px; color: var(--qa-fold-ink); opacity: .75; transition: transform 380ms cubic-bezier(.25, .46, .45, .94); }
+.qa-fold.cx-on .cx-chev { transform: rotate(180deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-el, .cx-tab, .cx-tab span, .cx-tabs__bar, .cx-ring .fg, html[data-cx="accordion"] .qa-fold, .cx-chev, .cx-tile, .cx-use__g { transition: none !important; }
+  html[data-cx="tabs"] .qa-fold.cx-on { animation: none; }
+}
+`
+
+/* the four category marks and short names (the tabs' labels) — the panel's own exports */
+const GROUP = {
+  clinical: { short: 'Medical',    mark: 'qa-medical.svg', marks: ['qa-medical.svg', 'qa-medical.svg', 'qa-medical.svg', 'qa-fetal.svg'] },
+  animal:   { short: 'Animals',    mark: 'qa-paw.svg',     marks: ['qa-paw.svg', 'qa-paw.svg', 'qa-egg.svg', 'qa-paw.svg'] },
+  ops:      { short: 'Operations', mark: 'qa-request.svg', marks: ['qa-request.svg', 'qa-request.svg', 'qa-announce.svg', 'qa-user.svg'] },
+  /* qa-site.svg is the paw drawing in the live export, so the Site tab wears the shield to stay tellable from Animals */
+  estate:   { short: 'Site',       mark: 'qa-master.svg',   marks: ['qa-site.svg', 'qa-section.svg', 'qa-section.svg', 'qa-master.svg'] },
+}
+const NAME = { clinical: 'Medical & Clinical Care', animal: 'Animal Management', ops: 'Operations & Administration', estate: 'Site & System Management' }
+/* mockup data: the four a vet taps most (would come from a use count) */
+const USUAL = [
+  { id: 'medical',  tone: 'clinical', icon: 'qa-medical.svg', label: 'Medical Record' },
+  { id: 'dispense', tone: 'clinical', icon: 'qa-medical.svg', label: 'Dispense' },
+  { id: 'transfer', tone: 'animal',   icon: 'qa-paw.svg',     label: 'Transfer' },
+  { id: 'note',     tone: 'ops',      icon: 'qa-request.svg', label: 'New Note' },
+]
+/* the newest of the live panel's five drafts (QA_RESUME r1) */
+const DRAFT = { action: 'New Medical Record', icon: 'qa-medical.svg', where: 'CAR-03 · Indian Leopard', step: 3, of: 5 }
+const CHEV = '<svg class="cx-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
+
+const $ = (s) => document.querySelector(s)
+const app = $('#app'), now = $('#now'), cap = $('#cap'), pick = $('#pick'), toast = $('#toast')
+let cur = CONCEPTS[0].id
+
+/* ── the frame: wait for the live page, then open its panel ─────────────── */
+function ready(frame) {
+  return new Promise((res) => {
+    let tries = 0
+    const wait = () => {
+      const d = frame.contentDocument
+      if (d && d.querySelector('.qa-pill') && d.querySelector('.qa-menu')) res(d)
+      else if (tries++ < 150) setTimeout(wait, 100)
+    }
+    wait()
+  })
+}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+function toTop(frame) {
+  const w = frame.contentWindow, d = frame.contentDocument
+  w.scrollTo(0, 0); if (!w.scrollY) d.querySelector('.search-row')?.classList.remove('is-stuck')
+}
+const isOpen = (d) => d.querySelector('.qa')?.classList.contains('is-open')
+async function openPanel(d) { if (!isOpen(d)) d.querySelector('.qa-pill').click(); }
+async function closePanel(d) {
+  if (!isOpen(d)) return
+  d.querySelector('.qa-sub:not([hidden]) .qa-sub__back')?.click()
+  d.querySelector('.qa-pill').click()
+  await sleep(420)
+}
+
+function say(msg) {
+  toast.textContent = msg; toast.classList.add('is-on')
+  clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove('is-on'), 1800)
+}
+
+/* ── drawing a concept ──────────────────────────────────────────────────── */
+function el(d, html) { const t = d.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild }
+
+function teardown(d) {
+  d.querySelectorAll('[data-cx-el]').forEach((n) => n.remove())
+  d.querySelectorAll('.qa-fold').forEach((f) => f.classList.remove('cx-on', 'cx-from-l'))
+  const inp = d.querySelector('.qa-search__in')
+  if (inp && inp.dataset.cxPh) inp.placeholder = inp.dataset.cxPh
+}
+
+function draw(d, id) {
+  teardown(d)
+  d.documentElement.dataset.cx = id
+  const menu = d.querySelector('.qa-menu'), body = menu.querySelector('.qa-body'), foot = menu.querySelector('.qa-foot')
+  const add = (node, where) => { node.setAttribute('data-cx-el', ''); where(node); return node }
+
+  if (id === 'below') {
+    const s = menu.querySelector('.qa-search'), inp = s.querySelector('.qa-search__in')
+    inp.dataset.cxPh = inp.dataset.cxPh || inp.placeholder
+    inp.placeholder = 'Search or scan'
+    add(el(d, '<img class="cx-sg" src="assets/icon/search.svg" alt="">'), (n) => s.prepend(n))
+    add(el(d, '<button type="button" class="cx-scan" aria-label="Scan a tag" data-cx-act="scan"><img src="assets/icon/scan.svg" alt=""></button>'), (n) => s.append(n))
+  }
+
+  if (id === 'usual') {
+    add(el(d, `<div class="cx-use cx-el cx-hide" style="--cx-d:0ms"><p class="cx-use__t">Most used</p><div class="cx-use__row">${
+      USUAL.map((u) => `<button type="button" class="qa-frow" data-action="${u.id}" data-tone="${u.tone}" style="--qa-fold-bg:var(--cx-${u.tone})">` +
+        `<span class="cx-use__g"><img class="qa-frow__g" src="assets/icon/${u.icon}" alt=""></span><span class="qa-frow__t">${u.label}</span></button>`).join('')
+    }</div></div>`), (n) => foot.before(n))
+  }
+
+  if (id === 'tabs') {
+    const ids = Object.keys(GROUP)
+    const bar = add(el(d, `<div class="cx-tabs cx-el cx-hide" role="tablist" style="--cx-d:0ms">${
+      ids.map((g, i) => `<button type="button" class="cx-tab" role="tab" data-cx-tab="${g}" aria-selected="${!i}" aria-label="${NAME[g]}">` +
+        `<img src="assets/icon/${GROUP[g].mark}" alt=""><span>${GROUP[g].short}</span></button>`).join('')
+    }<i class="cx-tabs__bar"></i></div>`), (n) => foot.before(n))
+    setTab(d, ids[0], 0)
+    requestAnimationFrame(() => placeBar(d))
+  }
+
+  if (id === 'folders') {
+    add(el(d, `<div class="cx-tiles">${
+      Object.keys(GROUP).map((g) => `<button type="button" class="cx-tile" data-folder="${g}" style="--qa-fold-bg:var(--cx-${g})">` +
+        `<span class="cx-tile__m">${GROUP[g].marks.map((m) => `<i><img src="assets/icon/${m}" alt=""></i>`).join('')}</span>` +
+        `<span><b>${NAME[g]}</b><small>4 actions</small></span></button>`).join('')
+    }</div>`), (n) => menu.querySelector('.qa-folders').after(n))
+  }
+
+  if (id === 'continue') {
+    add(el(d, `<div class="cx-cont cx-el cx-hide" style="--cx-d:0ms">` +
+      `<button type="button" class="cx-cont__go" data-cx-act="resume">` +
+        `<span class="cx-ring" style="--p:${DRAFT.step / DRAFT.of}"><svg viewBox="0 0 44 44"><circle class="bg" cx="22" cy="22" r="20"/><circle class="fg" cx="22" cy="22" r="20"/></svg><img src="assets/icon/${DRAFT.icon}" alt=""></span>` +
+        `<span class="cx-cont__b"><span class="cx-cont__k">Continue · ${DRAFT.step} of ${DRAFT.of} done</span><b>${DRAFT.action}</b><small>${DRAFT.where}</small></span>` +
+      `</button>` +
+      `<button type="button" class="cx-cont__more" data-sub="todo" aria-label="All 5 drafts">+4</button></div>`), (n) => foot.before(n))
+  }
+
+  if (id === 'accordion') {
+    menu.querySelectorAll('.qa-fold').forEach((f, i) => {
+      const hd = f.querySelector('.qa-fold__hd')
+      add(el(d, CHEV), (n) => hd.append(n))
+      if (i === 0) f.classList.add('cx-on')
+    })
+  }
+}
+
+/* the tabs: which fold shows, the strip's bar under the picked tab */
+function setTab(d, g, dir) {
+  d.querySelectorAll('.qa-fold').forEach((f) => {
+    const on = f.dataset.group === g
+    f.classList.toggle('cx-on', on)
+    f.classList.toggle('cx-from-l', on && dir < 0)
+  })
+  d.querySelectorAll('.cx-tab').forEach((t) => t.setAttribute('aria-selected', t.dataset.cxTab === g))
+  placeBar(d)
+}
+function placeBar(d) {
+  const bar = d.querySelector('.cx-tabs__bar'), t = d.querySelector('.cx-tab[aria-selected="true"]')
+  if (!bar || !t) return
+  /* measured after the tabs' own 460ms flex change has a target: read the end widths */
+  const tabs = [...d.querySelectorAll('.cx-tab')], i = tabs.indexOf(t), row = t.parentElement.clientWidth
+  const w = tabs.map((x) => (x === t ? 2.6 : 1)), sum = w.reduce((a, b) => a + b, 0)
+  const left = w.slice(0, i).reduce((a, b) => a + b, 0) / sum * row
+  bar.style.left = `${left + 10}px`; bar.style.width = `${w[i] / sum * row - 20}px`
+}
+
+/* one listener per frame, reading the current concept at the event */
+function wire(d) {
+  const st = d.createElement('style'); st.textContent = CSS +
+    /* the category grounds, read once from the live folds so the tiles match them exactly */
+    `:root{${[...d.querySelectorAll('.qa-fold')].map((f) => `--cx-${f.dataset.group}:${getComputedStyle(f).getPropertyValue('--qa-fold-bg').trim()};`).join('')}}`
+  d.head.append(st)
+  const menu = d.querySelector('.qa-menu')
+
+  menu.addEventListener('click', (e) => {
+    const cx = d.documentElement.dataset.cx
+    const tab = e.target.closest('.cx-tab')
+    if (tab) {
+      const ids = Object.keys(GROUP), from = ids.indexOf(d.querySelector('.cx-tab[aria-selected="true"]')?.dataset.cxTab)
+      const to = ids.indexOf(tab.dataset.cxTab)
+      if (to !== from) setTab(d, tab.dataset.cxTab, to - from)
+      return
+    }
+    const act = e.target.closest('[data-cx-act]')
+    if (act) {
+      e.stopPropagation()
+      if (act.dataset.cxAct === 'scan') say('Scan a tag — opens the scanner')
+      if (act.dataset.cxAct === 'resume') say(`Resumes ${DRAFT.action} at field ${DRAFT.step + 1}`)
+      return
+    }
+    if (cx === 'accordion') {
+      const hd = e.target.closest('.qa-fold__hd')
+      if (hd) {
+        const f = hd.closest('.qa-fold'), was = f.classList.contains('cx-on')
+        menu.querySelectorAll('.qa-fold').forEach((x) => x.classList.remove('cx-on'))
+        if (!was) f.classList.add('cx-on')
+      }
+    }
+    if (cx === 'folders') {
+      const tile = e.target.closest('.cx-tile')
+      /* the live handler opens the sub-list; then it grows out of the tile */
+      if (tile) {
+        const from = tile.getBoundingClientRect()
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          const list = menu.querySelector('.qa-sub:not([hidden]) .qa-sub__list'); if (!list) return
+          const to = list.getBoundingClientRect()
+          list.animate([
+            { transform: `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${from.width / to.width}, ${from.height / to.height})`, opacity: .4, transformOrigin: '0 0' },
+            { transform: 'none', opacity: 1, transformOrigin: '0 0' },
+          ], { duration: 380, easing: 'cubic-bezier(.25, .46, .45, .94)' })
+        }))
+      }
+    }
+  }, true)
+
+  /* the tabs: swipe the card sideways to move one tab */
+  let x0 = null, swiped = false
+  menu.addEventListener('pointerdown', (e) => { if (d.documentElement.dataset.cx === 'tabs' && e.target.closest('.qa-fold')) x0 = e.clientX })
+  menu.addEventListener('pointerup', (e) => {
+    if (x0 == null) return
+    const dx = e.clientX - x0; x0 = null
+    if (Math.abs(dx) < 44) return
+    swiped = true; setTimeout(() => { swiped = false }, 0)
+    const ids = Object.keys(GROUP), i = ids.indexOf(d.querySelector('.cx-tab[aria-selected="true"]')?.dataset.cxTab)
+    const j = Math.max(0, Math.min(ids.length - 1, i + (dx < 0 ? 1 : -1)))
+    if (j !== i) setTab(d, ids[j], j - i)
+  })
+  /* a swipe must not also fire the row it started on */
+  menu.addEventListener('click', (e) => { if (swiped) { swiped = false; e.stopPropagation(); e.preventDefault() } }, true)
+}
+
+async function show(id) {
+  cur = id
+  const c = CONCEPTS.find((x) => x.id === id), n = CONCEPTS.indexOf(c) + 1
+  cap.innerHTML = `<b>${n} · ${c.name}</b><small>${c.note} <i>${c.tryit}</i></small>`
+  for (const b of pick.children) b.setAttribute('aria-pressed', b.dataset.cx === id)
+  if (typeof fit === 'function') fit()
+  try { history.replaceState(null, '', `#${id}`) } catch {}
+  const d = app.contentDocument
+  if (!d || !d.documentElement.dataset.cxWired) return
+  await closePanel(d)
+  draw(d, id)
+  await sleep(60)
+  openPanel(d)
+}
+
+/* ── the page ──────────────────────────────────────────────────────────── */
+CONCEPTS.forEach((c, i) => pick.insertAdjacentHTML('beforeend',
+  `<button type="button" data-cx="${c.id}" aria-pressed="false"><b>${i + 1}</b>${c.name}</button>`))
+pick.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && b.dataset.cx !== cur) show(b.dataset.cx) })
+addEventListener('keydown', (e) => {
+  if (!['ArrowLeft', 'ArrowRight'].includes(e.key) || e.target.closest('input')) return
+  const i = CONCEPTS.findIndex((c) => c.id === cur), j = (i + (e.key === 'ArrowRight' ? 1 : -1) + CONCEPTS.length) % CONCEPTS.length
+  show(CONCEPTS[j].id)
+})
+const hash = location.hash.slice(1)
+show(CONCEPTS.some((c) => c.id === hash) ? hash : cur)
+
+for (const frame of [now, app]) {
+  frame.addEventListener('load', async () => {
+    const d = await ready(frame)
+    ;[200, 900].forEach((ms) => setTimeout(() => toTop(frame), ms))
+    if (frame === app) { wire(d); d.documentElement.dataset.cxWired = '1'; draw(d, cur) }
+    await sleep(1400)
+    toTop(frame)
+    openPanel(d)
+    if (frame === app) setTimeout(() => placeBar(d), 500)
+  })
+  /* set here, after the listener: a cached page can finish loading while the fonts stylesheet holds this script back */
+  frame.src = frame.dataset.src
+}
+
+/* two phones side by side, scaled to the window's height; both captions take
+   the taller one's height so the phones stay level */
+function fit() {
+  const root = document.documentElement, caps = [...document.querySelectorAll('.cap')]
+  root.style.removeProperty('--cap-h')
+  const c = Math.max(58, ...caps.map((x) => x.offsetHeight))
+  const k = Math.min(1, ($('#stage').clientHeight - 22 - c - 14 - 16) / 864)
+  root.style.setProperty('--k', Math.max(.5, k).toFixed(3))
+  root.style.setProperty('--cap-h', `${Math.max(58, ...caps.map((x) => x.offsetHeight))}px`)
+}
+addEventListener('resize', fit); fit()
+</script>
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!doctype html>
+<!--
+  QUICK ACTIONS, RETHOUGHT FOR THE PHONE (owner, 21 Oct 2026: "Please Think
+  same Mobile View how it Looks. Rethink For Mobile").
+
+  On a phone the live panel is still the tablet's floating card made narrow:
+  48px lost each side, a 22px title, a Close pill under it. The phone already
+  has its own sheet — All Modules (17 Oct: "For Mobile it has proper component
+  … Apple kind of popup or bottom sheet") — so every idea here IS that sheet:
+  its .mview classes, drawn by the live review.css, with actions in it instead
+  of modules. Like All Modules it grows out of its button (the Quick Actions
+  pill), the bottom row steps out while it is up, and it closes by ✕, the
+  scrim, Escape, or a pull down on the grabber.
+
+    1  Sheet       All Modules' twin: newest draft first, then the sixteen as
+                   four-across green rings under grey captions
+    2  Half sheet  opens halfway, in the thumb's half: newest draft + four most
+                   used; pull up for everything (iOS medium / large detents)
+    3  List        All Modules' list form: a row and one line per action, with
+                   a filter in the sheet's own switch style
+    4  Hold        tap opens the sheet; press and hold the pill for a short menu
+                   right above the thumb (newest draft + four most used)
+
+  No foot: no Search everything, no Edit Modules. One ink for every mark
+  (#37BD69, open 1px rings, as All Modules since 20 Oct). Hints under the
+  actions and the "most used" four are sample content. Mockup only.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quick Actions · mobile</title>
+<link rel="icon" href="../assets/icon/qa-bolt.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" media="print" onload="this.media='all'">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { display: flex; flex-direction: column; background: #EFF5F2; font: 14px/1.4 Inter, system-ui, sans-serif; color: #1F415B; -webkit-font-smoothing: antialiased; }
+.bar { flex: none; display: flex; align-items: center; gap: 16px; min-height: 60px; padding: 10px 28px; border-bottom: 1px solid #DFE8E4; background: rgba(255, 255, 255, .6); }
+.bar > div { flex: 1 1 auto; min-width: 0; }
+.bar__t { font-weight: 700; font-size: 16px; white-space: nowrap; }
+.bar__s { font-size: 12.5px; color: #7A8684; }
+.bar nav { flex: none; display: flex; gap: 6px; max-width: 70%; overflow-x: auto; scrollbar-width: none; }
+.bar button { flex: none; height: 34px; padding: 0 14px; border: 0; border-radius: 17px; background: #fff; box-shadow: inset 0 0 0 1px #DFE8E4;
+  font: 600 13px/34px Inter, sans-serif; color: #44544A; cursor: pointer; white-space: nowrap; }
+.bar button b { font-weight: 600; opacity: .5; margin-right: 6px; }
+.bar button[aria-pressed='true'] { background: #1F515B; color: #fff; box-shadow: none; }
+.stage { flex: 1; min-height: 0; display: flex; justify-content: center; gap: 40px; padding: 22px 24px 0; }
+.cell { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: 0; }
+.cap { flex: none; width: calc(410px * var(--k, 1)); min-width: 300px; min-height: var(--cap-h, 58px); text-align: left; }
+.cap b { display: block; font-size: 15px; }
+.cap small { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.45; color: #7A8684; }
+.cap i { font-style: normal; color: #1F515B; font-weight: 600; }
+.cap button { margin-top: 6px; height: 28px; padding: 0 12px; border: 0; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px #DFE8E4; font: 600 12px Inter, sans-serif; color: #1F515B; cursor: pointer; }
+.fit { flex: none; width: calc(410px * var(--k, 1)); }
+/* zoom, not a scale transform: under a transform the live page's fixed layers
+   escape the round corners and its stuck-search observer never sees 100% */
+.phone { zoom: var(--k, 1); width: 410px; height: 864px; padding: 10px; border-radius: 56px; background: #0E0E0E; box-shadow: inset 0 0 0 2px #2B2B2B, 0 30px 60px -30px rgba(31, 65, 91, .45); }
+.scr { position: relative; width: 390px; height: 844px; border-radius: 46px; overflow: hidden; clip-path: inset(0 round 46px); background: #E6F6F5; }
+.phone iframe { display: block; width: 100%; height: 100%; border: 0; }
+.toast { position: absolute; left: 50%; top: 58px; z-index: 5; translate: -50% -8px; opacity: 0; pointer-events: none;
+  padding: 9px 14px; border-radius: 12px; background: #1F415B; color: #fff; font: 500 13px/1.3 Inter, sans-serif; white-space: nowrap;
+  box-shadow: 0 10px 24px -12px rgba(16, 45, 52, .6); transition: opacity 200ms, translate 260ms cubic-bezier(.32, .72, 0, 1); }
+.toast.is-on { opacity: 1; translate: -50% 0; }
+@media (max-width: 900px) {
+  .bar { padding: 8px 10px; }
+  .bar > div { display: none; }
+  .bar nav { margin: 0; max-width: none; flex: 1 1 auto; }
+  .stage { padding: 0; gap: 0; }
+  .cell--now, .cap { display: none; }
+  .cell { flex: 1; }
+  .fit, .phone { zoom: 1; width: 100%; height: 100%; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+  .scr { width: 100%; height: 100%; border-radius: 0; clip-path: none; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div>
+    <div class="bar__t">Quick Actions · on the phone</div>
+    <div class="bar__s">Left: today’s panel. Right: the All Modules sheet, with actions in it.</div>
+  </div>
+  <nav id="pick" aria-label="Idea"></nav>
+</header>
+<main class="stage" id="stage">
+  <figure class="cell cell--now">
+    <figcaption class="cap"><b>Now</b><small>The tablet’s floating card, made narrow: 48px lost each side, a big title, a Close pill under it, and the foot that goes.</small></figcaption>
+    <div class="fit"><div class="phone"><div class="scr"><iframe id="now" title="Quick Actions today" data-src="../index.html?v=2"></iframe></div></div></div>
+  </figure>
+  <figure class="cell">
+    <figcaption class="cap" id="cap"></figcaption>
+    <div class="fit"><div class="phone"><div class="scr"><iframe id="app" title="Quick Actions on the phone" data-src="../index.html?v=2"></iframe><div class="toast" id="toast" role="status"></div></div></div></div>
+  </figure>
+</main>
+
+<script>
+const IDEAS = [
+  { id: 'sheet', name: 'Sheet',
+    note: 'Quick Actions becomes the bottom sheet All Modules already uses — grabber, title and ✕, search, grey captions, white cards, green rings — and grows out of the pill the way All Modules grows from its button. Your newest draft is first; the sixteen are four-across, thumb-sized.',
+    tryit: 'Tap a ring, tap All drafts, or pull the grabber down.' },
+  { id: 'half', name: 'Half sheet',
+    note: 'Opens halfway, so everything is in the thumb’s half of the screen: your newest draft and your four most-used actions. Pull up or scroll for all sixteen; pull down to close — iOS’s medium and large heights.',
+    tryit: 'Drag the grabber up, then down.' },
+  { id: 'list', name: 'List',
+    note: 'All Modules’ list form: one row per action with a line saying what it does, and a filter in the sheet’s own switch style. Easiest to read for new staff; a filter leaves four rows.',
+    tryit: 'Tap Animals in the filter.' },
+  { id: 'hold', name: 'Hold',
+    note: 'A tap opens the sheet (1). Pressing and holding the Quick Actions pill raises a short menu right above the thumb — continue your newest draft, or one of your four most used. Slide and lift to pick, like holding an app icon on iPhone.',
+    tryit: 'Press and hold Quick Actions.' },
+]
+
+/* ══ CONTENT · the live panel's sixteen and five drafts (js/data/quickActions.js) ══ */
+const GROUPS = [
+  { id: 'clinical', name: 'Medical & Clinical Care', short: 'Medical' },
+  { id: 'animal',   name: 'Animal Management',       short: 'Animals' },
+  { id: 'ops',      name: 'Operations & Administration', short: 'Ops' },
+  { id: 'estate',   name: 'Site & System Management', short: 'Site' },
+]
+/* `tile` is the four-across name (two lines at most); `hint` is sample copy */
+const ACTIONS = [
+  { id: 'medical',      g: 'clinical', icon: 'qa-medical.svg',  label: 'New Medical Record', tile: 'Medical Record',   hint: 'Start a record for an animal' },
+  { id: 'dispense',     g: 'clinical', icon: 'qa-medical.svg',  label: 'Dispense Medicine',  tile: 'Dispense Medicine', hint: 'Log a dose given' },
+  { id: 'hospitalize',  g: 'clinical', icon: 'qa-medical.svg',  label: 'Hospitalise',        tile: 'Hospitalise',      hint: 'Admit an animal to the hospital' },
+  { id: 'fetal',        g: 'clinical', icon: 'qa-fetal.svg',    label: 'Add Fetal Death',    tile: 'Fetal Death',      hint: 'Record a fetal loss' },
+  { id: 'transfer',     g: 'animal',   icon: 'qa-paw.svg',      label: 'Transfer Animal',    tile: 'Transfer Animal',  hint: 'Move to another enclosure or site' },
+  { id: 'accession',    g: 'animal',   icon: 'qa-paw.svg',      label: 'Add Accession',      tile: 'Add Accession',    hint: 'Bring a new animal into the collection' },
+  { id: 'eggs',         g: 'animal',   icon: 'qa-egg.svg',      label: 'Add Eggs',           tile: 'Add Eggs',         hint: 'Log a clutch' },
+  { id: 'missing',      g: 'animal',   icon: 'qa-paw.svg',      label: 'Report Missing / Escaped Animal', tile: 'Missing / Escaped', hint: 'Raise the alert at once' },
+  { id: 'request',      g: 'ops',      icon: 'qa-request.svg',  label: 'New Request',        tile: 'New Request',      hint: 'Ask for supplies, repairs or approval' },
+  { id: 'note',         g: 'ops',      icon: 'qa-request.svg',  label: 'New Note',           tile: 'New Note',         hint: 'Write a note for your site' },
+  { id: 'announcement', g: 'ops',      icon: 'qa-announce.svg', label: 'New Announcement',   tile: 'Announce­ment', hint: 'Tell everyone at once' },
+  { id: 'user',         g: 'ops',      icon: 'qa-user.svg',     label: 'Add User',           tile: 'Add User',         hint: 'Invite a staff member' },
+  { id: 'site',         g: 'estate',   icon: 'qa-site.svg',     label: 'New Site',           tile: 'New Site',         hint: 'Add a zoo, centre or holding' },
+  { id: 'section',      g: 'estate',   icon: 'qa-section.svg',  label: 'New Section',        tile: 'New Section',      hint: 'Add a section to a site' },
+  { id: 'enclosure',    g: 'estate',   icon: 'qa-section.svg',  label: 'New Enclosure',      tile: 'New Enclosure',    hint: 'Add an enclosure to a section' },
+  { id: 'master',       g: 'estate',   icon: 'qa-master.svg',   label: 'Master Settings',    tile: 'Master Settings',  hint: 'Lists, units and defaults' },
+]
+const USUAL = ['medical', 'dispense', 'transfer', 'note']   /* sample: would come from a use count */
+const DRAFTS = [
+  { id: 'r1', kind: 'Draft',    action: 'medical',  where: 'CAR-03 · Indian Leopard', note: '3 of 5 done',       ago: '14 min', p: .6 },
+  { id: 'r2', kind: 'Draft',    action: 'dispense', where: 'BER-01 · Sloth Bear',      note: 'dose not entered', ago: '18 h',   p: .4 },
+  { id: 'r3', kind: 'Not sent', action: 'missing',  where: 'HRB-02 · Blackbuck',       note: 'saved offline',    ago: '40 min', p: 1 },
+  { id: 'r4', kind: 'Awaiting', action: 'transfer', where: 'CAR-01 → Rescue Holding',  note: 'with the Curator', ago: '2 d',    p: 1 },
+  { id: 'r5', kind: 'Awaiting', action: 'request',  where: 'Bannerghatta Safari',      note: 'with Finance',     ago: '4 d',    p: 1 },
+]
+const A = Object.fromEntries(ACTIONS.map((a) => [a.id, a]))
+const HALF = 516   /* the half sheet's open height on a 844 phone: grabber, head, search, draft, most used, and a peek of the rest */
+
+/* ══ THE MARKS · line icons as in the live sprite; module art through the sheet's own mask ══ */
+const SVG = (d, w = 2) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`
+const I = {
+  search: SVG('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>'),
+  x: SVG('<path d="M6 6l12 12M18 6 6 18"/>', 2.2),
+  back: SVG('<path d="m15 18-6-6 6-6"/>', 2.2),
+  chev: SVG('<path d="m9 18 6-6-6-6"/>'),
+  clock: SVG('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>', 1.8),
+}
+const mark = (icon) => `<i class="mview__mark" style="-webkit-mask-image:url(assets/icon/${icon});mask-image:url(assets/icon/${icon})" aria-hidden="true"></i>`
+const ring = (icon) => `<span class="mview__ico">${mark(icon)}</span>`
+/* a draft's ring carries its progress: the sheet's 1px ring, and the part done in a 2px arc */
+const progRing = (icon, p) => `<span class="mview__ico cx-prog" style="--p:${p}">${mark(icon)}<svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="21"/></svg></span>`
+
+/* ══ STYLES ADDED INSIDE THE FRAME · only what the live .mview rules do not already draw ══ */
+const CSS = `
+html.cx-lock, html.cx-lock body { overflow: hidden; }
+.cx-sheet .mview__head { gap: 6px; }
+.cx-sheet .mview__title { flex: 1; min-width: 0; }
+.cx-back { flex: none; display: grid; place-items: center; width: 36px; height: 36px; margin-left: -10px; padding: 0; border: 0; border-radius: 50%; background: none; color: #44544A; cursor: pointer; }
+.cx-back[hidden] { display: none; }
+.cx-back .icon { width: 22px; height: 22px; }
+.cx-scan { flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px; background: rgba(0, 0, 0, .05); cursor: pointer; }
+.cx-scan img { width: 22px; height: 22px; display: block; }
+.cx-scan:active { background: rgba(0, 0, 0, .09); }
+/* cards: rows in one white card, the hairline starting under the name (iOS inset) */
+.cx-card { border-radius: 14px; background: #fff; overflow: hidden; }
+.cx-card .mview__row { border-radius: 0; }
+.cx-card .mview__row + .mview__row::before { content: ""; position: absolute; top: 0; left: 72px; right: 0; height: 1px; background: rgba(31, 65, 91, .08); }
+.cx-card .cx-more { min-height: 52px; }
+.cx-more .mview__txt b { font-weight: 500; color: #006D35; }
+.cx-count { flex: none; font-size: 15px; font-weight: 500; color: #7A8684; }
+.mview__row:active { background: #F4F7F6; }
+.cx-tag { flex: none; display: grid; justify-items: end; gap: 2px; font-size: 12px; font-weight: 600; color: #7A8684; }
+.cx-tag small { font-weight: 400; }
+/* the progress arc */
+.cx-prog { box-shadow: inset 0 0 0 1px rgba(55, 189, 105, .3); }
+.cx-prog svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.cx-prog circle { fill: none; stroke: var(--c-primary, #37BD69); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 131.95; stroke-dashoffset: 131.95; transition: stroke-dashoffset 900ms cubic-bezier(.32, .72, 0, 1) 300ms; }
+.cx-sheet.is-on .cx-prog circle { stroke-dashoffset: calc(131.95 * (1 - var(--p))); }
+/* the filter · the sheet's grid/list switch, five wide */
+.cx-seg { flex: none; display: flex; margin: 8px 16px 0; height: 40px; padding: 3px; border-radius: 12px; background: rgba(0, 0, 0, .05); }
+.cx-seg button { flex: 1 1 0; min-width: 0; padding: 0; border: 0; border-radius: 9px; background: none; font: 600 13px Inter, sans-serif; color: #7A8684; cursor: pointer; transition: background 200ms, color 200ms; -webkit-tap-highlight-color: transparent; }
+.cx-seg button[aria-pressed="true"] { background: #fff; color: #006D35; box-shadow: 0 1px 2px rgba(16, 45, 52, .12); }
+.cx-sheet.is-q .cx-hide-q { display: none; }
+[data-sec]:not(:has(.mview__cat)) { padding-top: 12px; }
+.cx-drafts .mview__txt small { white-space: normal; }
+.cx-empty { padding: 28px 16px; text-align: center; font-size: 14px; color: #7A8684; }
+.cx-empty b { color: #1F415B; font-weight: 600; }
+.cx-sheet [hidden] { display: none !important; }
+/* the half sheet at half height: the list does not scroll, a pull or a scroll grows the sheet */
+.cx-sheet.is-medium .mview__list { overflow: hidden; }
+/* swapping the list (drafts in, drafts out) */
+@keyframes cx-push { from { opacity: 0; transform: translateX(28px); } }
+@keyframes cx-pop { from { opacity: 0; transform: translateX(-28px); } }
+.cx-push { animation: cx-push 340ms cubic-bezier(.32, .72, 0, 1) both; }
+.cx-pop { animation: cx-pop 340ms cubic-bezier(.32, .72, 0, 1) both; }
+
+/* ── 4 · the hold menu, right above the pill ── */
+.cx-hold-veil { position: fixed; inset: 0; z-index: 455; background: rgba(16, 45, 52, .22); opacity: 0; transition: opacity 220ms ease; -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+.cx-hold-veil.is-on { opacity: 1; }
+html.cx-held .qa { z-index: 456; }
+/* only the held pill stays sharp, as a held icon does on iPhone */
+.qa .mhint, .qa .qa-chat { transition: opacity 220ms ease, filter 220ms ease; }
+html.cx-held .qa .mhint, html.cx-held .qa .qa-chat { opacity: .35; filter: blur(2px); pointer-events: none; }
+.cx-hold.is-on .cx-prog circle { stroke-dashoffset: calc(131.95 * (1 - var(--p))); }
+html.cx-held .qa-pill { transform: scale(1.05); transition: transform 260ms cubic-bezier(.32, .72, 0, 1); }
+.qa-pill { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.cx-hold { position: fixed; z-index: 457; width: 264px; padding: 6px; border-radius: 18px; background: #fff; font-family: Inter, system-ui, sans-serif;
+  box-shadow: 0 1px 2px rgba(31, 65, 91, .08), 0 22px 50px -18px rgba(16, 45, 52, .45);
+  transform-origin: 50% 100%; transform: translateY(10px) scale(.86); opacity: 0;
+  transition: transform 340ms cubic-bezier(.32, .72, 0, 1), opacity 180ms ease; }
+.cx-hold.is-on { transform: none; opacity: 1; }
+.cx-hold__t { margin: 6px 10px 4px; font-size: 12px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: #7A8684; }
+.cx-hold__i { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 6px 10px; border: 0; border-radius: 12px; background: none; font: inherit; text-align: left; cursor: pointer; }
+.cx-hold__i.is-hot, .cx-hold__i:active { background: #F4F7F6; }
+.cx-hold__i .mview__ico { width: 34px; height: 34px; }
+.cx-hold__i .mview__mark { width: 19px; height: 19px; }
+.cx-hold__i b { display: block; font-size: 15px; font-weight: 500; color: #1F415B; }
+.cx-hold__i small { display: block; font-size: 12.5px; color: #7A8684; }
+.cx-hold__rule { height: 1px; margin: 4px 10px; background: rgba(31, 65, 91, .08); }
+@media (prefers-reduced-motion: reduce) { .cx-hold, .cx-hold-veil, .cx-prog circle, .cx-seg button { transition: none; } .cx-push, .cx-pop { animation: none; } }
+`
+
+const $ = (s) => document.querySelector(s)
+const app = $('#app'), now = $('#now'), cap = $('#cap'), pick = $('#pick'), toast = $('#toast')
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches
+let cur = IDEAS[0].id
+
+function say(msg) {
+  toast.textContent = msg; toast.classList.add('is-on')
+  clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove('is-on'), 1900)
+}
+
+/* ══ THE SHEET'S CONTENT ══════════════════════════════════════════════════ */
+const tile = (a) => `<button type="button" class="mview__tile" data-do="${a.id}" data-q="${a.label.toLowerCase()}">${ring(a.icon)}<span class="mview__lbl">${a.tile}</span></button>`
+const row = (a) => `<div class="mview__item" data-q="${a.label.toLowerCase()}"><div class="mview__row" role="button" tabindex="0" data-do="${a.id}">${ring(a.icon)}` +
+  `<span class="mview__txt"><b>${a.label}</b><small>${a.hint}</small></span><span class="mview__chev">${I.chev}</span></div></div>`
+function continueCard() {
+  const r = DRAFTS[0], a = A[r.action]
+  return `<h3 class="mview__cat cx-hide-q">Continue</h3><div class="cx-card cx-hide-q">` +
+    `<div class="mview__row" role="button" tabindex="0" data-resume="${r.id}">${progRing(a.icon, r.p)}` +
+      `<span class="mview__txt"><b>${a.label}</b><small>${r.where}</small></span><span class="cx-tag">${r.note.replace(' done', '')}<small>${r.ago}</small></span></div>` +
+    `<div class="mview__row cx-more" role="button" tabindex="0" data-drafts><span class="mview__ico">${I.clock}</span>` +
+      `<span class="mview__txt"><b>All drafts</b></span><span class="cx-count">${DRAFTS.length}</span><span class="mview__chev">${I.chev}</span></div>` +
+  '</div>'
+}
+const gridSections = () => GROUPS.map((g) =>
+  `<section data-sec><h3 class="mview__cat">${g.name}</h3><div class="mview__grid">${ACTIONS.filter((a) => a.g === g.id).map(tile).join('')}</div></section>`).join('')
+const listSections = (only) => GROUPS.filter((g) => !only || only === g.id).map((g) =>
+  `<section data-sec>${only ? '' : `<h3 class="mview__cat">${g.name}</h3>`}${ACTIONS.filter((a) => a.g === g.id).map(row).join('')}</section>`).join('')
+const empty = '<p class="cx-empty" hidden>No action called <b></b></p>'
+
+function body(kind) {
+  if (kind === 'half') {
+    return continueCard() +
+      `<h3 class="mview__cat cx-hide-q">Most used</h3><div class="mview__grid cx-hide-q">${USUAL.map((id) => tile(A[id])).join('')}</div>` +
+      gridSections() + empty
+  }
+  if (kind === 'list') return continueCard() + listSections(null) + empty
+  return continueCard() + gridSections() + empty
+}
+function draftsBody() {
+  return '<div class="cx-card cx-drafts" style="margin-top:12px">' + DRAFTS.map((r) => {
+    const a = A[r.action]
+    return `<div class="mview__row" role="button" tabindex="0" data-resume="${r.id}">${r.kind === 'Draft' ? progRing(a.icon, r.p) : ring(a.icon)}` +
+      `<span class="mview__txt"><b>${a.label}</b><small>${r.where} · ${r.note}</small></span><span class="cx-tag">${r.kind}<small>${r.ago}</small></span></div>`
+  }).join('') + '</div>'
+}
+
+/* ══ ONE SHEET PER FRAME, REBUILT FOR EACH IDEA ═══════════════════════════ */
+const S = { d: null, sheet: null, scrim: null, list: null, open: false, kind: 'sheet', grow: false, base: 0, seg: 'all', growing: null }
+
+function build(d, kind) {
+  S.sheet?.remove(); S.scrim?.remove()
+  const scrim = d.createElement('div'); scrim.className = 'mview-scrim cx-scrim'; scrim.hidden = true; scrim.setAttribute('data-cx-el', '')
+  const sheet = d.createElement('div'); sheet.className = 'mview cx-sheet'; sheet.hidden = true; sheet.setAttribute('data-cx-el', '')
+  sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', 'Quick Actions')
+  sheet.innerHTML =
+    '<span class="mview__handle" aria-hidden="true"></span>' +
+    `<div class="mview__head"><button type="button" class="cx-back" aria-label="Back" hidden>${I.back}</button><h2 class="mview__title">Quick Actions</h2><button type="button" class="mview__x" aria-label="Close">${I.x}</button></div>` +
+    `<div class="mview__tools"><label class="mview__search">${I.search}<input type="search" placeholder="Search actions" aria-label="Search actions" autocomplete="off" spellcheck="false"></label>` +
+      '<button type="button" class="cx-scan" aria-label="Scan a tag"><img src="assets/icon/scan.svg" alt=""></button></div>' +
+    (kind === 'list' ? `<div class="cx-seg" role="group" aria-label="Show">${[{ id: 'all', short: 'All' }, ...GROUPS].map((g, i) =>
+      `<button type="button" data-seg="${g.id}" aria-pressed="${!i}">${g.short}</button>`).join('')}</div>` : '') +
+    `<div class="mview__list" tabindex="-1">${body(kind)}</div>`
+  d.body.append(scrim, sheet)
+  Object.assign(S, { d, sheet, scrim, list: sheet.querySelector('.mview__list'), kind, seg: 'all', open: false })
+  wireSheet()
+}
+
+function wireSheet() {
+  const { sheet, scrim, d } = S, input = sheet.querySelector('input')
+  sheet.querySelector('.mview__x').addEventListener('click', () => close())
+  scrim.addEventListener('click', () => close())
+  sheet.querySelector('.cx-back').addEventListener('click', () => drafts(false))
+  sheet.querySelector('.cx-scan').addEventListener('click', () => say('Scan a tag — opens the scanner'))
+  input.addEventListener('input', () => filter(input.value))
+  input.addEventListener('focus', () => { if (S.kind === 'half') detent('large') })
+  sheet.addEventListener('click', (e) => {
+    const go = e.target.closest('[data-do]')
+    if (go) { const a = A[go.dataset.do]; close(); say(`Opens ${a.label}`); return }
+    const res = e.target.closest('[data-resume]')
+    if (res) { const r = DRAFTS.find((x) => x.id === res.dataset.resume), a = A[r.action]; close(); say(`${r.kind === 'Awaiting' ? 'Shows' : 'Resumes'} ${a.label} · ${r.where.split(' · ')[0]}`); return }
+    if (e.target.closest('[data-drafts]')) { drafts(true); return }
+    const seg = e.target.closest('[data-seg]')
+    if (seg) segment(seg.dataset.seg)
+  })
+  /* pull on the grabber and the head: down closes, and on the half sheet up grows it */
+  let pull = null
+  const startPull = (e) => {
+    if (e.target.closest('button')) return
+    pull = { y: e.clientY, from: S.base, moved: false }
+    /* the circle was the open; from here the sheet slides, so a release eases back */
+    sheet.classList.remove('is-grow'); sheet.classList.add('is-pulling'); sheet.setPointerCapture?.(e.pointerId)
+  }
+  for (const el of [sheet.querySelector('.mview__handle'), sheet.querySelector('.mview__head')]) el.addEventListener('pointerdown', startPull)
+  sheet.addEventListener('pointermove', (e) => {
+    if (!pull) return
+    const dy = e.clientY - pull.y; if (Math.abs(dy) > 4) pull.moved = true
+    const v = Math.max(0, pull.from + dy)
+    sheet.style.setProperty('--mv-drag', `${v}px`)
+    scrim.style.opacity = String(Math.max(0, 1 - Math.max(0, v - S.base) / 400))
+  })
+  const endPull = (e) => {
+    if (!pull) return
+    const v = Math.max(0, pull.from + (e.clientY - pull.y)), moved = pull.moved; pull = null
+    sheet.classList.remove('is-pulling'); scrim.style.opacity = ''
+    if (!moved) { sheet.style.setProperty('--mv-drag', `${S.base}px`); return }
+    const mid = sheet.offsetHeight - HALF
+    if (v > S.base + 110 || (S.kind !== 'half' && v > 110)) return close(true)
+    if (S.kind === 'half') detent(v < mid / 2 ? 'large' : 'medium')
+    else sheet.style.setProperty('--mv-drag', '0px')
+  }
+  sheet.addEventListener('pointerup', endPull); sheet.addEventListener('pointercancel', endPull)
+  /* the half sheet: a scroll or an upward drag on the list grows it first */
+  S.list.addEventListener('wheel', (e) => { if (sheet.classList.contains('is-medium') && e.deltaY > 0) { e.preventDefault(); detent('large') } }, { passive: false })
+  let ly = null
+  S.list.addEventListener('pointerdown', (e) => { ly = sheet.classList.contains('is-medium') ? e.clientY : null })
+  S.list.addEventListener('pointermove', (e) => { if (ly != null && ly - e.clientY > 14) { ly = null; detent('large') } })
+  S.list.addEventListener('pointerup', () => { ly = null })
+  d.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.open) close() })
+}
+
+function filter(q) {
+  q = q.trim().toLowerCase()
+  const { sheet, list } = S
+  sheet.classList.toggle('is-q', !!q)
+  let n = 0
+  list.querySelectorAll('[data-q]').forEach((el) => { const on = !q || el.dataset.q.includes(q); el.hidden = !on; if (on && el.closest('[data-sec]')) n++ })
+  list.querySelectorAll('[data-sec]').forEach((s) => { s.hidden = ![...s.querySelectorAll('[data-q]')].some((x) => !x.hidden) })
+  const e = list.querySelector('.cx-empty'); if (e) { e.hidden = !(q && !n); e.querySelector('b').textContent = `“${q}”` }
+}
+function segment(id) {
+  S.seg = id
+  S.sheet.querySelectorAll('[data-seg]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.seg === id))
+  S.list.innerHTML = (id === 'all' ? continueCard() : '') + listSections(id === 'all' ? null : id) + empty
+  S.list.classList.remove('cx-push'); void S.list.offsetWidth; S.list.classList.add('cx-push')
+  filter(S.sheet.querySelector('input').value)
+}
+function drafts(on) {
+  const { sheet, list } = S
+  sheet.querySelector('.cx-back').hidden = !on
+  sheet.querySelector('.mview__title').textContent = on ? 'Drafts' : 'Quick Actions'
+  sheet.querySelector('.mview__tools').hidden = on
+  sheet.querySelector('.cx-seg')?.toggleAttribute('hidden', on)
+  list.innerHTML = on ? draftsBody() : body(S.kind)
+  if (!on && S.kind === 'list' && S.seg !== 'all') segment(S.seg)
+  list.scrollTop = 0
+  list.classList.remove('cx-push', 'cx-pop'); void list.offsetWidth; list.classList.add(on ? 'cx-push' : 'cx-pop')
+  if (on && S.kind === 'half') detent('large')
+}
+function detent(which) {
+  const { sheet } = S
+  S.base = which === 'medium' ? Math.max(0, sheet.offsetHeight - HALF) : 0
+  sheet.classList.toggle('is-medium', which === 'medium')
+  sheet.style.setProperty('--mv-drag', `${S.base}px`)
+}
+
+/* the circle: All Modules' own open, from the pill instead of the Modules button (reveal() in the live sheet) */
+function reveal(opening) {
+  const { sheet, d } = S, from = d.querySelector('.qa-pill')
+  S.growing?.forEach((a) => a.cancel())
+  const sr = sheet.getBoundingClientRect(), r = from.getBoundingClientRect()
+  const x = r.left + r.width / 2 - sr.left, y = r.top + r.height / 2 - sr.top
+  const r0 = Math.min(r.width, r.height) / 2
+  const R = Math.hypot(Math.max(x, sr.width - x), Math.max(y, sr.height - y)) + 120
+  const small = `circle(${r0}px at ${x}px ${y}px)`, big = `circle(${R}px at ${x}px ${y}px)`
+  const ease = 'cubic-bezier(.32, .72, 0, 1)'
+  const anims = [sheet.animate(opening ? [{ clipPath: small }, { clipPath: big }] : [{ clipPath: big }, { clipPath: small, opacity: 1, offset: .82 }, { clipPath: small, opacity: 0 }],
+    opening ? { duration: 560, easing: ease } : { duration: 360, easing: 'cubic-bezier(.55, 0, .75, .2)', fill: 'forwards' })]
+  if (opening) {
+    for (const el of sheet.querySelectorAll('.mview__handle, .mview__head, .mview__tools, .cx-seg')) anims.push(el.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: 90, easing: ease, fill: 'backwards' }))
+    anims.push(S.list.animate([{ opacity: 0, transform: 'scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: 160, easing: ease, fill: 'backwards' }))
+    from.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 360, easing: ease })
+  }
+  S.growing = anims
+  return anims[0].finished.catch(() => {})
+}
+
+function open() {
+  const { sheet, scrim, d } = S
+  if (S.open) return
+  if (sheet.querySelector('.cx-back:not([hidden])')) drafts(false)
+  S.open = true
+  S.grow = S.kind !== 'half' && !reduced()
+  sheet.classList.toggle('is-grow', S.grow)
+  sheet.classList.remove('is-medium')
+  sheet.style.removeProperty('--mv-drag'); scrim.style.opacity = ''
+  scrim.hidden = false; sheet.hidden = false
+  S.list.scrollTop = 0
+  if (S.kind === 'half') detent('medium'); else S.base = 0
+  d.documentElement.classList.add('mview-on', 'cx-lock')
+  requestAnimationFrame(() => { scrim.classList.add('is-on'); sheet.classList.add('is-on'); if (S.grow) reveal(true) })
+}
+async function close(slide) {
+  const { sheet, scrim, d } = S
+  if (!S.open) return
+  S.open = false
+  d.documentElement.classList.remove('mview-on', 'cx-lock')
+  scrim.classList.remove('is-on')
+  if (S.grow && !slide) {
+    await reveal(false)
+  } else {
+    sheet.classList.remove('is-grow'); sheet.classList.remove('is-on')
+    await sleep(330)
+  }
+  if (S.open) return
+  S.growing?.forEach((a) => a.cancel()); S.growing = null
+  sheet.classList.remove('is-on', 'is-grow', 'is-pulling', 'is-medium', 'is-q'); sheet.style.removeProperty('--mv-drag')
+  sheet.hidden = true; scrim.hidden = true
+  const input = sheet.querySelector('input'); if (input.value) { input.value = ''; filter('') }
+}
+
+/* ══ 4 · HOLD THE PILL ══════════════════════════════════════════════════ */
+const H = { menu: null, veil: null, timer: 0, held: false, swallow: false }
+function holdMenu(d) {
+  const r = DRAFTS[0], a = A[r.action]
+  const veil = d.createElement('div'); veil.className = 'cx-hold-veil'; veil.hidden = true; veil.setAttribute('data-cx-el', '')
+  const m = d.createElement('div'); m.className = 'cx-hold'; m.hidden = true; m.setAttribute('data-cx-el', ''); m.setAttribute('role', 'menu')
+  m.innerHTML = '<p class="cx-hold__t">Most used</p>' +
+    USUAL.map((id) => `<button type="button" class="cx-hold__i" role="menuitem" data-do="${id}">${ring(A[id].icon)}<b>${A[id].label}</b></button>`).join('') +
+    '<div class="cx-hold__rule"></div>' +
+    `<button type="button" class="cx-hold__i" role="menuitem" data-resume="${r.id}">${progRing(a.icon, r.p)}<span><b>Continue</b><small>${a.label} · ${r.where.split(' · ')[0]}</small></span></button>`
+  d.body.append(veil, m)
+  Object.assign(H, { menu: m, veil })
+  veil.addEventListener('click', () => holdOff())
+  m.addEventListener('click', (e) => fire(e.target.closest('.cx-hold__i')))
+}
+function holdOn(d) {
+  const { menu, veil } = H, pill = d.querySelector('.qa-pill'), r = pill.getBoundingClientRect()
+  H.held = true
+  veil.hidden = false; menu.hidden = false
+  menu.style.left = `${Math.round(Math.min(Math.max(12, r.left + r.width / 2 - 132), d.documentElement.clientWidth - 276))}px`
+  menu.style.bottom = `${Math.round(d.documentElement.clientHeight - r.top + 12)}px`
+  d.documentElement.classList.add('cx-held')
+  requestAnimationFrame(() => { veil.classList.add('is-on'); menu.classList.add('is-on') })
+  try { navigator.vibrate?.(8) } catch {}
+}
+async function holdOff() {
+  const { menu, veil, d } = { ...H, d: S.d }
+  if (!menu || menu.hidden) return
+  H.held = false
+  menu.classList.remove('is-on'); veil.classList.remove('is-on'); d.documentElement.classList.remove('cx-held')
+  menu.querySelectorAll('.is-hot').forEach((x) => x.classList.remove('is-hot'))
+  await sleep(240)
+  if (!H.held) { menu.hidden = true; veil.hidden = true }
+}
+function fire(item) {
+  if (!item) return
+  holdOff()
+  if (item.dataset.do) say(`Opens ${A[item.dataset.do].label}`)
+  else { const r = DRAFTS[0]; say(`Resumes ${A[r.action].label} · ${r.where.split(' · ')[0]}`) }
+}
+
+/* ══ WIRING ONE FRAME ════════════════════════════════════════════════════ */
+function wire(d) {
+  const st = d.createElement('style'); st.textContent = CSS; d.head.append(st)
+  /* the pill opens the phone sheet, not the floating panel */
+  d.addEventListener('click', (e) => {
+    if (!e.target.closest('.qa-pill')) return
+    e.stopPropagation(); e.preventDefault()
+    if (H.swallow) { H.swallow = false; return }
+    open()
+  }, true)
+  d.addEventListener('contextmenu', (e) => { if (e.target.closest('.qa-pill')) e.preventDefault() }, true)
+  d.addEventListener('pointerdown', (e) => {
+    if (cur !== 'hold' || !e.target.closest('.qa-pill') || S.open) return
+    clearTimeout(H.timer)
+    H.timer = setTimeout(() => { H.swallow = true; holdOn(d) }, 420)
+  }, true)
+  d.addEventListener('pointermove', (e) => {
+    if (!H.held || !(e.buttons & 1)) return
+    const hit = d.elementFromPoint(e.clientX, e.clientY)?.closest('.cx-hold__i')
+    H.menu.querySelectorAll('.cx-hold__i').forEach((x) => x.classList.toggle('is-hot', x === hit))
+  }, true)
+  d.addEventListener('pointerup', (e) => {
+    clearTimeout(H.timer)
+    if (!H.held) return
+    const hit = d.elementFromPoint(e.clientX, e.clientY)?.closest('.cx-hold__i')
+    /* lifted on an item: that is the pick. Lifted anywhere else: the menu stays for a tap, as iOS's does */
+    if (hit && H.menu.querySelector('.is-hot') === hit) fire(hit)
+  }, true)
+}
+
+async function show(id) {
+  cur = id
+  const c = IDEAS.find((x) => x.id === id), n = IDEAS.indexOf(c) + 1
+  cap.innerHTML = `<b>${n} · ${c.name}</b><small>${c.note} <i>${c.tryit}</i></small><button type="button" id="again">${id === 'hold' ? 'Show the menu again' : 'Open it again'}</button>`
+  $('#again').addEventListener('click', () => demo())
+  for (const b of pick.children) b.setAttribute('aria-pressed', b.dataset.cx === id)
+  try { history.replaceState(null, '', `#${id}`) } catch {}
+  fit()
+  const d = app.contentDocument
+  if (!d || !d.documentElement.dataset.cxWired) return
+  await holdOff(); await close()
+  build(d, id === 'hold' ? 'sheet' : id)
+  d.querySelectorAll('.cx-hold, .cx-hold-veil').forEach((x) => x.remove()); H.menu = null
+  if (id === 'hold') holdMenu(d)
+  await sleep(120)
+  demo()
+}
+/* show each idea in its open state, the way a person would first meet it */
+function demo() {
+  const d = S.d; if (!d) return
+  if (cur === 'hold') { if (!S.open) holdOn(d) } else if (!S.open) open()
+}
+
+/* ── the page ──────────────────────────────────────────────────────────── */
+IDEAS.forEach((c, i) => pick.insertAdjacentHTML('beforeend',
+  `<button type="button" data-cx="${c.id}" aria-pressed="false"><b>${i + 1}</b>${c.name}</button>`))
+pick.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && b.dataset.cx !== cur) show(b.dataset.cx) })
+addEventListener('keydown', (e) => {
+  if (!['ArrowLeft', 'ArrowRight'].includes(e.key) || e.target.closest('input')) return
+  const i = IDEAS.findIndex((c) => c.id === cur), j = (i + (e.key === 'ArrowRight' ? 1 : -1) + IDEAS.length) % IDEAS.length
+  show(IDEAS[j].id)
+})
+
+function ready(frame) {
+  return new Promise((res) => {
+    let tries = 0
+    const wait = () => {
+      const d = frame.contentDocument
+      if (d && d.querySelector('.qa-pill') && d.querySelector('.qa-menu')) res(d)
+      else if (tries++ < 200) setTimeout(wait, 100)
+    }
+    wait()
+  })
+}
+function toTop(frame) {
+  const w = frame.contentWindow, d = frame.contentDocument
+  w.scrollTo(0, 0); if (!w.scrollY) d.querySelector('.search-row')?.classList.remove('is-stuck')
+}
+for (const frame of [now, app]) {
+  frame.addEventListener('load', async () => {
+    const d = await ready(frame)
+    ;[200, 900].forEach((ms) => setTimeout(() => toTop(frame), ms))
+    if (frame === app) {
+      wire(d); d.documentElement.dataset.cxWired = '1'
+      build(d, cur === 'hold' ? 'sheet' : cur); if (cur === 'hold') holdMenu(d)
+    }
+    await sleep(1400)
+    toTop(frame)
+    if (frame === now) d.querySelector('.qa-pill').click()
+    else demo()
+  })
+  /* set here, after the listener: a cached page can finish loading before this script runs */
+  frame.src = frame.dataset.src
+}
+
+/* two phones side by side, scaled to the window's height; both captions take
+   the taller one's height so the phones stay level */
+function fit() {
+  const root = document.documentElement, caps = [...document.querySelectorAll('.cap')]
+  root.style.removeProperty('--cap-h')
+  const c = Math.max(58, ...caps.map((x) => x.offsetHeight))
+  const k = Math.min(1, ($('#stage').clientHeight - 22 - c - 14 - 16) / 864)
+  root.style.setProperty('--k', Math.max(.5, k).toFixed(3))
+  root.style.setProperty('--cap-h', `${Math.max(58, ...caps.map((x) => x.offsetHeight))}px`)
+}
+addEventListener('resize', fit)
+const hash = location.hash.slice(1)
+show(IDEAS.some((c) => c.id === hash) ? hash : cur)
+</script>
+</body>
+</html>

@@ -13919,7 +13919,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261020g">
+<link rel="stylesheet" href="review.css?v=20261021r">
 </head>
 
 <style>
@@ -22092,7 +22092,7 @@ const VARIANTS = [
        "C 1", where the plate card's pills carry the words */
     shortBadges: true,
     supportedSizes: ['tall', 'large'], defaultSize: 'tall', priority: 'secondary',
-    data: { title: 'My Focus Hub', legend: 'Recent Updates', items: FOCUS_ITEMS },
+    data: { title: 'Focus Hub', legend: 'Recent Updates', items: FOCUS_ITEMS },
   },
   {
     id: 'focus.light', moduleId: 'focus', name: 'Focus Hub · Plate',
@@ -22105,7 +22105,7 @@ const VARIANTS = [
        variation asks for it. */
     hideRef2: true,
     supportedSizes: ['tall', 'large'], defaultSize: 'tall', priority: 'secondary',
-    data: { title: 'My Focus Hub', legend: 'Recent Updates', items: FOCUS_ITEMS },
+    data: { title: 'Focus Hub', legend: 'Recent Updates', items: FOCUS_ITEMS },
   },
 
   /* ══ NOTES ══════════════════════════════════════════════════════════════
@@ -23726,7 +23726,7 @@ const MODULES = [
        other, and the alternative was a wrong metaphor. */
     sprite: 'pin-push',
     gradient: '--g-approvals-wash',
-    name: 'My Focus Hub',
+    name: 'Focus Hub',   /* was "My Focus Hub" — owner, 21 Oct 2026: 'Remove "My"' */
     category: 'animal',
     keywords: ['pinned', 'watch', 'starred', 'following', 'my animals', 'case'],
     blurb: 'The animals you are watching, and what has happened to them.',
@@ -32515,6 +32515,51 @@ function createCarousel({ root, pages, nav, onShow } = {}) {
   __x.CAROUSEL_MAX = MAX;
 });
 
+__def('js/data/figIcons.js', function (__x, __req) {
+/* THE FIGMA ICONS (owner, 21 Oct 2026: "use icons from here", Figma 67918:13710): the frame's own
+   gradient exports (assets/icon/mf-*.svg) for the modules it draws — Necropsy takes its Lab mark and
+   Audit its Inventory clipboard. The modules it does not draw keep their own glyph, filled with the
+   frame's gradient (Gradients/greenturq) through a mask so the grid reads as one set. */
+const FIG = { species: 'collections', pharmacy: 'pharmacy', necropsy: 'lab', mortality: 'mortality', fetal: 'fetal',
+  eggs: 'egg', housing: 'housing', diet: 'kitchen', audit: 'inventory', announcements: 'announcement', users: 'users',
+  communication: 'communication', reports: 'reports', medical: 'medical',
+  /* Help Desk's own mark (owner, 21 Oct 2026, Figma 67927:13728: "this is the Help Desk icon") */
+  helpdesk: 'helpdesk',
+  /* Focus Hub's star (owner, 21 Oct 2026, Figma 67927:13782) — the INSTANCE's vector (46 × 44, gradient, 4px
+     stroke); the node's other export is its 24px master, grey at 1px, and read as "Very Light weight" */
+  focus: 'focus' }
+
+/* ONE SIZE, MEASURED (owner, 21 Oct 2026: "the icons are Different Different Sizes"): every source
+   draws into its square with its own margin — Diet and Fetal Death edge to edge, My Focus Hub in half
+   its width — so each is scaled by the box its ink really fills. INK is that box (x0, y0, x1, y1 as
+   fractions of the square), measured by rendering each one, the exports' white backing left out.
+   Every icon gets the same ink area (√(w·h) = .72 of the square, about 24px), is never taller or wider
+   than .76 (25px) — so Diet, Security and Eggs come down to the rest (owner: "Diet & security is
+   Big") — and sits centred on its ink. A module added here needs its line.
+   Housing and Announcements are Figma's bare vectors (the frame exports carried the frame's grey
+   backing); Announcements is arranged as Figma arranges it, 49.17 × 47.34 in the 50 frame, turned
+   25°, the frame clipping it (node 67918:1374). */
+const INK = {
+  pharmacy: [.1125, .08, .8875, .92], necropsy: [.04, .0825, .9575, .9575], species: [.0825, .13, .9175, .9225],
+  training: [.1025, .1025, .8975, .8975], mortality: [.07, .0175, .935, .875], fetal: [0, 0, 1, 1],
+  eggs: [.12, 0, .86, .96], focus: [.0025, .0225, .9975, .9775], housing: [0, 0, 1, 1],
+  diet: [.085, 0, .915, 1], audit: [.125, .04, .94, .875], helpdesk: [.06, .0275, .94, .9425],
+  announcements: [.0025, .165, 1, .8525], users: [.0825, .0825, .9175, .9175], security: [.125, 0, .875, 1],
+  reports: [.165, .0825, .835, .9175], communication: [.0825, .0825, .9175, .9175],
+  medical: [.12, .06, .88, .92],
+}
+/** The transform that brings module `id`'s icon to the common size, or '' when it has no INK line. */
+const inkFit = (id) => {
+  const b = INK[id]; if (!b) return ''
+  const w = b[2] - b[0], h = b[3] - b[1], k = Math.min(.72 / Math.sqrt(w * h), .76 / Math.max(w, h))
+  return `scale(${k.toFixed(3)}) translate(${((.5 - (b[0] + b[2]) / 2) * 100).toFixed(2)}%,${((.5 - (b[1] + b[3]) / 2) * 100).toFixed(2)}%)`
+}
+
+  __x.FIG = FIG;
+  __x.INK = INK;
+  __x.inkFit = inkFit;
+});
+
 __def('js/components/ModuleCard.js', function (__x, __req) {
 /**
  * MODULE CARD
@@ -33031,7 +33076,12 @@ function glyph(mod, variant, cls = 'card__icon') {
   const file = variant.icon || mod?.icon
   if (!file) return ''
   const fish = mod?.iconShape === 'fish' && !variant.icon
-  return `<span class="${cls}${fish ? ' card__icon--fish' : ''}">` +
+  /* THE FIGMA ICON, IN WHITE (owner, 21 Oct 2026: "here also u can replace that icons Only But White
+     Colour"): a module the Figma frame draws carries its export and the common-size transform; V2's
+     stylesheet paints it white over the card's own mark, which stays in place for its box. */
+  const figs = __req('js/data/figIcons.js'), fig = !variant.icon && figs.FIG[mod?.id]
+  const figAttr = fig ? ` data-fig style="--fig:url(${ASSET_ICON}mf-${fig}.svg);--fig-t:${figs.inkFit(mod.id) || 'none'}"` : ''
+  return `<span class="${cls}${fish ? ' card__icon--fish' : ''}"${figAttr}>` +
          `<img src="${ASSET_ICON}${esc(file)}" alt="" aria-hidden="true"></span>`
 }
 
@@ -34386,7 +34436,7 @@ const LAYOUTS = {
 
     return `<span class="l-focus">` +
       `<span class="l-focus__head">` +
-        `<span class="l-focus__title">${esc(data.title || 'My Focus Hub')}</span>` +
+        `<span class="l-focus__title">${esc(data.title || 'Focus Hub')}</span>` +
         pager(items.length, 'pinned item') +
       `</span>` +
       `<span class="l-focus__pages">${items.map(page).join('')}</span>` +
@@ -51717,10 +51767,26 @@ const QA_RESUME_KINDS = {
 }
 const QA_RESUME_ORDER = ['draft', 'unsent', 'awaiting']
 
+/* V2 · THE FIGMA ICONS (owner, 21 Oct 2026, Figma CNhiaOGCLdnlNxj7x2Ohrd node 1015:11345: "For Quick
+   actions, based on this Change Icons. Header Icons are U can make Fill"). Each action's glyph as the
+   frame assigns it — Medical, Dispense and Missing/Escaped share the clinic house; Site, Section and
+   Enclosure share the paw — drawn in a ring (QuickActions.js). The folder heads take the filled marks of
+   the module set (Figma 67918:13710) in their folder's own ink. V1, V3 and V4 keep `icon`. */
+const QA_FIG = {
+  medical: 'qa2-home-health.svg', dispense: 'qa2-home-health.svg', hospitalize: 'qa2-hospitalise.svg', fetal: 'qa2-fetal.svg',
+  transfer: 'qa2-transfer.svg', accession: 'qa2-pets.svg', eggs: 'qa2-egg.svg', missing: 'qa2-home-health.svg',
+  request: 'qa2-request.svg', note: 'qa2-note.svg', announcement: 'qa2-announce.svg', user: 'qa2-person.svg',
+  site: 'qa2-pets.svg', section: 'qa2-pets.svg', enclosure: 'qa2-pets.svg', master: 'qa2-encrypted.svg',
+}
+/* a folder head's mark, as the module whose filled icon it borrows (js/data/figIcons.js) */
+const QA_FIG_HEAD = { clinical: 'medical', animal: 'species', ops: 'reports', estate: 'housing' }
+
   __x.QA_RESUME = QA_RESUME;
   __x.QA_RESUME_KINDS = QA_RESUME_KINDS;
   __x.QA_RESUME_ORDER = QA_RESUME_ORDER;
   __x.QA_GROUPS = QA_GROUPS;
+  __x.QA_FIG = QA_FIG;
+  __x.QA_FIG_HEAD = QA_FIG_HEAD;
   __x.QA_LEVELS = QA_LEVELS;
   __x.QA_FOOT = QA_FOOT;
   __x.QA_FOOT_EDIT = QA_FOOT_EDIT;
@@ -51793,7 +51859,7 @@ __def('js/components/QuickActions.js', function (__x, __req) {
  * element in the tree, and no race between the click that opens the menu and
  * the click that would close it.
  */
-const { HOME_QUICK_ACTIONS, QA_GROUPS, QA_FOOT, QA_FOOT_EDIT, QA_LEVELS,
+const { HOME_QUICK_ACTIONS, QA_GROUPS, QA_FOOT, QA_FOOT_EDIT, QA_LEVELS, QA_FIG, QA_FIG_HEAD,
         QA_RESUME, QA_RESUME_KINDS, QA_RESUME_ORDER } = __req('js/data/quickActions.js');
 /* V2's contextual panel needs the estate to bind to. The flat panel does not
    touch any of it — see `contextual` in createQuickActions. */
@@ -51916,9 +51982,18 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
   /* NO DRAFT TAG ON A ROW — page feedback, 29 Sep 2026: "Remove the Drafts
      here". The strip above the folders is the one place unfinished work is
      named; a tag on the row as well said it twice. */
+  const figs = __req('js/data/figIcons.js')
   function frowHTML(a) {
     return `<button type="button" class="qa-frow" data-action="${a.id}">` +
-      `<img class="qa-frow__g" src="assets/icon/${a.icon}" alt="" width="20" height="20">` +
+      (QA_FIG[a.id]
+        /* the glyph is painted in the row's own ink through its export as a mask (owner, 21 Oct 2026: "icon &
+           circle Colour Should same as text") */
+        ? `<span class="qa-frow__g qa-frow__g--ring">${QA_FIG[a.id] === 'qa2-home-health.svg'
+            /* …except the clinic house, whose light inner stroke is part of the drawing: a mask would fill it, so
+               the export itself is toned to the ink (review.css) */
+            ? `<img class="qa-frow__ink qa-frow__ink--img" src="assets/icon/${QA_FIG[a.id]}" alt="">`
+            : `<i class="qa-frow__ink" style="--qa-g:url(assets/icon/${QA_FIG[a.id]})" aria-hidden="true"></i>`}</span>`
+        : `<img class="qa-frow__g" src="assets/icon/${a.icon}" alt="" width="20" height="20">`) +
       `<span class="qa-frow__t">${esc(a.label)}</span>` +
     '</button>'
   }
@@ -52042,15 +52117,8 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
            search, a picker or a sub-list hides the strip and the cards with
            it and no path needed a second element to know about. */
         '<div class="qa-menu__grid qa-menu__grid--folders">' +
-          (QA_RESUME.length ?
-            '<button type="button" class="qa-todo" data-sub="todo">' +
-              `<span class="qa-todo__g">${icon('clock')}</span>` +
-              /* ONE LABEL, NO BREAKDOWN — page feedback, 29 Sep 2026: "Label
-                 only have to show 5 Drafts like that". The kinds are told
-                 apart on the list the strip opens. */
-              `<b class="qa-todo__b">${QA_RESUME.length} Draft${QA_RESUME.length === 1 ? '' : 's'}</b>` +
-              `<span class="qa-todo__c">${icon('chev-right')}</span>` +
-            '</button>' : '') +
+          /* NO DRAFTS STRIP (owner, 21 Oct 2026: "also remove Drafts") — the strip and the
+             Continue rows a search used to list; QA_RESUME stays for V4's panel. */
           '<div class="qa-folders">' +
           QA_GROUPS.map((g) => {
             const list = actions.filter((a) => a.group === g.id)
@@ -52059,7 +52127,9 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
                action on the card, a chevron would promise a screen that
                shows the same four rows again. */
             const head =
-              `<span class="qa-fold__g"><img src="assets/icon/${g.icon}" alt="" width="20" height="20"></span>` +
+              (QA_FIG_HEAD[g.id]
+                ? `<span class="qa-fold__g"><i class="qa-fold__fill" style="--qa-head:url(assets/icon/mf-${figs.FIG[QA_FIG_HEAD[g.id]]}.svg);transform:${figs.inkFit(QA_FIG_HEAD[g.id])}" aria-hidden="true"></i></span>`
+                : `<span class="qa-fold__g"><img src="assets/icon/${g.icon}" alt="" width="20" height="20"></span>`) +
               `<h3 class="qa-fold__t">${esc(g.name)}</h3>`
             return `<section class="qa-fold" data-group="${g.id}" data-tone="${g.tone}">` +
               (more > 0
@@ -52178,9 +52248,11 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
          first one carries the query when there is one, so its label is
          written at filter time rather than here. */
       (isModules ? '' :
-        '<div class="qa-foot">' +
+        /* NO FOOT ON V2 (owner, 21 Oct 2026, over Search everything and Edit Modules: "Remove
+           this") — the field already searches everything; what is left is the empty state */
+        `<div class="qa-foot${fold ? ' qa-foot--bare' : ''}">` +
           '<p class="qa-foot__none" hidden>No action matches <b></b>.</p>' +
-          FOOT.map((f) =>
+          (fold ? [] : FOOT).map((f) =>
             `<button type="button" class="qa-foot__b" data-foot="${f.kind}">` +
               `<span class="qa-foot__g">${f.icon.endsWith('.svg')
                   ? `<img src="assets/icon/${f.icon}" alt="" width="18" height="18">`
@@ -52649,7 +52721,7 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
     }
     none.hidden = !(q && n === 0)
     if (none.firstElementChild) none.firstElementChild.textContent = `“${input.value.trim()}”`
-    searchBtn.textContent = q
+    if (searchBtn) searchBtn.textContent = q
       ? `Search everything for “${input.value.trim()}”` : 'Search everything'
   }
 
@@ -52675,7 +52747,7 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
     for (const chip of cells) chip.hidden = false
     for (const cat of menu.querySelectorAll('.qa-cat')) cat.hidden = false
     none.hidden = true
-    searchBtn.textContent = 'Search everything'
+    if (searchBtn) searchBtn.textContent = 'Search everything'
   }
 
   function searching(q) {
@@ -52683,7 +52755,7 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
     grid.hidden = true
     subOff()
     if (cont) cont.hidden = true
-    searchBtn.textContent = `Search everything for “${input.value.trim()}”`
+    if (searchBtn) searchBtn.textContent = `Search everything for “${input.value.trim()}”`
 
     const acts = actionHits(q)
     /* the index does the rest, ranked, and is re-ordered rather than re-sorted:
@@ -52695,7 +52767,7 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
        statement; inside a result list it is one more place a match can be,
        and it sits under the modules because a half-written record is a more
        specific thing to be looking for than either. */
-    const conts = ctx ? RESUME.filter((r) => {
+    const conts = ctx && !fold ? RESUME.filter((r) => {
       const a = actions.find((x) => x.id === r.action)
       return `${a ? a.label : ''} ${r.where} ${r.note}`.toLowerCase().includes(q)
     }) : []
@@ -52704,7 +52776,7 @@ function createQuickActions({ root, onAction, onChat, onSearch, onScan, onResume
     if (acts.length) {
       blocks.push(group('Quick Actions', acts.map((a) =>
         row({ cls: 'qa-hit--act', data: `data-action="${a.id}"`,
-              img: `assets/icon/${a.icon}`, title: a.label,
+              img: `assets/icon/${(fold && QA_FIG[a.id]) || a.icon}`, title: a.label,
               sub: QA_GROUPS.find((g) => g.id === a.group)?.name || '' }))))
     }
     for (const key of QA_RESULT_ORDER) {
@@ -53977,27 +54049,9 @@ if (document.documentElement.dataset.review && isV2()) {
     toastEl.classList.add('is-on'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('is-on'), 3200)
   }
 
-  /* GRID OR LIST (owner, 17 Oct 2026, with Gojek's services sheet as the
-     picture): the modules on Home first, as tiles; then All Modules by
-     category, as tiles or as the rows with their one line and the swipe.
-     The switch is the 7D · 30D · 30+ control's pill, and it is remembered. */
-  const MODE_KEY = 'antz.mview.mode'
-  let mode = 'grid'
-  try { if (localStorage.getItem(MODE_KEY) === 'list') mode = 'list' } catch { /* no storage: tiles */ }
-  const setMode = (m) => {
-    if (m === mode) return
-    mode = m; openRow = null
-    try { localStorage.setItem(MODE_KEY, m) } catch { /* not remembered, still switched */ }
-    render()
-  }
-  const GRID_I = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>'
-  const LIST_I = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="4" y="5" width="4.5" height="4.5" rx="1.5"/><rect x="11" y="5.75" width="9" height="3" rx="1.5"/><rect x="4" y="14.5" width="4.5" height="4.5" rx="1.5"/><rect x="11" y="15.25" width="9" height="3" rx="1.5"/></svg>'
-  const modeSw = document.createElement('div')
-  modeSw.className = 'mview__mode'; modeSw.setAttribute('role', 'group'); modeSw.setAttribute('aria-label', 'Show modules as')
-  modeSw.innerHTML = `<button type="button" data-mode="grid" aria-label="Grid" title="Grid">${GRID_I}</button>` +
-    `<button type="button" data-mode="list" aria-label="List" title="List">${LIST_I}</button>`
-  modeSw.addEventListener('click', (e) => { const b = e.target.closest('[data-mode]'); if (b) setMode(b.dataset.mode) })
-  sheet.querySelector('.mview__tools').append(modeSw)
+  /* ONE GRID, NOTHING ELSE (owner, 21 Oct 2026, over Figma 67918:13710: "Bottomsheet one
+     row Module Placement has like these. Do not Add: Recents, Category and all, list all modules
+     that all"): no grid/list switch, no Recent row, no category heads — the twenty, three to a row. */
   /* THE OWNER'S TWENTY (19 Oct 2026: "In Your Modules: Pharmacy, Necropsy,
      Collection, Animals, Training, Mortality, Natality, Fetal Death, Eggs,
      My Focus Hub, Housing, Diet, Audit, Help Desk, Announcements, Users,
@@ -54011,11 +54065,11 @@ if (document.documentElement.dataset.review && isV2()) {
      tap says so and they do not swipe. */
   const VIEW = [
     ['medical', ['pharmacy', 'necropsy']],
-    ['animal', ['species', 'animals', 'training', 'mortality', 'natality', 'fetal', 'eggs', 'focus']],
+    ['animal', ['species', 'training', 'mortality', 'fetal', 'eggs', 'focus']],
     ['operations', ['housing', 'diet', 'audit']],
-    ['admin', ['helpdesk', 'announcements', 'users', 'security', 'reports', 'approvals', 'communication']],
+    ['admin', ['helpdesk', 'announcements', 'users', 'security', 'reports', 'communication']],
   ]
-  const VIEW_IDS = new Set(VIEW.flatMap(([, ids]) => ids))
+  /* SEVENTEEN (owner, 21 Oct 2026: "Remove: Natality, Animals, Approvals") */
   const RENAME = { species: 'Collection', diet: 'Diet', helpdesk: 'Help Desk' }
   const FSV = (d) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`
   const FRESH = {
@@ -54032,66 +54086,29 @@ if (document.documentElement.dataset.review && isV2()) {
     return m && { ...m, name: RENAME[id] || m.name }
   }
   const onHome = (m) => !m.fresh && placed(defaultCard(m))
-  /* ONE COLOUR, IN AN OPEN CIRCLE (owner, 20 Oct 2026: first "Flat Colours only With Filled or normal
-     icons With Circle", then over the coloured discs "I dont want Fill inside Circle … All module
-     Colours have to same here. Now its too Colourful"): every mark is drawn in the one ink (review.css,
-     `.mview__ico`) inside a ring with nothing in it. The module art is white on its gradient, so it is
-     used as a MASK — its shape, the ink's colour, its cut-outs left open. */
-  const glyphOf = (m) => m.svg || (m.icon ? `<i class="mview__mark" style="-webkit-mask-image:url(assets/icon/${qesc(m.icon)});mask-image:url(assets/icon/${qesc(m.icon)})" aria-hidden="true"></i>` : icon(m.sprite))
+  const { FIG, inkFit } = __req('js/data/figIcons.js')
+  const lineMask = (body) => `url('data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>')}')`
+  const glyphOf = (m) => {
+    if (m.id === 'announcements') return `<span class="mview__fig" style="transform:${inkFit(m.id)}"><img src="assets/icon/mf-announcement.svg" alt=""` +
+      ' style="position:absolute;left:.83%;top:2.66%;width:98.33%;height:94.68%;transform:rotate(25deg)"></span>'
+    if (FIG[m.id]) return `<img src="assets/icon/mf-${FIG[m.id]}.svg" alt="" style="transform:${inkFit(m.id)}">`
+    const url = m.icon ? `url(assets/icon/${qesc(m.icon)})`
+      : lineMask(m.svg ? m.svg.replace(/^<svg[^>]*>|<\/svg>$/g, '') : document.getElementById(`i-${m.sprite}`)?.innerHTML || '')
+    return `<i class="mview__mark" style="-webkit-mask-image:${url};mask-image:${url};transform:${inkFit(m.id)}" aria-hidden="true"></i>`
+  }
   const tile = (m, on) => `<button type="button" class="mview__tile" data-mod="${qesc(m.id)}" aria-label="Open ${qesc(m.name)}${on ? ', on Home' : ''}">` +
     `<span class="mview__ico">${glyphOf(m)}</span>` +
     /* a name with a space wraps at it, not at the soft hyphen the 1×1 card needs ("Species Manage-ment") */
     `<span class="mview__lbl">${qesc(/\s/.test(m.name) ? m.name.replace(/\u00AD/g, '') : m.name)}</span></button>`
-  /* RECENT IN PLACE OF ON HOME (owner, 17 Oct 2026: "Remove On Home
-     container. If user using multiple times that part it has to show recent
-     module"): the modules last opened — from this sheet, a home card or a
-     module page — newest first, one row (4 on a phone, 5 on a tablet). The
-     list is the web's Recent row's own; until it has one, nothing is drawn. */
-  const recent = () => __req('js/components/ModulePages.js').recentModules()
-    .filter((id) => VIEW_IDS.has(id)).map(modOf).filter((m) => m && (m.fresh || defaultCard(m))).slice(0, 5)
-
-  function render() {
+  /* `enter`: the open's render — the cards rise in one after another and their icons pop
+     (owner, 21 Oct 2026: "Animetions has to there"); a search redraws without it */
+  function render(enter) {
     const q = query.trim().toLowerCase()
     const hit = (m) => !q || m.name.toLowerCase().includes(q) || (m.keywords || []).some((k) => k.includes(q))
-    const tiles = mode === 'grid'
-    const cats = VIEW.map(([cid, ids]) => {
-      const c = QC.find((x) => x.id === cid) || { name: cid }
-      const ms = ids.map(modOf).filter((m) => m && hit(m)).map((m) => ({ m, v: m.fresh ? null : defaultCard(m) })).filter((x) => x.m.fresh || x.v)
-      if (!ms.length) return ''
-      if (tiles) return `<h3 class="mview__cat">${qesc(c.name)}</h3><div class="mview__grid">${ms.map(({ m, v }) => tile(m, !!v && placed(v))).join('')}</div>`
-      return `<h3 class="mview__cat">${qesc(c.name)}</h3>` + ms.map(({ m, v }) => {
-        /* a new module: the same row, no swipe (is-core only shrugs) — it has no card to add yet */
-        if (m.fresh) return `<div class="mview__item is-core" role="listitem" data-mod="${qesc(m.id)}">
-          <div class="mview__row" role="button" tabindex="0" aria-label="Open ${qesc(m.name)}">
-            <span class="mview__ico">${m.svg}</span>
-            <span class="mview__txt"><b>${qesc(m.name)}</b><small>${qesc(m.blurb)}</small></span>
-            <span class="mview__chev" aria-hidden="true">${icon('chev-right')}</span>
-          </div>
-        </div>`
-        /* 1 Oct 2026 (owner: "each module one line explanation need … remove
-           from home interaction has to give"): the module's blurb under its
-           name, and the swipe offers Add to Home or, on a module already
-           there, Remove — each done at once, with Undo in the notice */
-        /* a CORE door (Medical, Species — layoutStore's isCore) is always on
-           Home: it wears the badge and does not offer Remove */
-        const on = placed(v), core = on && __req('js/state/layoutStore.js').isCore(v.id)
-        return `<div class="mview__item${on ? ' is-placed' : ''}${core ? ' is-core' : ''}" role="listitem" data-mod="${qesc(m.id)}">
-          ${core ? '' : `<button type="button" class="mview__act${on ? ' is-remove' : ''}" tabindex="-1">${on ? `${icon('minus')}<span>Remove</span>` : `${icon('plus')}<span>Add to Home</span>`}</button>`}
-          <div class="mview__row" role="button" tabindex="0" aria-label="Open ${qesc(m.name)}${on ? ', on Home' : ''}">
-            <span class="mview__ico">${glyphOf(m)}</span>
-            <span class="mview__txt"><b>${qesc(m.name)}</b>${m.blurb ? `<small>${qesc(m.blurb)}</small>` : ''}</span>
-            <span class="mview__chev" aria-hidden="true">${icon('chev-right')}</span>
-          </div>
-          ${core ? '' : `<button type="button" class="sr-only mview__kbd">${on ? 'Remove from Home' : 'Add to Home'}: ${qesc(m.name)}</button>`}
-        </div>`
-      }).join('')
-    }).join('')
-    const rec = q ? [] : recent()
-    sheet.querySelectorAll('.mview__mode [data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)))
-    list.innerHTML =
-      (rec.length ? `<h3 class="mview__sec">Recent</h3><div class="mview__grid mview__grid--recent">${rec.map((m) => tile(m, onHome(m))).join('')}</div>` : '') +
-      (cats && !tiles ? '<p class="mview__hint">Tap to open · swipe left to add to Home or remove</p>' : '') +
-      (cats || '<p class="mview__empty">No module matches that.</p>')
+    const ms = VIEW.flatMap(([, ids]) => ids).map(modOf).filter((m) => m && hit(m) && (m.fresh || defaultCard(m)))
+    list.innerHTML = ms.length
+      ? `<div class="mview__grid mview__grid--all${enter ? ' is-enter' : ''}">${ms.map((m, i) => tile(m, onHome(m)).replace('<button ', `<button style="--i:${i}" `)).join('')}</div>`
+      : '<p class="mview__empty">No module matches that.</p>'
   }
 
   /* ── the swipe: one row open at a time, the action revealed under it ── */
@@ -54223,7 +54240,7 @@ if (document.documentElement.dataset.review && isV2()) {
   }
   let back = null
   function openView(from) {
-    back = document.activeElement; query = ''; input.value = ''; openRow = null; render()
+    back = document.activeElement; query = ''; input.value = ''; openRow = null; render(true)
     growing?.forEach((a) => a.cancel()); growing = null
     grow = from instanceof Element && !prefersReducedMotion() ? { from, rect: from.getBoundingClientRect() } : null
     shown = true

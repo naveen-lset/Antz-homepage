@@ -302,6 +302,51 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
 @media (hover: hover) { .mview__tile:hover .mview__ico { transform: translateY(-2px); } }
 .mview__lbl { max-width: 100%; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: break-word; font-size: 12.5px; font-weight: 500; line-height: 1.25; text-align: center; color: #1F415B; }
 @media (prefers-reduced-motion: reduce) { .mview__tile, .mview__tile .mview__ico { transition: none; } }
+/* FIGMA 67918:13710 (owner, 21 Oct 2026: "Current All Module Bottomsheet Design has to change … use
+   icons from here … one row Module Placement has like these"): the twenty on MD3_Antz/Background, three
+   white r12 cards to a row, 8 apart; in each the frame's 32.76 gradient icon over a 10.48 Inter Semi Bold
+   name in OnPrimaryContainer #1F515B, 6.55 between. No ring: the icon is the mark. A tablet's wider form
+   sheet takes five to a row at the same card size. */
+.mview { background: #EFF5F2; }
+.mview__grid--all { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; padding: 0; border-radius: 0; background: none; }
+/* iPad AND TABLET: three to a row, bigger (owner, 21 Oct 2026: "For ipad or Tablet … keep three in row, make it
+   Bigger. Because Empty Space Was There") — the form sheet's 608 of content as three ~195px cards */
+@media (min-width: 744px) {
+  .mview .mview__grid--all { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .mview .mview__grid--all .mview__tile { gap: 12px; height: 150px; padding: 16px 8px; border-radius: 16px; }
+  .mview .mview__grid--all .mview__ico { width: 52px; height: 52px; }
+  .mview .mview__grid--all .mview__lbl { font-size: 16px; }
+}
+.mview__grid--all .mview__tile { justify-content: center; gap: 8px; height: 107.44px; padding: 12px 4px; border-radius: 12px; background: #fff; }
+.mview__grid--all .mview__ico { width: 32.76px; height: 32.76px; border-radius: 0; box-shadow: none; }
+.mview__grid--all .mview__ico img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.mview__grid--all .mview__fig { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; }
+/* THE SAME ICONS ON THE HOME CARDS, IN WHITE (owner, 21 Oct 2026: "here also u can replace that icons
+   Only But White Colour"): glyph() marks a Figma module's mark `data-fig` with its export (--fig) and
+   the common-size transform (--fig-t). The card's own <img> takes the export in place — the same
+   `content: url()` swap the bell and search use on V2 — keeps its box, turns white (every inked pixel
+   to #fff, the gaps left open), and sits at the common size. */
+:root[data-home='v2'] #moduleGrid [data-fig] > img { content: var(--fig); object-fit: contain; filter: brightness(0) invert(1); transform: var(--fig-t); }
+/* …and the wide Mortality count card, whose mark is its own file rather than glyph()'s; the transform
+   is inkFit('mortality'). Natality keeps its chick: the Figma frame has no Natality icon. */
+:root[data-home='v2'] #moduleGrid .card[data-variant='insight.mortality'] .l-v2ki__mark { content: url("assets/icon/mf-mortality.svg"); object-fit: contain;
+  filter: brightness(0) invert(1); transform: scale(.836) translate(-.25%, 5.38%); }
+.mview__grid--all .mview__mark { width: 100%; height: 100%; background: linear-gradient(118deg, #00D6C9, #37BD69); }
+/* the name a size up from the frame's 10.48 (owner, 21 Oct 2026: "Increase the font Size, Very small now") */
+.mview__grid--all .mview__lbl { font-size: 13px; font-weight: 600; line-height: 1.2; color: #1F515B; }
+/* MOTION (owner, 21 Oct 2026: "Animetions has to there"): on open the cards rise in one after
+   another and each icon pops on a soft overshoot; a press sinks the card and squeezes its icon.
+   `backwards`, not `both`, so the press can still move them once they have landed. */
+@keyframes mvCardIn { from { opacity: 0; transform: translateY(16px) scale(.94); } }
+@keyframes mvIcoPop { from { opacity: 0; transform: scale(.4) rotate(-12deg); } 60% { opacity: 1; } }
+.mview__grid--all.is-enter .mview__tile { animation: mvCardIn 480ms cubic-bezier(.32, .72, 0, 1) backwards; animation-delay: calc(150ms + var(--i, 0) * 28ms); }
+.mview__grid--all.is-enter .mview__ico { animation: mvIcoPop 560ms cubic-bezier(.34, 1.56, .64, 1) backwards; animation-delay: calc(230ms + var(--i, 0) * 28ms); }
+.mview__grid--all .mview__tile { transition: transform 200ms cubic-bezier(.32, .72, 0, 1), box-shadow 200ms ease; }
+.mview__grid--all .mview__tile:active { transform: scale(.95); }
+.mview__grid--all .mview__ico { transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1); }
+.mview__grid--all .mview__tile:active .mview__ico { transform: scale(.88); }
+@media (hover: hover) { .mview__grid--all .mview__tile:hover { box-shadow: 0 6px 16px -10px rgba(31, 81, 91, .35); } .mview__grid--all .mview__tile:hover .mview__ico { transform: translateY(-2px) scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .mview__grid--all.is-enter .mview__tile, .mview__grid--all.is-enter .mview__ico { animation: none; } .mview__grid--all .mview__tile, .mview__grid--all .mview__ico { transition: none; } }
 .mview__toast { position: absolute; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 3; display: flex; align-items: center; gap: 14px; max-width: calc(100% - 32px); padding: 10px 12px 10px 16px; border-radius: 12px; background: #1F415B; color: #fff; font: 500 14px Inter, sans-serif; white-space: nowrap; transform: translate(-50%, 12px); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
 .mview__toast > span { overflow: hidden; text-overflow: ellipsis; }
 .mview__toast.is-on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
@@ -1351,3 +1396,40 @@ html:root[data-home='v2'] .qa-pill__grid {
    20 Oct 2026: "Dont Reduce the Size when I scrolling time") */
 html:root[data-home='v2'] .qa.is-scrolled .qa-pill { gap: var(--s2); }
 html:root[data-home='v2'] .qa.is-scrolled .qa-pill__t { max-width: 12em; opacity: 1; }
+
+/* QUICK ACTIONS WITHOUT ITS FOOT (owner, 21 Oct 2026: "Remove this, also remove Drafts"): on V2 the foot
+   keeps only its "No action matches" line, so it takes no room and draws no rule until that shows. */
+.qa-foot--bare { margin-top: 0; padding-top: 0; border-top: 0; }
+.qa-foot--bare:has(.qa-foot__none[hidden]) { display: none; }
+
+/* QUICK ACTIONS · FIGMA 1015:11345 (owner, 21 Oct 2026: "based on this Change Icons. Header Icons are U can
+   make Fill"): each row's glyph sits in the frame's ring — 0.9px OnSurface #006D35, glyph .6 of the ring —
+   at 32 for a 48 row, so the hairline now starts under the label at 14 + 32 + 12. The folder heads wear
+   filled marks in the folder's own ink. */
+.qa-frow .qa-frow__g--ring { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; box-shadow: inset 0 0 0 .9px currentColor; }
+/* ring and glyph take the row's text colour, OnSurfaceVariant (owner, 21 Oct 2026: "icon & circle Colour Should
+   same as text"); so do the folder heads' marks, against their headings */
+.qa-frow__ink { display: block; width: 19.2px; height: 19.2px; background: currentColor;
+  -webkit-mask: var(--qa-g) center / contain no-repeat; mask: var(--qa-g) center / contain no-repeat; }
+/* the clinic house keeps its export, greyed 80%: #006D35 lands at #42574C beside the text's #44544A, and its light
+   inner stroke stays light */
+.qa-frow__ink--img { background: none; -webkit-mask: none; mask: none; object-fit: contain; filter: grayscale(.8); }
+.qa--folders .qa-frow + .qa-frow::before { left: 58px; }
+/* QUICK ACTIONS ON THE PHONE (owner, 21 Oct 2026, over the floating sheet: "In the Mobile. Keep Flowting only,
+   Remove Down Blur. also Circle With icons Can u Reduce the Size", then "Inside padding give 12px left &
+   Right"): the floating panel sits 4px from the screen's sides and keeps 12 inside, the title indented 12
+   more to sit over the cards' heads; the list ends
+   in a clean edge (no fade); the ring comes down to 28 with its glyph at the frame's .6, the hairline with it. */
+@media (max-width: 743px) {
+  :root[data-home='v2'] .qa-menu { width: calc(100vw - 8px); padding-left: 12px; padding-right: 12px; padding-bottom: 0; }
+  /* no padding under the list (owner: "Dont give Down Pading here"): the folders run to the panel's edge, and
+     the scroller keeps 12 of its own so the last card still clears the corner at the end */
+  :root[data-home='v2'] .qa-body { padding-bottom: 12px; }
+  :root[data-home='v2'] .qa-title { padding-left: 12px; padding-right: 12px; }
+  :root[data-home='v2'] .qa-body { -webkit-mask-image: none; mask-image: none; }
+  .qa-frow .qa-frow__g--ring { width: 28px; height: 28px; }
+  .qa-frow__ink { width: 16.8px; height: 16.8px; }
+  .qa--folders .qa-frow + .qa-frow::before { left: 54px; }
+}
+.qa-fold__fill { display: block; width: 24px; height: 24px; background: var(--ink-head, #44544A);
+  -webkit-mask: var(--qa-head) center / contain no-repeat; mask: var(--qa-head) center / contain no-repeat; }

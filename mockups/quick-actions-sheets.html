@@ -1,0 +1,271 @@
+<!doctype html>
+<!--
+  QUICK ACTIONS AS A BOTTOM SHEET · four ways to show it (owner, 21 Oct 2026:
+  "Can U make Some Other Versions How can we Show Bottomsheet. Keep the Same
+  Container. Try to make 4 padding left & right for Bottomsheet").
+
+  Both phones are the live ../index.html?v=2 with Quick Actions open. Left is
+  the panel today. Right keeps everything inside it — title, search, the four
+  folder cards and their rows — and changes only the sheet around them: 4px
+  from the screen's edges, and how it docks, opens and closes.
+
+    1  Floating        today's panel, widened to 4px each side; Close under it
+    2  Docked          4px from the sides and the foot, tall like All Modules,
+                       grabber and ✕; the bottom row steps out; pull down closes
+    3  Half, then full docked, opens at 60% under the thumb; pull up or scroll
+                       for the rest
+    4  Close inside    docked to 4px; the Close pill becomes the sheet's foot
+
+  The live panel's own open (it grows out of the pill) runs in all four.
+  Mockup only — the live index.html is untouched.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quick Actions · sheets</title>
+<link rel="icon" href="../assets/icon/qa-bolt.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" media="print" onload="this.media='all'">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { display: flex; flex-direction: column; background: #EFF5F2; font: 14px/1.4 Inter, system-ui, sans-serif; color: #1F415B; -webkit-font-smoothing: antialiased; }
+.bar { flex: none; display: flex; align-items: center; gap: 16px; min-height: 60px; padding: 10px 28px; border-bottom: 1px solid #DFE8E4; background: rgba(255, 255, 255, .6); }
+.bar > div { flex: 1 1 auto; min-width: 0; }
+.bar__t { font-weight: 700; font-size: 16px; white-space: nowrap; }
+.bar__s { font-size: 12.5px; color: #7A8684; }
+.bar nav { flex: none; display: flex; gap: 6px; max-width: 70%; overflow-x: auto; scrollbar-width: none; }
+.bar button { flex: none; height: 34px; padding: 0 14px; border: 0; border-radius: 17px; background: #fff; box-shadow: inset 0 0 0 1px #DFE8E4;
+  font: 600 13px/34px Inter, sans-serif; color: #44544A; cursor: pointer; white-space: nowrap; }
+.bar button b { font-weight: 600; opacity: .5; margin-right: 6px; }
+.bar button[aria-pressed='true'] { background: #1F515B; color: #fff; box-shadow: none; }
+.stage { flex: 1; min-height: 0; display: flex; justify-content: center; gap: 40px; padding: 22px 24px 0; }
+.cell { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: 0; }
+.cap { flex: none; width: calc(410px * var(--k, 1)); min-width: 300px; min-height: var(--cap-h, 58px); text-align: left; }
+.cap b { display: block; font-size: 15px; }
+.cap small { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.45; color: #7A8684; }
+.cap i { font-style: normal; color: #1F515B; font-weight: 600; }
+.cap button { margin-top: 6px; height: 28px; padding: 0 12px; border: 0; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px #DFE8E4; font: 600 12px Inter, sans-serif; color: #1F515B; cursor: pointer; }
+.fit { flex: none; width: calc(410px * var(--k, 1)); }
+/* zoom, not a scale transform: under a transform the live page's fixed layers
+   escape the round corners and its stuck-search observer never sees 100% */
+.phone { zoom: var(--k, 1); width: 410px; height: 864px; padding: 10px; border-radius: 56px; background: #0E0E0E; box-shadow: inset 0 0 0 2px #2B2B2B, 0 30px 60px -30px rgba(31, 65, 91, .45); }
+.scr { position: relative; width: 390px; height: 844px; border-radius: 46px; overflow: hidden; clip-path: inset(0 round 46px); background: #E6F6F5; }
+.phone iframe { display: block; width: 100%; height: 100%; border: 0; }
+@media (max-width: 900px) {
+  .bar { padding: 8px 10px; }
+  .bar > div { display: none; }
+  .bar nav { margin: 0; max-width: none; flex: 1 1 auto; }
+  .stage { padding: 0; gap: 0; }
+  .cell--now, .cap { display: none; }
+  .cell { flex: 1; }
+  .fit, .phone { zoom: 1; width: 100%; height: 100%; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+  .scr { width: 100%; height: 100%; border-radius: 0; clip-path: none; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div>
+    <div class="bar__t">Quick Actions · as a bottom sheet</div>
+    <div class="bar__s">Same containers inside. 4px outside: the sheet sits 4px from the screen’s sides. 4px inside: the sheet meets the sides and pads its content by 4px.</div>
+  </div>
+  <nav id="pick" aria-label="Version"></nav>
+  <nav id="pad" aria-label="Where the 4px goes"><button type="button" data-pad="out" aria-pressed="true">4px outside</button><button type="button" data-pad="in" aria-pressed="false">4px inside</button></nav>
+</header>
+<main class="stage" id="stage">
+  <figure class="cell cell--now">
+    <figcaption class="cap"><b>Now</b><small>The panel today: 48px in from each edge, floating over the Close pill.</small></figcaption>
+    <div class="fit"><div class="phone"><div class="scr"><iframe id="now" title="Quick Actions today" data-src="../index.html?v=2"></iframe></div></div></div>
+  </figure>
+  <figure class="cell">
+    <figcaption class="cap" id="cap"></figcaption>
+    <div class="fit"><div class="phone"><div class="scr"><iframe id="app" title="Quick Actions sheet" data-src="../index.html?v=2"></iframe></div></div></div>
+  </figure>
+</main>
+
+<script>
+const VERSIONS = [
+  { id: 'wide', name: 'Floating',
+    note: 'The panel as it is today, widened to 4px from each side — the folders gain 40px of width. It still grows out of the pill, and Close stays under it.',
+    tryit: 'Tap Close, then Quick Actions.' },
+  { id: 'docked', name: 'Docked',
+    note: 'A bottom sheet 4px from the sides and the foot, tall like All Modules, with a grabber and ✕. The bottom row steps out while it is up.',
+    tryit: 'Pull the grabber down, or tap outside.' },
+  { id: 'half', name: 'Half, then full',
+    note: 'Docked the same way, but it opens to 60% of the screen so the first folders sit under the thumb. Pull up or scroll for the rest.',
+    tryit: 'Drag the grabber up, then down.' },
+  { id: 'inside', name: 'Close inside',
+    note: 'Docked to 4px, and the Close pill stays where it was — now inside the sheet, as its foot — so the sheet and its button read as one object.',
+    tryit: 'Scroll the folders; Close stays put.' },
+]
+
+/* ══ THE SHEET AROUND THE PANEL · scoped by html[data-qs] inside the frame ══ */
+const CSS = `
+html[data-qs] .qa-menu { --qa-r: 28px; width: calc(100vw - 8px); }
+/* 4px INSIDE: the sheet meets the screen's sides, and its own padding left and right is 4px, so the folder
+   cards run nearly the full width; the title keeps a 12px indent so it lines up with the cards' heads */
+html[data-pad="in"] .qa-menu { width: 100vw; padding-left: 4px; padding-right: 4px; }
+html[data-pad="in"] .qa-title { padding-left: 12px; padding-right: 8px; }
+html[data-pad="in"][data-qs="docked"] .qa-menu, html[data-pad="in"][data-qs="half"] .qa-menu, html[data-pad="in"][data-qs="inside"] .qa-menu { bottom: 0; border-radius: 28px 28px 0 0; }
+html[data-pad="in"][data-qs="inside"] .qa-menu::after { left: 12px; right: 12px; }
+/* docked: 4px from the foot, round all round, the grabber on top */
+html[data-qs="docked"] .qa-menu, html[data-qs="half"] .qa-menu, html[data-qs="inside"] .qa-menu {
+  bottom: 4px; max-height: calc(100dvh - 56px) !important; padding-top: 30px; }
+html[data-qs="docked"] .qa-menu { height: calc(100dvh - 56px); }
+html[data-qs="half"] .qa-menu { height: 60dvh; max-height: 60dvh !important;
+  transition: opacity var(--qa-surface-in) linear, transform var(--qa-t-surface) var(--qa-ease), clip-path var(--qa-t-surface) var(--qa-ease),
+              height 420ms cubic-bezier(.32, .72, 0, 1), max-height 420ms cubic-bezier(.32, .72, 0, 1); }
+html[data-qs="half"] .qa-menu.qs-full { height: calc(100dvh - 56px); max-height: calc(100dvh - 56px) !important; }
+html[data-qs="docked"] .qa-menu::before, html[data-qs="half"] .qa-menu::before, html[data-qs="inside"] .qa-menu::before {
+  content: ""; position: absolute; top: 10px; left: 50%; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: rgba(31, 65, 91, .18); }
+/* the bottom row steps out while a docked sheet is up, as it does under All Modules */
+html[data-qs="docked"] .qa.is-open .qa-row, html[data-qs="half"] .qa.is-open .qa-row { opacity: 0; pointer-events: none; transition: opacity 200ms ease; }
+/* the title row carries the ✕ */
+html[data-qs] .qa-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.qs-x { flex: none; display: none; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: rgba(0, 0, 0, .05); color: #44544A; cursor: pointer; }
+.qs-x svg { width: 18px; height: 18px; }
+html[data-qs="docked"] .qs-x, html[data-qs="half"] .qs-x { display: grid; }
+/* close inside: the sheet runs to the foot and keeps a lane for the pill, which sits over it */
+html[data-qs="inside"] .qa-menu { height: calc(100dvh - 56px); padding-bottom: calc(var(--qa-b) + var(--qa-h) + 8px); z-index: 1; }
+html[data-qs="inside"] .qa-row { z-index: 2; }
+html[data-qs="inside"] .qa-menu::after { content: ""; position: absolute; left: 24px; right: 24px; bottom: calc(var(--qa-b) + var(--qa-h) + 4px); height: 1px; background: rgba(31, 65, 91, .08); }
+html[data-qs="inside"] .qa.is-open .qa-pill { background: #F2F5F4; box-shadow: none; }
+`
+const X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'
+
+const $ = (s) => document.querySelector(s)
+const app = $('#app'), now = $('#now'), cap = $('#cap'), pick = $('#pick')
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+let cur = VERSIONS[0].id, pad = 'out'
+const padNav = $('#pad')
+
+const isOpen = (d) => d.querySelector('.qa')?.classList.contains('is-open')
+function openPanel(d) { if (!isOpen(d)) d.querySelector('.qa-pill').click() }
+async function closePanel(d) { if (isOpen(d)) { d.querySelector('.qa-pill').click(); await sleep(420) } }
+
+function wire(d) {
+  const st = d.createElement('style'); st.textContent = CSS; d.head.append(st)
+  const menu = d.querySelector('.qa-menu'), pill = d.querySelector('.qa-pill')
+  const title = menu.querySelector('.qa-title')
+  if (title && !title.querySelector('.qs-x')) {
+    title.insertAdjacentHTML('beforeend', `<button type="button" class="qs-x" aria-label="Close">${X}</button>`)
+    title.querySelector('.qs-x').addEventListener('click', (e) => { e.stopPropagation(); pill.click() })
+  }
+  /* pull on the head: down closes; on the half sheet, up opens it full */
+  let drag = null
+  menu.addEventListener('pointerdown', (e) => {
+    const v = d.documentElement.dataset.qs
+    if (!['docked', 'half', 'inside'].includes(v) || e.target.closest('button, input')) return
+    if (e.clientY - menu.getBoundingClientRect().top > 76) return
+    drag = { y: e.clientY, dy: 0 }
+    menu.style.transition = 'none'; menu.setPointerCapture(e.pointerId)
+  })
+  menu.addEventListener('pointermove', (e) => {
+    if (!drag) return
+    drag.dy = e.clientY - drag.y
+    menu.style.transform = `translate(-50%, ${Math.max(0, drag.dy)}px)`
+  })
+  const end = () => {
+    if (!drag) return
+    const dy = drag.dy; drag = null
+    menu.style.transition = ''; menu.style.transform = ''
+    if (dy > 110) { menu.classList.remove('qs-full'); pill.click() }
+    else if (dy < -30 && d.documentElement.dataset.qs === 'half') menu.classList.add('qs-full')
+    else if (dy > 40 && menu.classList.contains('qs-full')) menu.classList.remove('qs-full')
+  }
+  menu.addEventListener('pointerup', end); menu.addEventListener('pointercancel', end)
+  /* half: a scroll in the folders opens it full first */
+  const body = menu.querySelector('.qa-body')
+  body?.addEventListener('wheel', (e) => {
+    if (d.documentElement.dataset.qs === 'half' && !menu.classList.contains('qs-full') && e.deltaY > 0) { e.preventDefault(); menu.classList.add('qs-full') }
+  }, { passive: false })
+  let by = null
+  body?.addEventListener('pointerdown', (e) => { by = e.clientY })
+  body?.addEventListener('pointermove', (e) => {
+    if (by != null && d.documentElement.dataset.qs === 'half' && !menu.classList.contains('qs-full') && by - e.clientY > 14) { by = null; menu.classList.add('qs-full') }
+  })
+  body?.addEventListener('pointerup', () => { by = null })
+  /* closing from anywhere resets the half sheet to half */
+  new MutationObserver(() => { if (!isOpen(d)) menu.classList.remove('qs-full') }).observe(d.querySelector('.qa'), { attributes: true, attributeFilter: ['class'] })
+}
+
+async function show(id) {
+  cur = id
+  const v = VERSIONS.find((x) => x.id === id), n = VERSIONS.indexOf(v) + 1
+  cap.innerHTML = `<b>${n} · ${v.name}</b><small>${v.note} <i>${v.tryit}</i></small><button type="button" id="again">Open it again</button>`
+  $('#again').addEventListener('click', () => { const d = app.contentDocument; if (d) openPanel(d) })
+  for (const b of pick.children) b.setAttribute('aria-pressed', b.dataset.v === id)
+  try { history.replaceState(null, '', `#${id}`) } catch {}
+  fit()
+  const d = app.contentDocument
+  if (!d || !d.documentElement.dataset.qsWired) return
+  await closePanel(d)
+  d.documentElement.dataset.qs = id
+  await sleep(80)
+  openPanel(d)
+}
+
+VERSIONS.forEach((v, i) => pick.insertAdjacentHTML('beforeend',
+  `<button type="button" data-v="${v.id}" aria-pressed="false"><b>${i + 1}</b>${v.name}</button>`))
+pick.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && b.dataset.v !== cur) show(b.dataset.v) })
+padNav.addEventListener('click', async (e) => {
+  const b = e.target.closest('button'); if (!b || b.dataset.pad === pad) return
+  pad = b.dataset.pad
+  for (const x of padNav.children) x.setAttribute('aria-pressed', x === b)
+  const d = app.contentDocument; if (!d || !d.documentElement.dataset.qsWired) return
+  await closePanel(d); d.documentElement.dataset.pad = pad; await sleep(80); openPanel(d)
+})
+addEventListener('keydown', (e) => {
+  if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return
+  const i = VERSIONS.findIndex((v) => v.id === cur), j = (i + (e.key === 'ArrowRight' ? 1 : -1) + VERSIONS.length) % VERSIONS.length
+  show(VERSIONS[j].id)
+})
+
+function ready(frame) {
+  return new Promise((res) => {
+    let tries = 0
+    const wait = () => {
+      const d = frame.contentDocument
+      if (d && d.querySelector('.qa-pill') && d.querySelector('.qa-menu')) res(d)
+      else if (tries++ < 200) setTimeout(wait, 100)
+    }
+    wait()
+  })
+}
+function toTop(frame) {
+  const w = frame.contentWindow, d = frame.contentDocument
+  w.scrollTo(0, 0); if (!w.scrollY) d.querySelector('.search-row')?.classList.remove('is-stuck')
+}
+for (const frame of [now, app]) {
+  frame.addEventListener('load', async () => {
+    const d = await ready(frame)
+    ;[200, 900].forEach((ms) => setTimeout(() => toTop(frame), ms))
+    if (frame === app) { wire(d); d.documentElement.dataset.qsWired = '1'; d.documentElement.dataset.qs = cur; d.documentElement.dataset.pad = pad }
+    await sleep(1400)
+    toTop(frame)
+    openPanel(d)
+  })
+  /* set here, after the listener: a cached page can finish loading before this script runs */
+  frame.src = frame.dataset.src
+}
+
+/* two phones side by side, scaled to the window's height; both captions take
+   the taller one's height so the phones stay level */
+function fit() {
+  const root = document.documentElement, caps = [...document.querySelectorAll('.cap')]
+  root.style.removeProperty('--cap-h')
+  const c = Math.max(58, ...caps.map((x) => x.offsetHeight))
+  const k = Math.min(1, ($('#stage').clientHeight - 22 - c - 14 - 16) / 864)
+  root.style.setProperty('--k', Math.max(.5, k).toFixed(3))
+  root.style.setProperty('--cap-h', `${Math.max(58, ...caps.map((x) => x.offsetHeight))}px`)
+}
+addEventListener('resize', fit)
+const [hash, hashPad] = location.hash.slice(1).split('-')
+if (hashPad === 'in') { pad = 'in'; for (const x of padNav.children) x.setAttribute('aria-pressed', x.dataset.pad === 'in') }
+show(VERSIONS.some((v) => v.id === hash) ? hash : cur)
+</script>
+</body>
+</html>

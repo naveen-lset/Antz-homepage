@@ -408,3 +408,69 @@ First deployed as `home-page-changes-hk1keyz0x` (12:22). Production is now the l
 - **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Every commit from 19 Oct onwards, including this one, is on this Mac only. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
 - **Not synced:** `mockups/web-v3/widgets-preview.html` still has the older sheet and tabs.
 - `.hub.json` is committed (in `8d1a398`) but kept out of deploys.
+
+# Session 21 Oct 2026: Figma module sheet and icons, Quick Actions on the phone
+
+## Run it
+`python3 -m http.server 8080` from `/Users/naveen/Home Page`, then <http://localhost:8080/Antz-Selected-Modules/?v=2>.
+- Check at 390 wide (phone) and 820 wide (iPad).
+- All Modules: the round Modules button, bottom left. Quick Actions: the pill.
+- The working tree loads `review.css?v=20261021r`.
+
+## Built and live (production `home-page-changes-64d1wv9mr`, <https://home-page-changes.vercel.app/?v=2>)
+- **All Modules sheet = Figma `S3frvvs4t7dP5P9YaFXoAn` node 67918:13710** (owner: "use icons from here … one row Module Placement has like these. Do not Add: Recents, Category").
+  - One grid of 17 modules (`.mview__grid--all` in `render(enter)`). Natality, Animals and Approvals were removed from `VIEW`.
+  - The Recent row, the category heads and the grid/list switch are gone. The list view's swipe Add/Remove went with the switch.
+  - Phone: 3 to a row, 107px white r12 cards, 13px names. Tablet (744+): 3 to a row, 150px cards, 52px icons, 16px names (`.mview .mview__grid--all` in a media block in `review.css`).
+  - Cards rise in on open and the icons pop: `render(true)`, `mvCardIn` / `mvIcoPop`. A press sinks the card.
+- **Icons: `assets/icon/mf-*.svg`, mapped in a new shared module `js/data/figIcons.js`.**
+  - `FIG` maps module to file. Help Desk comes from node 67927:13728. Focus Hub's star comes from node 67927:13784 (see below).
+  - `INK` holds each icon's measured ink box, and `inkFit()` scales every icon to the same visual size. A new icon needs its own `INK` line.
+  - Owner-confirmable mappings: Necropsy uses the Lab mark, Audit the Inventory clipboard.
+  - Training and Security have no Figma icon. They keep their glyph, painted with the Figma gradient (#00D6C9→#37BD69, 118deg) through a mask.
+  - Housing and Announcements use Figma's bare vectors. Announcements is turned 25° inside its frame, as Figma does (`.mview__fig`).
+  - **Figma gotchas:**
+    - A frame's `export` SVG carries the whole ancestor stack (grey section, card, shadow).
+    - A component instance can come out of `get_design_context` as its master. Focus Hub's star came out grey, 1px, 24px. The right file is `download_assets` → the svgAsset at the instance's size (46×44, gradient, 4px).
+- **Home cards on V2 wear the same icons in white.** `glyph()` in ModuleCard.js tags `data-fig`, and `review.css` swaps the `<img>` (`content: var(--fig)` + `filter: brightness(0) invert(1)`).
+  - The wide Mortality count card takes the Figma mark too.
+  - Natality, Hospital, Administer and Security keep theirs, because the frame has no icon for them.
+- **"My Focus Hub" is now "Focus Hub"** (module name and the Focus Hub card's title).
+- **Quick Actions, V2:**
+  - **Removed:** the foot (Search everything, Edit Modules; `qa-foot--bare` keeps only "No action matches"), the Drafts strip, and the Continue rows in search results.
+  - **Icons:** from Figma `CNhiaOGCLdnlNxj7x2Ohrd` node 1015:11345 (`assets/icon/qa2-*.svg`, `QA_FIG` in `js/data/quickActions.js`), with the frame's own assignments: the clinic house for Medical, Dispense and Missing; the paw for Site, Section and Enclosure.
+    - Each glyph sits in a ring. The ring and the glyph are painted in the row's text colour, #44544A, through masks.
+    - The clinic house is the exception: it stays an `<img>` with `grayscale(.8)`, because a mask fills its light inner stroke.
+    - Folder heads wear filled marks borrowed from the module set (`QA_FIG_HEAD`), also in #44544A. Operations uses the reports sheet, an outline, because no filled one exists.
+  - **Phone (≤743), the owner's pick from the mockups:** the floating panel sits 4px from the screen's sides with 12px inside. It has no bottom padding and no fade at the foot of the list, and 28px rings. Tablet keeps the old panel and 32px rings.
+- **Review mockups**, uncommitted until today:
+  - `mockups/quick-actions-concepts.html` — six foot-less ideas.
+  - `mockups/quick-actions-mobile.html` — four phone sheets built on the All Modules sheet.
+  - `mockups/quick-actions-sheets.html` — four sheet frames plus a "4px outside / inside" switch. The owner picked "Floating", which is now built.
+
+## Design Links hub
+- **The ANTZ home is now ONE entry, `home/antz-home/responsive`** (device "responsive", rev 1, 21 Oct note). `.hub.json` points at it.
+- The earlier `home/antz-home/mobile` (rev 2 today) and `/tablet` entries are **retired** (reversible).
+- **Gotcha:** a POST that carries `deploy_project: home-page-changes` matches the old mobile entry and returns `unchanged`, even with `force_new`. Update the responsive entry by `entry_id` and leave `deploy_project` out.
+- **The hub draws "responsive" as a MacBook plus an iPhone.** That is hard-coded in its `app.js`. The owner says the home is tablet and phone only (see open questions).
+
+## Deploying
+Same as 20 Oct:
+1. Make a clean copy (`git ls-files -co --exclude-standard`, minus `.hub.json`).
+2. `vercel link --yes --project home-page-changes --scope naveen-lsets-projects`, then delete `.env.local`.
+3. `vercel deploy --prod --yes`.
+
+Today's production deploys: 39mklceqj → qdvkucvxg → nnd43xucl → 5xhhnyvq1 → 3jxg7dt13 → **64d1wv9mr** (current).
+
+## Open questions for the owner
+- **Hub card for a tablet + phone build:** pick one.
+  - Two cards (iPad and Phone; they group in the Home folder on the Modules page).
+  - Ask Sourav for an iPad + iPhone responsive option.
+  - Keep the laptop + phone card.
+- **Icon mappings to confirm:** Necropsy = Lab, Audit = Inventory. Training and Security still need Figma icons, and so does a filled Operations head.
+- **The Quick Actions Figma frame (1015:11345) also has filter chips and a tile grid.** Only its icons were taken. Should the layout follow?
+
+## Not done
+- **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
+- **Left uncommitted on purpose:** the iPad Recents tabs and ticker outline, made by another session (home-page-95). These are two comments in `mountAnimals`, plus `review.css`'s "RECENTS AND THE TICKER'S OUTLINE" section and the rules it moved. They are **live**, because the deploys went from the working tree, but they are not in this commit. That session should commit them.
+- **Production matches the working tree, not this commit:** it also carries those iPad changes.
