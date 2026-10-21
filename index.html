@@ -43574,8 +43574,8 @@ function mountAnimals(root) {
     `<button type="button" class="fav__tab" role="tab" data-tab="${t.id}" aria-controls="favRail" aria-label="${t.label}" title="${t.label}">${TI[t.id]}<span class="fav__tabl" aria-hidden="true">${t.label}</span></button>`).join('')
   head.append(tabs); rail.id = 'favRail'; rail.setAttribute('role', 'tabpanel')
   /* the tabs and the rail share one box on a phone — since 19 Oct 2026 the
-     white folder drawn below (THE WHITE FOLDER); from 744 up the box is
-     display: contents and changes nothing */
+     white folder drawn below (THE WHITE FOLDER), on a tablet too since 21 Oct;
+     on the web home the box is display: contents and changes nothing */
   const box = document.createElement('div'); box.className = 'fav__box'
   head.before(box); box.append(head, rail)
   const bar = tabs.querySelector('.fav__tabbar')
@@ -43623,8 +43623,8 @@ function mountAnimals(root) {
      the tabs and the cards — no outline (owner: "remove the outline"; a 7%
      hairline was laid over it at first) — and when the pick moves it glides
      to the new tab on the tabs' 460ms curve, read against the tab every
-     frame. From 744 up the layer is display: none (review.css) and nothing is
-     drawn. */
+     frame. A tablet draws it too (21 Oct 2026); on the web home the layer is
+     display: none (review.css) and nothing is drawn. */
   const NS = 'http://www.w3.org/2000/svg'
   const layer = (cls) => { const s = document.createElementNS(NS, 'svg'), p = document.createElementNS(NS, 'path')
     s.setAttribute('class', `fav__fold ${cls}`); s.setAttribute('aria-hidden', 'true'); s.append(p); return p }

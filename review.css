@@ -496,51 +496,13 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
   html:root[data-review][data-home='v2'] .search__hint { left: 48px; max-width: calc(100% - 64px); font-size: 14px; }
   html:root[data-review][data-home='v2'] :is(.search__hint-lead, .search__cycle) { font-size: 14px; }
 
-  /* ── Recents · SOFT PILLS AND A WHITE FOLDER (owner, 19 Oct 2026: "implement
-     the Soft Pills", variant A of mockups/recents-folder-tabs.html, after
-     "background has to white, don't add too much outline, make more
-     premium"). 12 under the search and 16 over the band's foot, as before.
-     The four tabs are soft white pills, 54 tall, 6 apart (the mockup's 8,
-     "pills between, can you reduce little"), each its 20 mark over its 12.5
-     name. Every corner is r12 like the page's other containers — the search,
-     Announcements, Observation Notes, the module cards (owner, 19 Oct 2026:
-     "follow the corner radius of other containers"; an r8 pass came first).
-     The picked one turns white and opens into the rail as one folder:
-     the band's script draws it as one SVG path (.fav__fold) — white with a
-     soft shadow under the tabs and the cards, and no outline at all ("remove
-     the outline"; a 7% hairline came first) — and glides it to the next tab
-     on the tabs' 460ms curve. No bar. The rail sits 12 inside the folder,
-     the inset those containers keep ("there is no breathing space");
-     132 × 158 cards 6 apart at r10;
-     AAID:n 14 Medium, the species 12 at 90% ── */
+  /* ── Recents · the folder and its soft pills are shared with the tablet now
+     (RECENTS AND THE TICKER'S OUTLINE, after this block); what stays here is
+     the phone's own measure: 12 under the search and 16 over the band's foot,
+     132 × 158 cards 6 apart at r10 ── */
   html:root[data-review][data-home='v2'] .fav-band:not([hidden]) { padding-top: 12px; padding-bottom: 16px; gap: 0; }
-  html:root[data-review][data-home='v2'] .fav__box { position: relative; isolation: isolate; display: flex; flex-direction: column; gap: 0; min-width: 0; border-radius: 0; background: none; }
-  html:root[data-review][data-home='v2'] .fav__head { position: relative; z-index: 1; height: auto; }
-  html:root[data-review][data-home='v2'] .fav__rail { position: relative; z-index: 1; gap: 6px; margin: 0; padding: 12px; border-radius: 12px; scroll-padding-inline: 12px; }
+  html:root[data-review][data-home='v2'] .fav__rail { gap: 6px; }
   html:root[data-review][data-home='v2'] .fav__card { width: 132px; flex-basis: 132px; height: 158px; padding: 12px; border-radius: 10px; background: #EEF5F6; }
-  html:root[data-review][data-home='v2'] .fav__tabs { --tab-hug: 0; gap: 6px; height: auto; align-items: flex-end; box-shadow: none; }
-  html:root[data-review][data-home='v2'] .fav__tab { --tab-gap: 6px; flex: 1 1 0; width: auto; min-width: 0; height: 54px; margin-bottom: 8px; padding: 0 4px; overflow: visible;
-    flex-direction: column; justify-content: center; gap: 6px; border-radius: 12px; background-color: rgba(255, 255, 255, .55);
-    color: rgba(68, 84, 74, .88); font: 500 12.5px/1 Inter, var(--font); letter-spacing: .1px;
-    transition: background-color .3s ease .14s, color .26s ease; }   /* the pill comes back once the folder has left it */
-  html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] { color: var(--c-on-primary-ctr, #1F515B); background-color: transparent; transition: background-color .1s, color .26s ease; }
-  html:root[data-review][data-home='v2'] .fav__tab:focus-visible { outline-offset: -3px; border-radius: 12px; }
-  html:root[data-review][data-home='v2'] .fav__tab svg { width: 20px; height: 20px; transition: none; }
-  html:root[data-review][data-home='v2'] .fav__tabl { max-width: none; margin: 0; opacity: 1; transition: none; }
-  html:root[data-review][data-home='v2'] .fav__tab[aria-selected='true'] .fav__tabl { max-width: none; margin: 0; font-weight: 600; }
-  html:root[data-review][data-home='v2'] .fav__tabbar { display: none; }
-  html:root[data-review][data-home='v2'] .fav__fold { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-  html:root[data-review][data-home='v2'] .fav__fold--fill { z-index: 0; filter: drop-shadow(0 1px 2px rgba(31, 65, 91, .06)) drop-shadow(0 10px 22px rgba(31, 65, 91, .09)); }
-  html:root[data-review][data-home='v2'] .fav__fold--fill path { fill: #fff; }
-  /* under the climate header's dark sky the soft pills go glassy and their ink white; the folder stays white */
-  html:root[data-review][data-home='v2'].has-wsky[data-sky-tone='dark'] .fav__tab:not([aria-selected='true']) { background-color: rgba(255, 255, 255, .18); color: rgba(255, 255, 255, .88); }
-  @media (prefers-reduced-motion: reduce) {
-    html:root[data-review][data-home='v2'] .fav__tab { transition: none; }
-  }
-  /* a 320–359 phone: a quarter is under 70, so "Bookmarks" steps down to fit its pill */
-  @media (max-width: 359px) {
-    html:root[data-review][data-home='v2'] .fav__tab { padding: 0 2px; font-size: 11px; letter-spacing: 0; }
-  }
   html:root[data-review][data-home='v2'] .fav__txt { gap: 2px; }
   html:root[data-review][data-home='v2'] .fav__name { font-size: 14px; font-weight: 500; line-height: normal; letter-spacing: .1px; text-shadow: none; }
   html:root[data-review][data-home='v2'] .fav__idsep { font-size: 0; }
@@ -554,27 +516,7 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
      13 to the rule ── */
   html:root[data-review][data-home='v2'] .hstrip { margin-top: 14px; border-radius: 12px; box-shadow: inset 0 0 0 .5px #FFE86E; }   /* 993:1828: 14 under the sky's foot (455 − 441) */
   html:root[data-review][data-home='v2'] .hstrip__lane { height: 42px; border-radius: 12px; }
-  /* THE OUTLINE RUNS (owner, 6 Oct 2026: "here outline has to animate" — the
-     running light, picked over a pulse and a one-off draw). The .5 #FFE86E
-     edge is drawn ABOVE the cap now (the cap had hidden it at the left), and
-     a short warm streak laps it every 3s, like the LIVE signal beside it.
-     Masked to a 1.5 ring so it never touches the words; still for reduced
-     motion. */
   html:root[data-review][data-home='v2'] .hstrip__cap { border-radius: 12px 0 0 12px; }
-  html:root[data-review][data-home='v2'] .hstrip { box-shadow: none; }
-  html:root[data-review][data-home='v2'] .hstrip::before,
-  html:root[data-review][data-home='v2'] .hstrip::after {
-    content: ''; position: absolute; inset: 0; z-index: 4; border-radius: inherit; pointer-events: none;
-  }
-  html:root[data-review][data-home='v2'] .hstrip::before { box-shadow: inset 0 0 0 .5px #FFE86E; }
-  html:root[data-review][data-home='v2'] .hstrip::after {
-    padding: 1.5px;
-    background: conic-gradient(from var(--hs-run), transparent 0deg, transparent 290deg, rgba(255, 232, 110, .35) 320deg, #FFE86E 350deg, #FFFBE0 356deg, transparent 360deg);  /* light: the edge's own #FFE86E to near-white (owner: "too dark, make it light") */
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-    animation: hs-run 3s linear infinite;
-  }
   html:root[data-review][data-home='v2'] .hstrip__lead { display: none; }
   html:root[data-review][data-home='v2'] .hstrip__it { gap: 8px; padding-right: 13px; }
   html:root[data-review][data-home='v2'] .hstrip__txt { font-size: 12px; font-weight: 400; color: #44544A; }
@@ -642,7 +584,76 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
   html:root[data-review][data-home='v2'] #moduleGrid .card[data-layout='v2-ki'] { padding: 12px 16px; border-radius: 12px; }
 }
 
-/* the ticker's running outline (phone block above) */
+/* RECENTS AND THE TICKER'S OUTLINE · THE PHONE'S ON THE TABLET TOO (owner, 21 Oct
+   2026, of the iPad: "update the Tabs System same as Mobile", then of its ticker:
+   "Animation not there same as Mobile"). Both moved out of the phone block as they
+   were; :where() keeps their weight where it was, so the 320–359 step still wins.
+   The web home (data-v2desk) keeps its own rail and ticker. A tablet keeps its own
+   148 cards 8 apart and its ticker's 8 corners: the folder and the outline follow them. */
+/* ── Recents · SOFT PILLS AND A WHITE FOLDER (owner, 19 Oct 2026: "implement
+   the Soft Pills", variant A of mockups/recents-folder-tabs.html, after
+   "background has to white, don't add too much outline, make more
+   premium"). 12 under the search and 16 over the band's foot, as before.
+   The four tabs are soft white pills, 54 tall, 6 apart (the mockup's 8,
+   "pills between, can you reduce little"), each its 20 mark over its 12.5
+   name. Every corner is r12 like the page's other containers — the search,
+   Announcements, Observation Notes, the module cards (owner, 19 Oct 2026:
+   "follow the corner radius of other containers"; an r8 pass came first).
+   The picked one turns white and opens into the rail as one folder:
+   the band's script draws it as one SVG path (.fav__fold) — white with a
+   soft shadow under the tabs and the cards, and no outline at all ("remove
+   the outline"; a 7% hairline came first) — and glides it to the next tab
+   on the tabs' 460ms curve. No bar. The rail sits 12 inside the folder,
+   the inset those containers keep ("there is no breathing space"). The cards
+   inside are each width's own: the phone block's 132s, the tablet's 148s ── */
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__box { position: relative; isolation: isolate; display: flex; flex-direction: column; gap: 0; min-width: 0; border-radius: 0; background: none; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__head { position: relative; z-index: 1; height: auto; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__rail { position: relative; z-index: 1; margin: 0; padding: 12px; border-radius: 12px; scroll-padding-inline: 12px; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tabs { --tab-hug: 0; gap: 6px; height: auto; align-items: flex-end; box-shadow: none; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tab { --tab-gap: 6px; flex: 1 1 0; width: auto; min-width: 0; height: 54px; margin-bottom: 8px; padding: 0 4px; overflow: visible;
+  flex-direction: column; justify-content: center; gap: 6px; border-radius: 12px; background-color: rgba(255, 255, 255, .55);
+  color: rgba(68, 84, 74, .88); font: 500 12.5px/1 Inter, var(--font); letter-spacing: .1px;
+  transition: background-color .3s ease .14s, color .26s ease; }   /* the pill comes back once the folder has left it */
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tab[aria-selected='true'] { color: var(--c-on-primary-ctr, #1F515B); background-color: transparent; transition: background-color .1s, color .26s ease; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tab:focus-visible { outline-offset: -3px; border-radius: 12px; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tab svg { width: 20px; height: 20px; transition: none; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tabl { max-width: none; margin: 0; opacity: 1; transition: none; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tab[aria-selected='true'] .fav__tabl { max-width: none; margin: 0; font-weight: 600; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tabbar { display: none; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__fold { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__fold--fill { z-index: 0; filter: drop-shadow(0 1px 2px rgba(31, 65, 91, .06)) drop-shadow(0 10px 22px rgba(31, 65, 91, .09)); }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__fold--fill path { fill: #fff; }
+/* under the climate header's dark sky the soft pills go glassy and their ink white; the folder stays white */
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])).has-wsky[data-sky-tone='dark'] .fav__tab:not([aria-selected='true']) { background-color: rgba(255, 255, 255, .18); color: rgba(255, 255, 255, .88); }
+@media (prefers-reduced-motion: reduce) {
+  html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tab { transition: none; }
+}
+/* a 320–359 phone: a quarter is under 70, so "Bookmarks" steps down to fit its pill */
+@media (max-width: 359px) {
+  html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tab { padding: 0 2px; font-size: 11px; letter-spacing: 0; }
+}
+/* THE OUTLINE RUNS (owner, 6 Oct 2026: "here outline has to animate" — the
+   running light, picked over a pulse and a one-off draw). The .5 #FFE86E
+   edge is drawn ABOVE the cap now (the cap had hidden it at the left), and
+   a short warm streak laps it every 3s, like the LIVE signal beside it.
+   Masked to a 1.5 ring so it never touches the words; still for reduced
+   motion. */
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .hstrip { box-shadow: none; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .hstrip::before,
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .hstrip::after {
+  content: ''; position: absolute; inset: 0; z-index: 4; border-radius: inherit; pointer-events: none;
+}
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .hstrip::before { box-shadow: inset 0 0 0 .5px #FFE86E; }
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .hstrip::after {
+  padding: 1.5px;
+  background: conic-gradient(from var(--hs-run), transparent 0deg, transparent 290deg, rgba(255, 232, 110, .35) 320deg, #FFE86E 350deg, #FFFBE0 356deg, transparent 360deg);  /* light: the edge's own #FFE86E to near-white (owner: "too dark, make it light") */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: hs-run 3s linear infinite;
+}
+
+/* the ticker's running outline (RECENTS AND THE TICKER'S OUTLINE above) */
 @property --hs-run { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 @keyframes hs-run { to { --hs-run: 360deg; } }
 @media (prefers-reduced-motion: reduce) {
@@ -1345,8 +1356,8 @@ html:root[data-review][data-home='v2'][data-v2desk] .v2d-pend .l-v2sn__head { he
    and spreads into the empty room beside its neighbours' marks, which stay
    put; the bar then spans the name (place(), in the band's script). */
 html:root[data-review][data-home='v2'] .fav-band.has-tabs .fav__head { display: flex; align-items: center; height: auto; min-height: 22px; }
-.fav__box { display: contents; }   /* the phone's card around the tabs and the rail (993:2564, the phone block) */
-.fav__fold { display: none; }      /* the phone's white folder (the phone block); nothing from 744 up */
+.fav__box { display: contents; }   /* the folder around the tabs and the rail on a phone or tablet (RECENTS AND THE TICKER'S OUTLINE); flat on the web home */
+.fav__fold { display: none; }      /* the white folder (RECENTS AND THE TICKER'S OUTLINE); nothing on the web home */
 .fav-band.has-tabs .fav__edit { display: none; }
 .fav__tabs { flex: 1; min-width: 0; position: relative; display: flex; margin: 0; box-shadow: inset 0 -1px 0 rgba(31, 65, 91, .14); }
 .fav__tab { --tab-gap: 8px; position: relative; z-index: 1; flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; height: 52px; padding: 0 3px 6px; border: 0; background: none;

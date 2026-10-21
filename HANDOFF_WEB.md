@@ -474,3 +474,42 @@ Today's production deploys: 39mklceqj → qdvkucvxg → nnd43xucl → 5xhhnyvq1 
 - **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
 - **Left uncommitted on purpose:** the iPad Recents tabs and ticker outline, made by another session (home-page-95). These are two comments in `mountAnimals`, plus `review.css`'s "RECENTS AND THE TICKER'S OUTLINE" section and the rules it moved. They are **live**, because the deploys went from the working tree, but they are not in this commit. That session should commit them.
 - **Production matches the working tree, not this commit:** it also carries those iPad changes.
+
+# Session 21 Oct 2026 (home-page-95): phone home pushed to Figma; iPad Recents tabs and ticker outline
+
+## Run it
+`python3 -m http.server 8080` from `/Users/naveen/Home Page`, then <http://localhost:8080/Antz-Selected-Modules/>. Check the phone at 390 wide and the iPad at 744, 820, 1024, 1180 and 1366.
+
+## Built
+- **Figma: the phone home as plain layers** (owner: "Push the Mobile Screen in the Figma File. Don't create components … accurate").
+  - Frame `1010:600` "Mobile · Home (21 Oct)" in file `CNhiaOGCLdnlNxj7x2Ohrd`, page "Claude Screens". It sits at (3117, −552), right of the 19 Oct frame `977:581`.
+  - It is 390 × 3235, the full page at first load: announcement card 1, the ticker at its start, search "Animals". It has 270 layers named after the page's classes, and no components. The bottom dock is a "Bottom dock" frame, fixed when the prototype scrolls.
+  - Built from this morning's live page (`4105e3b`), so it does not show the other session's 21 Oct sheet, icon and Quick Actions changes.
+  - Pixel diff of Figma's 1× render against Chrome: 1.5% of pixels differ, all text anti-aliasing and half-pixel card edges.
+  - Not native layers:
+    - The KPI numbers (76, 192, 2,411, 110,020) are outlined, because the page forces DM Sans `opsz 14`.
+    - The 👋🏻 is an image.
+    - The live icon is `assets/icon/hs-live-still.png`.
+  - Left out on purpose: the closed drawer's shadow bleeding into the left edge (the 19 Oct live bug, still live).
+- **iPad Recents tabs = the phone's** (owner: "For ipad also … update the Tabs System same as Mobile"). The soft pills, the white folder and its 460ms glide now run from 744 up.
+  - The tablet keeps its own 148 × 158 cards, 8 apart, now inside the folder at a 12 inset.
+- **iPad ticker outline = the phone's** (owner: "Animation not there same as Mobile"). The .5 #FFE86E edge plus the running light (`hs-run`, 3s), on the tablet's own 8px corners.
+- **Where it lives:**
+  - `review.css`: the section "RECENTS AND THE TICKER'S OUTLINE", just before `@property --hs-run`. Those rules moved out of the phone block unchanged and are scoped `:where(:not([data-v2desk]))`.
+    - `:where()` adds no weight, so the 320–359 step still wins and the phone renders exactly as before (checked).
+    - The web home (data-v2desk) is untouched.
+  - `index.html`: two comments in `mountAnimals` only. `foldTo()` already worked at any width.
+- **Live:** the other session's production deploy `home-page-changes-64d1wv9mr` (<https://home-page-changes.vercel.app/?v=2>) was made from the working tree, so it includes this.
+
+## Open questions for the owner
+- Should the iPad ticker take the phone's 12px corners? It keeps the tablet's 8 for now.
+- Should the iPad cards drop to the phone's 132? They keep 148.
+
+## Not done
+- **This commit takes only this session's hunks.** The other session's 21 Oct work stays uncommitted in the working tree for it to commit:
+  - the All Modules sheet, the white card icons, and Quick Actions, in `index.html` and `review.css` (and the `review.css?v=` bump, now `r`);
+  - `assets/icon/mf-*.svg` and `qa2-*.svg`;
+  - `mockups/quick-actions-*.html`;
+  - `.hub.json`.
+- **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
+- The Figma build scripts lived in the session scratchpad and are gone. The method is in memory (figma-mobile-push).
