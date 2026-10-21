@@ -535,5 +535,8 @@ Today's production deploys: 39mklceqj → qdvkucvxg → nnd43xucl → 5xhhnyvq1 
 ## Open questions for the owner
 - The chosen switch mark is still #006D35 (17 Oct); should it be Antz Primary #37BD69 like the rest of the sheet?
 
+## Live
+- **Deployed 21 Oct 2026** (owner: "Deploy in Vercel after close the session"): production `home-page-changes-gftaeafgd` → <https://home-page-changes.vercel.app/?v=2>, from a clean copy of `e755b82` (`git ls-files -co` minus `.hub.json`; the `.env.local` that `vercel link` writes deleted). The live `index.html` and `review.css` match `e755b82` byte for byte.
+
 ## Not done
 - **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
