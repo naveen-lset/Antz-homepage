@@ -13919,7 +13919,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261021r">
+<link rel="stylesheet" href="review.css?v=20261021s">
 </head>
 
 <style>
@@ -54051,7 +54051,28 @@ if (document.documentElement.dataset.review && isV2()) {
 
   /* ONE GRID, NOTHING ELSE (owner, 21 Oct 2026, over Figma 67918:13710: "Bottomsheet one
      row Module Placement has like these. Do not Add: Recents, Category and all, list all modules
-     that all"): no grid/list switch, no Recent row, no category heads — the twenty, three to a row. */
+     that all"): no Recent row, no category heads — the seventeen, three to a row. */
+  /* GRID OR LIST, BACK BESIDE THE SEARCH (owner, 21 Oct 2026: "Near Search Add Option like grid &
+     List view. on old varsion is there right"): the 17 Oct switch — the 7D · 30D · 30+ control's
+     pill, remembered — over the same seventeen, as the cards or as rows with their one line and
+     the swipe to add to Home or remove. Still no categories, no Recent. */
+  const MODE_KEY = 'antz.mview.mode'
+  let mode = 'grid'
+  try { if (localStorage.getItem(MODE_KEY) === 'list') mode = 'list' } catch { /* no storage: cards */ }
+  const setMode = (m) => {
+    if (m === mode) return
+    mode = m; openRow = null
+    try { localStorage.setItem(MODE_KEY, m) } catch { /* not remembered, still switched */ }
+    render('swap'); list.scrollTop = 0; nudge()
+  }
+  const GRID_I = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>'
+  const LIST_I = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="4" y="5" width="4.5" height="4.5" rx="1.5"/><rect x="11" y="5.75" width="9" height="3" rx="1.5"/><rect x="4" y="14.5" width="4.5" height="4.5" rx="1.5"/><rect x="11" y="15.25" width="9" height="3" rx="1.5"/></svg>'
+  const modeSw = document.createElement('div')
+  modeSw.className = 'mview__mode'; modeSw.setAttribute('role', 'group'); modeSw.setAttribute('aria-label', 'Show modules as')
+  modeSw.innerHTML = `<button type="button" data-mode="grid" aria-label="Grid" title="Grid">${GRID_I}</button>` +
+    `<button type="button" data-mode="list" aria-label="List" title="List">${LIST_I}</button>`
+  modeSw.addEventListener('click', (e) => { const b = e.target.closest('[data-mode]'); if (b) setMode(b.dataset.mode) })
+  sheet.querySelector('.mview__tools').append(modeSw)
   /* THE OWNER'S TWENTY (19 Oct 2026: "In Your Modules: Pharmacy, Necropsy,
      Collection, Animals, Training, Mortality, Natality, Fetal Death, Eggs,
      My Focus Hub, Housing, Diet, Audit, Help Desk, Announcements, Users,
@@ -54100,15 +54121,34 @@ if (document.documentElement.dataset.review && isV2()) {
     `<span class="mview__ico">${glyphOf(m)}</span>` +
     /* a name with a space wraps at it, not at the soft hyphen the 1×1 card needs ("Species Manage-ment") */
     `<span class="mview__lbl">${qesc(/\s/.test(m.name) ? m.name.replace(/\u00AD/g, '') : m.name)}</span></button>`
-  /* `enter`: the open's render — the cards rise in one after another and their icons pop
-     (owner, 21 Oct 2026: "Animetions has to there"); a search redraws without it */
+  /* a row of the list: the card's icon, the name over its one line (1 Oct 2026: "each module one line
+     explanation need"), and under it the swipe's action — Add to Home, or Remove on a module already
+     there. A CORE door (layoutStore's isCore) is always on Home and offers no Remove; a new module
+     (FRESH) has no card to add, so it only shrugs. */
+  const listRow = (m, i) => {
+    const v = m.fresh ? null : defaultCard(m), on = !!v && placed(v)
+    const core = m.fresh || (on && __req('js/state/layoutStore.js').isCore(v.id))
+    return `<div class="mview__item${on ? ' is-placed' : ''}${core ? ' is-core' : ''}" role="listitem" data-mod="${qesc(m.id)}" style="--i:${i}">
+      ${core ? '' : `<button type="button" class="mview__act${on ? ' is-remove' : ''}" tabindex="-1">${on ? `${icon('minus')}<span>Remove</span>` : `${icon('plus')}<span>Add to Home</span>`}</button>`}
+      <div class="mview__row" role="button" tabindex="0" aria-label="Open ${qesc(m.name)}${on ? ', on Home' : ''}">
+        <span class="mview__ico">${glyphOf(m)}</span>
+        <span class="mview__txt"><b>${qesc(m.name.replace(/\u00AD/g, ''))}</b>${m.blurb ? `<small>${qesc(m.blurb)}</small>` : ''}</span>
+        <span class="mview__chev" aria-hidden="true">${icon('chev-right')}</span>
+      </div>
+      ${core ? '' : `<button type="button" class="sr-only mview__kbd">${on ? 'Remove from Home' : 'Add to Home'}: ${qesc(m.name)}</button>`}
+    </div>`
+  }
+  /* `enter`: the open's render ('swap': the switch's, at once) — the cards or rows rise in one after
+     another and their icons pop (owner, 21 Oct 2026: "Animetions has to there"); a search redraws without it */
   function render(enter) {
     const q = query.trim().toLowerCase()
     const hit = (m) => !q || m.name.toLowerCase().includes(q) || (m.keywords || []).some((k) => k.includes(q))
     const ms = VIEW.flatMap(([, ids]) => ids).map(modOf).filter((m) => m && hit(m) && (m.fresh || defaultCard(m)))
-    list.innerHTML = ms.length
-      ? `<div class="mview__grid mview__grid--all${enter ? ' is-enter' : ''}">${ms.map((m, i) => tile(m, onHome(m)).replace('<button ', `<button style="--i:${i}" `)).join('')}</div>`
-      : '<p class="mview__empty">No module matches that.</p>'
+    const anim = enter ? ` is-enter${enter === 'swap' ? ' is-swap' : ''}` : ''
+    modeSw.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)))
+    list.innerHTML = !ms.length ? '<p class="mview__empty">No module matches that.</p>'
+      : mode === 'list' ? `<div class="mview__rows${anim}">${ms.map(listRow).join('')}</div>`
+      : `<div class="mview__grid mview__grid--all${anim}">${ms.map((m, i) => tile(m, onHome(m)).replace('<button ', `<button style="--i:${i}" `)).join('')}</div>`
   }
 
   /* ── the swipe: one row open at a time, the action revealed under it ── */
@@ -54231,7 +54271,7 @@ if (document.documentElement.dataset.review && isV2()) {
     const anims = [sheet.animate(opening ? [{ clipPath: small }, { clipPath: big }] : [{ clipPath: big }, { clipPath: small, opacity: 1, offset: .82 }, { clipPath: small, opacity: 0 }],
       opening ? { duration: 560, easing: 'cubic-bezier(.32, .72, 0, 1)' } : { duration: 360, easing: 'cubic-bezier(.55, 0, .75, .2)', fill: 'forwards' })]
     if (opening) {
-      for (const el of sheet.querySelectorAll('.mview__handle, .mview__head, .mview__search')) anims.push(el.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: 90, easing: 'cubic-bezier(.32, .72, 0, 1)', fill: 'backwards' }))
+      for (const el of sheet.querySelectorAll('.mview__handle, .mview__head, .mview__tools')) anims.push(el.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: 90, easing: 'cubic-bezier(.32, .72, 0, 1)', fill: 'backwards' }))
       anims.push(list.animate([{ opacity: 0, transform: 'scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 460, delay: 160, easing: 'cubic-bezier(.32, .72, 0, 1)', fill: 'backwards' }))
       grow.from.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 360, easing: 'cubic-bezier(.32, .72, 0, 1)' })
     }
@@ -54255,14 +54295,16 @@ if (document.documentElement.dataset.review && isV2()) {
        lock refused the arrow and Page keys and Escape never reached the sheet */
     list.focus({ preventScroll: true })
     document.addEventListener('keydown', onEsc, true)
-    /* ONE NUDGE, the first time: the first free row slides to show its action and back */
-    if (!nudged && !prefersReducedMotion()) {
-      nudged = true
-      setTimeout(() => {
-        const row = list.querySelector('.mview__item:not(.is-placed) .mview__row'); if (!row || openRow) return
-        setX(row, -ACT * .8, true); setTimeout(() => { if (openRow !== row) setX(row, 0, true) }, 700)
-      }, 520)
-    }
+    nudge()
+  }
+  /* ONE NUDGE, the first time the list is up: the first free row slides to show its action and back */
+  function nudge() {
+    if (nudged || mode !== 'list' || prefersReducedMotion()) return
+    nudged = true
+    setTimeout(() => {
+      const row = list.querySelector('.mview__item:not(.is-placed):not(.is-core) .mview__row'); if (!row || openRow) return
+      setX(row, -ACT * .8, true); setTimeout(() => { if (openRow !== row) setX(row, 0, true) }, 700)
+    }, 520)
   }
   /* `slide` is true only from the pull: a sheet the finger has moved goes on down, it does not fold */
   function closeView(slide) {

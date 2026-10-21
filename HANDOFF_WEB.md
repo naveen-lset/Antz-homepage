@@ -513,3 +513,27 @@ Today's production deploys: 39mklceqj → qdvkucvxg → nnd43xucl → 5xhhnyvq1 
   - `.hub.json`.
 - **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
 - The Figma build scripts lived in the session scratchpad and are gone. The method is in memory (figma-mobile-push).
+
+# Session 21 Oct 2026 (late): All Modules grid / list switch back beside Search
+
+## Run it
+`python3 -m http.server 8080` from `/Users/naveen/Home Page`, then <http://localhost:8080/Antz-Selected-Modules/index.html?v=2>. Open the sheet from the Modules pill (or `window.__antzModulesSheet()`), check at 390 and at 820.
+
+## Built
+- **The switch is back** (owner, over a screenshot of the Figma-style sheet: "Near Search Add Option like grid & List view. on old varsion is there right"). It is the 17 Oct `.mview__mode` pill (grid · list), put into `.mview__tools` beside the field again, 44 tall on the field's grey. The choice is remembered in `localStorage['antz.mview.mode']`, read once when the page loads.
+- **Grid:** unchanged (Figma 67918:13710, three cards a row).
+- **List** (`.mview__rows`, built by `listRow()` in the sheet's script in `index.html`):
+  - the same seventeen in the grid's order, still no categories and no Recent row (the owner's 21 Oct rule);
+  - each row a white r12 card on the sheet's #EFF5F2, 8 apart: the card's Figma icon at its size (no ring, no tint), the name in #1F515B over the module's one-line blurb, a chevron;
+  - tap opens the module; swipe left offers Add to Home or Remove (Undo in the notice), as the old list did; core doors and new modules (Training, Announcements) only shrug;
+  - the one-time swipe nudge now fires the first time the LIST is shown (`nudge()`), not on the first open.
+  - iPad (≥744): rows 76 tall, r16, 12 apart, 40px icon, 16 / 14 type.
+- **Motion:** rows rise in like the cards (22ms apart); a switch redraws at once (`render('swap')` → `.is-swap` sets `--mv-d0: 0ms`; the grid's delays use the same variable). The open's head animation now lifts the whole `.mview__tools` row, not just the field.
+- `review.css`: the block "THE LIST, BACK", right after the grid's motion rules. Stylesheet `?v=20261021s`.
+- Checked headless at 390 × 844 and 820 × 1180: grid, list, list end, search "di", Add to Home + Undo, list remembered across a reload; no console errors.
+
+## Open questions for the owner
+- The chosen switch mark is still #006D35 (17 Oct); should it be Antz Primary #37BD69 like the rest of the sheet?
+
+## Not done
+- **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.

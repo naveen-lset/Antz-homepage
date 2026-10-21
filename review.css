@@ -339,14 +339,42 @@ html.mview-on .qa { opacity: 0; visibility: hidden; transition: opacity 200ms ea
    `backwards`, not `both`, so the press can still move them once they have landed. */
 @keyframes mvCardIn { from { opacity: 0; transform: translateY(16px) scale(.94); } }
 @keyframes mvIcoPop { from { opacity: 0; transform: scale(.4) rotate(-12deg); } 60% { opacity: 1; } }
-.mview__grid--all.is-enter .mview__tile { animation: mvCardIn 480ms cubic-bezier(.32, .72, 0, 1) backwards; animation-delay: calc(150ms + var(--i, 0) * 28ms); }
-.mview__grid--all.is-enter .mview__ico { animation: mvIcoPop 560ms cubic-bezier(.34, 1.56, .64, 1) backwards; animation-delay: calc(230ms + var(--i, 0) * 28ms); }
+.mview__grid--all.is-enter .mview__tile { animation: mvCardIn 480ms cubic-bezier(.32, .72, 0, 1) backwards; animation-delay: calc(var(--mv-d0, 150ms) + var(--i, 0) * 28ms); }
+.mview__grid--all.is-enter .mview__ico { animation: mvIcoPop 560ms cubic-bezier(.34, 1.56, .64, 1) backwards; animation-delay: calc(var(--mv-d0, 150ms) + 80ms + var(--i, 0) * 28ms); }
+/* the grid / list switch redraws at once: no wait for the sheet's own open */
+.mview .is-swap { --mv-d0: 0ms; }
 .mview__grid--all .mview__tile { transition: transform 200ms cubic-bezier(.32, .72, 0, 1), box-shadow 200ms ease; }
 .mview__grid--all .mview__tile:active { transform: scale(.95); }
 .mview__grid--all .mview__ico { transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1); }
 .mview__grid--all .mview__tile:active .mview__ico { transform: scale(.88); }
 @media (hover: hover) { .mview__grid--all .mview__tile:hover { box-shadow: 0 6px 16px -10px rgba(31, 81, 91, .35); } .mview__grid--all .mview__tile:hover .mview__ico { transform: translateY(-2px) scale(1.06); } }
 @media (prefers-reduced-motion: reduce) { .mview__grid--all.is-enter .mview__tile, .mview__grid--all.is-enter .mview__ico { animation: none; } .mview__grid--all .mview__tile, .mview__grid--all .mview__ico { transition: none; } }
+/* THE LIST, BACK (owner, 21 Oct 2026: "Near Search Add Option like grid & List view. on old varsion is
+   there right"): the switch beside the field again, and the seventeen as rows in the cards' order — white
+   r12 on the sheet's background, 8 apart, each the card's icon at its size, the name in the cards'
+   #1F515B over its one line, a chevron; the swipe under it adds to Home or removes. No ring, no tint. */
+.mview__rows { margin-top: 12px; }
+.mview__rows .mview__item, .mview__rows .mview__act { border-radius: 12px; }
+.mview__rows .mview__row { gap: 14px; min-height: 64px; padding: 12px 14px 12px 16px; border-radius: 12px; }
+.mview__rows .mview__ico { width: 32.76px; height: 32.76px; border-radius: 0; box-shadow: none; }
+.mview__rows .mview__ico img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.mview__rows .mview__fig { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; }
+.mview__rows .mview__mark { width: 100%; height: 100%; background: linear-gradient(118deg, #00D6C9, #37BD69); }
+.mview__rows .mview__txt b { color: #1F515B; }
+@media (min-width: 744px) {
+  .mview .mview__rows .mview__item { margin-bottom: 12px; }
+  .mview .mview__rows .mview__item, .mview .mview__rows .mview__act { border-radius: 16px; }
+  .mview .mview__rows .mview__row { gap: 16px; min-height: 76px; padding: 14px 18px 14px 20px; border-radius: 16px; }
+  .mview .mview__rows .mview__ico { width: 40px; height: 40px; }
+  .mview .mview__rows .mview__txt b { font-size: 16px; }
+  .mview .mview__rows .mview__txt small { font-size: 14px; }
+}
+/* the rows rise in as the cards do, a little closer together; a press sinks the row */
+.mview__rows.is-enter .mview__item { animation: mvCardIn 480ms cubic-bezier(.32, .72, 0, 1) backwards; animation-delay: calc(var(--mv-d0, 150ms) + var(--i, 0) * 22ms); }
+.mview__rows.is-enter .mview__ico { animation: mvIcoPop 560ms cubic-bezier(.34, 1.56, .64, 1) backwards; animation-delay: calc(var(--mv-d0, 150ms) + 80ms + var(--i, 0) * 22ms); }
+.mview__rows .mview__ico { transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1); }
+.mview__rows .mview__row:active .mview__ico { transform: scale(.88); }
+@media (prefers-reduced-motion: reduce) { .mview__rows.is-enter .mview__item, .mview__rows.is-enter .mview__ico { animation: none; } .mview__rows .mview__ico { transition: none; } }
 .mview__toast { position: absolute; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 3; display: flex; align-items: center; gap: 14px; max-width: calc(100% - 32px); padding: 10px 12px 10px 16px; border-radius: 12px; background: #1F415B; color: #fff; font: 500 14px Inter, sans-serif; white-space: nowrap; transform: translate(-50%, 12px); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
 .mview__toast > span { overflow: hidden; text-overflow: ellipsis; }
 .mview__toast.is-on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
