@@ -1085,42 +1085,6 @@ a.cw--mod:hover .cwm__go { transform: rotate(45deg); }
 .mc.picked { background: #fff !important; box-shadow: 0 0 0 2px var(--lime-ink) !important; }
 </style>
 <style>.mods__hd .mpick button#mpDone { width: auto; height: 34px; padding: 0 18px; margin-left: auto; border-radius: 999px; background: var(--lime-ink); color: #fff; }</style>
-<style>
-/* ══ STYLE 6 · minimal widgets (2 Nov): one number, one label ═══════════ */
-.cboard { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 236px; gap: 16px; }
-.cw.mw { padding: 24px 26px; border-radius: 14px; justify-content: space-between; color: #fff; box-shadow: none;
-  background-color: #26252F; background-image: repeating-radial-gradient(circle at -20% 135%, rgba(255, 255, 255, 0) 0 15px, rgba(255, 255, 255, .055) 15px 16px); }
-.cw.mw--glow { background-image: radial-gradient(75% 95% at 95% 0%, rgba(118, 208, 146, .5), rgba(118, 208, 146, 0) 70%), repeating-radial-gradient(circle at -20% 135%, rgba(255, 255, 255, 0) 0 15px, rgba(255, 255, 255, .055) 15px 16px); }
-.cw.mw--mint { color: var(--ink); background: linear-gradient(130deg, #D2FAD8 0%, #A3F3AE 45%, #86F09A 100%); }
-a.cw.mw:hover { box-shadow: 0 24px 40px -24px rgba(20, 30, 25, .6); }
-.mw__hd { display: flex; align-items: center; gap: 10px; min-height: 40px; }
-.mw__hd b { font-size: 19px; font-weight: 500; letter-spacing: -.01em; }
-.mw__hd .ico { width: 26px; height: 26px; }
-.mw__go { margin-left: auto; width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid currentColor; transition: transform .25s var(--ease); }
-.mw--ink .mw__go, .mw--glow .mw__go { border-color: rgba(255, 255, 255, .45); }
-.mw__go svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-a.mw:hover .mw__go { transform: rotate(45deg); }
-.mw__seg { margin-left: auto; display: inline-flex; gap: 2px; padding: 3px; border-radius: 8px; background: rgba(255, 255, 255, .1); }
-.mw__seg button { height: 30px; padding: 0 11px; border-radius: 6px; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, .72); transition: background .15s, color .15s; }
-.mw__seg button:hover { color: #fff; }
-.mw__seg button[aria-pressed='true'] { background: #fff; color: #17161D; }
-.mw__seg--row { margin: 14px 0 0; align-self: flex-start; max-width: 100%; overflow-x: auto; scrollbar-width: none; flex: none; }
-.mw__seg--row button { height: 28px; padding: 0 10px; font-size: 12.5px; white-space: nowrap; }
-.mw--mint .mw__seg { background: rgba(14, 21, 18, .07); }
-.mw--mint .mw__seg button { color: rgba(14, 21, 18, .62); }
-.mw--mint .mw__seg button[aria-pressed='true'] { color: var(--ink); }
-.mw__live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: rgba(255, 255, 255, .65); }
-.mw__live i { width: 7px; height: 7px; border-radius: 50%; background: #52F990; animation: blink 1.6s infinite; }
-.mw__ft { margin-top: auto; min-width: 0; }
-.mw__num { font-size: clamp(52px, 4.6vw, 72px); font-weight: 400; letter-spacing: -.045em; line-height: .95; color: var(--n, currentColor); }
-.mw__lbl { display: block; margin-top: 10px; font-size: 15px; color: rgba(255, 255, 255, .62); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mw--mint .mw__lbl { color: rgba(14, 21, 18, .62); }
-.mw__title, .mw__tagline { display: block; font-size: clamp(22px, 1.7vw, 30px); font-weight: 500; letter-spacing: -.02em; line-height: 1.15; }
-.mw__tagline { color: #8BE59A; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-body.editing .cboard > .mw::after { box-shadow: inset 0 0 0 2px rgba(82, 249, 144, .55); }
-@media (max-width: 1060px) { .cboard { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 640px) { .cboard { grid-template-columns: 1fr; grid-auto-rows: 210px; } .cw.mw { padding: 20px; } }
-</style>
 </head>
 <body>
 <div class="app">
@@ -1205,16 +1169,68 @@ body.editing .cboard > .mw::after { box-shadow: inset 0 0 0 2px rgba(82, 249, 14
       <!-- centre: the stage -->
       <section class="stage" aria-label="Module stats">
         <div class="cboard" id="cboard">
-          <a class="cw mw mw--ink" data-wid="mortality" href="#" data-toast="Mortality"><div class="mw__hd"><span class="ico" style="--i:url('assets/icon/ki-mortality.svg')"></span><b>Mortality</b><div class="mw__seg" role="group" aria-label="Period"><button type="button" aria-pressed="true" data-mr="0">7D</button><button type="button" aria-pressed="false" data-mr="1">30D</button><button type="button" aria-pressed="false" data-mr="2">30+</button></div></div><div class="mw__ft"><div class="mw__num num" id="mortNum" style="--n:#F4B8A0">192</div><small class="mw__lbl">Deaths recorded</small></div></a>
-          <a class="cw mw mw--glow mw--tag" data-wid="eggs" href="#" data-toast="Eggs"><div class="mw__hd"><span class="ico" style="--i:url('assets/icon/m-eggs.svg')"></span></div><div class="mw__ft"><b class="mw__title">Eggs</b><span class="mw__tagline">from clutch to hatch.</span></div></a>
-          <a class="cw mw mw--mint" data-wid="animals" href="#" data-toast="Animals"><div class="mw__hd"><b>Animals</b><span class="mw__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="mw__ft"><div class="mw__num num" data-k="new">643</div><small class="mw__lbl">Newly added animals</small></div></a>
-          <a class="cw mw mw--mint" data-wid="approvals" href="#" data-toast="Approvals"><div class="mw__hd"><b>Approvals</b><span class="mw__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="mw__seg mw__seg--row" role="group" aria-label="Show"><button type="button" aria-pressed="true" data-ap="0" data-l="Transfers waiting for approval">Pending</button><button type="button" aria-pressed="false" data-ap="1" data-l="Transfers approved, last 30 days">Approved</button><button type="button" aria-pressed="false" data-ap="2" data-l="Transfers rejected, last 30 days">Rejected</button></div><div class="mw__ft"><div class="mw__num num">16</div><small class="mw__lbl">Transfers waiting for approval</small></div></a>
-          <a class="cw mw mw--ink" data-wid="audit" href="#" data-toast="Audit"><div class="mw__hd"><span class="ico" style="--i:url('assets/icon/m-audit.svg')"></span><b>Audit</b><span class="mw__live"><i></i>Live</span></div><div class="mw__ft"><div class="mw__num num" id="auditNum" style="--n:#9DEBB0">68%</div><small class="mw__lbl">Animal audit score</small></div></a>
-          <a class="cw mw mw--glow" data-wid="housing" href="#" data-toast="Housing"><div class="mw__hd"><span class="ico" style="--i:url('assets/icon/m-housing.svg')"></span><b>Housing</b><span class="mw__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="mw__seg mw__seg--row" role="group" aria-label="Show"><button type="button" aria-pressed="true" data-key="enclosures" data-l="Enclosures across sections">Enclosures</button><button type="button" aria-pressed="false" data-key="sections" data-l="Housing sections">Sections</button></div><div class="mw__ft"><div class="mw__num num">9,937</div><small class="mw__lbl">Enclosures across sections</small></div></a>
-          <a class="cw mw mw--glow" data-wid="users" href="#" data-toast="Users"><div class="mw__hd"><span class="ico" style="--i:url('assets/icon/m-users.svg')"></span><b>Users</b><span class="mw__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="mw__seg mw__seg--row" role="group" aria-label="Show"><button type="button" aria-pressed="true" data-v="272" data-l="Staff accounts">Total</button><button type="button" aria-pressed="false" data-v="0" data-l="Active today">Active</button><button type="button" aria-pressed="false" data-v="12" data-l="Blocked accounts">Blocked</button></div><div class="mw__ft"><div class="mw__num num">272</div><small class="mw__lbl">Staff accounts</small></div></a>
-          <a class="cw mw mw--mint" data-wid="helpdesk" href="#" data-toast="Help Desk"><div class="mw__hd"><b>Help Desk</b><span class="mw__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="mw__seg mw__seg--row" role="group" aria-label="Show"><button type="button" aria-pressed="true" data-v="61" data-l="Tickets pending">Pending</button><button type="button" aria-pressed="false" data-v="177" data-l="Tickets approved">Approved</button><button type="button" aria-pressed="false" data-v="47" data-l="Tickets rejected">Rejected</button><button type="button" aria-pressed="false" data-v="36" data-l="Tickets cancelled">Cancelled</button></div><div class="mw__ft"><div class="mw__num num">61</div><small class="mw__lbl">Tickets pending</small></div></a>
-          <a class="cw mw mw--ink" data-wid="lab" href="#" data-toast="Lab"><div class="mw__hd"><span class="ico" style="--i:url('assets/icon/m-lab.svg')"></span><b>Lab</b><span class="mw__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="mw__seg mw__seg--row" role="group" aria-label="Show"><button type="button" aria-pressed="true" data-v="1445" data-l="Tests pending">Pending</button><button type="button" aria-pressed="false" data-v="41" data-l="Tests in progress">Active</button><button type="button" aria-pressed="false" data-v="155" data-l="Tests completed">Done</button><button type="button" aria-pressed="false" data-v="440" data-l="Test requests">Requests</button></div><div class="mw__ft"><div class="mw__num num" style="--n:#F7D88A">1,445</div><small class="mw__lbl">Tests pending</small></div></a>
-          <a class="cw mw mw--ink" data-wid="necropsy" href="#" data-toast="Necropsy"><div class="mw__hd"><span class="ico" style="--i:url('assets/icon/m-mortality.svg')"></span><b>Necropsy</b><span class="mw__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="mw__seg mw__seg--row" role="group" aria-label="Show"><button type="button" aria-pressed="true" data-v="67" data-l="Reports pending">Pending</button><button type="button" aria-pressed="false" data-v="19" data-l="Reports incoming">Incoming</button><button type="button" aria-pressed="false" data-v="0" data-l="Reports in draft">Draft</button><button type="button" aria-pressed="false" data-v="67" data-l="Reports completed">Completed</button></div><div class="mw__ft"><div class="mw__num num" style="--n:#9FDCF2">67</div><small class="mw__lbl">Reports pending</small></div></a>
+          <a class="cw cw--blue c2 r2" data-wid="animals" href="#" data-toast="Animals">
+            <div class="cw__hd"><div><b>Animals</b><small>Newly added, by site</small></div><span class="go">↗</span></div>
+            <div class="cw__big num" data-k="new">643</div>
+            <div class="sbars sbars--white" id="vbars"></div>
+            <div class="cw__foot"><span>9 sites</span><span>Scroll →</span></div>
+          </a>
+          <a class="cw c2 r2" data-wid="audit" href="#" data-toast="Audit">
+            <div class="cw__hd"><span class="cw__ic" style="--c:var(--lime-ink)"><span class="ico" style="--i:url('assets/icon/m-audit.svg')"></span></span><b>Audit</b><span class="live"><i></i>LIVE</span></div>
+            <div style="display:flex;align-items:baseline;gap:10px"><div class="cw__big num" id="auditNum" style="margin:6px 0 0">68%</div><small class="cw__lbl">animal audit score</small></div>
+            <div class="sbars sbars--audit" id="abars"></div>
+            <div class="cw__foot"><span>9 sites</span><span>Scroll →</span></div>
+          </a>
+          <a class="cw cw--teal c2" data-wid="approvals" href="#" data-toast="Approvals">
+            <div class="cw__hd"><span class="cw__ic cw__ic--glass"><span class="ico" style="--i:url('assets/icon/m-approvals.svg')"></span></span><div><b>Approvals</b><small>Transfers · last 30 days</small></div><span class="go">↗</span></div>
+            <div class="flow"><span><b class="num" data-ap="0">16</b><small><i style="background:#FFD36B"></i>Pending</small></span><span><b class="num" data-ap="1">42</b><small><i style="background:#52F990"></i>Approved</small></span><span><b class="num" data-ap="2">3</b><small><i style="background:#FFBDA8"></i>Rejected</small></span></div>
+          </a>
+          <div class="cw cw--coral" data-wid="mortality">
+            <div class="cw__hd"><span class="cw__ic" style="--c:var(--coral)"><span class="ico" style="--i:url('assets/icon/ki-mortality.svg')"></span></span><b>Mortality</b></div>
+            <div class="cw__big num" id="mortNum" style="color:var(--coral)">192</div>
+            <div class="mseg" id="mseg"><button type="button" aria-pressed="true" data-r="0">7D</button><button type="button" aria-pressed="false" data-r="1">30D</button><button type="button" aria-pressed="false" data-r="2">30+</button></div>
+          </div>
+          <a class="cw" data-wid="housing" href="#" data-toast="Housing">
+            <div class="cw__hd"><span class="cw__ic" style="--c:#0A8A47"><span class="ico" style="--i:url('assets/icon/m-housing.svg')"></span></span><b>Housing</b></div>
+            <div class="duo"><div><b class="num" data-k="sections">115</b><span>Sections</span></div><div><b class="num" data-k="enclosures">9,937</b><span>Enclosures</span></div></div>
+          </a>
+          <a class="cw c2 wu2" data-wid="users" href="#" data-toast="Users">
+            <div class="cw__hd"><span class="cw__ic" style="--c:#1F415B"><span class="ico" style="--i:url('assets/icon/m-users.svg')"></span></span><div><b>Users</b><small>Staff accounts</small></div><span class="go go--d">↗</span></div>
+            <div class="wu2__body">
+              <ul class="wu2__list">
+                <li><i style="background:var(--lime)"></i>Active today<b class="num">0</b></li>
+                <li><i style="background:var(--coral)"></i>Blocked<b class="num">12</b></li>
+                <li><i style="background:#C9D6E1"></i>Not active today<b class="num">260</b></li>
+              </ul>
+              <div class="wu2__ring"><svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="34" fill="none" stroke="#E6EEF6" stroke-width="9"/></svg><span><b class="num">272</b><small>users</small></span></div>
+            </div>
+          </a>
+          <a class="cw c2 wh" data-wid="helpdesk" href="#" data-toast="Help Desk">
+            <div class="cw__hd"><span class="cw__ic" style="--c:#00ABAB"><svg class="ico" viewBox="0 0 24 24" style="background:none;-webkit-mask:none;mask:none"><path fill="currentColor" fill-rule="evenodd" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 6a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm-6.6-.9 2.6 2.6a5 5 0 0 0 0 4.6l-2.6 2.6a8.5 8.5 0 0 1 0-9.8zm13.2 0a8.5 8.5 0 0 1 0 9.8L16 14.3a5 5 0 0 0 0-4.6l2.6-2.6z"/></svg></span><div><b>Help Desk</b><small><span class="num">321</span> tickets</small></div><span class="go go--d">↗</span></div>
+            <div class="wh2">
+              <span style="--t:#FFF4D6;--d:#E0A100"><b class="num">61</b><small>Pending</small></span>
+              <span style="--t:#E3F9EC;--d:#1F9E52"><b class="num">177</b><small>Approved</small></span>
+              <span style="--t:#FFEBE5;--d:#FA6140"><b class="num">47</b><small>Rejected</small></span>
+              <span style="--t:#EEF2F5;--d:#7E8C98"><b class="num">36</b><small>Cancelled</small></span>
+            </div>
+          </a>
+          <a class="cw c2 wl2" data-wid="lab" href="#" data-toast="Lab">
+            <div class="cw__hd"><span class="cw__ic" style="--c:#C98A12"><span class="ico" style="--i:url('assets/icon/m-lab.svg')"></span></span><div><b>Lab</b><small><span class="num">440</span> test requests</small></div><span class="go go--d">↗</span></div>
+            <div class="wu__row">
+              <div><div class="wu__big num" style="color:#C98A12">1,445</div><small class="cw__lbl">tests pending</small></div>
+              <div class="wu__stats"><span><i style="background:#00AFD6"></i>In progress<b class="num">41</b></span><span><i style="background:#2BD873"></i>Completed<b class="num">155</b></span></div>
+            </div>
+            <div class="wu__bar"><i style="flex:1445;background:#F2C14E"></i><i style="flex:41;background:#00AFD6;min-width:6px"></i><i style="flex:155;background:#2BD873"></i></div>
+          </a>
+          <a class="cw c2 wn" data-wid="necropsy" href="#" data-toast="Necropsy">
+            <div class="cw__hd"><span class="cw__ic cw__ic--glass"><svg class="ico" viewBox="0 0 24 24" style="background:none;-webkit-mask:none;mask:none"><path fill="currentColor" d="M9 2h4v2h-1v6.1a4 4 0 0 1 2.9 3.4A6 6 0 0 0 17 8h2a8 8 0 0 1-3.4 6.5A4 4 0 0 1 12 17a4 4 0 0 1-3.6-2.3l-.4-.2V4H7V2h2zm1 2v6.1l-.1.1h1.1V4h-1zM4 20h16v2H4z"/></svg></span><div><b>Necropsy</b><small><span class="num">153</span> reports by stage</small></div><span class="go">↗</span></div>
+            <div class="wn__track">
+              <span><i class="on"></i><b class="num">19</b><small>Incoming</small></span>
+              <span><i class="on hot"></i><b class="num">67</b><small>Pending</small></span>
+              <span class="zero"><i></i><b class="num">0</b><small>Draft</small></span>
+              <span><i class="on done"></i><b class="num">67</b><small>Completed</small></span>
+            </div>
+          </a>
         </div>
       </section>
     </div>
@@ -1377,17 +1393,17 @@ body.editing .cboard > .mw::after { box-shadow: inset 0 0 0 2px rgba(82, 249, 14
     }).join('');
     el.addEventListener('wheel', function (e) { if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; var m = el.scrollWidth - el.clientWidth; if ((e.deltaY > 0 && el.scrollLeft < m) || (e.deltaY < 0 && el.scrollLeft > 0)) { e.preventDefault(); el.scrollLeft += e.deltaY; } }, { passive: false });
   }
+  bars($('#vbars'), 'new'); bars($('#abars'), 'audit', 100, '', 1);
   function paint() {
     var s = SITES[site];
     $$('[data-k]').forEach(function (el) { var k = el.getAttribute('data-k'); countTo(el, k === 'sites' ? (site === 'all' ? 9 : 1) : s[k]); });
-    countTo($('#auditNum'), s.audit, '%');
-    $$('.mw__seg').forEach(function (g) { segShow(g); });
+    countTo($('#mortNum'), s.mortality[mr]); countTo($('#auditNum'), s.audit, '%');
+    $$('[data-ap]').forEach(function (el) { countTo(el, s.appr[+el.dataset.ap]); });
+    ['#vbars', '#abars'].forEach(function (id) { var el = $(id); if (site === 'all') el.removeAttribute('data-focus'); else el.setAttribute('data-focus', site);
+      var on = null; $$('.sb', el).forEach(function (b) { var x = b.dataset.site === site; b.classList.toggle('on', x); if (x) on = b; });
+      el.scrollTo({ left: on ? on.offsetLeft - el.offsetLeft - 18 : 0, behavior: reduce ? 'auto' : 'smooth' }); });
   }
-  /* one number per widget; the switch picks which one */
-  function segVal(b) { var s = SITES[site]; return b.dataset.mr ? s.mortality[+b.dataset.mr] : b.dataset.ap ? s.appr[+b.dataset.ap] : b.dataset.key ? s[b.dataset.key] : +b.dataset.v; }
-  function segShow(g) { var b = $('[aria-pressed="true"]', g), w = g.closest('.mw'); countTo($('.mw__num', w), segVal(b)); if (b.dataset.l) $('.mw__lbl', w).textContent = b.dataset.l; }
-  $('#cboard').addEventListener('click', function (e) { var b = e.target.closest('.mw__seg button'); if (!b) return; e.preventDefault(); e.stopPropagation(); if (document.body.classList.contains('editing')) return;
-    $$('button', b.parentNode).forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); segShow(b.parentNode); });
+  $('#mseg').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; e.preventDefault(); e.stopPropagation(); $$('#mseg button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); mr = +b.dataset.r; countTo($('#mortNum'), SITES[site].mortality[mr]); });
 
   /* site picker */
   var SITE_LIST = ORDER.map(function (k) { return [k, SITES[k].name]; });
@@ -1426,20 +1442,20 @@ body.editing .cboard > .mw::after { box-shadow: inset 0 0 0 2px rgba(82, 249, 14
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pop.classList.contains('on')) closePop(true); });
 
   /* ── centre board: edit (drag, remove), undo, add ─────────────────── */
-  var cb = $('#cboard'), CKEY = 'antz-s6-centre-2', editing = false, drag = null, snap = null, shelf = {};
+  var cb = $('#cboard'), CKEY = 'antz-s6-centre', editing = false, drag = null, snap = null, shelf = {};
   /* module shortcuts pinned from the Modules panel: [name, line, icon, colour] each */
   var PKEY = 'antz-s6-pins', PINS = [];
   try { PINS = JSON.parse(localStorage.getItem(PKEY) || '[]') || []; } catch (e) { PINS = []; }
   function pinKey(n) { return 'mod-' + n.toLowerCase().replace(/[^a-z0-9]+/g, '-'); }
   function pinWidget(m) {
-    var w = document.createElement('a'); w.className = 'cw mw mw--glow mw--tag cw--mod'; w.href = '#'; w.dataset.wid = pinKey(m[0]); w.setAttribute('data-toast', m[0]);
+    var w = document.createElement('a'); w.className = 'cw cw--mod'; w.href = '#'; w.dataset.wid = pinKey(m[0]); w.setAttribute('data-toast', m[0]);
     w.style.setProperty('--c', m[3]);
-    w.innerHTML = '<div class="mw__hd"><span class="ico" style="--i:url(\'assets/icon/' + m[2] + '.svg\')"></span><span class="mw__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div><div class="mw__ft"><b class="mw__title">' + esc(m[0]) + '</b><span class="mw__tagline">' + esc(m[1]) + '</span></div>';
+    w.innerHTML = '<span class="cwm__ic"><span class="ico" style="--i:url(\'assets/icon/' + m[2] + '.svg\')"></span></span><span class="cwm__go">↗</span><b>' + esc(m[0]) + '</b><small>' + esc(m[1]) + '</small>';
     return w;
   }
   PINS.forEach(function (m) { cb.appendChild(pinWidget(m)); });
   function savePins() { try { localStorage.setItem(PKEY, JSON.stringify(PINS)); } catch (e) {} }
-  var CNAMES = { animals: ['Animals', 'Newly added, by site'], audit: ['Audit', 'Animal audit by site'], approvals: ['Approvals', 'Transfers and requests'], mortality: ['Mortality', 'Deaths recorded'], eggs: ['Eggs', 'From clutch to hatch'], housing: ['Housing', 'Sections and enclosures'], users: ['Users', 'Total, active, blocked'], helpdesk: ['Help Desk', 'Tickets by status'], lab: ['Lab', 'Test pipeline'], necropsy: ['Necropsy', 'Reports by stage'] };
+  var CNAMES = { animals: ['Animals', 'Newly added, by site'], audit: ['Audit', 'Animal audit by site'], approvals: ['Approvals', 'Transfers and requests'], mortality: ['Mortality', 'Deaths recorded'], housing: ['Housing', 'Sections and enclosures'], users: ['Users', 'Total, active, blocked'], helpdesk: ['Help Desk', 'Tickets by status'], lab: ['Lab', 'Test pipeline'], necropsy: ['Necropsy', 'Reports by stage'] };
   PINS.forEach(function (m) { CNAMES[pinKey(m[0])] = [m[0], 'Module shortcut']; });
   function cws() { return $$('#cboard > .cw'); }
   cws().forEach(function (w) { var d = document.createElement('button'); d.type = 'button'; d.className = 'cdel'; d.setAttribute('aria-label', 'Remove ' + CNAMES[w.dataset.wid][0]); d.innerHTML = '<svg class="s" viewBox="0 0 24 24"><path d="M5 12h14"/></svg>'; w.appendChild(d); });
@@ -1492,7 +1508,7 @@ body.editing .cboard > .mw::after { box-shadow: inset 0 0 0 2px rgba(82, 249, 14
   function renderAdd() {
     $('#cAddList').innerHTML = Object.keys(CNAMES).filter(function (k) { return k.indexOf('mod-') !== 0; }).map(function (k) {
       var off = !!shelf[k];
-      return '<div class="arow2"><span class="cw__ic" style="--c:var(--lime-ink)"><span class="ico" style="--i:url(\'assets/icon/' + ({ animals: 'm-species', audit: 'm-audit', approvals: 'm-approvals', mortality: 'ki-mortality', eggs: 'm-eggs', housing: 'm-housing', users: 'm-users', helpdesk: 'm-communication', lab: 'm-lab', necropsy: 'm-mortality' })[k] + '.svg\')"></span></span><span><b>' + CNAMES[k][0] + '</b><small>' + CNAMES[k][1] + '</small></span>' +
+      return '<div class="arow2"><span class="cw__ic" style="--c:var(--lime-ink)"><span class="ico" style="--i:url(\'assets/icon/' + ({ animals: 'm-species', audit: 'm-audit', approvals: 'm-approvals', mortality: 'ki-mortality', housing: 'm-housing', users: 'm-users', helpdesk: 'm-communication', lab: 'm-lab', necropsy: 'm-mortality' })[k] + '.svg\')"></span></span><span><b>' + CNAMES[k][0] + '</b><small>' + CNAMES[k][1] + '</small></span>' +
         (off ? '<button type="button" class="add" data-cadd="' + k + '">+ Add</button>' : '<span class="on">✓ On board</span><button type="button" class="rm" data-crm="' + k + '">Remove</button>') + '</div>';
     }).join('');
   }
