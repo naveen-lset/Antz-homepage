@@ -1,4 +1,4 @@
-/* Modules section · Style 1 | Style 2 (Sourav, 12 Oct 2026).
+/* Modules section · Style 1 | Style 2 (Sourav, 12 Oct 2026); Styles 3 and 4 are their own pages.
    Sets <html data-mstyle> from ?ms=1|2, else the last choice on this device,
    else 2; and puts a small switch beside the Modules heading. */
 (function () {
@@ -25,10 +25,11 @@
     sw.className = 'mstyle-switch';
     sw.setAttribute('role', 'group');
     sw.setAttribute('aria-label', 'Modules style');
-    sw.innerHTML = '<button type="button" data-ms="1">Style 1</button><button type="button" data-ms="2">Style 2</button>';
+    sw.innerHTML = '<button type="button" data-ms="1">Style 1</button><button type="button" data-ms="2">Style 2</button><button type="button" data-go="style-3.html">Style 3</button><button type="button" data-go="style-4.html">Style 4</button><button type="button" data-go="style-5.html">Style 5</button>';
     sw.addEventListener('click', function (e) {
       var b = e.target.closest('button');
-      if (b) set(b.dataset.ms);
+      if (b && b.dataset.go) location.href = b.dataset.go;
+      else if (b) set(b.dataset.ms);
     });
     actions.insertBefore(sw, actions.firstChild);
     set(root.getAttribute('data-mstyle'));

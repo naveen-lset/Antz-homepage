@@ -1,0 +1,884 @@
+<!doctype html>
+<!--
+  ANTZ HOME · STYLE 3 (Sourav, 23 Oct 2026)
+  The same widget home, rebuilt as a bento dashboard. Same content and the
+  same MD3_Antz colours as Style 2; the look follows six references:
+    · games dashboard  → icon sidebar, greeting + search bar, photo hero,
+                         photo cards with a glass footer, list-style right rail
+    · fintech bento    → photo fading into white, huge thin numbers, mesh card
+    · Omoskillo bento  → the audit gauge and the per-site tiles
+    · Omostate         → the dark statement card
+    · music dashboard  → the numbered Pending list
+    · circular deck    → coloured module cards with a circled ↗
+  Corners 8 everywhere; circles only for avatars and round icon buttons.
+  Standalone: open over http (python3 -m http.server) like index.html.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Antz Home · Style 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F4F7F6;
+  --paper: #FFFFFF;
+  --ink: #000000;
+  --ink-2: #44544A;
+  --mute: #7A8684;
+  --line: #DAE7DF;
+  --line-2: #E9F0EC;
+  --lime: #52F990;
+  --lime-ink: #006D35;
+  --dark: #262732;
+  --coral: #FA6140;
+  --coral-2: #FFBDA8;
+  --coral-3: #FFEBE5;
+  --teal: #00ABAB;
+  --navy: #1F415B;
+  --hl: #AFEFEB;
+  --mint: #E8F4F2;
+  --r: 8px;
+  --shadow: 0 1px 2px rgba(20, 45, 35, .04), 0 10px 30px -18px rgba(20, 45, 35, .22);
+  --shadow-lift: 0 2px 4px rgba(20, 45, 35, .05), 0 22px 40px -20px rgba(20, 45, 35, .32);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px; color: var(--ink); background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01', 'cv11';
+  overflow-x: hidden;
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 2px solid #00AFD6; outline-offset: 2px; }
+
+/* icon from an svg file, recoloured with currentColor */
+.ico { display: inline-block; width: 22px; height: 22px; background: currentColor; flex: none;
+  -webkit-mask: var(--i) center / contain no-repeat; mask: var(--i) center / contain no-repeat; }
+.arrow-ne { --i: url("assets/icon/v3-arrow-ne.svg"); width: 10px; height: 10px; }
+svg.s { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ── frame ─────────────────────────────────────────────────────────────── */
+.app { display: grid; grid-template-columns: 84px minmax(0, 1fr) 372px; min-height: 100vh; }
+
+.side {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 22px 0; background: var(--paper);
+  border-right: 1px solid var(--line-2);
+}
+.side__logo { width: 48px; height: 48px; margin-bottom: 28px; border-radius: var(--r); background: var(--dark); display: grid; place-items: center; box-shadow: 0 10px 20px -10px rgba(38, 39, 50, .8); }
+.side__logo img { width: 30px; height: 30px; object-fit: contain; }
+.side__btn {
+  position: relative; width: 48px; height: 48px; border-radius: var(--r);
+  display: grid; place-items: center; color: var(--mute);
+  transition: background .2s, color .2s;
+}
+.side__btn:hover { background: var(--mint); color: var(--ink-2); }
+.side__btn[aria-current] { background: var(--lime); color: var(--lime-ink); box-shadow: 0 8px 18px -8px rgba(82, 249, 144, .9); }
+.side__btn .dot { position: absolute; top: 11px; right: 11px; width: 7px; height: 7px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 2px var(--paper); }
+.side__rule { width: 28px; height: 1px; background: var(--line); margin: 12px 0; }
+.side__foot { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+
+.main { padding: 22px 28px 120px; min-width: 0; }
+.rail { padding: 22px 24px 120px 0; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+/* ── top bar ───────────────────────────────────────────────────────────── */
+.top { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+.hello { display: flex; align-items: center; gap: 12px; margin-right: auto; min-width: 0; }
+.hello__av { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: var(--mint); box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--line); }
+.hello__hi { font-size: 13px; color: var(--mute); }
+.hello__name { font-size: 20px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; }
+.search {
+  display: flex; align-items: center; gap: 10px; width: min(380px, 34vw);
+  height: 48px; padding: 0 8px 0 16px; border-radius: var(--r);
+  background: var(--paper); color: var(--mute); box-shadow: var(--shadow);
+}
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; color: var(--ink); background: none; }
+.search input::placeholder { color: var(--mute); }
+.search__scan { width: 34px; height: 34px; border-radius: var(--r); display: grid; place-items: center; background: var(--mint); color: var(--ink-2); }
+.wx { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 16px; border-radius: var(--r); background: var(--paper); box-shadow: var(--shadow); }
+.wx__t { font-size: 18px; font-weight: 600; line-height: 1; }
+.wx__d { font-size: 12px; color: var(--mute); }
+.iconbtn { position: relative; width: 48px; height: 48px; border-radius: var(--r); display: grid; place-items: center; background: var(--paper); color: var(--ink-2); box-shadow: var(--shadow); transition: transform .2s var(--ease); }
+.iconbtn:hover { transform: translateY(-2px); }
+.iconbtn .dot { position: absolute; top: 12px; right: 13px; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 2px var(--paper); }
+
+/* ── site tabs + style switch ──────────────────────────────────────────── */
+.bar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.sites { display: flex; gap: 6px; padding: 5px; border-radius: var(--r); background: var(--paper); box-shadow: var(--shadow); overflow-x: auto; scrollbar-width: none; }
+.sites::-webkit-scrollbar { display: none; }
+.sites button { height: 36px; padding: 0 16px; border-radius: 6px; color: var(--ink-2); font-weight: 500; white-space: nowrap; transition: background .2s, color .2s; }
+.sites button:hover { background: var(--mint); }
+.sites button[aria-pressed='true'] { background: var(--dark); color: #fff; }
+.styles { margin-left: auto; display: flex; gap: 2px; padding: 3px; border-radius: var(--r); background: #E6EEEA; font-size: 12px; }
+.styles a { padding: 6px 10px; border-radius: 6px; color: var(--ink-2); }
+.styles a[aria-current] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+
+/* ── hero ──────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative; overflow: hidden; border-radius: var(--r);
+  height: 300px; color: #fff; isolation: isolate;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 32px 36px; box-shadow: var(--shadow-lift);
+}
+.hero__img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; animation: kenburns 24s var(--ease) infinite alternate; }
+.hero::before { content: ''; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(90deg, rgba(20, 22, 30, .86) 0%, rgba(20, 22, 30, .55) 42%, rgba(20, 22, 30, 0) 75%),
+              linear-gradient(0deg, rgba(20, 22, 30, .45), rgba(20, 22, 30, 0) 55%); }
+@keyframes kenburns { from { transform: scale(1.02); } to { transform: scale(1.12) translate(-1.5%, -1%); } }
+.chip-glass { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .28); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.chip-glass i { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 3px rgba(82, 249, 144, .3); }
+.hero h1 { margin-top: 16px; font-size: 44px; line-height: 1.05; font-weight: 600; letter-spacing: -.03em; }
+.hero h1 em { font-style: normal; color: var(--lime); }
+.hero p { margin-top: 10px; max-width: 380px; font-size: 15px; color: rgba(255, 255, 255, .8); line-height: 1.45; }
+.cta { margin-top: 22px; align-self: flex-start; display: inline-flex; align-items: center; gap: 12px; height: 46px; padding: 0 8px 0 20px; border-radius: var(--r);
+  background: var(--lime); color: #04361B; font-weight: 600; box-shadow: 0 12px 26px -12px rgba(82, 249, 144, .9); transition: transform .2s var(--ease), box-shadow .2s; }
+.cta:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -12px rgba(82, 249, 144, 1); }
+.cta b { width: 30px; height: 30px; border-radius: 6px; background: #04361B; color: var(--lime); display: grid; place-items: center; }
+.hero__live { position: absolute; top: 24px; right: 24px; display: flex; gap: 8px; }
+.hero__stamp { padding: 10px 14px; border-radius: var(--r); background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.24); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.hero__stamp b { display: block; font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+.hero__stamp span { font-size: 11px; color: rgba(255,255,255,.75); }
+
+/* ── section head ──────────────────────────────────────────────────────── */
+.sec { margin-top: 30px; }
+.sec__head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.sec__head h2 { font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+.sec__head .count { font-size: 13px; color: var(--mute); font-weight: 400; }
+.sec__tools { margin-left: auto; display: flex; gap: 6px; }
+.tool { width: 36px; height: 36px; border-radius: var(--r); display: grid; place-items: center; color: var(--ink-2); background: var(--paper); box-shadow: var(--shadow); transition: color .2s, background .2s; }
+.tool:hover { background: var(--lime); color: var(--lime-ink); }
+.tool svg.s { width: 18px; height: 18px; }
+.see { font-size: 13px; color: var(--mute); font-weight: 500; }
+.see:hover { color: var(--ink); }
+
+/* circled ↗ */
+.ne { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px currentColor; flex: none; transition: transform .25s var(--ease), background .2s; }
+.card:hover .ne { transform: rotate(45deg); }
+
+/* ── cards ─────────────────────────────────────────────────────────────── */
+.card { position: relative; overflow: hidden; border-radius: var(--r); background: var(--paper); box-shadow: var(--shadow);
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease); isolation: isolate; text-align: left; display: block; }
+a.card:hover, button.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+
+/* tabs inside a card (info toggles) */
+.seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: var(--r); background: rgba(0, 0, 0, .05); font-size: 12px; font-weight: 500; position: relative; z-index: 2; }
+.seg button { padding: 4px 7px; border-radius: 6px; color: var(--ink-2); }
+.seg button[aria-pressed='true'] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.dark .seg { background: rgba(255, 255, 255, .08); }
+.dark .seg button { color: rgba(255, 255, 255, .7); }
+.dark .seg button[aria-pressed='true'] { background: rgba(255, 255, 255, .95); color: var(--dark); }
+
+/* ── module cards: glance ──────────────────────────────────────────────────────── */
+/* one grid for every module, placed by name so each width has a clean, gap-free layout */
+.mods { display: grid; gap: 16px; grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: 208px 208px 196px 196px 196px auto;
+  grid-template-areas:
+    "sp  nat aud aud"
+    "sp  mor ani ani"
+    "hos med hou die"
+    "hos adm usr die"
+    "mo2 sec egg egg"
+    "pen pen pen pen"; }
+.ga-sp { grid-area: sp; } .ga-nat { grid-area: nat; } .ga-aud { grid-area: aud; } .ga-mor { grid-area: mor; }
+.ga-ani { grid-area: ani; } .ga-egg { grid-area: egg; } .ga-hos { grid-area: hos; } .ga-med { grid-area: med; }
+.ga-hou { grid-area: hou; } .ga-die { grid-area: die; } .ga-adm { grid-area: adm; } .ga-usr { grid-area: usr; }
+.ga-mo2 { grid-area: mo2; } .ga-sec { grid-area: sec; } .ga-pen { grid-area: pen; }
+
+.species { display: flex; flex-direction: column; justify-content: flex-end; padding: 22px; }
+.species img { position: absolute; inset: 0 0 auto; height: 72%; width: 100%; object-fit: cover; z-index: -2; transition: transform .6s var(--ease); }
+.species:hover img { transform: scale(1.05); }
+.species::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(255,255,255,0) 22%, rgba(255,255,255,.75) 50%, #fff 64%); }
+.species__tag { position: absolute; top: 16px; left: 16px; display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px 0 6px; border-radius: var(--r); font-size: 12px; font-weight: 500; color: #fff;
+  background: rgba(20, 22, 30, .35); border: 1px solid rgba(255,255,255,.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.species__tag .ico { width: 18px; height: 18px; background: var(--lime); }
+.species h3 { font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+.species__nums { display: flex; gap: 0; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+.species__nums > div { flex: 1; }
+.species__nums > div + div { padding-left: 16px; border-left: 1px solid var(--line); }
+.big-s { font-size: 28px; font-weight: 300; letter-spacing: -.03em; line-height: 1; }
+.lbl { margin-top: 6px; font-size: 12px; color: var(--mute); }
+.species .ne { position: absolute; top: 16px; right: 16px; color: #fff; background: rgba(20,22,30,.25); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+.stat { padding: 18px 20px; display: flex; flex-direction: column; }
+.stat__head { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.stat__ico { width: 30px; height: 30px; border-radius: var(--r); display: grid; place-items: center; }
+.stat__ico .ico { width: 20px; height: 20px; }
+.stat > .seg { align-self: flex-start; margin-top: 12px; }
+.big { margin-top: auto; font-size: 64px; font-weight: 300; letter-spacing: -.05em; line-height: .95; font-variant-numeric: tabular-nums; }
+.stat .lbl { font-size: 13px; white-space: nowrap; }
+
+.natality { background: linear-gradient(160deg, #D5F5F1 0%, #EEF9F7 45%, #fff 100%); }
+.natality .stat__ico { background: #fff; color: var(--teal); }
+.natality::after { content: ''; position: absolute; right: -60px; bottom: -70px; width: 200px; height: 200px; border-radius: 50%; z-index: -1;
+  background: radial-gradient(circle, rgba(0, 171, 171, .22), rgba(0, 171, 171, 0) 70%); }
+
+.dark { background: var(--dark); color: #fff; }
+.mortality .stat__ico { background: rgba(250, 97, 64, .16); color: var(--coral); }
+.mortality .big { color: var(--coral); }
+.mortality .lbl { color: rgba(255, 255, 255, .6); }
+.mortality::after { content: ''; position: absolute; inset: 0; z-index: -1; opacity: .5;
+  background:
+    radial-gradient(120% 90% at 100% 100%, rgba(250, 97, 64, .28), transparent 55%),
+    repeating-radial-gradient(circle at 110% 120%, transparent 0 18px, rgba(255,255,255,.05) 18px 19px); }
+
+.animals { background: var(--lime); color: #04361B; }
+.animals::after { content: ''; position: absolute; right: -40px; top: -60px; width: 220px; height: 220px; border-radius: 50%; z-index: -1;
+  background: radial-gradient(circle, rgba(255,255,255,.65), rgba(255,255,255,0) 68%); }
+.animals .lbl { color: rgba(4, 54, 27, .7); }
+.animals .ne { margin-left: auto; }
+
+/* audit: header, the gauge on a mint panel, one column per site */
+.audit { padding: 16px 18px 18px; display: grid; grid-template-columns: 150px 1fr; grid-template-rows: auto minmax(0, 1fr); gap: 12px 12px; }
+.audit__head { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.audit__head .stat__ico { background: var(--mint); color: var(--lime-ink); }
+.audit__head .live { margin-left: auto; }
+.audit__panel { position: relative; overflow: hidden; border-radius: var(--r); background: linear-gradient(160deg, #EAF7F1 0%, #F5FBF8 100%);
+  display: grid; place-items: center; padding: 10px 8px 12px; isolation: isolate; }
+.audit__panel::before { content: ''; position: absolute; left: 50%; bottom: -50px; width: 170px; height: 120px; transform: translateX(-50%); border-radius: 50%; z-index: -1;
+  background: radial-gradient(closest-side, rgba(82, 249, 144, .35), rgba(82, 249, 144, 0)); }
+.gauge { position: relative; width: 136px; height: 90px; }
+.gauge svg { width: 136px; height: 74px; overflow: visible; }
+.gauge__track { stroke: rgba(0, 109, 53, .1); }
+.gauge__val { stroke: url(#gaugeGrad); stroke-dasharray: 0 999; transition: stroke-dasharray 1.4s var(--ease); }
+.gauge__num { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; }
+.gauge__num b { display: block; font-size: 32px; font-weight: 300; letter-spacing: -.04em; line-height: 1; }
+.gauge__num span { font-size: 10px; font-weight: 600; letter-spacing: .1em; color: var(--mute); text-transform: uppercase; }
+.live { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 6px; background: var(--coral-3); color: var(--coral); font-size: 11px; font-weight: 600; letter-spacing: .06em; }
+.live i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 1.6s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+.bars { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; min-height: 0; }
+.site { display: flex; flex-direction: column; justify-content: space-between; gap: 4px; min-width: 0; min-height: 0; padding: 9px 11px 10px; border-radius: var(--r); background: #F5F9F7; transition: opacity .25s, background .25s; }
+.site small { font-size: 11.5px; line-height: 1.3; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.site b { font-size: 20px; font-weight: 600; letter-spacing: -.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+.site b sup { font-size: 11px; font-weight: 500; color: var(--mute); margin-left: 1px; vertical-align: 6px; }
+.site__bar { height: 5px; border-radius: 3px; background: rgba(0, 109, 53, .1); overflow: hidden; }
+.site__bar i { display: block; height: 100%; width: 0; border-radius: 3px; background: linear-gradient(90deg, #A6FBC6, var(--lime)); transition: width 1.2s var(--ease); }
+.site.best { background: linear-gradient(150deg, #DFFCEA, #F2FEF6); }
+.site.best b { color: var(--lime-ink); }
+.site.best .site__bar i { background: linear-gradient(90deg, var(--lime), #1FD86F); }
+.site.low { background: var(--coral-3); }
+.site.low b { color: var(--coral); }
+.site.low .site__bar { background: rgba(250, 97, 64, .14); }
+.site.low .site__bar i { background: linear-gradient(90deg, var(--coral-2), var(--coral)); }
+.bars[data-focus] .site:not(.on) { opacity: .35; }
+
+/* eggs: mesh statement */
+.eggs { padding: 20px; display: flex; flex-direction: column; background: #F7FBFA; }
+.mesh { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
+.mesh i { position: absolute; border-radius: 50%; filter: blur(34px); opacity: .85; animation: drift 14s ease-in-out infinite alternate; }
+.mesh i:nth-child(1) { width: 170px; height: 150px; left: -30px; bottom: -40px; background: var(--hl); }
+.mesh i:nth-child(2) { width: 150px; height: 140px; left: 70px; bottom: -60px; background: #9BF9BE; animation-delay: -4s; }
+.mesh i:nth-child(3) { width: 120px; height: 110px; right: -30px; bottom: 10px; background: #FFD3C4; animation-delay: -8s; }
+@keyframes drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(18px, -14px) scale(1.12); } }
+.eggs .badge3d { width: 44px; height: 44px; border-radius: var(--r); display: grid; place-items: center; color: var(--lime-ink);
+  background: linear-gradient(145deg, #fff, #E6F7EE); box-shadow: 0 8px 18px -8px rgba(0, 109, 53, .45), inset 0 0 0 1px #fff; }
+.eggs .badge3d .ico { width: 30px; height: 30px; }
+.eggs h3 { margin-top: auto; font-size: 22px; font-weight: 600; letter-spacing: -.02em; line-height: 1.15; }
+.eggs h3 span { display: block; font-weight: 400; color: var(--lime-ink); }
+.eggs .ne { position: absolute; top: 20px; right: 20px; color: var(--ink-2); }
+
+/* ── modules ───────────────────────────────────────────────────────────── */
+.photo { color: #fff; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px; }
+.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; transition: transform .6s var(--ease); }
+.photo:hover img { transform: scale(1.06); }
+.photo__plus { position: absolute; top: 12px; right: 12px; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.92); color: var(--ink); display: grid; place-items: center; }
+.photo__plus svg.s { width: 16px; height: 16px; stroke-width: 2.2; }
+.glass { padding: 12px 14px; border-radius: 6px; background: rgba(28, 30, 38, .42); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); }
+.glass b { display: block; font-size: 16px; font-weight: 600; }
+.glass span { display: block; margin-top: 2px; font-size: 12px; color: rgba(255,255,255,.78); }
+
+.door { padding: 16px; display: flex; flex-direction: column; }
+.door__ico { width: 40px; height: 40px; border-radius: var(--r); display: grid; place-items: center; }
+.door__ico .ico { width: 26px; height: 26px; }
+.door b { margin-top: auto; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+.door span { margin-top: 3px; font-size: 12px; color: var(--mute); line-height: 1.35; }
+.door--white { box-shadow: var(--shadow), inset 0 0 0 1px var(--line-2); }
+.door--white .door__ico { background: var(--mint); color: var(--lime-ink); }
+.door--lime { background: linear-gradient(150deg, #8CFBB5 0%, var(--lime) 55%, #2BE57A 100%); color: #04361B; }
+.door--lime span { color: rgba(4, 54, 27, .72); }
+.door--lime .door__ico { background: rgba(255,255,255,.5); }
+.door--dark { background: radial-gradient(120% 100% at 100% 0%, #3A3C4A 0%, var(--dark) 60%); color: #fff; }
+.door--dark span { color: rgba(255,255,255,.6); }
+.door--dark .door__ico { background: rgba(82, 249, 144, .14); color: var(--lime); }
+.door--navy { background: linear-gradient(150deg, #2E5C7E 0%, var(--navy) 70%); color: #fff; }
+.door--navy span { color: rgba(255,255,255,.66); }
+.door--navy .door__ico { background: rgba(175, 239, 235, .16); color: var(--hl); }
+.door--coral .door__ico { background: var(--coral-3); color: var(--coral); }
+.door--coral .door__ico .ico { background: var(--coral); }
+
+/* ── pending: numbered list ───────────────────────────────────────────── */
+.pending { padding: 16px 20px 6px; }
+.pending__head { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.pending__head .stat__ico { background: var(--coral-3); color: var(--coral); }
+.pending__head .stat__ico svg.s { width: 18px; height: 18px; }
+.pending__head .see { margin-left: auto; }
+.pending__list { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, auto); grid-auto-flow: column; column-gap: 40px; margin-top: 4px; }
+.prow { display: grid; grid-template-columns: 28px 34px 1fr auto 20px; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line-2); border-radius: 0; transition: background .2s; text-align: left; }
+.prow:nth-child(3n) { border-bottom: 0; }
+.prow:hover .prow__go { color: var(--ink); transform: translateX(2px); }
+.prow__n { font-size: 13px; color: var(--mute); font-variant-numeric: tabular-nums; }
+.prow__ico { width: 34px; height: 34px; border-radius: var(--r); display: grid; place-items: center; }
+.prow__ico i { width: 10px; height: 10px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 18%, transparent); }
+.prow__name { font-weight: 500; }
+.prow__val { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.prow.hot .prow__val { color: var(--coral); }
+.prow__go { color: var(--mute); transition: transform .2s, color .2s; }
+.prow__go svg.s { width: 18px; height: 18px; }
+
+/* ── rail ──────────────────────────────────────────────────────────────── */
+.panel { padding: 18px; }
+.panel .sec__head { margin-bottom: 12px; }
+.panel .sec__head h2 { font-size: 17px; }
+
+.fav { display: grid; grid-template-columns: 48px 1fr auto; align-items: center; gap: 12px; padding: 9px 6px; margin: 0 -6px; border-radius: var(--r); transition: background .2s; }
+.fav:hover { background: var(--mint); }
+.fav img { width: 48px; height: 48px; border-radius: var(--r); object-fit: cover; }
+.fav > div > b { display: block; font-weight: 600; font-size: 14px; }
+.fav > div > span { display: block; margin-top: 2px; font-size: 12px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sex { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 24px; padding: 0 7px; border-radius: 6px; font-size: 11px; font-weight: 600; line-height: 1; letter-spacing: .02em; }
+.sex.f { background: var(--coral-3); color: var(--coral); }
+.sex.ud { background: #E3EBF2; color: var(--navy); }
+
+.ann { padding: 12px; }
+.ann__stage { position: relative; height: 404px; }
+.ann__slide { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transform: translateX(14px); transition: opacity .5s var(--ease), transform .5s var(--ease); pointer-events: none; }
+.ann__slide.on { opacity: 1; transform: none; pointer-events: auto; }
+.ann__media { height: 190px; border-radius: 6px; overflow: hidden; flex: none; position: relative; }
+.ann__media img { width: 100%; height: 100%; object-fit: cover; }
+.ann__media--tone { display: flex; align-items: flex-end; padding: 18px; }
+.ann__media--tone.important { background: var(--coral-3); color: var(--coral); }
+.ann__media--tone.fact { background: var(--mint); color: var(--lime-ink); }
+.ann__media--tone .big-ico { position: absolute; right: -16px; top: -16px; width: 150px; height: 150px; opacity: .14; }
+.ann__media--tone strong { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.ann__kind { position: absolute; top: 12px; left: 12px; }
+.tag { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.tag--lime { background: var(--lime); color: #04361B; }
+.tag--coral { background: var(--coral); color: #fff; }
+.ann__body { padding: 16px 8px 0; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.ann__body h3 { font-size: 17px; font-weight: 600; line-height: 1.3; letter-spacing: -.01em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ann__body p { margin-top: 8px; font-size: 13px; line-height: 1.55; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.meta { margin-top: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--mute); }
+.av { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 600; background: var(--lime); color: #04361B; flex: none; }
+.ann__foot { display: flex; align-items: center; gap: 8px; padding: 14px 8px 4px; }
+.dots { display: flex; gap: 5px; margin-right: auto; }
+.dots button { width: 7px; height: 7px; border-radius: 4px; background: var(--line); transition: width .3s var(--ease), background .3s; }
+.dots button[aria-current] { width: 22px; background: var(--dark); }
+.nav { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line); transition: background .2s; }
+.nav:hover { background: var(--mint); }
+.nav svg.s { width: 16px; height: 16px; }
+
+.note { display: grid; grid-template-columns: 56px 1fr; gap: 12px; padding: 14px 6px; margin: 0 -6px; border-radius: var(--r); transition: background .2s; }
+.note + .note { border-top: 1px solid var(--line-2); }
+.note:hover { background: #F8FBFA; }
+.note__thumb { width: 56px; height: 56px; border-radius: var(--r); object-fit: cover; position: relative; display: grid; place-items: center; overflow: hidden; }
+.note__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.note__thumb.high { background: var(--coral-3); color: var(--coral); }
+.note__thumb.low { background: var(--mint); color: var(--teal); }
+.note__top { display: flex; align-items: baseline; gap: 8px; }
+.note__top b { font-weight: 600; }
+.note__top time { margin-left: auto; font-size: 11px; color: var(--mute); white-space: nowrap; }
+.prio { width: 7px; height: 7px; border-radius: 50%; flex: none; align-self: center; }
+.tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+.tags span { height: 22px; padding: 0 8px; border-radius: 6px; display: inline-flex; align-items: center; font-size: 11px; font-weight: 500; background: var(--mint); color: var(--ink-2); }
+.tags.crit span { background: var(--coral-3); color: #C2401F; }
+.note p { margin-top: 6px; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.note .meta { margin-top: 8px; }
+.note .meta .rx { margin-left: auto; display: flex; gap: 10px; }
+.note .meta .rx span { display: inline-flex; align-items: center; gap: 4px; }
+.note .meta svg.s { width: 14px; height: 14px; }
+
+/* ── floating actions ─────────────────────────────────────────────────── */
+.dock { position: fixed; left: calc(84px + (100vw - 84px - 372px) / 2); bottom: 22px; transform: translateX(-50%); z-index: 20; display: flex; gap: 10px; align-items: center; }
+.qa { height: 52px; padding: 0 20px 0 16px; border-radius: var(--r); display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 600; white-space: nowrap;
+  background: rgba(38, 39, 50, .88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 18px 40px -16px rgba(20, 22, 30, .7); transition: transform .2s var(--ease); }
+.qa:hover { transform: translateY(-2px); }
+.qa .grid4 { display: grid; grid-template-columns: 8px 8px; gap: 3px; }
+.qa .grid4 i { width: 8px; height: 8px; border-radius: 2px; background: var(--lime); }
+.qa .grid4 i:nth-child(2) { background: #fff; }
+.qa .grid4 i:nth-child(3) { background: #fff; }
+.chat { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; color: #04361B; background: var(--lime); box-shadow: 0 14px 30px -12px rgba(82, 249, 144, .95); transition: transform .2s var(--ease); }
+.chat:hover { transform: translateY(-2px) rotate(-6deg); }
+
+.toast { position: fixed; left: 50%; bottom: 92px; transform: translate(-50%, 12px); z-index: 30; padding: 10px 16px; border-radius: var(--r); background: var(--dark); color: #fff; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s var(--ease); }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* entrance */
+.rise { opacity: 0; transform: translateY(14px); animation: rise .7s var(--ease) forwards; animation-delay: calc(var(--d, 0) * 60ms + 80ms); }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+/* ── responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 1280px) {
+  .app { grid-template-columns: 76px minmax(0, 1fr); }
+  .rail { grid-column: 2; padding: 0 28px 120px; display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+  .rail .ann-wrap { grid-row: span 2; }
+  .side { grid-row: 1 / 3; align-self: start; }
+  .dock { left: calc(76px + (100vw - 76px) / 2); }
+  .main { padding-bottom: 8px; }
+}
+@media (max-width: 1080px) {
+  .mods { grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: 204px 204px 204px 180px 180px 180px auto;
+    grid-template-areas: "sp nat mor" "sp ani egg" "aud aud hos" "med hou hos" "die adm usr" "die mo2 sec" "pen pen pen"; }
+  .wx { display: none; }
+}
+@media (max-width: 860px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .side { display: none; }
+  .rail { grid-column: 1; padding: 0 16px 120px; grid-template-columns: 1fr; }
+  .rail .ann-wrap { grid-row: auto; }
+  .main { padding: 16px 16px 8px; }
+  .dock { left: 50%; }
+  .search { flex: 1; width: auto; }
+  .hello__hi { display: none; }
+  .hello__name { font-size: 17px; }
+  .mods { grid-template-columns: 1fr 1fr;
+    grid-template-rows: 200px 200px auto 190px 170px 170px 170px 170px 170px auto;
+    grid-template-areas: "sp nat" "sp mor" "aud aud" "ani egg" "hos med" "hos hou" "adm die" "usr die" "mo2 sec" "pen pen"; }
+  .pending__list { grid-template-columns: 1fr; grid-template-rows: none; grid-auto-flow: row; }
+  .prow:nth-child(3n) { border-bottom: 1px solid var(--line-2); }
+  .prow:last-child { border-bottom: 0; }
+  .hero { height: 280px; padding: 24px; }
+  .hero h1 { font-size: 34px; }
+  .hero__live { display: none; }
+  .styles { margin-left: 0; }
+}
+@media (max-width: 520px) {
+  .top { flex-wrap: wrap; }
+  .search { order: 3; flex: 1 0 100%; }
+  .mods { gap: 12px;
+    grid-template-rows: 150px 150px 200px auto 180px 160px 160px 160px 160px 160px auto;
+    grid-template-areas: "sp sp" "sp sp" "nat mor" "aud aud" "ani egg" "hos med" "hos hou" "adm die" "usr die" "mo2 sec" "pen pen"; }
+  .audit { grid-template-columns: 1fr; grid-template-rows: auto auto 150px; }
+  .audit__panel { padding: 14px; }
+  .big { font-size: 52px; }
+  .sec { margin-top: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .rise { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gaugeGrad" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#AFEFEB"/><stop offset=".55" stop-color="#52F990"/><stop offset="1" stop-color="#00C060"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="app">
+
+  <!-- ── sidebar ── -->
+  <nav class="side" aria-label="Main">
+    <a class="side__logo" href="#" aria-label="Antz"><img src="assets/img/antz-mark.svg" alt=""></a>
+    <a class="side__btn" href="#" aria-current="page" aria-label="Home">
+      <svg class="s" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+    </a>
+    <button class="side__btn" data-toast="Your Modules" aria-label="Modules">
+      <svg class="s" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    </button>
+    <button class="side__btn" data-toast="Communication" aria-label="Communication">
+      <svg class="s" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span class="dot"></span>
+    </button>
+    <button class="side__btn" data-toast="Favourites" aria-label="Favourites">
+      <svg class="s" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>
+    </button>
+    <button class="side__btn" data-toast="Users" aria-label="Users">
+      <svg class="s" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/></svg>
+    </button>
+    <div class="side__rule"></div>
+    <button class="side__btn" data-toast="Notes" aria-label="Observation notes">
+      <svg class="s" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
+    </button>
+    <div class="side__foot">
+      <button class="side__btn" data-toast="Settings" aria-label="Settings">
+        <svg class="s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+      <button class="side__btn" data-toast="Logout" aria-label="Logout">
+        <svg class="s" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── main ── -->
+  <main class="main">
+
+    <header class="top rise">
+      <div class="hello">
+        <img class="hello__av" src="assets/img/avatar.png" alt="">
+        <div>
+          <div class="hello__hi" id="greet">Good afternoon,</div>
+          <div class="hello__name">Sourav Tambe 👋</div>
+        </div>
+      </div>
+      <label class="search">
+        <svg class="s" viewBox="0 0 24 24" style="width:20px;height:20px"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" placeholder="Search “Ira”" aria-label="Search">
+        <span class="search__scan" title="Scan"><span class="ico" style="--i:url('assets/icon/scan.svg');width:18px;height:18px"></span></span>
+      </label>
+      <div class="wx" title="Drizzle">
+        <svg class="s" viewBox="0 0 24 24" style="color:#3B8BEB"><path d="M7 15a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19 9a4 4 0 0 1-1 7.9H7z" fill="#CFE3FB" stroke="#3B8BEB"/><path d="M9 19.5 8.5 21M13 19.5l-.5 1.5M17 19.5l-.5 1.5"/></svg>
+        <div><div class="wx__t">24°</div><div class="wx__d">Drizzle</div></div>
+      </div>
+      <button class="iconbtn" aria-label="Notifications" data-toast="Notifications">
+        <svg class="s" viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span class="dot"></span>
+      </button>
+    </header>
+
+    <div class="bar rise" style="--d:1">
+      <div class="sites" role="group" aria-label="Site" id="sites">
+        <button aria-pressed="true" data-site="all">All sites</button>
+        <button aria-pressed="false" data-site="cf">Crimson Frosted</button>
+        <button aria-pressed="false" data-site="cs">Clearspring</button>
+        <button aria-pressed="false" data-site="hp">Hollowpine</button>
+        <button aria-pressed="false" data-site="fg">Foxglen</button>
+      </div>
+      <nav class="styles" aria-label="Home style">
+        <a href="./?ms=1">Style 1</a><a href="./?ms=2">Style 2</a><a href="style-3.html" aria-current="page">Style 3</a><a href="style-4.html">Style 4</a><a href="style-5.html">Style 5</a>
+      </nav>
+    </div>
+
+    <!-- hero -->
+    <a class="hero rise" style="--d:2" href="#" data-toast="Opening Command Centre">
+      <img class="hero__img" src="assets/img/hero-banner-v2.jpg" alt="">
+      <span class="chip-glass"><i></i>Live across 4 sites</span>
+      <h1>Antz <em>Command Centre</em></h1>
+      <p>A clear view of what’s happening across the zoo.</p>
+      <span class="cta">Open Command Centre <b><span class="ico arrow-ne"></span></b></span>
+    </a>
+
+    <!-- modules: every card on the home page is a module -->
+    <section class="sec">
+      <div class="sec__head rise" style="--d:3">
+        <h2>Modules</h2>
+        <div class="sec__tools">
+          <button class="tool" aria-label="Add module" data-toast="Your Modules"><svg class="s" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="tool" aria-label="Edit modules" data-toast="Edit mode"><svg class="s" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></button>
+        </div>
+      </div>
+      <div class="mods">
+        <a class="card ga-sp species rise" style="--d:4" href="#" data-toast="Species Management">
+          <img src="assets/img/species-cheetahs.jpg" alt="">
+          <h3>Species Management</h3>
+          <div class="species__nums">
+            <div><div class="big-s" data-k="species">2,411</div><div class="lbl">Species</div></div>
+            <div><div class="big-s" data-k="animals">110,020</div><div class="lbl">Animal population</div></div>
+          </div>
+        </a>
+        <div class="card ga-nat stat natality rise" style="--d:5" data-stat="natality">
+          <div class="stat__head">
+            <span class="stat__ico"><span class="ico" style="--i:url('assets/icon/ki-natality.svg')"></span></span>Natality
+
+          </div>
+          <div class="seg" role="group" aria-label="Range"><button aria-pressed="true" data-r="0">7D</button><button aria-pressed="false" data-r="1">30D</button><button aria-pressed="false" data-r="2">30+</button></div>
+          <div class="big" data-v>76</div>
+          <div class="lbl">Births recorded</div>
+        </div>
+        <a class="card ga-aud audit rise" style="--d:6" href="#" data-toast="Animal audit">
+          <div class="audit__head">
+            <span class="stat__ico"><span class="ico" style="--i:url('assets/icon/m-audit.svg')"></span></span>Animal audit
+            <span class="live"><i></i>LIVE</span>
+          </div>
+          <div class="audit__panel">
+            <div class="gauge">
+              <svg viewBox="0 0 168 92" aria-hidden="true">
+                <path class="gauge__track" d="M12 84a72 72 0 0 1 144 0" stroke-width="16" stroke-linecap="round" fill="none"/>
+                <path class="gauge__val" id="gaugeVal" d="M12 84a72 72 0 0 1 144 0" stroke-width="16" stroke-linecap="round" fill="none"/>
+              </svg>
+              <div class="gauge__num"><b id="auditNum">68%</b><span>Audit score</span></div>
+            </div>
+          </div>
+          <div class="bars" id="bars">
+            <div class="site" data-site="cf"><small>Crimson Frosted</small><b>72<sup>%</sup></b><span class="site__bar"><i data-w="72"></i></span></div>
+            <div class="site" data-site="cs"><small>Clearspring</small><b>64<sup>%</sup></b><span class="site__bar"><i data-w="64"></i></span></div>
+            <div class="site best" data-site="hp"><small>Hollowpine</small><b>81<sup>%</sup></b><span class="site__bar"><i data-w="81"></i></span></div>
+            <div class="site low" data-site="fg"><small>Foxglen</small><b>55<sup>%</sup></b><span class="site__bar"><i data-w="55"></i></span></div>
+          </div>
+        </a>
+        <div class="card ga-mor stat mortality dark rise" style="--d:7" data-stat="mortality">
+          <div class="stat__head">
+            <span class="stat__ico"><span class="ico" style="--i:url('assets/icon/ki-mortality.svg')"></span></span>Mortality
+
+          </div>
+          <div class="seg" role="group" aria-label="Range"><button aria-pressed="true" data-r="0">7D</button><button aria-pressed="false" data-r="1">30D</button><button aria-pressed="false" data-r="2">30+</button></div>
+          <div class="big" data-v>192</div>
+          <div class="lbl">Deaths recorded</div>
+        </div>
+        <a class="card ga-ani stat animals rise" style="--d:8" href="#" data-toast="Animals">
+          <div class="stat__head">Animals</div>
+          <div class="big" data-k="new">643</div>
+          <div class="lbl">Newly added animals</div>
+        </a>
+        <a class="card ga-egg eggs rise" style="--d:9" href="#" data-toast="Eggs">
+          <div class="mesh"><i></i><i></i><i></i></div>
+          <span class="badge3d"><span class="ico" style="--i:url('assets/icon/m-eggs.svg')"></span></span>
+          <h3>Eggs<span>from clutch to hatch.</span></h3>
+        </a>
+        <a class="card ga-hos photo rise" style="--d:10" href="#" data-toast="Hospital">
+          <img src="assets/img/hospital.jpg" alt="">
+          <span class="photo__plus"><svg class="s" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+          <div class="glass"><b>Hospital</b><span>Admissions and active cases</span></div>
+        </a>
+        <a class="card ga-med door door--white rise" style="--d:11" href="#" data-toast="Medical">
+          <span class="door__ico"><span class="ico" style="--i:url('assets/icon/m-medical.svg')"></span></span>
+          <b>Medical</b><span>Treatments and clinical requests</span>
+        </a>
+        <a class="card ga-hou door door--lime rise" style="--d:12" href="#" data-toast="Housing">
+          <span class="door__ico"><span class="ico" style="--i:url('assets/icon/m-housing.svg')"></span></span>
+          <b>Housing</b><span>Sections and enclosures</span>
+        </a>
+        <a class="card ga-die photo rise" style="--d:13" href="#" data-toast="Diet &amp; Kitchen">
+          <img src="assets/img/diet-kitchen.jpg" alt="">
+          <span class="photo__plus"><svg class="s" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+          <div class="glass"><b>Diet &amp; Kitchen</b><span>Diet plans and feed stock</span></div>
+        </a>
+        <a class="card ga-adm door door--white rise" style="--d:14" href="#" data-toast="Administer">
+          <span class="door__ico"><span class="ico" style="--i:url('assets/icon/m-administer.svg')"></span></span>
+          <b>Administer</b><span>Vaccines and deworming</span>
+        </a>
+        <a class="card ga-usr door door--dark rise" style="--d:15" href="#" data-toast="Users">
+          <span class="door__ico"><span class="ico" style="--i:url('assets/icon/m-users.svg')"></span></span>
+          <b>Users</b><span>Staff, roles and shifts</span>
+        </a>
+        <a class="card ga-mo2 door door--white door--coral rise" style="--d:16" href="#" data-toast="Mortality">
+          <span class="door__ico"><span class="ico" style="--i:url('assets/icon/ki-mortality.svg')"></span></span>
+          <b>Mortality</b><span>Deaths and necropsy records</span>
+        </a>
+        <a class="card ga-sec door door--navy rise" style="--d:17" href="#" data-toast="Security">
+          <span class="door__ico"><span class="ico" style="--i:url('assets/icon/m-security.svg')"></span></span>
+          <b>Security</b><span>Gates, patrols and access</span>
+        </a>
+        <div class="card pending ga-pen" style="--d:18">
+          <div class="pending__head">
+            <span class="stat__ico"><svg class="s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Pending
+            <a class="see" href="#" data-toast="All pending">View all</a>
+          </div>
+          <div class="pending__list" id="pending"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── right rail ── -->
+  <aside class="rail">
+    <section class="card panel rise" style="--d:3">
+      <div class="sec__head"><h2>Favourites <span class="count">4</span></h2><span class="sec__tools"><a class="see" href="#" data-toast="Favourites">See all</a></span></div>
+      <div id="favs"></div>
+    </section>
+
+    <section class="card panel ann ann-wrap rise" style="--d:5">
+      <div class="sec__head" style="padding:6px 6px 0"><h2>Announcements</h2><span class="sec__tools"><a class="see" href="#" data-toast="Announcements">View all</a></span></div>
+      <div class="ann__stage" id="annStage"></div>
+      <div class="ann__foot">
+        <div class="dots" id="annDots"></div>
+        <button class="nav" id="annPrev" aria-label="Previous"><svg class="s" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button class="nav" id="annNext" aria-label="Next"><svg class="s" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      </div>
+    </section>
+
+    <section class="card panel rise" style="--d:7">
+      <div class="sec__head"><h2>Observation Notes</h2><span class="sec__tools"><a class="see" href="#" data-toast="Observation Notes">View all</a></span></div>
+      <div id="notes"></div>
+    </section>
+  </aside>
+</div>
+
+<div class="dock">
+  <button class="qa" data-toast="Quick Actions"><span class="grid4"><i></i><i></i><i></i><i></i></span>Quick Actions</button>
+  <button class="chat" aria-label="Communication" data-toast="Communication">
+    <svg class="s" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01" stroke-width="2.6"/></svg>
+  </button>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* greeting by the hour */
+  var h = new Date().getHours();
+  $('#greet').textContent = (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + ',';
+
+  /* toast: stands in for pages that open in the app */
+  var toast = $('#toast'), tt;
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-toast]');
+    if (!t) return;
+    e.preventDefault();
+    toast.textContent = t.getAttribute('data-toast') + ' · opens in the ANTZ app';
+    toast.classList.add('on');
+    clearTimeout(tt); tt = setTimeout(function () { toast.classList.remove('on'); }, 1800);
+  });
+
+  /* counting numbers */
+  function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+  function countTo(el, to, suffix) {
+    suffix = suffix || '';
+    if (reduce) { el.textContent = fmt(to) + suffix; return; }
+    var from = parseFloat((el.textContent || '0').replace(/[^0-9.]/g, '')) || 0;
+    var t0 = performance.now(), dur = 900;
+    (function step(t) {
+      var p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(from + (to - from) * e) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+
+  /* per-site figures (sample values for the 30D / 30+ ranges) */
+  var SITES = {
+    all: { species: 2411, animals: 110020, new: 643, natality: [76, 318, 1142], mortality: [192, 806, 2954], audit: 68 },
+    cf:  { species: 697, animals: 14445, new: 188, natality: [24, 97, 352], mortality: [51, 214, 790], audit: 72 },
+    cs:  { species: 488, animals: 12820, new: 141, natality: [17, 71, 260], mortality: [44, 188, 676], audit: 64 },
+    hp:  { species: 534, animals: 11081, new: 164, natality: [21, 86, 301], mortality: [39, 170, 611], audit: 81 },
+    fg:  { species: 736, animals: 10178, new: 150, natality: [14, 64, 229], mortality: [58, 234, 877], audit: 55 }
+  };
+  var site = 'all';
+
+  /* gauge */
+  var gv = $('#gaugeVal'), glen = gv.getTotalLength();
+  function gauge(p) { gv.style.strokeDasharray = (glen * p / 100) + ' ' + glen; countTo($('#auditNum'), p, '%'); }
+
+  function paintStats() {
+    var s = SITES[site];
+    $$('[data-k]').forEach(function (el) { countTo(el, s[el.getAttribute('data-k')]); });
+    $$('[data-stat]').forEach(function (card) {
+      var r = +card.querySelector('[aria-pressed="true"]').getAttribute('data-r');
+      countTo(card.querySelector('[data-v]'), s[card.getAttribute('data-stat')][r]);
+    });
+    gauge(s.audit);
+    var bars = $('#bars');
+    if (site === 'all') bars.removeAttribute('data-focus'); else bars.setAttribute('data-focus', site);
+    $$('.site', bars).forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-site') === site); });
+  }
+
+  $('#sites').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    $$('#sites button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    site = b.getAttribute('data-site');
+    paintStats();
+  });
+  $$('[data-stat] .seg').forEach(function (seg) {
+    seg.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      $$('button', seg).forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      var card = seg.closest('[data-stat]');
+      countTo(card.querySelector('[data-v]'), SITES[site][card.getAttribute('data-stat')][+b.getAttribute('data-r')]);
+    });
+  });
+
+  /* pending */
+  var PENDING = [
+    ['Deworming', 319, '#FA6140', true], ['Vaccinations', 143, '#FA6140', true],
+    ['Necropsy reports', 14296, '#2BD873'], ['Sexing', 28532, '#1F415B'],
+    ['Microchipping', 20302, '#00ABAB'], ['Transfer pending', 16, '#52F990']
+  ];
+  $('#pending').innerHTML = PENDING.map(function (p, i) {
+    return '<a class="prow' + (p[3] ? ' hot' : '') + '" href="#" data-toast="' + p[0] + '">' +
+      '<span class="prow__n">0' + (i + 1) + '</span>' +
+      '<span class="prow__ico" style="color:' + p[2] + ';background:color-mix(in srgb,' + p[2] + ' 10%, #fff)"><i></i></span>' +
+      '<span class="prow__name">' + p[0] + '</span>' +
+      '<span class="prow__val">' + p[1].toLocaleString('en-US') + '</span>' +
+      '<span class="prow__go"><svg class="s" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></a>';
+  }).join('');
+
+  /* favourites */
+  var FAVS = [
+    [190317, 'Slate Pangolin', 'Ridge Path Enclosure', 'F', 'chital'],
+    [143944, 'Glacial Egret', 'Thistle Spring Den', 'UD', 'sarus-crane'],
+    [172277, 'Russet Whipsnake', 'Cedar Ridge Habitat', 'UD', 'indian-rock-python'],
+    [169095, 'Marbled Phantom Saki', 'Ivy Marsh Terrarium', 'F', 'sloth-bear']
+  ];
+  $('#favs').innerHTML = FAVS.map(function (f) {
+    return '<a class="fav" href="#" data-toast="' + f[1] + '"><img src="assets/img/species/' + f[4] + '.jpg" alt="">' +
+      '<div><b>' + f[1] + '</b><span>AAID ' + f[0] + ' · ' + f[2] + '</span></div>' +
+      '<span class="sex ' + f[3].toLowerCase() + '" title="' + (f[3] === 'F' ? 'Female' : 'Undetermined') + '">' + f[3] + '</span></a>';
+  }).join('');
+
+  /* announcements */
+  var ANN = [
+    { t: 'Zara and Kian, our leopard cubs, go on exhibit from Monday', by: 'Emerson Vance', d: '24 Aug 2026', img: 'assets/img/hero-leopard.jpg', pos: '50% 30%',
+      b: 'After twelve weeks in the den the two Persian leopard cubs have passed their final health check and will be out in the main habitat from Monday morning. Please keep the service path behind the exhibit closed between 09:00 and 11:00 while they get used to the space.' },
+    { t: 'World African Wild Dog Day: meet the pack this Saturday', by: 'Kunal Singh', d: '27 Aug 2026', img: 'assets/img/species.jpg',
+      b: 'Did you know that African wild dogs are the ultimate team players? Every hunt is shared, every pup is fed first, and no member of the pack is left behind. Join the Carnivore Section keepers at the viewing deck at 11:00.' },
+    { t: 'Please follow all safety protocols carefully to ensure smooth and secure daily operations', by: 'Vantara admin', d: '26 Aug 2026', tone: 'important',
+      b: 'Report any hazard to your section head at once, wear your issued PPE in every holding area, and never enter a night house alone.' },
+    { t: 'Quarterly health checks begin 7 September', by: 'Hospital team', d: '22 Aug 2026', img: 'assets/img/hospital.jpg',
+      b: 'The veterinary hospital starts the quarterly round on 7 September, section by section, beginning with Hoofstock. Please have weights, body-condition scores and any open medical notes updated in ANTZ before your date.' },
+    { t: 'Did you know? Orangutans share nearly 97% of our DNA', by: 'Kunal Singh', d: '18 Aug 2026', tone: 'fact',
+      b: 'New enrichment platforms go up in the Primate House this week; the keepers would love to hear how the troop takes to them, so log what you see in the daily notes.' },
+    { t: 'Fresh browse deliveries move to a morning schedule', by: 'Diet Kitchen', d: '12 Aug 2026', img: 'assets/img/diet-kitchen.jpg',
+      b: 'From next week the browse and produce delivery arrives at the Diet Kitchen at 06:30 instead of 14:00, so every section collects its rations before the first feed.' }
+  ];
+  function initials(n) { return n.split(/\s+/).map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase(); }
+  $('#annStage').innerHTML = ANN.map(function (a, i) {
+    var media = a.img
+      ? '<div class="ann__media"><img src="' + a.img + '" alt="" style="object-position:' + (a.pos || '50% 50%') + '"><span class="ann__kind"><span class="tag tag--lime">Announcement</span></span></div>'
+      : '<div class="ann__media ann__media--tone ' + a.tone + '"><svg class="s big-ico" viewBox="0 0 24 24">' +
+          (a.tone === 'important' ? '<path d="M12 2 22 12 12 22 2 12z"/><path d="M12 8v5M12 16h.01"/>' : '<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/>') +
+        '</svg><span class="ann__kind"><span class="tag ' + (a.tone === 'important' ? 'tag--coral' : 'tag--lime') + '">' + (a.tone === 'important' ? 'Important' : 'Did you know') + '</span></span>' +
+        '<strong>' + (a.tone === 'important' ? 'Safety first' : 'Primate House') + '</strong></div>';
+    return '<a class="ann__slide' + (i ? '' : ' on') + '" href="#" data-toast="Announcement">' + media +
+      '<div class="ann__body"><h3>' + a.t + '</h3><p>' + a.b + '</p>' +
+      '<div class="meta"><span class="av">' + initials(a.by) + '</span>' + a.by + ' · ' + a.d + '</div></div></a>';
+  }).join('');
+  $('#annDots').innerHTML = ANN.map(function (_, i) { return '<button aria-label="Announcement ' + (i + 1) + '"' + (i ? '' : ' aria-current="true"') + '></button>'; }).join('');
+  var ai = 0, timer;
+  function show(n) {
+    ai = (n + ANN.length) % ANN.length;
+    $$('.ann__slide').forEach(function (s, i) { s.classList.toggle('on', i === ai); });
+    $$('#annDots button').forEach(function (d, i) { if (i === ai) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
+  }
+  function auto() { clearInterval(timer); if (!reduce) timer = setInterval(function () { show(ai + 1); }, 6000); }
+  $('#annPrev').onclick = function () { show(ai - 1); auto(); };
+  $('#annNext').onclick = function () { show(ai + 1); auto(); };
+  $('#annDots').onclick = function (e) { var b = e.target.closest('button'); if (b) { show($$('#annDots button').indexOf(b)); auto(); } };
+  var stage = $('#annStage');
+  stage.addEventListener('mouseenter', function () { clearInterval(timer); });
+  stage.addEventListener('mouseleave', auto);
+  auto();
+
+  /* observation notes */
+  var NOTES = [
+    { t: 'Deep Flank Wound', d: '03 Sep', prio: '#FA6140', crit: true, tags: ['Open Wound', 'Bleeding'], img: 'assets/img/v2-note-tiger.jpg',
+      b: 'Found a 6cm laceration on the left flank during the morning check, still bleeding lightly.', by: 'Emerson Vance', l: 12, c: 4 },
+    { t: 'Metal Work', d: '02 Sep', prio: '#FF9A3D', tags: ['Rust and Corrosion', 'Structural Changes'], tone: 'high',
+      b: 'The lower rail on the north gate has rusted through where it meets the post, and the whole panel now flexes.', by: 'Kai Vance', l: 31, c: 9 },
+    { t: 'Coat Condition', d: '30 Aug', prio: '#00ABAB', tags: ['Grooming', 'Routine Check'], tone: 'low',
+      b: 'Slight thinning across the shoulders on four of the herd, most likely the seasonal moult rather than anything to treat.', by: 'Jordan Brenner', l: 5, c: 2 }
+  ];
+  var noteIco = '<svg class="s" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>';
+  $('#notes').innerHTML = NOTES.map(function (n) {
+    return '<a class="note" href="#" data-toast="' + n.t + '">' +
+      (n.img ? '<span class="note__thumb"><img src="' + n.img + '" alt=""></span>' : '<span class="note__thumb ' + n.tone + '">' + noteIco + '</span>') +
+      '<div><div class="note__top"><span class="prio" style="background:' + n.prio + '"></span><b>' + n.t + '</b><time>' + n.d + '</time></div>' +
+      '<div class="tags' + (n.crit ? ' crit' : '') + '">' + n.tags.map(function (g) { return '<span>' + g + '</span>'; }).join('') + '</div>' +
+      '<p>' + n.b + '</p>' +
+      '<div class="meta"><span class="av">' + initials(n.by) + '</span>' + n.by +
+      '<span class="rx"><span><svg class="s" viewBox="0 0 24 24"><path d="M7 10v11H4V10zM7 10l4-8a3 3 0 0 1 3 3v4h5.5a2 2 0 0 1 2 2.3l-1.4 8A2 2 0 0 1 18.1 21H7"/></svg>' + n.l + '</span>' +
+      '<span><svg class="s" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>' + n.c + '</span></span></div></div></a>';
+  }).join('');
+
+  /* first paint: bars + gauge animate in */
+  setTimeout(function () {
+    $$('#bars .site__bar i').forEach(function (i) { i.style.width = i.getAttribute('data-w') + '%'; });
+    gauge(SITES.all.audit);
+  }, reduce ? 0 : 450);
+})();
+</script>
+</body>
+</html>
