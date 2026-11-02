@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+  <!-- My Focus Hub's folder, drawn from the ANTZ app's own screen (2 Nov 2026): a pale yellow tile, an open folder -->
+  <rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="#FEFAD6" stroke="#F9EDB1"/>
+  <path d="M7.4 27.4V11.3a1.6 1.6 0 0 1 1.6-1.6h5.5a1.6 1.6 0 0 1 1.5 1.1l.8 2.6h10.4a2 2 0 0 1 2 2v1.5" fill="#fff" stroke="#655441" stroke-width="1.3" stroke-linejoin="round"/>
+  <path d="M10.6 16.6h20.6a.9.9 0 0 1 .86 1.15l-2.9 9.7a1.2 1.2 0 0 1-1.15.85H8.4a.9.9 0 0 1-.86-1.15l2.2-9.85a.9.9 0 0 1 .86-.7z" fill="#FFE86D" stroke="#655441" stroke-width="1.3" stroke-linejoin="round"/>
+</svg>

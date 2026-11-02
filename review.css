@@ -638,7 +638,8 @@ html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__box { po
 html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__head { position: relative; z-index: 1; height: auto; }
 html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__rail { position: relative; z-index: 1; margin: 0; padding: 12px; border-radius: 12px; scroll-padding-inline: 12px; }
 html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tabs { --tab-hug: 0; gap: 6px; height: auto; align-items: flex-end; box-shadow: none; }
-html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tab { --tab-gap: 6px; flex: 1 1 0; width: auto; min-width: 0; height: 54px; margin-bottom: 8px; padding: 0 4px; overflow: visible;
+/* margin-bottom = the row's gap: each soft pill 6 clear on every side (owner, 2 Nov 2026: "equal spacing all sides"; it was 8 under) */
+html:root[data-review][data-home='v2']:where(:not([data-v2desk])) .fav__tab { --tab-gap: 6px; flex: 1 1 0; width: auto; min-width: 0; height: 54px; margin-bottom: 6px; padding: 0 4px; overflow: visible;
   flex-direction: column; justify-content: center; gap: 6px; border-radius: 12px; background-color: rgba(255, 255, 255, .55);
   color: rgba(68, 84, 74, .88); font: 500 12.5px/1 Inter, var(--font); letter-spacing: .1px;
   transition: background-color .3s ease .14s, color .26s ease; }   /* the pill comes back once the folder has left it */
@@ -1403,17 +1404,36 @@ html:root[data-review][data-home='v2'] .fav-band.has-tabs .fav__head { display: 
 :root.has-wsky[data-sky-tone='dark'] .fav__tab[aria-selected='true'] { color: #fff; }
 :root.has-wsky[data-sky-tone='dark'] .fav__tabbar { background: #fff; }
 :root.has-wsky[data-sky-tone='dark'] .fav__tabs { box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .16); }
-/* the cards the tabs add: a Favourite star or a Bookmark mark on the corner the
-   sex tag leaves free (its 24 by 24, 6 round), a type tag on the other */
-.fav__mark { position: absolute; z-index: 2; top: 8px; left: 8px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: rgba(255, 255, 255, .92); color: #1F515B; }
-.fav__mark--star { color: #F2B01E; }
+/* the cards the tabs add: a Bookmark mark on the corner the sex tag leaves free
+   (its 24 by 24, 6 round) — a favourite has no star and an enclosure no
+   "Enclosure" tag since 2 Nov 2026 (owner: "remove star", "remove the Enclosure badge") */
+.fav__mark { position: absolute; z-index: 2; top: 8px; left: 8px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; background: rgba(255, 255, 255, .92); color: #37453C; }
 .fav__mark svg { width: 14px; height: 14px; }
-.fav__tag { position: absolute; z-index: 2; top: 8px; right: 8px; display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 7px; border-radius: 6px; background: rgba(255, 255, 255, .92); color: #1F415B; font: 600 11px/1 Inter, var(--font); letter-spacing: .1px; }
-.fav__tag svg { width: 13px; height: 13px; }
-/* a folder: its first four photos as the cover, the card's own scrim over them */
-.fav__mosaic { position: absolute; inset: 0; display: grid; grid-template: 1fr 1fr / 1fr 1fr; gap: 2px; background: rgba(255, 255, 255, .85); }
-.fav__mosaic > * { position: relative; width: 100%; height: 100%; min-height: 0; overflow: hidden; }
-.fav__mosaic img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* A CARD WITH NO PHOTOGRAPH (owner, 2 Nov 2026, over the app's My Focus Hub:
+   "with image & without image show antz logo"): no scrim. An animal or an
+   enclosure with no photo wears the ANTZ mark in light grey, #C3CEC7 (owner:
+   "antz logo should be light gray"), in the room over its name; a kind of
+   bookmark wears its mark in a white disc — the add card's — and a folder the
+   app's yellow folder.
+   THE COLOURS ARE THE OWNER'S FIGMA (Desktop-Navigation, node 1031:2721, same
+   day: "check this for empty, colours and all"): the card MD3_Antz/Background
+   #EFF5F2, its name MD3_Antz/OnPrimaryContainer #1F515B, the line under it
+   OnSurfaceVariant. And NO CSS MASKS: Figma's capture drew each mask as an
+   empty box, so the mark and the kinds' marks are real SVG images
+   (antz-mark-grey.svg, fh-note/medical/lab.svg). */
+html:root[data-review][data-home='v2'] .fav__card--plain { background: #EFF5F2; color: #1F515B; }
+html:root[data-review][data-home='v2'] .fav__card--plain::after { display: none; }
+html:root[data-review][data-home='v2'] .fav__card--plain .fav__meta { color: var(--c-on-surface-var, #44544A); opacity: 1; }
+.antz-noimg { display: grid; place-items: center; background: #EFF5F2; }
+.antz-noimg > img { display: block; width: 46%; height: auto; }
+.fav__card > .antz-noimg { align-items: start; padding-top: 26px; background: none; }
+.fav__card > .antz-noimg > img { width: 44%; }
+.fav__glyph { position: absolute; top: 12px; left: 12px; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #fff; }
+.fav__glyph.is-folder { border-radius: 0; background: none; }
+.fh-folder { display: block; width: 40px; height: 40px; }
+.fav__gi { display: block; width: 22px; height: 22px; }
+/* a name with no line under it — an enclosure, a kind, a folder — may take two lines */
+html:root[data-review][data-home='v2'] :is(.fav__card--group, .fav__txt:not(:has(.fav__meta))) .fav__name { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
 /* View all and Back: the add card, kept beside other cards (the page hides an
    add card that is not alone, and the web hides it outright) */
 .fav__item > .fav__card--all { display: flex !important; gap: 8px; }
@@ -1472,3 +1492,146 @@ html:root[data-home='v2'] .qa.is-scrolled .qa-pill__t { max-width: 12em; opacity
 }
 .qa-fold__fill { display: block; width: 24px; height: 24px; background: var(--ink-head, #44544A);
   -webkit-mask: var(--qa-head) center / contain no-repeat; mask: var(--qa-head) center / contain no-repeat; }
+
+/* ══ MY FOCUS HUB, THE PAGE (owner, 2 Nov 2026: "if I click it has to go to
+   the same page — My Focus Hub"; ModulePages.js, ROUTES.focus) ═════════════
+   THE APP'S SCREEN, MEASURED (owner, same day: "has to match my reference
+   image accurate"). Every size below is read off the four screenshots of the
+   ANTZ app in My Focus Hub/ (an iPhone 402 wide, at 3×), and every colour is
+   the Antz token the app paints (the screenshots are Display P3, so their raw
+   numbers sit a little off the sRGB tokens):
+     · the type is the app's — the system font (SF Pro), 12px for nearly
+       everything, 14 for a row's name, 17 for the title;
+     · OnSurfaceVariant #44544A the text, OnPrimaryContainer #1F515B the AAID,
+       the search and the picked chip, Antz Primary the picked tab, mute
+       #7A8684 the Latin name, #C3CEC7 the hairline, #DAE7DF the list ground;
+     · the sex tile Secondary (M) or Tertiary (F), the letter white.
+   On the web the content keeps to 1120 and the cards go two or three across. */
+.mpage[data-mod='focus'] { --fh-ground: #DAE7DF; --fh-ink: var(--c-on-surface-var, #44544A); --fh-teal: var(--c-on-primary-ctr, #1F515B); --fh-mute: #7A8684;
+  --fh-field: #F2F2F2; --fh-chip: #E0EBE9; --fh-line: #C3CEC7; --fh-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; font-family: var(--fh-font); }
+.mpage[data-mod='focus'] .mpage__bar { min-height: 60px; padding: max(3px, env(safe-area-inset-top)) 16px 0; gap: 6px; background: #fff; }
+.mpage[data-mod='focus'] .mpage__back { margin-left: -10px; }
+.mpage[data-mod='focus'] .mpage__back svg { width: 22px; height: 22px; }
+/* over the module pages' navy title (.mpage:not(…):not(…) .mpage__title) */
+html .mpage[data-mod='focus'][data-view='focus'] :is(.mpage__title, .mpage__back) { color: var(--fh-ink); }
+html .mpage[data-mod='focus'][data-view='focus'] .mpage__title { font: 500 17px/22px var(--fh-font); letter-spacing: 0; }
+.mpage[data-mod='focus'] .mpage__body { gap: 0; padding: 0; background: var(--fh-ground); color: var(--fh-ink); }
+.fh { --fh-wide: max(0px, calc((100% - 1120px) / 2)); --fh-pad: max(16px, var(--fh-wide)); display: flex; flex-direction: column; min-height: 100%; font: 400 12px/1.2 var(--fh-font); }
+.fh-top { display: flex; flex-direction: column; gap: 12px; padding-bottom: 12px; background: #fff; }
+.fh-top > :not(.fh-tabs, .fh-chips) { margin-inline: var(--fh-pad); }
+.fh-ground { flex: 1 0 auto; display: flex; flex-direction: column; padding: 16px var(--fh-pad) 32px; }
+
+/* the tabs: each as wide as its mark and name, the row filled; a 1px hairline under all, a 2px Primary bar under the picked */
+.fh-tabs { display: flex; margin-inline: var(--fh-wide); box-shadow: inset 0 -1px 0 var(--fh-line); }
+.fh-tab { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 4px; height: 46px; padding: 0 12px 2px; border-bottom: 2px solid transparent;
+  color: var(--fh-ink); font: 500 12px/1 var(--fh-font); white-space: nowrap; text-decoration: none; transition: color .2s ease, border-color .2s ease; }
+.fh-tab svg { flex: none; width: 16px; height: 16px; }
+.fh-tab[aria-selected='true'] { border-bottom-color: var(--c-primary, #37BD69); color: var(--c-primary, #37BD69); }
+
+/* the chips: 32 tall, r8, 14 apart, 12.5 in from the edge; Favourites' two share the row, Bookmarks' hug their names */
+.fh-chips { display: flex; gap: 14px; margin-inline: max(12.5px, var(--fh-wide)); overflow-x: auto; scrollbar-width: none; }
+.fh-chips::-webkit-scrollbar { display: none; }
+.fh-chips.is-even > * { flex: 1 1 0; }
+.fh-chip { flex: none; display: grid; place-items: center; height: 32px; padding: 0 12.5px; border-radius: 8px; background: var(--fh-chip); color: var(--fh-teal);
+  font: 500 12px/1 var(--fh-font); white-space: nowrap; text-decoration: none; transition: background-color .2s ease, color .2s ease; }
+.fh-chip[aria-pressed='true'] { background: var(--fh-teal); color: #fff; }
+
+/* the search, 48 tall, its mark and words in OnPrimaryContainer; the filter a 48 square beside it, 8 apart */
+.fh-find { display: flex; gap: 8px; }
+.fh-search { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 9px; height: 48px; padding: 0 10px; border-radius: 10px; background: var(--fh-field); color: var(--fh-teal); cursor: text; }
+.fh-search svg { flex: none; width: 18px; height: 18px; }
+.fh-search input { flex: 1 1 auto; min-width: 0; border: 0; background: none; color: var(--fh-teal); font: 500 12px/1 var(--fh-font); outline: none; }
+.fh-search input::placeholder { color: var(--fh-teal); opacity: 1; }
+.fh-search:focus-within { box-shadow: inset 0 0 0 1.5px var(--c-primary, #37BD69); }
+.fh-fbtn { flex: none; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 10px; background: var(--fh-field); color: var(--fh-ink); cursor: pointer; }
+.fh-fbtn svg { width: 18px; height: 18px; }
+
+/* the list: white r12 cards 12 apart on the ground */
+.fh-list { display: grid; gap: 12px; }
+@media (min-width: 900px) { .fh-list { grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); } }
+.fh-card { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; padding: 8px; border: 0; border-radius: 12px; background: #fff; color: var(--fh-ink);
+  font: inherit; text-align: left; text-decoration: none; cursor: pointer; transition: transform .16s ease; }
+.fh-card:active { transform: scale(.985); }
+.fh-ph { position: relative; flex: none; width: 115px; height: 115px; overflow: hidden; border-radius: 7px; background: #EFF5F2; }
+.fh-ph > :is(.fh-img, .antz-noimg, .dood) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.fh-ph.is-round { width: 50px; height: 50px; border-radius: 50%; }
+.fh-ph.is-sm { width: 66px; height: 66px; }
+/* the sex: a solid 24 tile 4 in from the photo's corner, its letter white */
+.fh-sex { position: absolute; z-index: 1; top: 4px; left: 4px; display: grid; place-items: center; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 6px;
+  background: var(--fh-mute); color: #fff; font: 400 12px/1 var(--fh-font); font-style: normal; }
+.fh-sex[data-s='m'] { background: var(--c-secondary, #00D6C9); }
+.fh-sex[data-s='f'] { background: var(--c-tertiary, #FA6140); }
+.fh-zoom { position: absolute; z-index: 1; right: 5px; bottom: 5px; width: 11px; height: 11px; }
+/* an animal: the photo, then AAID · Name · species · Latin · Encl, 12px on an 18.6 line, top with the photo */
+.fh-animal { align-items: flex-start; }
+.fh-txt { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; margin-top: -2px; font: 600 12px/18.6px var(--fh-font); color: var(--fh-ink); }
+.fh-txt > * { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fh-txt i { font-weight: 400; color: var(--fh-mute); }
+.fh-aaid { color: var(--fh-teal); }
+
+/* an enclosure: a 66 row, r8, 8 apart, its 50 round photo, its name 14 semibold 13 along */
+.fh-list.is-rows { gap: 8px; margin-top: -2px; }
+.fh-row { gap: 13px; border-radius: 8px; }
+.fh-row b { flex: 1 1 auto; min-width: 0; font: 600 14px/18px var(--fh-font); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* a note: the app's note card — a 4 white frame round the photo (362 × 350 on
+   the phone), its words over a dark foot, the site, two lines, the actions */
+.fh-list.is-notes { margin-top: 8px; }
+.fh-note { display: flex; flex-direction: column; min-width: 0; padding: 4px 4px 16px; border-radius: 12px; background: #fff; color: var(--fh-ink); }
+.fh-note__ph { position: relative; display: block; width: 100%; aspect-ratio: 362 / 350; padding: 0; border: 0; border-radius: 8px; overflow: hidden; background: #EFF5F2; cursor: pointer; text-align: left; }
+.fh-note__ph > :is(.fh-img, .antz-noimg, .dood) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.fh-note__ph::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .78)); }
+.fh-note__over { position: absolute; z-index: 1; left: 18px; right: 56px; bottom: 14px; display: flex; flex-direction: column; color: #fff; }
+.fh-note__over b { font: 600 20px/24px var(--fh-font); }
+.fh-note__over span { margin-top: 13px; font: 400 12px/16px var(--fh-font); }
+.fh-note__over small { margin-top: 10px; font: 400 12px/16px var(--fh-font); }
+.fh-note__over strong { font-weight: 600; }
+.fh-note__over > * { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fh-note__flag { position: absolute; z-index: 1; right: 12px; bottom: 66px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; background: #fff;
+  color: var(--c-secondary, #00D6C9); font: 700 17px/1 var(--fh-font); font-style: normal; }
+.fh-note__site { display: flex; align-items: center; gap: 13px; margin: 20px 12px 0; }
+.fh-note__site img { flex: none; width: 46px; height: 46px; border-radius: 50%; object-fit: cover; }
+.fh-note__site span { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.fh-note__site b { font: 400 13px/17px var(--fh-font); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fh-note__site small { color: var(--fh-mute); font: 400 12px/14px var(--fh-font); }
+.fh-note__txt { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin: 20px 17px 0 12px; font: 400 13px/16px var(--fh-font); }
+.fh-note__more { padding: 0; border: 0; background: none; color: var(--c-add-primary, #00AFD6); font: inherit; cursor: pointer; }
+.fh-note__acts { display: flex; align-items: center; gap: 31px; margin: 12px 0 0; padding: 14px 23px 0 16px; border-top: 1px solid #EAEFEC; font: 400 12px/1 var(--fh-font); }
+.fh-note__acts span { display: inline-flex; align-items: center; gap: 8px; }
+.fh-note__acts img { display: block; width: 24px; height: 24px; }
+.fh-note__acts .fh-note__saved { width: 16px; height: 22px; margin-left: auto; }
+
+/* a medical record or a lab request (the app's screen shows none): the note's
+   family in a row — the photo, its kind, its title, its animal, the bookmark */
+.fh-rec { gap: 12px; padding-right: 16px; }
+.fh-rec .fh-txt { margin-top: 0; gap: 2px; line-height: 16px; }
+.fh-rec .fh-txt b { color: var(--fh-teal); font-size: 14px; line-height: 18px; }
+.fh-rec .fh-txt > span { font-weight: 400; }
+.fh-kind { align-self: flex-start; padding: 0 6px; border-radius: 4px; background: #EFF5F2; color: var(--fh-teal); font: 600 11px/18px var(--fh-font); font-style: normal; }
+.fh-saved { flex: none; display: block; width: 16px; height: 22px; }
+
+/* the folders: "Folders - 4" and Create new, then 56 rows, r8, 8 apart */
+.fh-ghead { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 20px; margin-bottom: 16px; }
+.fh-ghead b { font: 400 14px/20px var(--fh-font); }
+.fh-create { display: inline-flex; align-items: center; gap: 4px; padding: 0; border: 0; background: none; color: #006D35; font: 600 11.5px/1 var(--fh-font); cursor: pointer; }
+.fh-create svg { width: 14px; height: 14px; }
+.fh-list.is-folders { gap: 8px; }
+.fh-frow { gap: 13px; height: 56px; padding: 8px 13px 8px 12px; border-radius: 8px; }
+.fh-frow .fh-folder { flex: none; width: 40px; height: 40px; }
+.fh-frow b { flex: 1 1 auto; min-width: 0; font: 500 14px/18px var(--fh-font); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fh-frow em { flex: none; font: 500 14px/18px var(--fh-font); font-style: normal; }
+.fh-empty { padding: 48px 16px; text-align: center; color: var(--fh-ink); font: 400 13px/18px var(--fh-font); }
+
+/* COPY TO FIGMA — the localhost design tool (index.html, the last script): a
+   dark pill with Figma's logo, bottom-left, over everything; out of the copy
+   itself (data-h2d-ignore) */
+.figma-copy { position: fixed; left: 20px; bottom: 20px; z-index: 100000; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 12px;
+  border: 0; border-radius: 20px; background: #1A1A1A; color: #fff; font: 500 14px/1 Inter, var(--font, sans-serif); box-shadow: 0 2px 8px rgba(0, 0, 0, .25); cursor: pointer; }
+.figma-copy:disabled { opacity: .6; cursor: progress; }
+.figma-copy:focus-visible { outline: 2px solid #0D99FF; outline-offset: 2px; }
+/* a phone or a tablet has the Modules · Quick Actions · chat row along the
+   foot: the pill is the logo alone, in a 40 disc, above that row */
+@media (max-width: 1023px) {
+  .figma-copy { bottom: calc(96px + env(safe-area-inset-bottom)); left: 16px; width: 40px; padding: 0; justify-content: center; }
+  .figma-copy span { display: none; }
+}

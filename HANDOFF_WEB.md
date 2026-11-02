@@ -540,3 +540,29 @@ Today's production deploys: 39mklceqj → qdvkucvxg → nnd43xucl → 5xhhnyvq1 
 
 ## Not done
 - **Not pushed:** GitHub `CleanUp` is still `a8b0179`. Push with `git push git@github-work:naveen-lset/Antz-homepage.git CleanUp`.
+
+# Session 2 Nov 2026: the Focus Hub band, the My Focus Hub page, Copy to Figma
+
+## Run it
+`python3 -m http.server 8090` from `/Users/naveen/Home Page` (8080 was taken by the Kitchen `dev-auth-stub`), then <http://localhost:8090/Antz-Selected-Modules/?v=2>. The page: <http://localhost:8090/Antz-Selected-Modules/?v=2#m/focus/fav/animals>.
+
+## Built
+- **The band (Recents · Favourites · Bookmarks · Folders, `mountAnimals` in `index.html`)**, over the owner's four app screenshots in `My Focus Hub/` (HEIC, reference only, kept out of deploys):
+  - Favourites = favourite animals and enclosures, alternating, six then View all. An animal card shows AAID over its name; an enclosure its name only. No star, no "Enclosure" tag (owner).
+  - No photo → the ANTZ mark in light grey (`assets/img/antz-mark-grey.svg`, #C3CEC7) on MD3_Antz/Background #EFF5F2; names in OnPrimaryContainer #1F515B (the owner's Figma, CNhiaOGCLdnlNxj7x2Ohrd node 1031:2721).
+  - Bookmarks = one card a kind (Notes 2 · Medical Record 5 · Lab Request 0) with `fh-note/medical/lab.svg`; Folders = the app's four, with the app's yellow folder `fh-folder.svg`.
+  - A kind, a folder or View all opens the page; Recents' View all keeps the My animals sheet.
+  - Changing tab slides the cards: the old row is cloned under the rail and slides 48 away, the new cards come in from 72 the other way on the tabs' 460ms curve. Photos are pre-fetched 800ms after load.
+  - Phone/tablet tab pills: 6 clear on every side; the folder's fillets r12 like the pills.
+  - Names, notes and folder contents are SAMPLE (`MY FOCUS HUB'S RECORDS` in Favourites.js — ENC, RECS, NOTE, GROUPS); the extract has no animal names.
+- **My Focus Hub page** (`ROUTES.focus` in ModulePages.js; `#m/focus/fav[/animals|enclosures]`, `/book[/notes|medical|lab]`, `/folders[/care|vet|feed|obs]`): measured off the screenshots (iPhone 402 wide @3×) — SF Pro 12px, 115 photo cards r12, 66 enclosure rows r8, the app's note card, 56 folder rows; Antz tokens only. CSS block "MY FOCUS HUB, THE PAGE" in `review.css`.
+- **Copy to Figma** (localhost only, last script in `index.html`): Figma's `capture.js` in clipboard mode; paste with ⌘V. Lesson: **no CSS masks on anything that gets copied** — capture draws a mask as an empty box, so the band's marks are real SVG images now. Masks remain elsewhere (Quick Actions, bottom row, web header mark).
+- `review.css` is `?v=20261102k`.
+
+## Live
+- **Deployed 2 Nov 2026** (owner: "Deploy the build & update the hub"): production `home-page-changes-48gqwgxu5` → <https://home-page-changes.vercel.app/?v=2>; its site files match this commit. The first plain `vercel deploy` died with "fetch failed"; `vercel deploy --prod --yes --archive=tgz` works. Copy = `git ls-files -co --exclude-standard` minus `.hub.json` and `My Focus Hub/`.
+- **Hub:** writes now need header `x-skill-version: 2026-10-30a` (the kit's SKILL.md is stale; the hub serves the new one at `/api/agent/skill`). Re-posting the same URL returns `unchanged`, so the link is now `https://home-page-changes.vercel.app/?v=2&b=<deploy id>` (the page reads only `v`) → rev 13, "2 Nov". Change `b=` on each deploy.
+
+## Open questions for the owner
+- Hub device: switch the entry to the new `mobile-tablet` ("Phone + iPad") type?
+- Convert the remaining CSS-mask icons so Copy to Figma pastes them too?

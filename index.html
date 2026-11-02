@@ -13919,7 +13919,7 @@ html.pmenu-lock, html.pmenu-lock body { overflow: hidden; overscroll-behavior: n
   .sheet .sheet__foot { left: 264px; border-radius: 0 0 16px 0; }
 }
 </style>
-<link rel="stylesheet" href="review.css?v=20261021s">
+<link rel="stylesheet" href="review.css?v=20261102k">
 </head>
 
 <style>
@@ -43438,11 +43438,25 @@ const curve = (name, fallback) => {
    the first time with one real animal of each seed species, so a first
    visit is not empty; clearing it leaves it empty. */
 const A_FAV = 'antz.home.animals.fav', A_SEEN = 'antz.home.animals.seen', SEEN_MAX = 12
+/* every animal carries its name since 2 Nov 2026 (owner: "in animal card show
+   AAID, Name"). SAMPLE names — the extract is anonymised and keeps none. */
 const A_SEED = [
-  { aaid: 190317, sp: 'Slate Pangolin', sex: 1, encl: 'Ridge Path Enclosure' },
-  { aaid: 143944, sp: 'Glacial Egret', sex: 2, encl: 'Thistle Spring Den' },
-  { aaid: 172277, sp: 'Russet Whipsnake', sex: 2, encl: 'Cedar Ridge Habitat' },
-  { aaid: 169095, sp: 'Marbled Phantom Saki', sex: 1, encl: 'Ivy Marsh Terrarium' },
+  { aaid: 190317, sp: 'Slate Pangolin', name: 'Rani', sex: 1, encl: 'Ridge Path Enclosure' },
+  { aaid: 143944, sp: 'Glacial Egret', name: 'Chintu', sex: 2, encl: 'Thistle Spring Den' },
+  { aaid: 172277, sp: 'Russet Whipsnake', name: 'Naga', sex: 2, encl: 'Cedar Ridge Habitat' },
+  { aaid: 169095, sp: 'Marbled Phantom Saki', name: 'Tara', sex: 1, encl: 'Ivy Marsh Terrarium' },
+]
+/* SAMPLE favourite animals, until the reader stars their own. `photo: false`
+   is an animal with no photograph: its card wears the ANTZ mark (owner, 2 Nov
+   2026: "with image & without image show antz logo") — two of them, placed so
+   the first six favourites show both kinds of card. */
+const A_FAV_SEED = [
+  { aaid: 181204, sp: 'Emerald Marbled Otter', name: 'Bruno', sex: 0, encl: 'Stonewater Pool' },
+  { aaid: 158812, sp: 'Cinder Langur', name: 'Meera', sex: 1, encl: 'Cedar Ridge Habitat', photo: false },
+  A_SEED[0],
+  { aaid: 163377, sp: 'Dappled Fyrel', name: 'Raja', sex: 0, encl: 'Ridge Path Enclosure', photo: false },
+  A_SEED[3], A_SEED[1], A_SEED[2],
+  { aaid: 176530, sp: 'Coral Bulbul', name: 'Sultan', sex: 0, encl: 'Fernbrook Aviary' },
 ]
 const SEX_A = ['Male', 'Female', 'Undetermined']
 const SEX_TAG = [['M', 'm'], ['F', 'f'], ['UD', 'u']]
@@ -43451,7 +43465,7 @@ const readA = (k, seed) => {
   catch (_) { return [...(seed || [])] }
 }
 const writeA = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch (_) {} }
-const favAnimals = () => readA(A_FAV)
+const favAnimals = () => readA(A_FAV, A_FAV_SEED)
 const seenAnimals = () => readA(A_SEEN, A_SEED)
 const isFavAnimal = (aaid) => favAnimals().some((r) => r.aaid === +aaid)
 const animalsChanged = () => dispatchEvent(new CustomEvent('antz:animals'))
@@ -43465,37 +43479,88 @@ function sawAnimal(rec) {
 const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2L9.19 8.62L2 9.24l5.45 4.73L5.82 21z"/></svg>'
 const STAR_O = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 15.39l-3.76 2.27l.99-4.28l-3.32-2.88l4.38-.37L12 6.09l1.71 4.04l4.38.37l-3.32 2.88l.99 4.28M22 9.24l-7.19-.61L12 2L9.19 8.63L2 9.24l5.45 4.73L5.82 21L12 17.27L18.18 21l-1.64-7.03z"/></svg>'
 
+/* ══ MY FOCUS HUB'S RECORDS (owner, 2 Nov 2026, over the app's My Focus Hub
+   screens) — the home's band and the My Focus Hub page (ModulePages.js,
+   #m/focus) read the same ones. SAMPLE: the app keeps no bookmarks, folders
+   or favourite enclosures for this build; the counts are the app's. */
+/* a record kept in this browser before names came keeps the seed's name and photo flag */
+const SEEDR = new Map([...A_SEED, ...A_FAV_SEED].map((r) => [r.aaid, r]))
+const nameOf = (r) => r.name || SEEDR.get(+r.aaid)?.name || r.sp
+const hasPhoto = (r) => !!r && (r.photo ?? SEEDR.get(+r.aaid)?.photo) !== false && !noPhoto()
+const img = (r) => r.img || photo(r.sp)
+/* the photograph, or with none the ANTZ mark on the card's own ground (2 Nov 2026),
+   in light grey (owner, same day: "antz logo should be light gray"). The mark is
+   a real SVG, not a CSS mask: Figma's capture ("Copy to Figma") drew a mask as
+   an empty box (owner: "check this for empty") */
+const face = (r, cls) => hasPhoto(r) ? pic(r.sp, cls, img(r))
+  : `<span class="antz-noimg ${cls}" aria-hidden="true"><img src="assets/img/antz-mark-grey.svg" alt=""></span>`
+const animalOf = (aaid) => [...seenAnimals(), ...favAnimals()].find((r) => r.aaid === +aaid) || SEEDR.get(+aaid)
+const ENC = {   /* favourite enclosures · [name, the animal whose photo stands for it — 0 for none, the ANTZ mark] */
+  'e-ridge': ['Ridge Path Enclosure', 190317], 'e-fern': ['Fernbrook Aviary', 0],
+  'e-thistle': ['Thistle Spring Den', 143944], 'e-cedar': ['Cedar Ridge Habitat', 172277],
+  'e-ivy': ['Ivy Marsh Terrarium', 169095], 'e-stone': ['Stonewater Pool', 0],
+}
+const RECS = {  /* bookmarks · [kind, title, the animal it is about] */
+  'n-feed': ['Note', 'Feeding change', 190317], 'n-gait': ['Note', 'Limping', 169095],
+  'm-2291': ['Medical', 'MC-2291 · Open', 143944], 'm-2307': ['Medical', 'MC-2307 · Review', 190317],
+  'm-2315': ['Medical', 'MC-2315 · Open', 181204], 'm-2320': ['Medical', 'MC-2320 · Closed', 172277],
+  'm-2331': ['Medical', 'MC-2331 · Review', 158812],
+}
+/* a bookmarked note, as the app's note card draws it: its category over the
+   photo, who wrote it and when, the site, two lines of it, likes and comments */
+const NOTE = {
+  'n-feed': { cat: 'Diet', by: 'Dr. Asha Rao', ago: '3d ago', site: 'Crimson Frosted Wildlife Estate', likes: 2, comments: 1,
+    text: 'Rani has been leaving half of her evening feed for three days. Moving her to two smaller feeds and weighing her each morning this week.' },
+  'n-gait': { cat: 'Health', by: 'Dr. Sam Menon', ago: '14d ago', site: 'Clearspring Habitat', likes: 1, comments: 0, flag: true,
+    text: 'During the morning round Tara was favouring her left hind leg on the ramp. No swelling found; keep her on soft ground and review on Friday.' },
+}
+/* Bookmarks, one kind a card under its count; Folders, the app's four. `key`
+   is each one's address on the page (#m/focus/book/notes, #m/focus/folders/care).
+   The kinds' marks are plain one-colour SVGs (fh-*.svg), drawn as images */
+const GROUPS = [
+  { id: 'b-notes', key: 'notes', tab: 'book', name: 'Notes', icon: 'fh-note.svg', items: ['n-feed', 'n-gait'] },
+  { id: 'b-med', key: 'medical', tab: 'book', name: 'Medical Record', icon: 'fh-medical.svg', items: ['m-2291', 'm-2307', 'm-2315', 'm-2320', 'm-2331'] },
+  { id: 'b-lab', key: 'lab', tab: 'book', name: 'Lab Request', icon: 'fh-lab.svg', items: [] },
+  { id: 'f-care', key: 'care', tab: 'folders', name: 'Medical care', items: ['m-2291', 'm-2307', 'a181204', 'm-2315', 'a158812', 'm-2320', 'a190317', 'm-2331'] },
+  { id: 'f-vet', key: 'vet', tab: 'folders', name: 'Veterinary follow-up', items: ['a143944', 'm-2291', 'a172277', 'm-2320', 'n-gait', 'a169095'] },
+  { id: 'f-feed', key: 'feed', tab: 'folders', name: 'Feeding & nutrition', items: ['n-feed', 'a163377', 'e-ridge', 'a176530', 'e-ivy'] },
+  { id: 'f-obs', key: 'obs', tab: 'folders', name: 'Daily observations', items: ['a190317', 'e-thistle', 'a169095', 'e-fern', 'n-gait', 'a172277', 'e-stone', 'a181204'] },
+]
+/* the folder as the app draws it: a pale yellow tile, an open folder */
+const FOLDER_ICON = '<img class="fh-folder" src="assets/icon/fh-folder.svg" alt="">'
+
 function mountAnimals(root) {
   const title = root.querySelector('.fav__title'), rail = root.querySelector('.fav__rail'), edit = root.querySelector('.fav__edit')
   const pages = () => __req('js/components/ModulePages.js')
-  const img = (r) => r.img || photo(r.sp)
   const aCard = (r, badge = '') =>
-    `<div class="fav__item" role="listitem"><button type="button" class="fav__card" data-aaid="${r.aaid}" data-sp="${esc(r.sp)}" aria-label="${esc(r.sp)}, AAID ${r.aaid}">` +
-      pic(r.sp, 'fav__img', img(r)) + badge +
+    `<div class="fav__item" role="listitem"><button type="button" class="fav__card${hasPhoto(r) ? '' : ' fav__card--plain'}" data-aaid="${r.aaid}" data-sp="${esc(r.sp)}" aria-label="${esc(nameOf(r))}, ${esc(r.sp)}, AAID ${r.aaid}">` +
+      face(r, 'fav__img') + badge +
       /* the sex as the species page tags an animal photo, in the corner (owner,
-         5 Oct 2026); the AAID leads, the species under it on one line */
+         5 Oct 2026); the AAID leads, the animal's name under it on one line
+         (owner, 2 Nov 2026: "show AAID ID, Name") */
       `<span class="fav__sex" data-s="${SEX_TAG[r.sex]?.[1] || 'u'}" title="${SEX_A[r.sex] || 'Undetermined'}">${SEX_TAG[r.sex]?.[0] || 'UD'}</span>` +
-      `<span class="fav__txt"><b class="fav__name">AAID<span class="fav__idsep"> </span>${r.aaid}</b><small class="fav__meta fav__meta--sp">${esc(r.sp)}</small></span>` +
+      `<span class="fav__txt"><b class="fav__name">AAID<span class="fav__idsep"> </span>${r.aaid}</b><small class="fav__meta fav__meta--sp">${esc(nameOf(r))}</small></span>` +
     `</button></div>`
   /* ══ FOUR TABS · Recent · Favourites · Bookmarks · Folders ══════════════════
      Owner, 19 Oct 2026: "implement in the live" — concept 6 "Strip" of
      mockups/animals-tabs.html as it was approved over that day: Swiggy's top
      tabs in this page's style — four equal tabs inside the page padding, one
      colour (OnSurfaceVariant), a 3px bar and no glow under the picked one;
-     the others only their icon, which never moves; six cards, then View all;
-     Favourites (animals and enclosures) and Bookmarks (notes, medical
-     records, lab requests) open on their folders, and Folders lists them all.
+     the others only their icon, which never moves; six cards, then View all.
+     WHAT EACH TAB HOLDS (owner, 2 Nov 2026, over the app's My Focus Hub
+     screens): Favourites the animals and enclosures, alternating — an animal
+     its AAID and name, an enclosure its name; Bookmarks one card a kind
+     (Notes, Medical Record, Lab Request) with its count; Folders each
+     folder's name and how many it holds. A kind, a folder and View all open
+     the My Focus Hub page (#m/focus, ModulePages.js) where they point.
      Recent and the favourite animals are this browser's own (sawAnimal,
-     setFavAnimal). SAMPLE: the app keeps no bookmarks, folders or favourite
-     enclosures yet, so those stand on the four seed animals and their real
-     enclosures; tapping one says it is not part of this preview. */
+     setFavAnimal); the rest is MY FOCUS HUB'S RECORDS, above. */
   const TSV = (d, fill) => `<svg viewBox="0 0 24 24" width="18" height="18" fill="${fill ? 'currentColor' : 'none'}" stroke="${fill ? 'none' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`
   const TI = {
     recent: TSV('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
     fav: TSV('<path d="M12 3.8l2.5 5.1 5.6.8-4.05 3.95.96 5.6L12 16.6l-5.01 2.65.96-5.6L3.9 9.7l5.6-.8z"/>'),
     book: TSV('<path d="M7 3.8h10a1 1 0 0 1 1 1V20l-6-3.8L6 20V4.8a1 1 0 0 1 1-1z"/>'),
     folders: TSV('<path d="M3.5 7.2a2 2 0 0 1 2-2h3.8l2 2.2h7.2a2 2 0 0 1 2 2v7.6a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'),
-    star: TSV('<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2L9.19 8.62L2 9.24l5.45 4.73L5.82 21z"/>', true),
     mark: TSV('<path d="M7 3h10a1.5 1.5 0 0 1 1.5 1.5V21l-6.5-4.1L5.5 21V4.5A1.5 1.5 0 0 1 7 3z"/>', true),
     next: TSV('<path d="M5 12h14M13 6l6 6-6 6"/>'),
     back: TSV('<path d="M19 12H5M11 6l-6 6 6 6"/>'),
@@ -43506,64 +43571,48 @@ function mountAnimals(root) {
     { id: 'book', label: 'Bookmarks', noun: 'bookmarks' },
     { id: 'folders', label: 'Folders', noun: 'folders' },
   ]
-  const SEEDR = new Map(A_SEED.map((r) => [r.aaid, r]))
-  const ENC = {   /* SAMPLE favourite enclosures · [name, the seed animal there] */
-    'e-ridge': ['Ridge Path Enclosure', 190317], 'e-thistle': ['Thistle Spring Den', 143944],
-    'e-cedar': ['Cedar Ridge Habitat', 172277], 'e-ivy': ['Ivy Marsh Terrarium', 169095],
-  }
-  const RECS = {  /* SAMPLE bookmarks · [kind, title, the animal it is about] */
-    'n-feed': ['Note', 'Feeding change', 190317], 'm-2291': ['Medical', 'MC-2291 · Open', 143944],
-    'l-0457': ['Lab', 'Blood panel', 172277], 'n-gait': ['Note', 'Limping', 169095],
-    'm-2307': ['Medical', 'MC-2307 · Review', 190317], 'l-0462': ['Lab', 'Faecal screen', 143944],
-  }
-  const FOLDERS = [  /* SAMPLE folders, two in each */
-    { id: 'f-watch', tab: 'fav', name: 'Watch list', items: ['a190317', 'a169095', 'e-ridge', 'e-ivy'] },
-    { id: 'f-birds', tab: 'fav', name: 'Birds & reptiles', items: ['a143944', 'a172277', 'e-thistle', 'e-cedar'] },
-    { id: 'f-vet', tab: 'book', name: 'Vet follow-up', items: ['m-2291', 'l-0457', 'n-gait', 'm-2307'] },
-    { id: 'f-labs', tab: 'book', name: 'Weekly labs', items: ['l-0457', 'l-0462', 'm-2307', 'n-feed'] },
-  ]
   const SHOW = 6
-  let cur = 'recent', folder = null, busy = false
+  let cur = 'recent', busy = false
   const recOf = (aaid) => all().get(+aaid) || SEEDR.get(+aaid)
-  const aaidOf = (k) => (k[0] === 'a' ? +k.slice(1) : (ENC[k] || RECS[k])?.at(-1))
   const keysOf = (tab) => {
     if (tab === 'recent') return seenAnimals().map((r) => `a${r.aaid}`)
-    if (tab === 'book') return [...FOLDERS.filter((f) => f.tab === 'book').map((f) => f.id), ...Object.keys(RECS)]
-    if (tab === 'folders') return FOLDERS.map((f) => f.id)
-    /* favourites: the folders, then the starred animals and the enclosures, alternating */
+    if (tab === 'book' || tab === 'folders') return GROUPS.filter((g) => g.tab === tab).map((g) => g.id)
+    /* favourites: the starred animals and the enclosures, alternating */
     const an = favAnimals().map((r) => `a${r.aaid}`), en = Object.keys(ENC), mix = []
     for (let i = 0; i < Math.max(an.length, en.length); i++) { if (an[i]) mix.push(an[i]); if (en[i]) mix.push(en[i]) }
-    return [...FOLDERS.filter((f) => f.tab === 'fav').map((f) => f.id), ...mix]
+    return mix
   }
-  const badge = (tab) => tab === 'fav' ? `<span class="fav__mark fav__mark--star" title="Favourite">${TI.star}</span>`
-    : tab === 'book' ? `<span class="fav__mark" title="Bookmarked">${TI.mark}</span>` : ''
-  /* an enclosure or a bookmarked record: its animal's photo, the badge, a type tag, its name over one line */
-  const thing = (k, tag, name, aaid, tab) => { const r = SEEDR.get(aaid)
-    return `<div class="fav__item" role="listitem"><button type="button" class="fav__card" data-sample="${esc(`${tag}: ${name}`)}" aria-label="${esc(`${tag}: ${name}`)}">` +
-      pic(r.sp, 'fav__img', img(r)) + badge(tab) + `<span class="fav__tag">${esc(tag)}</span>` +
-      `<span class="fav__txt"><b class="fav__name">${esc(name)}</b><small class="fav__meta">${esc(r.sp)}</small></span></button></div>` }
-  const folderCard = (f, tab) => { const n = f.items.length
-    const meta = tab === 'folders' ? `In ${f.tab === 'fav' ? 'Favourites' : 'Bookmarks'} · ${n}` : `${n} items`
-    return `<div class="fav__item" role="listitem"><button type="button" class="fav__card fav__card--folder" data-folder="${f.id}" aria-label="Folder ${esc(f.name)}, ${n} items">` +
-      `<span class="fav__mosaic">${f.items.slice(0, 4).map((k) => { const r = recOf(aaidOf(k)); return r ? pic(r.sp, 'fav__mimg', img(r)) : '<i></i>' }).join('')}</span>` +
-      `<span class="fav__tag fav__tag--n">${TI.folders}${n}</span>` +
-      `<span class="fav__txt"><b class="fav__name">${esc(f.name)}</b><small class="fav__meta">${esc(meta)}</small></span></button></div>` }
+  /* no star on a favourite (owner, 2 Nov 2026: "remove star from here") — the tab already says it */
+  const badge = (tab) => tab === 'book' ? `<span class="fav__mark" title="Bookmarked">${TI.mark}</span>` : ''
+  /* an enclosure or a bookmarked record: a photo or the ANTZ mark, the badge; an
+     enclosure its name alone, a record its title over its animal. No type tag
+     on the corner (owner, 2 Nov 2026: "remove the Enclosure badge") */
+  const thing = (tag, name, aaid, tab, meta = '') => { const r = recOf(aaid)
+    return `<div class="fav__item" role="listitem"><button type="button" class="fav__card${hasPhoto(r) ? '' : ' fav__card--plain'}" data-sample="${esc(`${tag}: ${name}`)}" aria-label="${esc(`${tag}: ${name}`)}">` +
+      face(r, 'fav__img') + badge(tab) +
+      `<span class="fav__txt"><b class="fav__name">${esc(name)}</b>${meta ? `<small class="fav__meta">${esc(meta)}</small>` : ''}</span></button></div>` }
+  /* a kind of bookmark its mark in a white disc, a folder the app's yellow
+     folder (owner, 2 Nov 2026: "use same icons I given in the reference");
+     its name over its count */
+  const groupCard = (g) => { const n = plural(g.items.length, 'item', 'items')
+    return `<div class="fav__item" role="listitem"><button type="button" class="fav__card fav__card--plain fav__card--group" data-folder="${g.id}" aria-label="${esc(g.name)}, ${n}">` +
+      (g.icon ? `<span class="fav__glyph" aria-hidden="true"><img class="fav__gi" src="assets/icon/${g.icon}" alt=""></span>` : `<span class="fav__glyph is-folder" aria-hidden="true">${FOLDER_ICON}</span>`) +
+      `<span class="fav__txt"><b class="fav__name">${esc(g.name)}</b><small class="fav__meta">${n}</small></span></button></div>` }
   const cardOf = (k, tab) => {
-    if (k[0] === 'f') return folderCard(FOLDERS.find((x) => x.id === k), tab)
+    if (k[0] === 'b' || k[0] === 'f') return groupCard(GROUPS.find((g) => g.id === k))
     if (k[0] === 'a') { const r = recOf(k.slice(1)); return r ? aCard(r, badge(tab)) : '' }
-    if (ENC[k]) return thing(k, 'Enclosure', ENC[k][0], ENC[k][1], tab)
-    return thing(k, RECS[k][0], RECS[k][1], RECS[k][2], tab)
+    if (ENC[k]) return thing('Enclosure', ENC[k][0], ENC[k][1], tab)
+    const [kind, title, aaid] = RECS[k], r = recOf(aaid)
+    return thing(kind, title, aaid, tab, r ? nameOf(r) : '')
   }
-  /* the white card the page uses for "add": View all at a row's end, Back at an open folder's start */
+  /* the white card the page uses for "add": View all at a row's end */
   const whiteCard = (attr, glyph, name, sub, label) => `<div class="fav__item" role="listitem"><button type="button" class="fav__card fav__card--add fav__card--all" ${attr} aria-label="${esc(label)}">` +
     `<span class="fav__plus" aria-hidden="true">${glyph}</span><b class="fav__name">${esc(name)}</b><small class="fav__alln">${esc(sub)}</small></button></div>`
   const railHTML = () => {
-    const f = folder && FOLDERS.find((x) => x.id === folder)
-    const keys = f ? f.items : keysOf(cur), tab = f ? f.tab : cur, noun = f ? 'items' : TABS.find((t) => t.id === cur).noun
+    const keys = keysOf(cur), noun = TABS.find((t) => t.id === cur).noun
     if (!keys.length) return `<div class="fav__item" role="listitem"><button type="button" class="fav__card fav__card--add" data-browse>` +
       `<span class="fav__plus" aria-hidden="true">${icon('plus')}</span><b class="fav__name">Find an animal</b></button></div>`
-    return (f ? whiteCard('data-folder-back', TI.back, f.name, `${keys.length} items`, `Back from ${f.name}`) : '') +
-      keys.slice(0, SHOW).map((k) => cardOf(k, tab)).join('') +
+    return keys.slice(0, SHOW).map((k) => cardOf(k, cur)).join('') +
       (keys.length > SHOW ? whiteCard('data-all', TI.next, 'View all', `${keys.length} ${noun}`, `View all ${keys.length} ${noun}`) : '')
   }
   /* the tabs, where the title was: the title stays for the band's name, unseen */
@@ -43636,7 +43685,10 @@ function mountAnimals(root) {
     return { W: bx.width, B: bx.height, T: t.top - bx.top, H: r.top - bx.top, x: t.left - bx.left, w: t.width }
   }
   const foldPath = ({ W, B, T, H, x, w }) => {
-    const s = .5, L = s, R = W - s, Tt = T + s, Bt = B - s, r = 12, P = 12, f = 8   // tab and rail r12, as the page's other containers; fillets r8
+    /* tab and rail r12, as the page's other containers; the fillets r12 too since
+       2 Nov 2026 (owner: "that curve on the active tab should match the curve on
+       the inactive tab" — the soft pills' r12; they were r8) */
+    const s = .5, L = s, R = W - s, Tt = T + s, Bt = B - s, r = 12, P = 12, f = 12
     const x1 = Math.max(L, x + s), x2 = Math.min(R, x + w - s)
     const fl = clampN((x1 - L) / 2, 0, f), Pl = clampN(x1 - L - fl, 0, P), fr = clampN((R - x2) / 2, 0, f), Pr = clampN(R - x2 - fr, 0, P)
     return `M${L} ${Bt - P}L${L} ${H + Pl}A${Pl} ${Pl} 0 0 1 ${L + Pl} ${H}L${x1 - fl} ${H}A${fl} ${fl} 0 0 0 ${x1} ${H - fl}` +
@@ -43663,22 +43715,39 @@ function mountAnimals(root) {
     requestAnimationFrame(step)
   }
   const draw = () => { rail.innerHTML = railHTML(); rail.scrollLeft = 0; mark(); place(true) }
-  const onScreen = (el) => { const a = el.getBoundingClientRect(), b = rail.getBoundingClientRect(); return a.right > b.left - 4 && a.left < b.right + 4 }
-  /* the cards on screen slip out toward where you came from, the new ones slide in from where you are going */
-  const swap = async (dir, lift) => {
+  /* THE CARDS SLIDE WITH THE TAB (owner, 2 Nov 2026: "when changing the tab
+     the cards have to come with a smooth animation, like right to left"). The
+     old row is lifted into a copy laid over the rail, which slides 48 toward
+     where you came from and fades, while the new cards come in from 72 the
+     other way, one after another, on the tabs' own 460ms curve — one page
+     sliding: right to left when you go right, left to right going back. Both
+     run at once (the copy needs no wait); the copy sits UNDER the rail and
+     clips its own cards, so the old row never shows past the folder's edge or
+     over the new cards, and the photos were fetched on load (warm, below), so
+     no card slides in blank. */
+  if (getComputedStyle(rail).position === 'static') rail.style.position = 'relative'   /* the web's rail: above the copy too */
+  if (getComputedStyle(rail).zIndex === 'auto') rail.style.zIndex = '1'
+  const swap = (dir) => {
     busy = true
-    const out = [...rail.children].filter(onScreen)
-    await Promise.all(out.map((el, i) => el === lift
-      ? anim(el, [{ transform: 'none', opacity: 1 }, { transform: 'scale(1.06)', opacity: 0 }], { duration: 200, easing: 'ease-in' })?.finished
-      : anim(el, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${-dir * 14}px)` }], { duration: 130, delay: i * 12, easing: 'ease-in' })?.finished))
+    const ghost = still() || !rail.animate ? null : rail.cloneNode(true)
+    if (ghost) {
+      ghost.removeAttribute('id'); ghost.removeAttribute('role'); ghost.setAttribute('aria-hidden', 'true'); ghost.inert = true
+      Object.assign(ghost.style, { position: 'absolute', left: `${rail.offsetLeft}px`, top: `${rail.offsetTop}px`, width: `${rail.offsetWidth}px`,
+        height: `${rail.offsetHeight}px`, margin: '0', boxSizing: 'border-box', overflow: 'hidden', zIndex: 0, pointerEvents: 'none' })
+      const at = rail.scrollLeft; rail.before(ghost); ghost.scrollLeft = at
+      const gone = () => ghost.remove()
+      Promise.all([...ghost.children].map((el) => el.animate([{ transform: 'none', opacity: 1 }, { opacity: 0, offset: .6 }, { transform: `translateX(${-dir * 48}px)`, opacity: 0 }],
+        { duration: 240, easing: 'cubic-bezier(.4, 0, .7, .2)', fill: 'forwards' }).finished)).then(gone, gone)
+    }
     rail.innerHTML = railHTML(); rail.scrollLeft = 0
-    ;[...rail.children].forEach((el, i) => anim(el, [{ opacity: 0, transform: `translate(${dir * 22}px, 8px)` }, { opacity: 1, transform: 'none' }], { duration: 420, delay: Math.min(i, 6) * 32, easing: 'cubic-bezier(.16,1,.3,1)' }))
-    busy = false
+    ;[...rail.children].forEach((el, i) => anim(el, [{ transform: `translateX(${dir * 72}px) scale(.97)`, opacity: 0 }, { opacity: 1, offset: .38 }, { transform: 'none', opacity: 1 }],
+      { duration: 460, delay: 60 + Math.min(i, 6) * 36, easing: 'cubic-bezier(.32, .72, 0, 1)' }))
+    setTimeout(() => { busy = false }, 180)
   }
   const go = (id) => {
     if (id === cur || busy) return
     const dir = Math.sign(TABS.findIndex((t) => t.id === id) - TABS.findIndex((t) => t.id === cur))
-    cur = id; folder = null; mark(); place(); swap(dir)
+    cur = id; mark(); place(); swap(dir)
   }
   tabs.addEventListener('click', (e) => { const b = e.target.closest('.fav__tab'); if (b) go(b.dataset.tab) })
   tabs.addEventListener('keydown', (e) => {
@@ -43701,8 +43770,8 @@ function mountAnimals(root) {
   let sh = null
   const row = (r, on) =>
     `<div class="fan__row"><button type="button" class="fan__open" data-aaid="${r.aaid}">` +
-      pic(r.sp, 'fan__ph', img(r)) +
-      `<span><b>${esc(r.sp)}</b><small>AAID ${r.aaid} · ${SEX_A[r.sex] || 'Unsexed'}${r.encl ? ` · ${esc(r.encl)}` : ''}</small></span></button>` +
+      face(r, 'fan__ph') +
+      `<span><b>${esc(nameOf(r))}</b><small>AAID ${r.aaid} · ${esc(r.sp)} · ${SEX_A[r.sex] || 'Unsexed'}${r.encl ? ` · ${esc(r.encl)}` : ''}</small></span></button>` +
       `<button type="button" class="fan__star" data-star="${r.aaid}" aria-pressed="${on}" aria-label="${on ? 'Remove from' : 'Add to'} My animals">${on ? STAR : STAR_O}</button></div>`
   const fill = () => {
     const fav = favAnimals(), seen = seenAnimals()
@@ -43734,16 +43803,22 @@ function mountAnimals(root) {
   rail.addEventListener('click', (e) => {
     const b = e.target.closest('.fav__card'); if (!b) return
     if (b.hasAttribute('data-browse')) { pages().go('species'); return }
-    /* a folder opens in place, behind a Back card; Back closes it */
-    if (b.dataset.folder || b.hasAttribute('data-folder-back')) { if (!busy) { folder = b.dataset.folder || null; swap(folder ? 1 : -1, folder ? b.closest('.fav__item') : null) } return }
-    /* View all: the animals' own sheet for Recent and Favourites */
-    if (b.hasAttribute('data-all')) { if (!folder && (cur === 'recent' || cur === 'fav')) openSheet(); else say('The full list opens in the ANTZ app — not part of this preview'); return }
+    /* MY FOCUS HUB (owner, 2 Nov 2026: "if I click it has to go to the same
+       page — My Focus Hub", the app's screen): a kind or a folder opens the
+       page on it, and View all opens it on its tab; Recents keeps the
+       animals' own sheet, since the hub has no Recents */
+    const g = b.dataset.folder && GROUPS.find((x) => x.id === b.dataset.folder)
+    if (g) { pages().go(`focus/${g.tab}/${g.key}`); return }
+    if (b.hasAttribute('data-all')) { openAll(); return }
     if (b.dataset.sample) { say(`${b.dataset.sample} opens in the ANTZ app — not part of this preview`); return }
     const r = recOf(b.dataset.aaid); if (r) openAnimal(r)
   })
-  edit.addEventListener('click', openSheet)
+  const openAll = () => (cur === 'recent' ? openSheet() : pages().go(`focus/${cur}`))
+  edit.addEventListener('click', openAll)   /* the web's View all in the band's head clicks this */
   addEventListener('antz:animals', () => { draw(); if (sh && sh.body.isConnected && sh.body.closest('.gsx-sheet:not([hidden])')) fill() })
   draw()
+  /* every photo the tabs can show, fetched once the page has settled, so a card never slides in blank */
+  setTimeout(() => { for (const r of new Set([...SEEDR.values(), ...seenAnimals(), ...favAnimals()])) if (hasPhoto(r)) new Image().src = img(r) }, 800)
   root.hidden = false
   return root
 }
@@ -44087,6 +44162,9 @@ __x.canFavourite = canFavourite
 __x.isFavAnimal = isFavAnimal
 __x.setFavAnimal = setFavAnimal
 __x.sawAnimal = sawAnimal
+/* what the My Focus Hub page draws (ModulePages.js, #m/focus) */
+__x.focus = { ENC, RECS, NOTE, GROUPS, FOLDER_ICON, favAnimals, animalOf, nameOf, hasPhoto, face, SEX_A, SEX_TAG,
+  latinOf: (sp) => DB.species(sp)?.latin || '' }
 });
 
 __def('js/components/Necropsy.js', function (__x, __req) {
@@ -49298,6 +49376,110 @@ function morDays(el, keys, S, ev, avg, pick) {
     (v[i][2] ? `<p style="--c:${INK[2]}"><i></i><span>Not referred</span><b>${fmt(v[i][2])}</b></p>` : '') + `<p class="is-t"><span>Deaths</span><b>${fmt(tot[i])}</b></p><p class="is-hint"><span>${tot[i] ? (S.day === days[i] ? 'Tap to show every day' : 'Tap to see this day') : 'No deaths recorded'}</span></p>`)
   f.svg.style.cursor = 'pointer'
   f.svg.addEventListener('click', (e) => { const r = f.svg.getBoundingClientRect(), i = Math.floor((e.clientX - r.left - f.pl) / f.bw); if (i >= 0 && i < days.length && tot[i]) pick(days[i]) })
+}
+
+/* ══ MY FOCUS HUB (owner, 2 Nov 2026: "if I click it has to go to the same
+   page — My Focus Hub", over four screens of the ANTZ app) ═══════════════
+   The home band's View all, a kind of bookmark and a folder open here, where
+   they point. The app's screen as it is: three tabs with their counts —
+   Favourites, Bookmarks, Folders; Favourites' Animals · Enclosures and
+   Bookmarks' Notes · Medical Record · Lab Request; a search with its filter;
+   white cards on the app's mint-grey ground; a folder the app's yellow
+   folder. Its records are the band's (Favourites.js, MY FOCUS HUB'S
+   RECORDS) — SAMPLE, but for the favourite animals, this browser's own.
+     #m/focus/fav[/animals|enclosures] · #m/focus/book[/notes|medical|lab]
+     #m/focus/folders · #m/focus/folders/<folder> */
+const fhIcon = (k, on) => `<svg viewBox="0 0 24 24" fill="${on ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true">${{
+  fav: '<path d="M12 3.8l2.5 5.1 5.6.8-4.05 3.95.96 5.6L12 16.6l-5.01 2.65.96-5.6L3.9 9.7l5.6-.8z"/>',
+  book: '<path d="M7 3.8h10a1 1 0 0 1 1 1V20l-6-3.8L6 20V4.8a1 1 0 0 1 1-1z"/>',
+  folders: '<path d="M3.5 7.2a2 2 0 0 1 2-2h3.8l2 2.2h7.2a2 2 0 0 1 2 2v7.6a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>' }[k]}</svg>`
+ROUTES.focus = (parts) => {
+  const F = __req('js/components/Favourites.js').focus
+  const tab = ['fav', 'book', 'folders'].includes(parts[0]) ? parts[0] : 'fav'
+  const animals = F.favAnimals(), encl = Object.keys(F.ENC)
+  const kinds = F.GROUPS.filter((g) => g.tab === 'book'), folders = F.GROUPS.filter((g) => g.tab === 'folders')
+  const folder = tab === 'folders' && parts[1] ? folders.find((g) => g.key === parts[1]) || null : null
+  const sub = tab === 'fav' ? (parts[1] === 'enclosures' ? 'enclosures' : 'animals') : tab === 'book' ? (kinds.find((g) => g.key === parts[1]) || kinds[0]).key : folder?.key || ''
+  const S = st(`focus:${tab}/${sub}`)
+  const q = S.q.toLowerCase(), hit = (...t) => !q || t.some((x) => String(x ?? '').toLowerCase().includes(q))
+  /* a tab or a chip takes the page's place; a folder is a step deeper, so Back comes out of it */
+  const to = (path, swap = true) => `href="#m/${esc(path)}" data-go="${esc(path)}"${swap ? ' data-replace' : ''}`
+
+  /* ── the cards, as the app draws them (owner, 2 Nov 2026: "match my reference
+     image accurate" — every size measured off the app's own 402-wide screens) ── */
+  /* the sex the app's way: a solid tile, its letter white — Secondary for M, Tertiary for F */
+  const sexTag = (r) => `<em class="fh-sex" data-s="${F.SEX_TAG[r.sex]?.[1] || 'u'}" title="${F.SEX_A[r.sex] || 'Undetermined'}">${F.SEX_TAG[r.sex]?.[0] || 'UD'}</em>`
+  const zoom = '<svg class="fh-zoom" viewBox="0 0 12 12" aria-hidden="true"><path d="M11 3.5V11H3.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="square"/></svg>'
+  const animal = (r) => { const go = `species/${encodeURIComponent(r.sp)}/population?aaid=${r.aaid}`, lat = F.latinOf(r.sp)
+    return `<a class="fh-card fh-animal" ${to(go, false)}><span class="fh-ph">${F.face(r, 'fh-img')}${sexTag(r)}${F.hasPhoto(r) ? zoom : ''}</span>` +
+      `<span class="fh-txt"><b class="fh-aaid">AAID: ${r.aaid}</b><span>Name: ${esc(F.nameOf(r))}</span><span>${esc(r.sp)}</span>` +
+      (lat ? `<i>${esc(lat)}</i>` : '') + (r.encl ? `<span>Encl: ${esc(r.encl)}</span>` : '') + `</span></a>` }
+  const enclosure = (k) => { const [name, aaid] = F.ENC[k], r = aaid ? F.animalOf(aaid) : null
+    return `<button type="button" class="fh-card fh-row" data-act="sample" data-what="${esc(name)}"><span class="fh-ph is-round">${F.face(r, 'fh-img')}</span><b>${esc(name)}</b></button>` }
+  /* a note: the app's note card — the photo with its category, title, writer
+     and age over a dark foot and a "!" when flagged; the site; two lines of
+     it with Read More; likes, comments and the yellow bookmark */
+  const note = (k, n) => { const [, title, aaid] = F.RECS[k], r = F.animalOf(aaid)
+    return `<article class="fh-note"><button type="button" class="fh-note__ph" data-act="sample" data-what="${esc(`Note: ${title}`)}">${F.face(r, 'fh-img')}` +
+        `<span class="fh-note__over"><b>${esc(n.cat)}</b><span>${esc(title)}</span><small><strong>${esc(n.by)}</strong> • ${esc(n.ago)}</small></span>` +
+        (n.flag ? `<em class="fh-note__flag" title="Flagged">!</em>` : '') + `</button>` +
+      `<div class="fh-note__site"><img src="assets/img/hero-banner.jpg" alt=""><span><b>${esc(n.site)}</b><small>Site</small></span></div>` +
+      `<p class="fh-note__txt">${esc(n.text)} <button type="button" class="fh-note__more" data-act="sample" data-what="${esc(`Note: ${title}`)}">Read More</button></p>` +
+      `<div class="fh-note__acts"><span><img src="assets/icon/ann-like.svg" alt="Likes">${n.likes}</span><span><img src="assets/icon/obs-comment.svg" alt="Comments">${n.comments}</span>` +
+        `<img class="fh-note__saved" src="assets/icon/fh-bookmark-on.svg" alt="Bookmarked"></div></article>` }
+  const record = (k) => { const [kind, title, aaid] = F.RECS[k], r = F.animalOf(aaid)
+    if (F.NOTE[k]) return note(k, F.NOTE[k])
+    return `<button type="button" class="fh-card fh-rec" data-act="sample" data-what="${esc(`${kind}: ${title}`)}"><span class="fh-ph is-sm">${F.face(r, 'fh-img')}</span>` +
+      `<span class="fh-txt"><em class="fh-kind">${esc(kind)}</em><b>${esc(title)}</b><span>${r ? `${esc(F.nameOf(r))} · AAID ${r.aaid}` : ''}</span></span>` +
+      `<img class="fh-saved" src="assets/icon/fh-bookmark-on.svg" alt="Bookmarked"></button>` }
+  const folderRow = (g) => `<a class="fh-card fh-frow" ${to(`focus/folders/${g.key}`, false)}>${F.FOLDER_ICON}<b>${esc(g.name)}</b><em>${g.items.length}</em></a>`
+  /* what a key in a folder is, and what its search reads */
+  const textOf = (k) => {
+    if (k[0] === 'a') { const r = F.animalOf(k.slice(1)); return r ? [r.aaid, F.nameOf(r), r.sp, r.encl] : [] }
+    if (F.ENC[k]) return [F.ENC[k][0]]
+    const x = F.RECS[k], r = x && F.animalOf(x[2])
+    return x ? [x[0], x[1], r && F.nameOf(r), r?.aaid] : []
+  }
+  const cardOf = (k) => k[0] === 'a' ? (F.animalOf(k.slice(1)) ? animal(F.animalOf(k.slice(1))) : '') : F.ENC[k] ? enclosure(k) : F.RECS[k] ? record(k) : ''
+  const none = (t) => `<div class="fh-empty">${esc(t)}</div>`
+  /* `kind` names the list's own spacing (review.css): is-rows the enclosures, is-notes the notes, is-folders the folders */
+  const list = (items, draw, nothing, kind = '') => { const shown = items.filter((x) => hit(...textOf(x)))
+    return shown.length ? `<div class="fh-list${kind ? ` ${kind}` : ''}">${shown.map(draw).join('')}</div>` : none(q ? 'Nothing here matches the search' : nothing) }
+
+  /* ── the top: tabs, then the tab's own chips, then the search ── */
+  const tabsRow = `<nav class="fh-tabs" role="tablist" aria-label="My Focus Hub">` + [
+      ['fav', 'Favourites', animals.length + encl.length], ['book', 'Bookmarks', kinds.reduce((t, g) => t + g.items.length, 0)], ['folders', 'Folders', folders.length]]
+    .map(([k, l, n]) => `<a class="fh-tab" role="tab" aria-selected="${k === tab}" ${to(`focus/${k}`)}>${fhIcon(k, k === tab)}<span>${l} - ${n}</span></a>`).join('') + `</nav>`
+  const chips = (list, even) => `<div class="fh-chips${even ? ' is-even' : ''}" role="group">` +
+    list.map(([path, l, n, on]) => `<a class="fh-chip" aria-pressed="${on}" ${to(path)}>${esc(l)} - ${n}</a>`).join('') + `</div>`
+  const find = (ph, filter = true) => `<div class="fh-find"><label class="fh-search">${I.search}<input type="search" data-q placeholder="${esc(ph)}" value="${esc(S.q)}" autocomplete="off" enterkeyhint="search" aria-label="${esc(ph)}"></label>` +
+    (filter ? `<button type="button" class="fh-fbtn" data-act="filters" aria-label="Filters">${SR_FILT}</button>` : '') + `</div>`
+
+  let top = '', ground = ''
+  if (folder) {
+    top = find(`Search in ${folder.name}`, false)
+    ground = list(folder.items, cardOf, `${folder.name} is empty`)
+  } else if (tab === 'fav') {
+    top = tabsRow + chips([['focus/fav/animals', 'Animals', animals.length, sub === 'animals'], ['focus/fav/enclosures', 'Enclosures', encl.length, sub === 'enclosures']], true) + find('Search')
+    ground = sub === 'animals' ? list(animals.map((r) => `a${r.aaid}`), cardOf, 'Star an animal to keep it here') : list(encl, enclosure, 'No favourite enclosures yet', 'is-rows')
+  } else if (tab === 'book') {
+    const g = kinds.find((x) => x.key === sub)
+    top = tabsRow + chips(kinds.map((x) => [`focus/book/${x.key}`, x.name, x.items.length, x === g])) + find('Search')
+    ground = list(g.items, record, `No ${g.name} bookmarked yet`, g.key === 'notes' ? 'is-notes' : '')
+  } else {
+    top = tabsRow + find('Search by folder name', false)
+    const shown = folders.filter((g) => hit(g.name))
+    ground = `<div class="fh-ghead"><b>Folders - ${folders.length}</b><button type="button" class="fh-create" data-act="create">${I.plus}Create new</button></div>` +
+      (shown.length ? `<div class="fh-list is-folders">${shown.map(folderRow).join('')}</div>` : none('No folder has that name'))
+  }
+  return { title: folder ? folder.name : 'My Focus Hub', layout: 'focus',
+    html: `<div class="fh"><div class="fh-top">${top}</div><div class="fh-ground">${ground}</div></div>`,
+    mount(root) {
+      wire(root, { onQuery: (v) => { S.q = v; refresh() },
+        onFilters: () => toast('Filters open in the ANTZ app — not part of this preview'),
+        on: { sample: (b) => toast(`${b.dataset.what} opens in the ANTZ app — not part of this preview`),
+          create: () => toast('New folders are made in the ANTZ app — not part of this preview') } })
+    } }
 }
 
 const INSIGHT_TO = { natality: 'natality', mortality: 'deaths', vaccination: 'medical/vaccination/pending', deworming: 'medical/deworming/pending', admin: 'medical' }
@@ -57505,6 +57687,37 @@ if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
   __ag.src = 'tools/agentation/agentation.js'; __ag.defer = true;
   document.body.appendChild(__ag);
 }
+</script>
+<script>
+/* COPY TO FIGMA (owner, 2 Nov 2026: "add Figma copy toolbar") — a design tool,
+   on localhost only, as in the Kitchen prototype (src/components/FigmaCopy.tsx).
+   It loads Figma's own capture script (html-to-design) in clipboard mode: the
+   screen is copied as Figma layers, to paste with Cmd+V in any Figma file, and
+   nothing is sent to Figma. With a page open (My Focus Hub, a module) it copies
+   that page; after the first copy Figma's bar stays at the top with "Entire
+   screen" and "Select element" to copy one part. data-h2d-ignore keeps the
+   button out of the copy. */
+if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) (function () {
+  var SRC = 'https://mcp.figma.com/mcp/html-to-design/capture.js'
+  var s = document.createElement('script'); s.src = SRC; s.async = true; document.head.appendChild(s)
+  var b = document.createElement('button')
+  b.type = 'button'; b.className = 'figma-copy'; b.setAttribute('data-h2d-ignore', 'true')
+  b.setAttribute('aria-label', 'Copy to Figma'); b.title = 'Copy this screen to Figma (paste with Cmd+V)'
+  var label = '<span>Copy to Figma</span>'
+  b.innerHTML = '<svg width="12" height="18" viewBox="0 0 38 57" aria-hidden="true">' +
+    '<path fill="#1ABCFE" d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z"/><path fill="#0ACF83" d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 1 1-19 0z"/>' +
+    '<path fill="#FF7262" d="M19 0v19h9.5a9.5 9.5 0 1 0 0-19H19z"/><path fill="#F24E1E" d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z"/>' +
+    '<path fill="#A259FF" d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z"/></svg>' + label
+  b.addEventListener('click', function () {
+    var capture = window.figma && window.figma.captureForDesign
+    if (!capture || b.disabled) return
+    var open = document.querySelector('.mpage:not([hidden])')
+    b.disabled = true; b.lastChild.textContent = 'Copying…'
+    Promise.resolve(capture({ selector: open ? '.mpage:not([hidden])' : 'body' }))
+      .catch(function () {}).then(function () { b.disabled = false; b.lastChild.textContent = 'Copy to Figma' })
+  })
+  document.body.appendChild(b)
+})()
 </script>
 </body>
 </html>
